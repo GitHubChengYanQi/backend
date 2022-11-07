@@ -682,5 +682,17 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/templateLibrary/createNotice'),
     meta: { title: '设置通知模板' }
+  },
+  '/lossingCustomer/index': {
+    path: '/lossingCustomer/index',
+    name: '流失客户',
+    component: () => import('@/views/lossingCustomer/index'),
+    meta: { title: '流失客户' }
+  },
+  '/lossAnalysis/index': {
+    path: '/lossAnalysis/index',
+    name: '流失分析',
+    component: () => import('@/views/lossAnalysis/index'),
+    meta: { title: '流失分析' }
   }
 }

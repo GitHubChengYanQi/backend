@@ -12,7 +12,7 @@
       style="width: 100%"
       :tree-data="treeData"
       tree-checkable
-      placeholder="请选择门店"
+      :placeholder="placeholder"
       :maxTagCount="1"
       :show-checked-strategy="SHOW_PARENT"
       :replaceFields="replaceFields"
@@ -40,6 +40,10 @@ export default {
       default: () => {
         return false
       }
+    },
+    placeholder: {
+      type: String,
+      default: '请选择门店'
     }
   },
   watch: {
@@ -69,7 +73,7 @@ export default {
   },
   methods: {
     departmentList () {
-      departmentList().then(res => {
+      departmentList().then((res) => {
         this.treeData = res.data
       })
     },
@@ -88,5 +92,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 </style>
