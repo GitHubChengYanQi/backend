@@ -19,7 +19,6 @@
               class="input"
               :treeCheckStrictly="true"
               :placeholder="item.placeholder"
-              @getDept="getDept"
               v-model="search.data[item.key]"
               v-if="item.type == 'selct_checkbox'"
             />
@@ -357,9 +356,6 @@ export default {
     }
   },
   methods: {
-    getDept (e) {
-      this.storeIds = e
-    },
     getSearch () {
       console.log(this.search.data)
     },
