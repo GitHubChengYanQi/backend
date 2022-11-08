@@ -5,6 +5,25 @@ export const routeList = {
     component: () => import('@/views/corp/index'),
     meta: { title: '企业微信授权' }
   },
+  '/dict/dictData': {
+    path: '/dict/dictData',
+    name: 'dictData',
+    component: () => import('@/views/dict/dictData'),
+    meta: { title: '普通字典' }
+  },
+  '/dict/dictDataDetail': {
+    path: '/dict/dictDataDetail',
+    name: 'dictDataDetail',
+    hidden: true,
+    component: () => import('@/views/dict/dictDataDetail'),
+    meta: { title: '普通字典详情' }
+  },
+  '/dict/dictTree': {
+    path: '/dict/dictTree',
+    name: 'dictTree',
+    component: () => import('@/views/dict/dictTree'),
+    meta: { title: '多级字典' }
+  },
   '/corp/create': {
     path: '/corp/create',
     name: 'corpCreate',
