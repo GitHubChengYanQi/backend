@@ -28,6 +28,18 @@
           </div>
         </template>
       </div>
+      <div slot="showExecuteVal" slot-scope="text, record">
+        <a-popover title="执行字段">
+          <template slot="content">
+            <div class="labelBox">
+              {{ text }}
+            </div>
+          </template>
+          <a-tag type="button">
+            查看
+          </a-tag>
+        </a-popover>
+      </div>
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
@@ -139,7 +151,8 @@ export default {
           title: '执行字段',
           align: 'center',
           dataIndex: 'showExecuteVal',
-          width: 250
+          width: 250,
+          scopedSlots: { customRender: 'showExecuteVal' }
         },
         {
           title: '启用',
@@ -389,4 +402,10 @@ export default {
 </style>
 <style lang="less" scoped>
 @import '../index.less';
+.labelBox{
+  width:400px;
+  span{
+    margin-bottom:10px;
+  }
+}
 </style>

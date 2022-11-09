@@ -208,7 +208,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .taskPrize {
   .search {
     width: 100%;
@@ -259,6 +259,12 @@ export default {
         white-space: nowrap;
       }
     }
+  }
+}
+.labelBox{
+  width:400px;
+  span{
+    margin-bottom:10px;
   }
 }
 </style>
