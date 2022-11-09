@@ -132,9 +132,20 @@ const vueConfig = {
       '/api': {
         target: 'https://apijavascrm.yifeijiankang.com/',
         // target: 'https://testscrmapi.yifeijiankang.com/',
+<<<<<<< HEAD
         target: 'http://192.168.31.253:6007/',
         // target: 'http://124.70.77.92:6007/',
         // target: 'http://192.168.31.16:6007/',
+=======
+        // target: 'http://192.168.31.248:6007/',
+<<<<<<< HEAD
+        target: 'http://124.70.77.92:6007/',
+        // target: 'http://192.168.31.253:6007/',
+=======
+        // target: 'http://124.70.77.92:6007/',
+        target: 'http://192.168.31.18:6007/',
+>>>>>>> de95f590e76862e2033a84e21f312e037566c7da
+>>>>>>> main
         // target: 'http:/192.168.50.143:6001/',
         // target: 'http://192.168.50.143:6007/',
         ws: false,
