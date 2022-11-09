@@ -64,21 +64,37 @@
             <div>{{ mobile }}</div>
           </div>
           <div slot="employeeNames" slot-scope="employeeNames">
-            <More :show="employeeNames.length > 3" :height="26">
-              <a-tag v-for="(v,i) in employeeNames" :key="i" class="tag-box">
-                {{ v }}
-              </a-tag>
-            </More>
+            <template>
+              <a-popover title="所属员工" v-if="employeeNames.length > 0">
+                <template slot="content">
+                  <div class="labelBox">
+                    <a-tag v-for="(item, index) in employeeNames" :key="index">{{ item }}</a-tag>
+                  </div>
+                </template>
+                <a-tag type="button">
+                  查看
+                </a-tag>
+              </a-popover>
+              <span class="nolabel" v-else>无员工</span>
+            </template>
           </div>
           <div slot="createdAt" slot-scope="createdAt">
             <div>{{ timeFormat(createdAt) }}</div>
           </div>
           <div slot="categoryResults" slot-scope="categoryResults">
-            <More :show="categoryResults.length > 3" :height="26">
-              <a-tag v-for="(item,i) in categoryResults" :key="i" class="tag-box">
-                {{ item.name }}
-              </a-tag>
-            </More>
+            <template>
+              <a-popover title="患者分组" v-if="categoryResults.length > 0">
+                <template slot="content">
+                  <div class="labelBox">
+                    <a-tag v-for="(item, index) in categoryResults" :key="index">{{ item.name }}</a-tag>
+                  </div>
+                </template>
+                <a-tag type="button">
+                  查看
+                </a-tag>
+              </a-popover>
+              <span class="nolabel" v-else>无分组</span>
+            </template>
           </div>
           <div slot="planList" slot-scope="planList">
             <More :show="planList.length > 3" :height="26">
@@ -96,7 +112,7 @@
                     <a-menu-item key="1" v-permission="'/ollowUp/patient2#detail1'" @click="open(1,record)"> 添加患者分组 </a-menu-item>
                     <a-menu-item key="2" v-permission="'/ollowUp/patient2#detail2'" @click="open(3,record)"> 删除患者分组 </a-menu-item>
                     <a-menu-item key="3" v-permission="'/ollowUp/patient2#detail3'" @click="open(4,record)"> 添加随访方案 </a-menu-item>
-                    <a-menu-item key="4" v-permission="'/ollowUp/patient2#detail4'"@click="open(5,record)"> 健康档案 </a-menu-item>
+                    <a-menu-item key="4" v-permission="'/ollowUp/patient2#detail4'" @click="open(5,record)"> 健康档案 </a-menu-item>
                   </a-menu>
                   <a-button type="primary" ghost>更多<a-icon type="down" /></a-button>
                 </a-dropdown>
@@ -408,5 +424,11 @@ export default {
   padding: 0 6px;
   height: 23px;
   margin-bottom: 4px;
+}
+.labelBox{
+  width:400px;
+  span{
+    margin-bottom:10px;
+  }
 }
 </style>
