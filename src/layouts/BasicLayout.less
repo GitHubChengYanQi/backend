@@ -1,4 +1,4 @@
-@import "~ant-design-vue/es/style/themes/default.less";
+@import '~ant-design-vue/es/style/themes/default.less';
 .breadcrumb-wrapper {
   // background: #fff;
   height: 40px;
@@ -34,13 +34,25 @@
     letter-spacing: normal;
     color: #333333;
   }
+  .default {
+    font-family: PingFang SC-Medium, PingFang SC;
+    font-weight: 500;
+    color: #999999;
+    line-height: 30px;
+  }
+  .pitch {
+    font-family: PingFang SC-Medium, PingFang SC;
+    font-weight: 500;
+    color: #444444;
+    line-height: 30px;
+  }
 }
 .ant-pro-global-header-index-right {
   margin-right: 8px;
 
   &.ant-pro-global-header-index-dark {
     .ant-pro-global-header-index-action {
-      color: hsla(0, 0%, 100%, .85);
+      color: hsla(0, 0%, 100%, 0.85);
 
       &:hover {
         background: #1890ff;
@@ -68,59 +80,59 @@
     }
   }
 }
-.ant-layout.sidemenu{
-  .ant-layout-header{
-    .ant-pro-global-header{
+.ant-layout.sidemenu {
+  .ant-layout-header {
+    .ant-pro-global-header {
       display: flex;
       align-content: center;
       justify-content: center;
       background: #001529;
       // #fff #001529
       // 控制菜单开关
-      .ant-pro-global-header-trigger{
+      .ant-pro-global-header-trigger {
         display: flex;
         flex: 0 0 68px;
         padding-top: 23px;
-        .anticon.anticon-menu-fold{
+        .anticon.anticon-menu-fold {
           // display: block;
           color: #fff;
         }
-        .anticon.anticon-menu-unfold{
+        .anticon.anticon-menu-unfold {
           color: #fff;
         }
       }
       // 头部路由
-      .header.ant-layout-header{
+      .header.ant-layout-header {
         flex: 1;
         padding: 0;
-        .ant-menu-item.ant-menu-item-selected{
+        .ant-menu-item.ant-menu-item-selected {
           color: #fff;
         }
       }
       // 右侧功能组件
-      .ant-pro-global-header-index-right.ant-pro-global-header-index-light{
+      .ant-pro-global-header-index-right.ant-pro-global-header-index-light {
         flex: 0 0 600px;
         margin: 0;
         color: #fff;
-        .select{
+        .select {
           max-width: 180px;
         }
       }
     }
   }
 }
-footer.ant-layout-footer{
-  width:0;
-  height:0;
-  overflow:hidden;
-  padding:0 !important;
+footer.ant-layout-footer {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  padding: 0 !important;
   .footer {
     text-align: center;
     color: #212943;
     font-size: 16px;
     font-weight: 400;
-    width:0;
-    height:0;
+    width: 0;
+    height: 0;
     overflow: hidden;
   }
 }
@@ -149,7 +161,7 @@ footer.ant-layout-footer{
       justify-content: center;
       img {
         width: 142px;
-        padding: 3px 0
+        padding: 3px 0;
       }
       h1 {
         display: none;
@@ -159,5 +171,5 @@ footer.ant-layout-footer{
 }
 
 .ant-select-selection {
-  height: 100%!important;
+  height: 100% !important;
 }

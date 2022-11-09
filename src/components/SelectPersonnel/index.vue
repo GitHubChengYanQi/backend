@@ -26,6 +26,7 @@
       :open="false"
       :showArrow="true"
       :allowClear="true"
+      style="width:100%"
       @click.native="openModal"
       @change="onChange"
       placeholder="请选择员工"
