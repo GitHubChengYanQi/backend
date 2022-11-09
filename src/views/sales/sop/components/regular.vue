@@ -28,7 +28,7 @@
           </div>
         </template>
       </div>
-      <div slot="showExecuteVal" slot-scope="text, record">
+      <div slot="showExecuteVal" slot-scope="text">
         <a-popover title="执行字段">
           <template slot="content">
             <div class="labelBox">

@@ -142,7 +142,7 @@ export default {
         this.expandedKeys = []
         this.backupsExpandedKeys = []
         const candidateKeysList = this.getkeyList(this.searchValue, this.treeData, [])
-        
+
         candidateKeysList.forEach(
           (item) => {
             const key = this.getParentKey(item, this.treeData)
