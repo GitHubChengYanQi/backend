@@ -16,11 +16,6 @@
         <div class="fl">
           <!-- tree -->
           <a-input-search v-model="searchStr" :placeholder="placeholder" @search="onSearch"></a-input-search>
-          <!-- <div class="searchList">
-            <ul>
-              <li v-for=""></li>
-            </ul>
-          </div> -->
           <!-- selectedKeys是选中项key的集合，expandedKeys是展开项key的集合 -->
           <a-tree
             multiple

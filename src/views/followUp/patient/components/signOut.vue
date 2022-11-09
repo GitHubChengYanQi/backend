@@ -97,11 +97,19 @@
             </template>
           </div>
           <div slot="planList" slot-scope="planList">
-            <More :show="planList.length > 3" :height="26">
-              <a-tag v-for="(item,i) in planList" :key="i" class="tag-box" style="color: #1890ff;" @click="toDetail(item)">
-                {{ item.planName }}
-              </a-tag>
-            </More>
+            <template>
+              <a-popover title="随访方案" v-if="planList.length > 0">
+                <template slot="content">
+                  <div class="labelBox">
+                    <a-tag v-for="(item, index) in planList" class="tag-box" style="color: #1890ff;" :key="index" @click="toDetail(item)">{{ item.planName }}</a-tag>
+                  </div>
+                </template>
+                <a-tag type="button">
+                  查看
+                </a-tag>
+              </a-popover>
+              <span class="nolabel" v-else>无方案</span>
+            </template>
           </div>
           <div slot="action" class="action" slot-scope="text, record">
             <template>
