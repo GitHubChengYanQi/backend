@@ -2,8 +2,9 @@
   <div>
     <a-modal v-model="visible" :title="title" @ok="handleOk" :width="400" :destroyOnClose="true">
       <div class="dateContent" v-if="type == 3">
-        <span>选择发送日期 : </span>
-        <a-date-picker v-model="dateTime" />
+        <span style="width:135px">选择发送日期 : </span>
+        <a-date-picker v-model="dateTime" format="YYYY-MM-DD" />
+        <a-time-picker v-model="time" format="HH:mm" :minuteStep="15" :allowClear="false" />
       </div>
       <a-input-search :placeholder="placeholder" v-model="searchVal" @search="onSearch" @change="nameChange"/>
       <a-spin :spinning="loading">
@@ -42,6 +43,7 @@
 <script>
 import { planPlanList, planBindAddBatch, diagnosisCareQuestionnaireList, taskAdd } from '@/api/healthManage'
 import infiniteScroll from '@/utils/directive'
+import moment from 'moment'
 export default {
   // eslint-disable-next-line
   props: ['contactId'],
@@ -58,6 +60,7 @@ export default {
       id: '', // 所需ID
       placeholder: '',
       dateTime: '',
+      time: '',
       loading: false,
       busy: false,
       userListPagination: {
@@ -187,12 +190,18 @@ export default {
       this.$emit('updataPage')
     },
     async addQuestionnaire () {
+      let date = ''
+      if (this.dateTime && this.time) {
+        date = moment(this.dateTime).format('YYYY-MM-DD') + ' ' + moment(this.time).format('HH:mm') + ':00'
+      } else {
+        this.$message.error('请选择发送日期')
+      }
       const { code } = await taskAdd({
         formId: this.currentId,
         type: 1,
         contactId: this.contactId,
         planId: this.id,
-        startTime: this.dateTime
+        startTime: date
       })
       this.visible = false
       if (code === 200) {
@@ -213,7 +222,7 @@ export default {
   flex-direction: row;
   align-items: center;
 
-  span {
+  &>span {
     margin-right: 15px;
   }
 }
