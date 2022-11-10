@@ -3,19 +3,19 @@
     <a-card title="数据筛选">
       <a-row>
         <a-col :span="6">
-          <a-input v-model="searchInfo.typeCode" placeholder="请输入分类编码"></a-input>
+          <a-input v-model="searchInfo.dictCode" placeholder="请输入字典编码"></a-input>
         </a-col>
         <a-col :span="6" :offset="1">
-          <a-input v-model="searchInfo.typeName" placeholder="请输入字典编码"></a-input>
+          <a-input v-model="searchInfo.dictName" placeholder="请输入字典名称"></a-input>
         </a-col>
         <a-col :span="6" :offset="1">
-          <a-button type="primary" style="marginRight:10px" @click="search">查询</a-button>
-          <a-button @click="resetSearch">重置</a-button>
+          <a-button type="primary" style="marginRight:10px" @click="search" v-permission="'/dictType/common/getDataList@post'">查询</a-button>
+          <a-button @click="resetSearch" v-permission="'/dictType/common/getDataList@post'">重置</a-button>
         </a-col>
       </a-row>
       <div class="table-wrapper">
         <div class="top-btn">
-          <a-button class="batch" type="primary" @click="add">添加</a-button>
+          <a-button class="batch" type="primary" @click="add" v-permission="'/dictType/common/addData@post'">添加</a-button>
         </div>
         <a-table
           bordered
@@ -25,12 +25,16 @@
           :pagination="pagination"
           @change="handleTableChange"
         >
-          <div slot="options" slot-scope="text, record">
+          <div slot="isDefault" slot-scope="text, record">
+            <template>
+              <div>{{ returnDefault(record.isDefault) }}</div>
+            </template>
+          </div>
+          <div slot="options" slot-scope="record">
             <template>
               <div style="display: flex;justify-content: space-around;">
-                <a-button type="link" @click="goDetail(record)">详情</a-button>
-                <a-button type="link" @click="editItem(record)">编辑</a-button>
-                <a-button type="link" @click="deleteItem(record.id)">删除</a-button>
+                <a-button type="link" @click="editItem(record)" v-permission="'/dictType/common/modifyData@post'">编辑</a-button>
+                <a-button type="link" @click="deleteItem(record.id)" v-permission="'/dictType/common/deleteData@get'">删除</a-button>
               </div>
             </template>
           </div>
@@ -38,11 +42,11 @@
       </div>
     </a-card>
     <a-modal
-      :title="menuShowTitle"
+      :title="modelShowTitle"
       :maskClosable="false"
       :width="500"
-      :visible="menuShow"
-      @cancel="menuShow = false"
+      :visible="modelShowStatus"
+      @cancel="resetForm"
     >
       <a-form-model
         class="form"
@@ -55,33 +59,53 @@
           label="分类编码"
           prop="typeCode"
           required>
-          <a-input v-model.trim="info.typeCode" :maxLength="10" placeholder="请输入分类编码"></a-input>
+          <a-input disabled v-model.trim="info.typeCode" placeholder="请输入分类编码"></a-input>
         </a-form-model-item>
         <a-form-model-item
           label="字典编码"
-          prop="typeName"
+          prop="dictCode"
           required>
-          <a-input v-model.trim="info.typeName" placeholder="请输入字典编码"></a-input>
+          <a-input :disabled="modelShowTitle === '修改字典'" v-model.trim="info.dictCode" :maxLength="10" placeholder="请输入字典编码"></a-input>
+        </a-form-model-item>
+        <a-form-model-item
+          label="字典名称"
+          prop="dictName"
+          required>
+          <a-input v-model.trim="info.dictName" placeholder="请输入字典名称"></a-input>
         </a-form-model-item>
         <a-form-model-item
           label="字典排序"
-          prop="typeSort"
+          prop="dictSort"
           required>
-          <a-input-number class="inputNumberDiv" v-model.trim="info.typeSort" placeholder="请输入字典排序"></a-input-number>
+          <a-input-number class="inputNumberDiv" v-model.trim="info.dictSort" placeholder="请输入字典排序"></a-input-number>
         </a-form-model-item>
         <a-form-model-item
           label="字典描述"
-          prop="typeDesc"
+          prop="dictDesc"
           required>
-          <a-textarea v-model.trim="info.typeDesc" placeholder="请输入字典描述"></a-textarea>
+          <a-textarea v-model.trim="info.dictDesc" placeholder="请输入字典描述"></a-textarea>
+        </a-form-model-item>
+        <a-form-model-item
+          label="是否默认"
+          prop="isDefault">
+          <a-switch :checked="Boolean(info.isDefault)" :checkedValue="1" :unCheckedValue="0" @change="changeSwitch"/>
+          <!-- <a-textarea v-model.trim="info.dictDesc" placeholder="请输入字典描述"></a-textarea> -->
         </a-form-model-item>
       </a-form-model>
       <div slot="footer" class="footer">
         <template>
           <a-button
+            v-if="modelShowTitle === '新增字典'"
             type="link"
             @click="submit"
-            :loading="loading">
+            v-permission="'/dictType/common/addData@post'">
+            确认
+          </a-button>
+          <a-button
+            v-if="modelShowTitle === '修改字典'"
+            type="link"
+            @click="submit"
+            v-permission="'/dictType/common/modifyData@post'">
             确认
           </a-button>
           <a-button
@@ -97,7 +121,7 @@
 
 <script>
 import IconSelector from '@/components/IconSelector/IconSelector'
-// import { getDictData } from '@/api/dict'
+import { getDictData, addDictData, editDictData, deleteDictData } from '@/api/dict'
 
 const columns = [
   {
@@ -108,17 +132,28 @@ const columns = [
   {
     title: '字典编码',
     align: 'center',
-    dataIndex: 'typeName'
+    dataIndex: 'dictCode'
+  },
+  {
+    title: '字典名称',
+    align: 'center',
+    dataIndex: 'dictName'
   },
   {
     title: '字典排序',
-    dataIndex: 'typeSort',
+    dataIndex: 'dictSort',
     align: 'center'
   },
   {
     title: '字典描述',
     align: 'center',
-    dataIndex: 'typeDesc'
+    dataIndex: 'dictDesc'
+  },
+  {
+    title: '是否默认',
+    align: 'center',
+    dataIndex: 'isDefault',
+    scopedSlots: { customRender: 'isDefault' }
   },
   {
     title: '操作',
@@ -152,19 +187,25 @@ export default {
       value = this.info.typeCode
       createValidate(callback, value, '请输入分类编码')
     }
-    const vTypeName = (rule, value, callback) => {
-      value = this.info.typeName
+    const vDictCode = (rule, value, callback) => {
+      value = this.info.dictCode
       createValidate(callback, value, '请输入字典编码')
     }
-    const vTypeSort = (rule, value, callback) => {
-      value = this.info.typeSort
+    const vDictName = (rule, value, callback) => {
+      value = this.info.dictName
+      createValidate(callback, value, '请输入字典名称')
+    }
+    const vDictSort = (rule, value, callback) => {
+      value = this.info.dictSort
       createValidate(callback, value, '请输入字典排序')
     }
-    const vTypeDesc = (rule, value, callback) => {
-      value = this.info.typeDesc
+    const vDictDesc = (rule, value, callback) => {
+      value = this.info.dictDesc
       createValidate(callback, value, '请输入字典描述')
     }
     return {
+      // 从上页传入的对象
+      importInfo: JSON.parse(this.$route.query.importString),
       // 搜索对象
       searchInfo: {},
       // 表单新增/修改对象
@@ -180,33 +221,58 @@ export default {
         showSizeChanger: true
       },
       // 弹框显示状态
-      menuShow: false,
+      modelShowStatus: false,
       // 弹框标题
-      menuShowTitle: '',
+      modelShowTitle: '',
       loading: false,
       // 表单提交规则
       rules: {
         typeCode: createFunc(vTypeCode, 'change'),
-        typeName: createFunc(vTypeName, 'change'),
-        typeSort: createFunc(vTypeSort, 'change'),
-        typeDesc: createFunc(vTypeDesc, 'change')
+        dictCode: createFunc(vDictCode, 'change'),
+        dictName: createFunc(vDictName, 'change'),
+        dictSort: createFunc(vDictSort, 'change'),
+        dictDesc: createFunc(vDictDesc, 'change')
       },
       usedIconList: []
     }
   },
   watch: {
-    menuShow (value) {
+    modelShowStatus (value) {
       if (!value) {
-        this.loading = false
         this.$refs.ruleForm.clearValidate()
       }
     }
   },
   created () {
-    console.log(this.$route.query, '传递的参数')
-    this.getTableData()
+    // console.log(this.$route.query, '传递的参数')
+    if (this.importInfo.typeCode) {
+      console.log(this.importInfo, 'this.importInfo')
+      this.getTableData()
+    } else {
+      this.$message.error('缺少参数')
+    }
   },
   methods: {
+    returnDefault (text) {
+      let tempText = ''
+      if (Number(text) === 1) {
+        tempText = '是'
+      } else {
+        tempText = '否'
+      }
+      return tempText
+    },
+    // 切换开关
+    changeSwitch (e) {
+      console.log(e, '切换开关')
+      if (e) {
+        // 为true
+        this.$set(this.info, 'isDefault', 1)
+      } else {
+        // 为false
+        this.$set(this.info, 'isDefault', 0)
+      }
+    },
     // 切换页码
     handleTableChange ({ current, pageSize }) {
       this.pagination.current = current
@@ -216,19 +282,33 @@ export default {
     // 获取数据
     async getTableData () {
       const params = {
-        typeCode: this.searchInfo.typeCode ? this.searchInfo.typeCode : '',
-        typeName: this.searchInfo.typeName ? this.searchInfo.typeName : '',
+        dictCode: this.searchInfo.dictCode ? this.searchInfo.dictCode : '',
+        dictName: this.searchInfo.dictName ? this.searchInfo.dictName : '',
         page: this.pagination.current,
-        perPage: this.pagination.pageSize
+        perPage: this.pagination.pageSize,
+        typeCode: this.importInfo.typeCode
       }
       console.log(params, '查询数据提交接口的对象')
-      //   try {
-      //     const data = await menuList(params)
-      //     this.pagination.total = Number(data.data.page.total)
-      //     this.tableData = data.data.list
-      //   } catch (e) {
-      //     console.log(e)
-      //   }
+      await getDictData(params).then(response => {
+        this.tableLoading = false
+        console.log(response, '获取字典列表数据')
+        this.tableData = response.data.records
+        this.$set(this.pagination, 'total', Number(response.data.total))
+        this.$set(this.pagination, 'current', Number(response.data.current))
+        if (this.tableData.length === 0) {
+          // 列表中没有数据
+          if (this.pagination.total !== 0) {
+            // 总数据有,但当前页没有
+            // 重新将页码换成1
+            this.$set(this.pagination, 'current', 1)
+            this.getTableData()
+          } else {
+            // 是真没有数据
+          }
+        }
+      }).catch(() => {
+        this.tableLoading = false
+      })
     },
     // 搜索
     search () {
@@ -236,64 +316,84 @@ export default {
       this.getTableData()
     },
     // 修改数据
-    async editItem (menuId) {
-      console.log(menuId)
-      this.menuShow = true
-      this.menuShowType = 'edit'
-      this.menuShowTitle = '修改字典'
-      //   this.menuShow = true
-      //   this.menuShowType = 'edit'
-      //   this.menuShowTitle = '编辑菜单'
-      //   try {
-      //     const { data } = await menuDetail({ menuId })
-      //     Object.assign(this, data)
-      //     this.firstMenuChange()
-      //     this.secondMenuChange()
-      //     this.thirdMenuChange()
-      //   } catch (e) {
-      //     console.log(e)
-      //   }
-    },
-    // 查看字典详情
-    goDetail (info) {
-      console.log(info)
-      this.$router.push({ path: '/dict/dictDataDetail' })
+    async editItem (record) {
+      this.modelShowStatus = true
+      this.modelShowTitle = '修改字典'
+      const tempIndex = this.tableData.findIndex(item => item.id === record.id)
+      this.info = Object.assign({}, this.tableData[tempIndex])
+      this.$set(this.info, 'isDefault', Number(this.info.isDefault))
     },
     // 重置搜索
     resetSearch () {
-      this.$delete(this.searchInfo, 'typeName')
-      this.$delete(this.searchInfo, 'typeCode')
+      this.$delete(this.searchInfo, 'dictName')
+      this.$delete(this.searchInfo, 'dictCode')
+      this.$set(this.pagination, 'page', 1)
+      this.$set(this.pagination, 'perPage', 10)
+      this.getTableData()
     },
     // 重置提交表单
     resetForm () {
+      this.modelShowStatus = false
       this.info = {}
     },
     // 添加
     add () {
-      this.menuShow = true
-      this.menuShowType = 'add'
-      this.menuShowTitle = '新增字典'
+      this.modelShowStatus = true
+      this.modelShowTitle = '新增字典'
+      // this.$set(this.info, 'typeCode', this.importInfo.typeCode)
+      this.info = { typeCode: this.importInfo.typeCode, isDefault: 0 }
+    },
+    // 删除字典类型
+    deleteItem (id) {
+      const params = { id }
+      this.$confirm({
+        title: '确定删除所选内容?',
+        // content: 'Some descriptions',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          deleteDictData(params).then(response => {
+            console.log(response, '删除数据')
+            if (response.code === 200) {
+              this.$message.success('删除成功')
+              // this.pageIndex = 1
+              // this.sopName = ''
+              this.getTableData()
+            }
+          })
+        }
+      })
     },
     // 提交
     submit () {
+      console.log('提交')
       this.$refs.ruleForm.validate(async valid => {
         if (valid) {
-          console.log('提交', this.info)
-          // this.loading = true
-          // try {
-          //     if (this.menuShowType == 'add') {
-          //         this.menuShow = false
-          //         this.$message.success('添加成功')
-          //         this.getTableData()
-          //     } else {
-          //         this.menuShow = false
-          //         this.$message.success('修改成功')
-          //         this.getTableData()
-          //     }
-          // } catch (e) {
-          //     console.log(e)
-          //     this.loading = false
-          // }
+          console.log('可以提交', this.info)
+          if (this.modelShowTitle === '新增字典') {
+            addDictData(this.info).then(response => {
+              this.modelShowStatus = false
+              if (response.code === 200) {
+                this.$message.success('添加成功')
+                this.$set(this.pagination, 'page', 1)
+                this.$set(this.pagination, 'perPage', 10)
+                this.getTableData()
+              }
+            }).catch(() => {
+              this.modelShowStatus = false
+            })
+          } else if (this.modelShowTitle === '修改字典') {
+            editDictData(this.info).then(response => {
+              this.modelShowStatus = false
+              if (response.code === 200) {
+                this.$message.success('修改成功')
+                this.getTableData()
+              }
+            }).catch(() => {
+              this.modelShowStatus = false
+            })
+          }
         }
       })
     }
