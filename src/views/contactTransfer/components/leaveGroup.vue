@@ -13,6 +13,14 @@
                 <a-input v-model="screenData.roomName" placeholder="请输入要搜索的群名称"></a-input>
               </a-form-item>
             </a-col>
+            <a-col :lg="6">
+              <a-form-item
+                label="群主："
+                :labelCol="{lg: {span: 7} }"
+                :wrapperCol="{lg: {span: 17} }">
+                <a-input v-model="screenData.owner" placeholder="请输入要搜索的群主"></a-input>
+              </a-form-item>
+            </a-col>
             <a-col :lg="6" class="btnBox">
               <a-button type="primary" @click="search">查询</a-button>
               <a-button @click="resetSearch">重置</a-button>

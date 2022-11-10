@@ -43,7 +43,7 @@
               <span class="return_lt"></span>
               <span class="return">返回</span>
             </div>
-            <span v-if="item != true && item != 'isBack'">{{ item }}</span>
+            <span v-if="item != true && item != 'isBack'" :class="index + 1 == breadcrumb.length ? 'pitch':'default'">{{ item }}</span>
           </a-breadcrumb-item>
         </a-breadcrumb>
       </div>

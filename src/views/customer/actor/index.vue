@@ -15,6 +15,14 @@
             </a-col>
             <a-col :lg="6">
               <a-form-item
+                label="规则名称："
+                :labelCol="{lg: {span: 7} }"
+                :wrapperCol="{lg: {span: 17} }">
+                <a-input v-model="screenData.ruleName" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6">
+              <a-form-item
                 label="状态："
                 :labelCol="{lg: {span: 7} }"
                 :wrapperCol="{lg: {span: 17} }" >
@@ -42,7 +50,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :lg="6">
+            <!-- <a-col :lg="6">
               <a-form-item
                 label="执行人数："
                 :labelCol="{lg: {span: 7} }"
@@ -65,7 +73,7 @@
                   </a-select-option>
                 </a-select>
               </a-form-item>
-            </a-col>
+            </a-col> -->
           </a-row>
         </a-form>
       </div>

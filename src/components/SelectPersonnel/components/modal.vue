@@ -29,7 +29,7 @@
             checkable
           >
             <template slot="title" slot-scope="{name}">
-              <span v-if="name" v-html="name.replace(new RegExp(searchValue,'g'),'<span style=color:#f50>'+ searchValue +'</span>')"></span>
+              <span v-if="name" v-html="name.replace(new RegExp(searchValue,'g'),'<span style=color:#40a9ff>'+ searchValue +'</span>')"></span>
             </template>
           </a-tree>
           <!-- end tree -->
@@ -46,14 +46,13 @@
 </template>
 
 <script>
-import { deepClone } from '@/utils/util'
+import { deepClonev2 } from '@/utils/util'
 export default {
   data () {
     return {
       modalShow: false,
       loading: false,
       selected: [],
-
       replaceFields: { title: 'name' },
       expandedKeys: [],
       backupsExpandedKeys: [],
@@ -113,7 +112,7 @@ export default {
     }
   },
   methods: {
-    deepClone,
+    deepClonev2,
     handleOk () {
       const Multiple = this.$parent.multiple
       if (!Multiple && this.checkedKeys.length > 1) {
@@ -133,10 +132,12 @@ export default {
       this.searchValue = this.searchStr
       if (this.searchValue === '') {
         this.expandedKeys = []
+        this.setDisplay(this.treeData, [])
       } else {
         this.expandedKeys = []
         this.backupsExpandedKeys = []
         const candidateKeysList = this.getkeyList(this.searchValue, this.treeData, [])
+
         candidateKeysList.forEach(
           (item) => {
             const key = this.getParentKey(item, this.treeData)
@@ -150,6 +151,7 @@ export default {
           this.getAllParentKey(this.backupsExpandedKeys[i], this.treeData)
         }
         this.expandedKeys = this.backupsExpandedKeys.slice()
+        this.setDisplay(this.treeData, [...candidateKeysList, ...this.expandedKeys])
       }
     },
     // 获取节点中含有value的所有key集合
@@ -179,6 +181,24 @@ export default {
         }
       }
       return nodes
+    },
+    // 设置显示/隐藏
+    setDisplay (tree, keyList) {
+      for (let i = 0; i < tree.length; i++) {
+        const node = tree[i]
+        if (keyList.length === 0) {
+          delete node.style
+        } else {
+          if (keyList.indexOf(node.key) > -1) {
+            node['style'] = 'display: block'
+          } else {
+            node['style'] = 'display: none'
+          }
+        }
+        if (node.children) {
+          this.setDisplay(node.children, keyList)
+        }
+      }
     },
     // 该递归主要用于获取key的父亲节点的key值
     getParentKey (key, tree) {

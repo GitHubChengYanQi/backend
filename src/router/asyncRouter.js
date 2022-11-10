@@ -5,6 +5,32 @@ export const routeList = {
     component: () => import('@/views/corp/index'),
     meta: { title: '企业微信授权' }
   },
+  '/dict/dictData': {
+    path: '/dict/dictData',
+    name: 'dictData',
+    component: () => import('@/views/dict/dictData'),
+    meta: { title: '普通字典' }
+  },
+  '/dict/dictDataDetail': {
+    path: '/dict/dictDataDetail',
+    name: 'dictDataDetail',
+    hidden: true,
+    component: () => import('@/views/dict/dictDataDetail'),
+    meta: { title: '普通字典详情' }
+  },
+  '/dict/dictTreeType': {
+    path: '/dict/dictTreeType',
+    name: 'dictTreeType',
+    component: () => import('@/views/dict/dictTreeType'),
+    meta: { title: '多级字典分类' }
+  },
+  '/dict/dictTreeDict': {
+    path: '/dict/dictTreeDict',
+    name: 'dictTreeDict',
+    hidden: true,
+    component: () => import('@/views/dict/dictTreeDict'),
+    meta: { title: '多级字典详情' }
+  },
   '/corp/create': {
     path: '/corp/create',
     name: 'corpCreate',
@@ -682,5 +708,17 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/templateLibrary/createNotice'),
     meta: { title: '设置通知模板' }
+  },
+  '/lossingCustomer/index': {
+    path: '/lossingCustomer/index',
+    name: '流失客户',
+    component: () => import('@/views/lossingCustomer/index'),
+    meta: { title: '流失客户' }
+  },
+  '/lossAnalysis/index': {
+    path: '/lossAnalysis/index',
+    name: '流失分析',
+    component: () => import('@/views/lossAnalysis/index'),
+    meta: { title: '流失分析' }
   }
 }
