@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card title="数据筛选">
+    <a-card>
       <!-- <a-row>
         <a-col :span="6">
           <a-input v-model="searchInfo.typeCode" placeholder="请输入分类编码"></a-input>
@@ -14,25 +14,31 @@
         </a-col>
       </a-row> -->
       <div class="table-wrapper">
-        <!-- <div class="top-btn">
-          <a-button class="batch" type="primary" @click="add('addType')" v-permission="'/dictType/tree/addTree@post'">新增字典</a-button>
-        </div> -->
+        <div class="top-btn">
+          <a-button class="batch" type="primary" @click="add()" v-permission="'/dictType/tree/addTree@post'">新增字典</a-button>
+        </div>
         <!-- :expandIconColumnIndex="4" -->
         <!-- :expandIcon="expandIcon" -->
         <a-table
+          :loading="tableLoading"
           bordered
           :columns="columns"
           :data-source="tableData"
           :pagination="pagination"
           @change="handleTableChange"
-          :expandIconColumnIndex="4"
+          :expandIconColumnIndex="5"
           :expandIcon="expandIcon"
           :row-key="record => record.id"
         >
+          <div slot="isDefault" slot-scope="text, record">
+            <template>
+              <div>{{ returnDefault(record.isDefault) }}</div>
+            </template>
+          </div>
           <div slot="options" slot-scope="record">
             <template>
               <div style="display: flex;justify-content: space-around;">
-                <a-button type="link" v-permission="'/dictType/tree/addTree@post'" @click="add('addData', record)">新增字典</a-button>
+                <a-button type="link" v-permission="'/dictType/tree/addTree@post'" @click="add(record)">新增字典</a-button>
                 <a-button type="link" v-permission="'/dictType/tree/modifyTree@post'" @click="editItem(record)">编辑</a-button>
                 <a-button type="link" @click="deleteItem(record.id)" v-permission="'/dictType/tree/deleteTree@get'">删除</a-button>
               </div>
@@ -55,41 +61,46 @@
         :model="addDictInfo"
         :rules="dictRules"
         ref="ruleDictForm">
-        <a-form-model-item
+        <!-- <a-form-model-item
           label="分类编码"
           prop="typeCode"
           required>
-          <a-input v-model.trim="addDictInfo.typeCode" :maxLength="10" placeholder="请输入分类编码"></a-input>
-        </a-form-model-item>
+          <a-input disabled v-model.trim="addDictInfo.typeCode" :maxLength="10" placeholder="请输入分类编码"></a-input>
+        </a-form-model-item> -->
         <a-form-model-item
           label="父节点编码"
           prop="parentDictCode"
-          required>
-          <a-input v-model.trim="addDictInfo.parentDictCode" :maxLength="10" placeholder="请输入父节点编码"></a-input>
+          v-if="Number(addDictInfo.parentDictCode) !== 0">
+          <a-input disabled v-model.trim="addDictInfo.parentDictCode" :maxLength="20" placeholder="请输入父节点编码"></a-input>
         </a-form-model-item>
         <a-form-model-item
           label="字典编码"
-          prop="typeCode"
+          prop="dictCode"
           required>
-          <a-input v-model.trim="addDictInfo.dictCode" :maxLength="10" placeholder="请输入字典编码"></a-input>
+          <a-input :disabled="modelShowTitle === '修改字典'" v-model.trim="addDictInfo.dictCode" :maxLength="20" placeholder="请输入字典编码"></a-input>
         </a-form-model-item>
         <a-form-model-item
           label="字典名称"
-          prop="typeName"
+          prop="dictName"
           required>
-          <a-input v-model.trim="addDictInfo.dictName" placeholder="请输入字典名称"></a-input>
+          <a-input v-model.trim="addDictInfo.dictName" placeholder="请输入字典名称" :maxLength="20"></a-input>
         </a-form-model-item>
         <a-form-model-item
           label="字典排序"
-          prop="typeSort"
+          prop="dictSort"
           required>
           <a-input-number class="inputNumberDiv" v-model.trim="addDictInfo.dictSort" placeholder="请输入字典排序"></a-input-number>
         </a-form-model-item>
         <a-form-model-item
           label="字典描述"
-          prop="dictDesc"
-          required>
+          prop="dictDesc">
           <a-textarea v-model.trim="addDictInfo.dictDesc" placeholder="请输入字典描述"></a-textarea>
+        </a-form-model-item>
+        <a-form-model-item
+          label="是否默认"
+          prop="isDefault">
+          <a-switch :checked="Boolean(addDictInfo.isDefault)" :checkedValue="1" :unCheckedValue="0" @change="changeSwitch"/>
+          <!-- <a-textarea v-model.trim="info.dictDesc" placeholder="请输入字典描述"></a-textarea> -->
         </a-form-model-item>
       </a-form-model>
       <div slot="footer" class="footer">
@@ -117,12 +128,12 @@ import { getDictTreeData, addDictTreeData, editDictTreeData, deleteDictTreeData 
 
 const columns = [
   {
-    title: '分类编码',
+    title: '字典编码',
     align: 'center',
     dataIndex: 'dictCode'
   },
   {
-    title: '字典编码',
+    title: '字典名称',
     align: 'center',
     dataIndex: 'dictName'
   },
@@ -135,6 +146,12 @@ const columns = [
     title: '字典描述',
     align: 'center',
     dataIndex: 'dictDesc'
+  },
+  {
+    title: '是否默认',
+    align: 'center',
+    dataIndex: 'isDefault',
+    scopedSlots: { customRender: 'isDefault' }
   },
   {
     title: '操作',
@@ -163,10 +180,6 @@ export default {
         trigger: change || 'blur'
       }
     }
-    const vDictTypeCode = (rule, value, callback) => {
-      value = this.addDictInfo.typeCode
-      createValidate(callback, value, '请输入字典编码')
-    }
     const vDictCode = (rule, value, callback) => {
       value = this.addDictInfo.dictCode
       createValidate(callback, value, '请输入字典编码')
@@ -179,19 +192,11 @@ export default {
       value = this.addDictInfo.dictSort
       createValidate(callback, value, '请输入字典排序')
     }
-    const vDictDesc = (rule, value, callback) => {
-      value = this.addDictInfo.dictDesc
-      createValidate(callback, value, '请输入字典描述')
-    }
-    const vParentDictCode = (rule, value, callback) => {
-      value = this.addDictInfo.parentDictCode
-      createValidate(callback, value, '请输入父节点编码')
-    }
     return {
+      tableLoading: false,
+      importInfo: JSON.parse(this.$route.query.importString),
       // 搜索对象
       searchInfo: {},
-      // 分类表单新增/修改对象
-      addTypeInfo: {},
       // 字典表单新增/修改对象
       addDictInfo: {},
       // 表格表头数据
@@ -212,12 +217,9 @@ export default {
       modelShowTitle: '',
       // 字典表单提交规则
       dictRules: {
-        parentDictCode: createFunc(vParentDictCode, 'change'),
-        typeCode: createFunc(vDictTypeCode, 'change'),
         dictCode: createFunc(vDictCode, 'change'),
         dictName: createFunc(vDictName, 'change'),
-        dictSort: createFunc(vDictSort, 'change'),
-        dictDesc: createFunc(vDictDesc, 'change')
+        dictSort: createFunc(vDictSort, 'change')
       }
     }
   },
@@ -229,9 +231,33 @@ export default {
     }
   },
   created () {
-    this.getTableData()
+    if (this.importInfo.typeCode) {
+      this.getTableData()
+    } else {
+      this.$message.error('缺少重要参数')
+    }
   },
   methods: {
+    // 切换开关
+    changeSwitch (e) {
+      console.log(e, '切换开关')
+      if (e) {
+        // 为true
+        this.$set(this.addDictInfo, 'isDefault', 1)
+      } else {
+        // 为false
+        this.$set(this.addDictInfo, 'isDefault', 0)
+      }
+    },
+    returnDefault (text) {
+      let tempText = ''
+      if (Number(text) === 1) {
+        tempText = '是'
+      } else {
+        tempText = '否'
+      }
+      return tempText
+    },
     // 菜单展开
     expandIcon (props) {
       if (!props.record.children) {
@@ -257,30 +283,18 @@ export default {
     },
     // 获取数据
     async getTableData () {
+      this.tableLoading = true
       const params = {
-        typeCode: this.searchInfo.typeCode ? this.searchInfo.typeCode : '',
-        typeName: this.searchInfo.typeName ? this.searchInfo.typeName : '',
-        page: this.pagination.current,
-        perPage: this.pagination.pageSize
+        typeCode: this.importInfo.typeCode ? this.importInfo.typeCode : ''
+        // typeName: this.searchInfo.typeName ? this.searchInfo.typeName : '',
+        // page: this.pagination.current,
+        // perPage: this.pagination.pageSize
       }
       console.log(params, '查询数据提交接口的对象')
       await getDictTreeData(params).then(response => {
         this.tableLoading = false
         console.log(response, '获取字典列表数据')
-        this.tableData = response.data.records
-        this.$set(this.pagination, 'total', Number(response.data.total))
-        this.$set(this.pagination, 'current', Number(response.data.current))
-        if (this.tableData.length === 0) {
-          // 列表中没有数据
-          if (this.pagination.total !== 0) {
-            // 总数据有,但当前页没有
-            // 重新将页码换成1
-            this.$set(this.pagination, 'current', 1)
-            this.getTableData()
-          } else {
-            // 是真没有数据
-          }
-        }
+        this.tableData = response.data
       }).catch(() => {
         this.tableLoading = false
       })
@@ -328,8 +342,13 @@ export default {
       // this.modelShowStatus = true
       // this.menuShowType = 'edit'
       // this.modelShowTitle = '修改字典'
+      // debugger
+      this.modelDictShowStatus = true
+      this.modelShowTitle = '修改字典'
       // const tempIndex = this.tableData.findIndex(item => item.id === record.id)
-      // this.info = Object.assign({}, this.tableData[tempIndex])
+      this.addDictInfo = Object.assign({}, record)
+      this.$set(this.addDictInfo, 'typeCode', this.importInfo.typeCode)
+      this.$set(this.addDictInfo, 'isDefault', Number(this.addDictInfo.isDefault))
     },
     // 重置搜索
     resetSearch () {
@@ -338,35 +357,50 @@ export default {
     },
     // 取消按钮,清空提交表单
     resetForm () {
-      this.addTypeInfo = {}
       this.addDictInfo = {}
       this.modelDictShowStatus = false
-      this.modelTypeShowStatus = false
     },
     // 添加
-    add (type, info) {
-      if (type === 'addType') {
-        // 表示分类新增/修改
-        this.modelTypeShowStatus = true
-        if (info) {
-          // 表示修改
-          this.modelShowTitle = '修改分类'
-          console.log(info, '修改分类')
-        } else {
-          this.modelShowTitle = '新增分类'
-          this.addTypeInfo = {}
-        }
-      } else if (type === 'addData') {
-        console.log(info, '分类新增/修改')
-        this.modelDictShowStatus = true
-        // 表示数据新增
-        if (info) {
-          // 表示修改
-          this.modelShowTitle = '修改字典'
-        } else {
-          this.modelShowTitle = '新增字典'
-        }
+    add (record) {
+      console.log(record, 'record')
+      this.modelDictShowStatus = true
+      this.modelShowTitle = '新增字典'
+      this.addDictInfo = {}
+      this.$set(this.addDictInfo, 'typeCode', this.importInfo.typeCode)
+      this.$set(this.addDictInfo, 'isDefault', 0)
+      if (record) {
+        // 添加子节点
+        // const tempIndex = this.tableData.findIndex(item => item.id === record.id)
+        // this.addDictInfo = Object.assign({}, this.tableData[tempIndex])
+        // this.$set(this.addDictInfo, 'typeCode', record.typeCode)
+        // this.$set(this.addDictInfo, 'parentDictCode', record.id)
+        this.$set(this.addDictInfo, 'parentDictCode', record.dictCode)
+      } else {
+        // 添加根节点
+        this.$set(this.addDictInfo, 'parentDictCode', '0')
       }
+      // if (type === 'addType') {
+      //   // 表示分类新增/修改
+      //   this.modelTypeShowStatus = true
+      //   if (info) {
+      //     // 表示修改
+      //     this.modelShowTitle = '修改分类'
+      //     console.log(info, '修改分类')
+      //   } else {
+      //     this.modelShowTitle = '新增分类'
+      //     this.addTypeInfo = {}
+      //   }
+      // } else if (type === 'addData') {
+      //   console.log(info, '分类新增/修改')
+      //   this.modelDictShowStatus = true
+      //   // 表示数据新增
+      //   if (info) {
+      //     // 表示修改
+      //     this.modelShowTitle = '修改字典'
+      //   } else {
+      //     this.modelShowTitle = '新增字典'
+      //   }
+      // }
     },
     // 字典提交
     submitDict () {
@@ -378,8 +412,6 @@ export default {
               this.modelDictShowStatus = false
               if (response.code === 200) {
                 this.$message.success('添加成功')
-                this.$set(this.pagination, 'page', 1)
-                this.$set(this.pagination, 'perPage', 10)
                 this.getTableData()
               }
             }).catch(() => {
@@ -389,9 +421,7 @@ export default {
             await editDictTreeData(this.addDictInfo).then(response => {
               this.modelDictShowStatus = false
               if (response.code === 200) {
-                this.$message.success('添加成功')
-                this.$set(this.pagination, 'page', 1)
-                this.$set(this.pagination, 'perPage', 10)
+                this.$message.success('修改成功')
                 this.getTableData()
               }
             }).catch(() => {

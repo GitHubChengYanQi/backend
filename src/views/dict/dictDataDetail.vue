@@ -18,6 +18,7 @@
           <a-button class="batch" type="primary" @click="add" v-permission="'/dictType/common/addData@post'">添加</a-button>
         </div>
         <a-table
+          :loading="tableLoading"
           bordered
           :row-key="record => record.id"
           :columns="columns"
@@ -81,8 +82,7 @@
         </a-form-model-item>
         <a-form-model-item
           label="字典描述"
-          prop="dictDesc"
-          required>
+          prop="dictDesc">
           <a-textarea v-model.trim="info.dictDesc" placeholder="请输入字典描述"></a-textarea>
         </a-form-model-item>
         <a-form-model-item
@@ -199,11 +199,8 @@ export default {
       value = this.info.dictSort
       createValidate(callback, value, '请输入字典排序')
     }
-    const vDictDesc = (rule, value, callback) => {
-      value = this.info.dictDesc
-      createValidate(callback, value, '请输入字典描述')
-    }
     return {
+      tableLoading: false,
       // 从上页传入的对象
       importInfo: JSON.parse(this.$route.query.importString),
       // 搜索对象
@@ -230,10 +227,8 @@ export default {
         typeCode: createFunc(vTypeCode, 'change'),
         dictCode: createFunc(vDictCode, 'change'),
         dictName: createFunc(vDictName, 'change'),
-        dictSort: createFunc(vDictSort, 'change'),
-        dictDesc: createFunc(vDictDesc, 'change')
-      },
-      usedIconList: []
+        dictSort: createFunc(vDictSort, 'change')
+      }
     }
   },
   watch: {
@@ -281,6 +276,7 @@ export default {
     },
     // 获取数据
     async getTableData () {
+      this.tableLoading = true
       const params = {
         dictCode: this.searchInfo.dictCode ? this.searchInfo.dictCode : '',
         dictName: this.searchInfo.dictName ? this.searchInfo.dictName : '',

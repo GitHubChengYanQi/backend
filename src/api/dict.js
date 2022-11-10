@@ -110,11 +110,11 @@ export function deleteDictTreeTypeData (params) {
 }
 
 // 获取多级字典数据
-export function getDictTreeData (data) {
+export function getDictTreeData (params) {
   return request({
     url: '/dictType/tree/getTreeList',
     method: 'get',
-    data
+    params
   })
 }
 

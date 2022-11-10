@@ -27,6 +27,7 @@ export const routeList = {
   '/dict/dictTreeDict': {
     path: '/dict/dictTreeDict',
     name: 'dictTreeDict',
+    hidden: true,
     component: () => import('@/views/dict/dictTreeDict'),
     meta: { title: '多级字典详情' }
   },

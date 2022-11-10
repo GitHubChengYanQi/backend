@@ -56,38 +56,37 @@
           label="分类编码"
           prop="typeCode"
           required>
-          <a-input :disabled="modelShowType === '修改字典类型'" v-model.trim="info.typeCode" :maxLength="10" placeholder="请输入分类编码"></a-input>
+          <a-input :disabled="modelShowType === '修改字典分类'" v-model.trim="info.typeCode" :maxLength="20" placeholder="请输入分类编码"></a-input>
         </a-form-model-item>
         <a-form-model-item
           label="分类名称"
           prop="typeName"
           required>
-          <a-input v-model.trim="info.typeName" placeholder="请输入分类名称"></a-input>
+          <a-input v-model.trim="info.typeName" :maxLength="20" placeholder="请输入分类名称"></a-input>
         </a-form-model-item>
         <a-form-model-item
-          label="字典排序"
+          label="分类排序"
           prop="typeSort"
           required>
-          <a-input-number v-model.trim="info.typeSort" placeholder="请输入字典排序" class="inputNumberDiv"></a-input-number>
+          <a-input-number v-model.trim="info.typeSort" placeholder="请输入分类排序" class="inputNumberDiv"></a-input-number>
         </a-form-model-item>
         <a-form-model-item
-          label="字典描述"
-          prop="typeDesc"
-          required>
-          <a-textarea v-model.trim="info.typeDesc" placeholder="请输入字典描述"></a-textarea>
+          label="分类描述"
+          prop="typeDesc">
+          <a-textarea v-model.trim="info.typeDesc" placeholder="请输入分类描述"></a-textarea>
         </a-form-model-item>
       </a-form-model>
       <div slot="footer" class="footer">
         <template>
           <a-button
-            v-if="modelShowType === '新增字典类型'"
+            v-if="modelShowType === '新增字典分类'"
             type="link"
             @click="submit"
             v-permission="'/dictType/common/add@post'">
             确认
           </a-button>
           <a-button
-            v-if="modelShowType === '修改字典类型'"
+            v-if="modelShowType === '修改字典分类'"
             type="link"
             @click="submit"
             v-permission="'/dictType/common/modify@post'">
@@ -120,12 +119,12 @@ const columns = [
     dataIndex: 'typeName'
   },
   {
-    title: '字典排序',
+    title: '分类排序',
     dataIndex: 'typeSort',
     align: 'center'
   },
   {
-    title: '字典描述',
+    title: '分类描述',
     align: 'center',
     dataIndex: 'typeDesc'
   },
@@ -167,11 +166,7 @@ export default {
     }
     const vTypeSort = (rule, value, callback) => {
       value = this.info.typeSort
-      createValidate(callback, value, '请输入字典排序')
-    }
-    const vTypeDesc = (rule, value, callback) => {
-      value = this.info.typeDesc
-      createValidate(callback, value, '请输入字典描述')
+      createValidate(callback, value, '请输入分类排序')
     }
     return {
       // 表格加载动画
@@ -198,8 +193,7 @@ export default {
       rules: {
         typeCode: createFunc(vTypeCode, 'change'),
         typeName: createFunc(vTypeName, 'change'),
-        typeSort: createFunc(vTypeSort, 'change'),
-        typeDesc: createFunc(vTypeDesc, 'change')
+        typeSort: createFunc(vTypeSort, 'change')
       },
       usedIconList: []
     }
@@ -283,7 +277,7 @@ export default {
     async editItem (record) {
       console.log(record)
       this.modelShow = true
-      this.modelShowType = '修改字典类型'
+      this.modelShowType = '修改字典分类'
       const tempIndex = this.tableData.findIndex(item => item.id === record.id)
       this.info = Object.assign({}, this.tableData[tempIndex])
     //   this.modelShow = true
@@ -324,7 +318,7 @@ export default {
     // 添加
     add () {
       this.modelShow = true
-      this.modelShowType = '新增字典类型'
+      this.modelShowType = '新增字典分类'
       // this.$refs.ruleForm.clearValidate()
       this.info = {}
     },
@@ -334,7 +328,7 @@ export default {
       this.$refs.ruleForm.validate(async valid => {
         if (valid) {
           console.log('可以提交', this.info)
-          if (this.modelShowType === '新增字典类型') {
+          if (this.modelShowType === '新增字典分类') {
             addDictType(this.info).then(response => {
               this.modelShow = false
               if (response.code === 200) {
@@ -346,7 +340,7 @@ export default {
             }).catch(() => {
               this.modelShow = false
             })
-          } else if (this.modelShowType === '修改字典类型') {
+          } else if (this.modelShowType === '修改字典分类') {
             editDictType(this.info).then(response => {
               this.modelShow = false
               if (response.code === 200) {
