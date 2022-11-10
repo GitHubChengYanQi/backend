@@ -10,14 +10,9 @@
                 <a-input v-model="screenData.contactName" placeholder="请输入客户姓名"></a-input>
               </a-form-item>
             </a-col>
-            <a-col :lg="6" style="display:none;">
+            <a-col :lg="6" >
               <a-form-item label="所属员工：" :labelCol="{ lg: { span: 7 } }" :wrapperCol="{ lg: { span: 17 } }">
-                <selectPersonnel
-                  v-model="screenData.employeeId"
-                  :multiple="true"
-                  :num="1"
-                  :type="'selector'"
-                />
+                <a-input v-model="screenData.employeeName" placeholder="请输入员工姓名"></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="6">
