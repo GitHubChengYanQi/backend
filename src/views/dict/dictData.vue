@@ -68,7 +68,7 @@
           label="分类排序"
           prop="typeSort"
           required>
-          <a-input-number v-model.trim="info.typeSort" placeholder="请输入分类排序" class="inputNumberDiv"></a-input-number>
+          <a-input-number v-model.trim="info.typeSort" :min="1" placeholder="请输入分类排序" class="inputNumberDiv"></a-input-number>
         </a-form-model-item>
         <a-form-model-item
           label="分类描述"

@@ -89,7 +89,7 @@
           label="字典排序"
           prop="dictSort"
           required>
-          <a-input-number class="inputNumberDiv" v-model.trim="addDictInfo.dictSort" placeholder="请输入字典排序"></a-input-number>
+          <a-input-number class="inputNumberDiv" :min="1" v-model.trim="addDictInfo.dictSort" placeholder="请输入字典排序"></a-input-number>
         </a-form-model-item>
         <a-form-model-item
           label="字典描述"
