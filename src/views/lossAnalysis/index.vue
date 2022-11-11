@@ -253,34 +253,34 @@
           :row-selection="{selectedRowKeys:table.rowSelection,onChange: onSelectChange}"
           :scroll="{ x: 1500}"
           @change="handleTableChange"
+          ref="table"
         >
           <div
-            slot="tag"
-            slot-scope="text,row"
+            slot="add_time"
+            class="table_header"
+            @click="Click('add_time')"
           >
             <template>
-              <a-popover
-                title="标签"
-                v-if="row.tag && row.tag.length > 0"
-              >
-                <template slot="content">
-                  <div class="labelBox">
-                    <a-tag
-                      v-for="(item, index) in row.tag"
-                      :key="index"
-                    >{{ item }}</a-tag>
-                  </div>
-                </template>
-                <a-tag type="button">
-                  查看
-                </a-tag>
-              </a-popover>
-              <span
-                class="nolabel"
-                v-else
-              >无标签</span>
+              <span>add_time</span>
+              <span class="ant-table-column-sorter">
+                <div class="ant-table-column-sorter-inner ant-table-column-sorter-inner-full">
+                  <a-icon
+                    type="caret-up"
+                    :style="{ color: Type ? '#1890ff' : '#bfbfbf' }"
+                    class="anticon anticon-caret-up ant-table-column-sorter-up off"
+                  >
+                  </a-icon>
+                  <a-icon
+                    type="caret-down"
+                    :style="{ color: !Type ? '#1890ff' : '#bfbfbf' }"
+                    class="anticon anticon-caret-down ant-table-column-sorter-down off"
+                  >
+                  </a-icon>
+                </div>
+              </span>
             </template>
           </div>
+
         </a-table>
       </div>
     </div>
@@ -705,22 +705,23 @@ export default {
             {
               align: 'center',
               title: '员工数量',
-              sorter: true,
               dataIndex: 'tag',
               scopedSlots: { customRender: 'tag' },
               width: 150
             },
             {
               align: 'center',
-              title: '总客户数',
+              // title: '总客户数',
               dataIndex: 'add_time',
-              sorter: true,
+              slots: { title: 'add_time' },
+              scopedSlots: { customRender: 'add_time' },
               width: 150
             },
             {
               align: 'center',
               title: '总流失客户数',
-              sorter: true,
+
+              slots: { title: 'titleNote' },
               dataIndex: 'subsidiary_organ',
               width: 150
             },
@@ -744,8 +745,8 @@ export default {
             },
             {
               align: 'center',
-              title: '员工删除客户流失人数',
-              sorter: true,
+              // title: '员工删除客户流失人数',
+              slots: { title: 'loss_why' },
               dataIndex: 'loss_why',
               width: 200
             },
@@ -757,8 +758,8 @@ export default {
             },
             {
               align: 'center',
-              title: '客户删除员工流失人数',
-              sorter: true,
+              // title: '客户删除员工流失人数',
+              slots: { title: 'last_time' },
               dataIndex: 'last_time',
               width: 200
             },
@@ -770,9 +771,9 @@ export default {
             },
             {
               align: 'center',
-              title: '离职继承失败流失人数',
+              // title: '离职继承失败流失人数',
               dataIndex: 'integral',
-              sorter: true,
+              slots: { title: 'integral' },
               width: 200
             },
             {
@@ -800,8 +801,9 @@ export default {
             },
             {
               align: 'center',
-              title: '员工数量',
-              sorter: true,
+              // title: '员工数量',
+
+              slots: { title: 'tag' },
               dataIndex: 'tag',
               scopedSlots: { customRender: 'tag' },
               width: 150
@@ -810,13 +812,15 @@ export default {
               align: 'center',
               title: '总客户数',
               dataIndex: 'add_time',
-              sorter: true,
+
+              slots: { title: 'titleNote' },
               width: 150
             },
             {
               align: 'center',
               title: '总流失客户数',
-              sorter: true,
+
+              slots: { title: 'titleNote' },
               dataIndex: 'subsidiary_organ',
               width: 150
             },
@@ -841,7 +845,8 @@ export default {
             {
               align: 'center',
               title: '员工删除客户流失人数',
-              sorter: true,
+
+              slots: { title: 'titleNote' },
               dataIndex: 'loss_why',
               width: 200
             },
@@ -854,7 +859,8 @@ export default {
             {
               align: 'center',
               title: '客户删除员工流失人数',
-              sorter: true,
+
+              slots: { title: 'titleNote' },
               dataIndex: 'last_time',
               width: 200
             },
@@ -868,7 +874,8 @@ export default {
               align: 'center',
               title: '离职继承失败流失人数',
               dataIndex: 'integral',
-              sorter: true,
+
+              slots: { title: 'titleNote' },
               width: 200
             },
             {
@@ -995,7 +1002,8 @@ export default {
         },
         tableData: [],
         rowSelection: []
-      }
+      },
+      Type: true
     }
   },
   methods: {
@@ -1015,6 +1023,9 @@ export default {
     },
     handleTableChange (pagination, filters, sorter, extra) {
       console.log(pagination, filters, sorter, extra)
+    },
+    Click (e) {
+      this.Type = !this.Type
     }
   }
 }
@@ -1139,11 +1150,15 @@ export default {
     margin-top: 16px;
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     .A_leftChart_box {
       box-sizing: border-box;
       padding: 16px 20px 14px 16px;
-      width: 800px;
+      width: 49%;
+      min-width: 700px;
+      margin-right: 16px;
       height: 500px;
+      flex-shrink: 0;
       background: #ffffff;
       border-radius: 8px;
       .hearder_box {
@@ -1200,9 +1215,10 @@ export default {
     }
     .A_rightChart_box {
       box-sizing: border-box;
+      flex-shrink: 0;
       padding: 16px 20px 14px 16px;
-      margin-left: 16px;
-      width: 800px;
+      width: 49%;
+      min-width: 700px;
       height: 500px;
       background: #ffffff;
       border-radius: 8px;
@@ -1331,6 +1347,13 @@ export default {
         .button {
           margin-left: 16px;
         }
+      }
+    }
+    .table_box {
+      .table_header {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
       }
     }
   }
