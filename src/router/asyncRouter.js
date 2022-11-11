@@ -18,11 +18,18 @@ export const routeList = {
     component: () => import('@/views/dict/dictDataDetail'),
     meta: { title: '普通字典详情' }
   },
-  '/dict/dictTree': {
-    path: '/dict/dictTree',
-    name: 'dictTree',
-    component: () => import('@/views/dict/dictTree'),
-    meta: { title: '多级字典' }
+  '/dict/dictTreeType': {
+    path: '/dict/dictTreeType',
+    name: 'dictTreeType',
+    component: () => import('@/views/dict/dictTreeType'),
+    meta: { title: '多级字典分类' }
+  },
+  '/dict/dictTreeDict': {
+    path: '/dict/dictTreeDict',
+    name: 'dictTreeDict',
+    hidden: true,
+    component: () => import('@/views/dict/dictTreeDict'),
+    meta: { title: '多级字典详情' }
   },
   '/corp/create': {
     path: '/corp/create',

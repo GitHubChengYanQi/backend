@@ -96,6 +96,14 @@ export function setBreadcrumb (path, data) {
         '/sales/clusterEdit'
       ],
       returnPath: '/sales/sop'
+    },
+    12: {
+      path: ['/dict/dictDataDetail'],
+      returnPath: '/dict/dictData'
+    },
+    13: {
+      path: ['/dict/dictTreeDict'],
+      returnPath: '/dict/dictTreeType'
     }
   }
 

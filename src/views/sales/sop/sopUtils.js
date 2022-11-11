@@ -100,7 +100,7 @@ export const handleBtnArr = [
     type: 'link'
   },
   {
-    name: '营销内容',
+    name: '素材库',
     type: 'library'
   },
   {

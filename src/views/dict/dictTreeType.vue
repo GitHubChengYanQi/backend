@@ -9,13 +9,13 @@
           <a-input v-model="searchInfo.typeName" placeholder="请输入分类名称"></a-input>
         </a-col>
         <a-col :span="6" :offset="1">
-          <a-button type="primary" style="marginRight:10px" @click="search" v-permission="'/dictType/common/getList@post'">查询</a-button>
-          <a-button @click="resetSearch" v-permission="'/dictType/common/getList@post'">重置</a-button>
+          <a-button type="primary" style="marginRight:10px" @click="search" v-permission="'/dictType/tree/getList@post'">查询</a-button>
+          <a-button @click="resetSearch" v-permission="'/dictType/tree/getList@post'">重置</a-button>
         </a-col>
       </a-row>
       <div class="table-wrapper">
         <div class="top-btn">
-          <a-button class="batch" type="primary" @click="add" v-permission="'/dictType/common/add@post'">添加</a-button>
+          <a-button class="batch" type="primary" @click="add" v-permission="'/dictType/tree/add@post'">添加</a-button>
         </div>
         <a-table
           :loading="tableLoading"
@@ -29,9 +29,9 @@
           <div slot="options" slot-scope="record">
             <template>
               <div style="display: flex;justify-content: space-around;">
-                <a-button type="link" @click="goDetail(record)">详情</a-button>
-                <a-button type="link" @click="editItem(record)" v-permission="'/dictType/common/modify@post'">编辑</a-button>
-                <a-button type="link" @click="deleteItem(record.id)" v-permission="'/dictType/common/delete@get'">删除</a-button>
+                <a-button type="link" @click="goDetail(record)" v-permission="'/dictType/tree/modify@post'">详情</a-button>
+                <a-button type="link" @click="editItem(record)" v-permission="'/dictType/tree/modify@post'">编辑</a-button>
+                <a-button type="link" @click="deleteItem(record.id)" v-permission="'/dictType/tree/delete@get'">删除</a-button>
               </div>
             </template>
           </div>
@@ -62,7 +62,7 @@
           label="分类名称"
           prop="typeName"
           required>
-          <a-input v-model.trim="info.typeName" :maxLength="20" placeholder="请输入分类名称"></a-input>
+          <a-input v-model.trim="info.typeName" placeholder="请输入分类名称" :maxLength="20"></a-input>
         </a-form-model-item>
         <a-form-model-item
           label="分类排序"
@@ -82,14 +82,14 @@
             v-if="modelShowType === '新增字典分类'"
             type="link"
             @click="submit"
-            v-permission="'/dictType/common/add@post'">
+            v-permission="'/dictType/tree/add@post'">
             确认
           </a-button>
           <a-button
             v-if="modelShowType === '修改字典分类'"
             type="link"
             @click="submit"
-            v-permission="'/dictType/common/modify@post'">
+            v-permission="'/dictType/tree/modify@post'">
             确认
           </a-button>
           <a-button
@@ -105,7 +105,7 @@
 
 <script>
 import IconSelector from '@/components/IconSelector/IconSelector'
-import { getDictTypeData, addDictType, editDictType, deleteDictType } from '@/api/dict'
+import { getDictTreeTypeData, addDictTreeTypeData, editDictTreeTypeData, deleteDictTreeTypeData } from '@/api/dict'
 
 const columns = [
   {
@@ -225,7 +225,7 @@ export default {
         perPage: this.pagination.pageSize
       }
       console.log(params, '查询数据提交接口的对象')
-      await getDictTypeData(params).then(response => {
+      await getDictTreeTypeData(params).then(response => {
         this.tableLoading = false
         console.log(response, '获取字典列表数据')
         this.tableData = response.data.records
@@ -256,7 +256,7 @@ export default {
         okType: 'danger',
         cancelText: '取消',
         onOk: async () => {
-          deleteDictType(params).then(response => {
+          deleteDictTreeTypeData(params).then(response => {
             console.log(response, '删除数据')
             if (response.code === 200) {
               this.$message.success('删除成功')
@@ -280,23 +280,12 @@ export default {
       this.modelShowType = '修改字典分类'
       const tempIndex = this.tableData.findIndex(item => item.id === record.id)
       this.info = Object.assign({}, this.tableData[tempIndex])
-    //   this.modelShow = true
-    //   this.modelShowType = '编辑菜单'
-    //   try {
-    //     const { data } = await menuDetail({ menuId })
-    //     Object.assign(this, data)
-    //     this.firstMenuChange()
-    //     this.secondMenuChange()
-    //     this.thirdMenuChange()
-    //   } catch (e) {
-    //     console.log(e)
-    //   }
     },
     // 查看字典详情
     goDetail (info) {
       console.log(info)
       this.$router.push({
-        path: '/dict/dictDataDetail',
+        path: '/dict/dictTreeDict',
         query: {
           importString: JSON.stringify(info)
         }
@@ -329,7 +318,7 @@ export default {
         if (valid) {
           console.log('可以提交', this.info)
           if (this.modelShowType === '新增字典分类') {
-            addDictType(this.info).then(response => {
+            addDictTreeTypeData(this.info).then(response => {
               this.modelShow = false
               if (response.code === 200) {
                 this.$message.success('添加成功')
@@ -341,7 +330,7 @@ export default {
               this.modelShow = false
             })
           } else if (this.modelShowType === '修改字典分类') {
-            editDictType(this.info).then(response => {
+            editDictTreeTypeData(this.info).then(response => {
               this.modelShow = false
               if (response.code === 200) {
                 this.$message.success('修改成功')
@@ -358,45 +347,45 @@ export default {
 }
 </script>
 
-  <style lang="less" scoped>
-  .top-btn{
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-    .batch{
-      // margin-right: 20px;
+    <style lang="less" scoped>
+    .top-btn{
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+      .batch{
+        // margin-right: 20px;
+      }
     }
-  }
-  .table-wrapper {
-    .icon {
-      text-align: center;
-      font-size: 25px;
+    .table-wrapper {
+      .icon {
+        text-align: center;
+        font-size: 25px;
+      }
+      .text {
+        font-size: 14px;
+      }
+      .second {
+        color: #1890ff
+      }
+      .third {
+        color: red
+      }
+      .fourth {
+        color: rgb(201, 154, 240)
+      }
+      .fif {
+        color:  rgb(105, 236, 100)
+      }
     }
-    .text {
-      font-size: 14px;
+    .inputNumberDiv {
+      width: 100%;
     }
-    .second {
-      color: #1890ff
+    .expand-wrapper {
+      width: 60px;
+      padding: 0 16px;
+      display: inline-block;
     }
-    .third {
-      color: red
+    .footer {
+      text-align: left;
     }
-    .fourth {
-      color: rgb(201, 154, 240)
-    }
-    .fif {
-      color:  rgb(105, 236, 100)
-    }
-  }
-  .inputNumberDiv {
-    width: 100%;
-  }
-  .expand-wrapper {
-    width: 60px;
-    padding: 0 16px;
-    display: inline-block;
-  }
-  .footer {
-    text-align: left;
-  }
-  </style>
+    </style>
