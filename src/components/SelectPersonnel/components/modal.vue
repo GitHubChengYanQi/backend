@@ -25,6 +25,7 @@
             @expand="onExpand"
             :autoExpandParent="autoExpandParent"
             :replaceFields="replaceFields"
+            :fieldNames="fieldNames"
             @check="onCheck"
             checkable
           >
@@ -86,6 +87,12 @@ export default {
     placeholder: {
       type: String,
       default: '请输入搜索项'
+    },
+    fieldNames: {
+      type: Object,
+      default: () => {
+        return { children: 'children', title: 'title', key: 'key' }
+      }
     }
   },
   watch: {

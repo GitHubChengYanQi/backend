@@ -48,10 +48,19 @@
           <span class="f-blod">共{{ dataTotal }}个待分配客户</span>
         </div>
         <div class="btn-box">
-          <a-button type="primary" ghost @click="allocation" v-permission="'/contactTransfer/workIndex@allocation'">分配客户</a-button>
+          <!--          <a-button type="primary" ghost @click="allocation" v-permission="'/contactTransfer/workIndex@allocation'">分配客户</a-button>-->
+          <SelectPersonnel
+            v-model="treeData"
+            @getVal="acceptData"
+            type="buttonGhost"
+            name="分配客户"
+            :multiple="false"
+            :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+            v-permission="'/contactTransfer/workIndex@allocation'" />
+          <!--          wxUserId-->
           <a-button type="primary" ghost @click="$router.push('/contactTransfer/workAllotRecord')" v-permission="'/contactTransfer/workIndex@workAllotRecord'">分配记录</a-button>
         </div>
-        <selectStaff ref="choiceStaff" @change="acceptData" />
+        <!-- <selectStaff ref="choiceStaff" @change="acceptData" />-->
       </div>
       <div class="table">
         <a-table
@@ -180,7 +189,8 @@ export default {
           }
         ],
         data: [],
-        rowSelection: []
+        rowSelection: [],
+        treeData: []
       }
     }
   },
@@ -223,12 +233,14 @@ export default {
       this.$refs.choiceStaff.show(0)
     },
     // 接收子组件传值
-    acceptData (e) {
+    acceptData (e = []) {
+      if (!e.length) return
       const params = {
         type: 2,
         list: JSON.stringify(this.tableSelectClient),
-        takeoverUserId: e
+        takeoverUserId: e[0]
       }
+      this.treeData = e
       allotContactApi(params).then((res) => {
         const successNum = res.data.successNum
         const errNum = res.data.errNum
