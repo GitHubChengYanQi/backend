@@ -87,8 +87,12 @@
         <div style="display: flex;justify-content:flex-end;margin-top: 30px;">
           <a-pagination
             :total="dataTotal"
+            :showSizeChanger="true"
+            :pageSizeOptions="['10', '20', '30', '50']"
             v-model="searchData.page"
-            @change="changePage"/>
+            :defaultPageSize="searchData.perPage"
+            @change="changePage"
+            @showSizeChange="changePage"/>
         </div>
       </div>
     </a-card>
@@ -123,7 +127,8 @@ export default {
         // 结束时间
         addTimeEnd: '',
         // 员工
-        employeeId: ''
+        employeeId: '',
+        perPage: 10
       },
       // 表格选中的客户
       tableSelectClient: [],
@@ -252,6 +257,7 @@ export default {
       this.showEmployee = []
       this.showTimeSearch = []
       this.searchData.page = 1
+      this.searchData.perPage = 10
       this.getTableData()
     },
     // 接收子组件数据
