@@ -345,6 +345,8 @@ export default {
 }
 
 .btn-box {
+  display: flex;
+  flex-direction: row;
   .ant-btn {
     margin-right: 10px;
   }

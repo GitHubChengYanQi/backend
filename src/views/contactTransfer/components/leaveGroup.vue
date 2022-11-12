@@ -323,8 +323,11 @@ export default {
     }
 
     .fr {
-      float: right;
+      display: flex;
+      flex-direction: row;
+      //float: right;
       text-align: right;
+      justify-content: flex-end;
 
       & > * {
         margin-left: 10px;

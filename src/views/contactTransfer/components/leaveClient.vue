@@ -346,14 +346,15 @@ export default {
 
   .table-head {
     height: 50px;
-
+    display: flex;
+    flex-direction: row;
     & > div {
       width: 50%;
     }
 
     .fl {
       float: left;
-
+      width: 50%;
       span {
         font-size: 14px;
         margin-right: 10px;
@@ -365,8 +366,13 @@ export default {
     }
 
     .fr {
-      float: right;
+      width: 50%;
+      flex-direction: row;
+      //float: right;
       text-align: right;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
 
       & > * {
         margin-left: 10px;
