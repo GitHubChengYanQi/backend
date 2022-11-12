@@ -37,7 +37,15 @@
             <span class="f-blod">共{{ unassignedNum }}个待分配群</span>
           </div>
           <div class="fr">
-            <a-button type="primary" ghost @click="distributionGroup" v-permission="'/contactTransfer/resignIndex@distributionGroup'">分配群聊</a-button>
+            <!-- <a-button type="primary" ghost @click="distributionGroup" v-permission="'/contactTransfer/resignIndex@distributionGroup'">分配群聊</a-button>-->
+            <SelectPersonnel
+              v-model="treeData"
+              @getVal="acceptData"
+              type="buttonGhost"
+              name="分配群聊"
+              :multiple="false"
+              :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+              v-permission="'/contactTransfer/resignIndex@distributionGroup'" />
             <a-button type="primary" ghost @click="$router.push('/contactTransfer/resignAllotRecord')" v-permission="'/contactTransfer/resignIndex@resignAllotRecord'">分配记录</a-button>
             <selectStaff ref="choiceStaff" @change="acceptData" />
           </div>
@@ -48,7 +56,6 @@
           :columns="columns"
           :data-source="tableData"
           :pagination="pagination"
-          :pageSizeOptions="['10', '20', '30', '50']"
           :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
           :scroll="{ x: 1500 }"
           @change="handleTableChange"
@@ -266,11 +273,12 @@ export default {
      * 接收组件传值
      * @param {*} e
      */
-    acceptData (e) {
+    acceptData (e = []) {
+      if (!e.length) return
       const params = {
         type: 1,
         list: JSON.stringify(this.selectedRowKeys),
-        takeoverUserId: e
+        takeoverUserId: e[0]
       }
       allotRoomApi(params).then((res) => {
         this.$message.info('分配成功')

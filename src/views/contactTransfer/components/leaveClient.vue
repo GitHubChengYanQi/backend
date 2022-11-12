@@ -43,12 +43,20 @@
             <span class="f-blod">上次同步时间：{{ data.lastUpdateTime }}</span>
           </div>
           <div class="fr">
-            <a-button
-              type="primary"
-              ghost
-              @click="allocation"
-              v-permission="'/contactTransfer/resignIndex@allocation'"
-            >分配客户</a-button>
+            <!--            <a-button-->
+            <!--              type="primary"-->
+            <!--              ghost-->
+            <!--              @click="allocation"-->
+            <!--              v-permission="'/contactTransfer/resignIndex@allocation'"-->
+            <!--            >分配客户</a-button>-->
+            <SelectPersonnel
+              v-model="treeData"
+              @getVal="acceptData"
+              type="buttonGhost"
+              name="分配客户"
+              :multiple="false"
+              :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+              v-permission="'/contactTransfer/resignIndex@allocation'" />
             <a-button type="primary" ghost @click="$router.push('/contactTransfer/resignAllotRecord')" v-permission="'/contactTransfer/resignIndex@resignAllotRecord'">分配记录</a-button>
             <a-button type="primary" ghost @click="updateTo" v-permission="'/contactTransfer/resignIndex@updateTo'">同步</a-button>
             <selectStaff ref="choiceStaff" @change="acceptData" />
@@ -60,7 +68,6 @@
           :columns="columns"
           :data-source="tableData"
           :pagination="pagination"
-          :pageSizeOptions="['10', '20', '30', '50']"
           :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
           :scroll="{ x: 1500 }"
           @change="handleTableChange"
@@ -289,11 +296,12 @@ export default {
      * 接收组件传值
      * @param {*} e
      */
-    acceptData (e) {
+    acceptData (e = []) {
+      if (!e.length) return
       const params = {
         type: 1,
         list: '',
-        takeoverUserId: e
+        takeoverUserId: e[0]
       }
       const arr = this.selectedRows
       const ids = []
