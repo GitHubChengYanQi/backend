@@ -55,6 +55,7 @@
             type="buttonGhost"
             name="分配客户"
             :multiple="false"
+            :transferTip="true"
             :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
             v-permission="'/contactTransfer/workIndex@allocation'" />
           <!--          wxUserId-->

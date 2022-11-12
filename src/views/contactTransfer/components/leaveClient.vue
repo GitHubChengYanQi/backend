@@ -56,6 +56,7 @@
               name="分配客户"
               :multiple="false"
               :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+              :transferTip="true"
               v-permission="'/contactTransfer/resignIndex@allocation'" />
             <a-button type="primary" ghost @click="$router.push('/contactTransfer/resignAllotRecord')" v-permission="'/contactTransfer/resignIndex@resignAllotRecord'">分配记录</a-button>
             <a-button type="primary" ghost @click="updateTo" v-permission="'/contactTransfer/resignIndex@updateTo'">同步</a-button>

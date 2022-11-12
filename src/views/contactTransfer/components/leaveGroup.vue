@@ -44,6 +44,7 @@
               type="buttonGhost"
               name="分配群聊"
               :multiple="false"
+              :transferTip="true"
               :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
               v-permission="'/contactTransfer/resignIndex@distributionGroup'" />
             <a-button type="primary" ghost @click="$router.push('/contactTransfer/resignAllotRecord')" v-permission="'/contactTransfer/resignIndex@resignAllotRecord'">分配记录</a-button>

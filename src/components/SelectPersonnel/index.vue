@@ -10,6 +10,7 @@
   * 输入[layout] = 'inline'//不换行;'block'//换行
   * 输入[record] = [] //备选数据 <selectPersonnel v-if="treeData" :record="treeData" />
   * 输入[fieldNames] = { children: 'children', title: 'title', key: 'key' } // 替换 treeNode 中 title,key,children 字段为 treeData 中对应的字段
+  * 输入[transferTip] = true //转接提示
   *
   * 输出:getVal = ['100','101','102']
   *
@@ -54,6 +55,7 @@
       :placeholder="searchPlaceholder"
       :list="treeData"
       :fieldNames="fieldNames"
+      :transferTip="transferTip"
       ref="SelectPersonnel"/>
   </div>
 </template>
@@ -119,6 +121,10 @@ export default {
       default: () => {
         return { children: 'children', title: 'title', key: 'key' }
       }
+    },
+    transferTip: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
