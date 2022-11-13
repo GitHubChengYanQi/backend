@@ -379,15 +379,19 @@ export default {
         })
       }
       filter.employeeId = filter.employeeId.join(',')
-
-      workContactList({
-        page: 1,
-        perPage: this.total,
-        ...filter
-      }).then(res => {
-        this.exportList = res.data.list
+      if (this.table.selectRows[this.table.page.page]) {
+        this.exportList = JSON.parse(JSON.stringify(this.table.selectRows[this.table.page.page]))
         this.excel()
-      })
+      } else {
+        workContactList({
+          page: 1,
+          perPage: this.total,
+          ...filter
+        }).then(res => {
+          this.exportList = res.data.list
+          this.excel()
+        })
+      }
     },
     getData (search) {
       this.loading = true
