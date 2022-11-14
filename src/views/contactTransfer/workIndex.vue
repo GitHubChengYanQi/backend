@@ -48,10 +48,20 @@
           <span class="f-blod">共{{ dataTotal }}个待分配客户</span>
         </div>
         <div class="btn-box">
-          <a-button type="primary" ghost @click="allocation" v-permission="'/contactTransfer/workIndex@allocation'">分配客户</a-button>
+          <!--          <a-button type="primary" ghost @click="allocation" v-permission="'/contactTransfer/workIndex@allocation'">分配客户</a-button>-->
+          <SelectPersonnel
+            v-model="treeData"
+            @getVal="acceptData"
+            type="buttonGhost"
+            name="分配客户"
+            :multiple="false"
+            :transferTip="true"
+            :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+            v-permission="'/contactTransfer/workIndex@allocation'" />
+          <!--          wxUserId-->
           <a-button type="primary" ghost @click="$router.push('/contactTransfer/workAllotRecord')" v-permission="'/contactTransfer/workIndex@workAllotRecord'">分配记录</a-button>
         </div>
-        <selectStaff ref="choiceStaff" @change="acceptData" />
+        <!-- <selectStaff ref="choiceStaff" @change="acceptData" />-->
       </div>
       <div class="table">
         <a-table
@@ -87,8 +97,12 @@
         <div style="display: flex;justify-content:flex-end;margin-top: 30px;">
           <a-pagination
             :total="dataTotal"
+            :showSizeChanger="true"
+            :pageSizeOptions="['10', '20', '30', '50']"
             v-model="searchData.page"
-            @change="changePage"/>
+            :defaultPageSize="searchData.perPage"
+            @change="changePage"
+            @showSizeChange="changePage"/>
         </div>
       </div>
     </a-card>
@@ -123,7 +137,8 @@ export default {
         // 结束时间
         addTimeEnd: '',
         // 员工
-        employeeId: ''
+        employeeId: '',
+        perPage: 10
       },
       // 表格选中的客户
       tableSelectClient: [],
@@ -175,7 +190,8 @@ export default {
           }
         ],
         data: [],
-        rowSelection: []
+        rowSelection: [],
+        treeData: []
       }
     }
   },
@@ -218,12 +234,14 @@ export default {
       this.$refs.choiceStaff.show(0)
     },
     // 接收子组件传值
-    acceptData (e) {
+    acceptData (e = []) {
+      if (!e.length) return
       const params = {
         type: 2,
         list: JSON.stringify(this.tableSelectClient),
-        takeoverUserId: e
+        takeoverUserId: e[0]
       }
+      this.treeData = e
       allotContactApi(params).then((res) => {
         const successNum = res.data.successNum
         const errNum = res.data.errNum
@@ -252,6 +270,7 @@ export default {
       this.showEmployee = []
       this.showTimeSearch = []
       this.searchData.page = 1
+      this.searchData.perPage = 10
       this.getTableData()
     },
     // 接收子组件数据
@@ -327,6 +346,8 @@ export default {
 }
 
 .btn-box {
+  display: flex;
+  flex-direction: row;
   .ant-btn {
     margin-right: 10px;
   }

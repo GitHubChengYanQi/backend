@@ -52,10 +52,10 @@ export default {
             title: '客户入群时间',
             dataIndex: 'joinTime'
           },
-          {
-            title: '状态',
-            scopedSlots: { customRender: 'isJoin' }
-          },
+          // {
+          //   title: '状态',
+          //   scopedSlots: { customRender: 'isJoin' }
+          // },
           {
             title: '创建时间',
             dataIndex: 'createdAt'
