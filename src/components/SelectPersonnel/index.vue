@@ -9,6 +9,8 @@
   * 输入[name] = '请选择' //按钮名称
   * 输入[layout] = 'inline'//不换行;'block'//换行
   * 输入[record] = [] //备选数据 <selectPersonnel v-if="treeData" :record="treeData" />
+  * 输入[fieldNames] = { children: 'children', title: 'title', key: 'key' } // 替换 treeNode 中 title,key,children 字段为 treeData 中对应的字段
+  * 输入[transferTip] = true //转接提示
   *
   * 输出:getVal = ['100','101','102']
   *
@@ -36,6 +38,7 @@
     <a-button :loading="loading" @click.native="openModal" type="primary" v-if="type==='button'">{{ name }}</a-button>
     <a-button :loading="loading" @click.native="openModal" type="link" v-if="type==='link'">{{ name }}</a-button>
     <a-button :loading="loading" @click.native="openModal" type="primary" v-if="type==='buttonLink'">{{ name }}</a-button>
+    <a-button :loading="loading" ghost @click.native="openModal" type="primary" v-if="type==='buttonGhost'">{{ name }}</a-button>
     <div class="list" v-if="type==='button'">
       <template v-if="num">
         <a-tag closable @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows.slice(0,num)" :key="index">{{ item.name }}</a-tag>
@@ -51,6 +54,8 @@
       :selectedRows="rows"
       :placeholder="searchPlaceholder"
       :list="treeData"
+      :fieldNames="fieldNames"
+      :transferTip="transferTip"
       ref="SelectPersonnel"/>
   </div>
 </template>
@@ -110,6 +115,16 @@ export default {
     searchPlaceholder: {
       type: String,
       default: '请输入成员昵称'
+    },
+    fieldNames: {
+      type: Object,
+      default: () => {
+        return { children: 'children', title: 'title', key: 'key' }
+      }
+    },
+    transferTip: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {

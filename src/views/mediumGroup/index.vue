@@ -958,7 +958,7 @@
                 <vpload
                   @successDefine="uploadSuccessV"
                   :file-type="2"></vpload>
-                <div>(音频上传大小不超过2MB，播放长度不超过60s,支持AMR,MP3格式。)</div>
+                <div>(音频上传大小不超过2MB，播放长度不超过60s,仅支持AMR格式。)</div>
                 <div v-if="uploadDefine" style="color: red">上传成功</div>
               </a-form-item>
             </a-form-model>
