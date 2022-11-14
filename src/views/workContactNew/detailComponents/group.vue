@@ -1,5 +1,6 @@
 <template>
   <div class="box">
+    <!-- :row-key="record => record.id" -->
     <a-table
       bordered
       :columns="table.col"
