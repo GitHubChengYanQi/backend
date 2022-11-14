@@ -703,53 +703,7 @@ export default {
                 type: 'pie',
                 radius: ['40%', '70%'],
                 tadius: ['50%', '60%'],
-                data: [
-                  {
-                    name: '邮件营销',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件12',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件3',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件4',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件6',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  }
-                ]
+                data: []
               }
             ]
           }
@@ -773,53 +727,7 @@ export default {
                 type: 'pie',
                 radius: ['40%', '70%'],
                 tadius: ['50%', '60%'],
-                data: [
-                  {
-                    name: '邮件营销',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件12',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件3',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件4',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  },
-                  {
-                    name: '邮件6',
-                    value: '335',
-                    label: {
-                      color: '#444444',
-                      fontSize: 14,
-                      formatter: '{b}({d}%)'
-                    }
-                  }
-                ]
+                data: []
               }
             ]
           }
