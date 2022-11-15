@@ -52,6 +52,7 @@
           <a-button
             type="primary"
             class="button"
+            v-permission="'/lossingCustomer/index@search'"
             @click="getSearch"
           >查询</a-button>
           <a-button
@@ -65,6 +66,7 @@
             <a-button
               class="button"
               type="primary"
+              v-permission="'/lossingCustomer/index@exports'"
               @click.prevent
             >导出</a-button>
             <template #overlay>
@@ -109,7 +111,7 @@
                 <div class="client_info">
                   <div class="nickname f-blod fz13">
                     <a-tooltip>
-                      {{ row.contactInfoName.length > 0 ? row.contactInfoName : '--' }}
+                      {{  row.contactInfoNick?.length > 0 ? row.contactInfoNick : '--' }}
                     </a-tooltip>
                   </div>
                   <div class="rek fz12">
@@ -412,6 +414,8 @@ export default {
         createdAt: [],
         tradeConsumeLast: []
       }
+      this.table.pagination.current = 1
+      this.table.pagination.pageSize = 10
       this.getTable()
     },
     handleTableChange ({ current, pageSize }) {
@@ -433,7 +437,8 @@ export default {
           'tradeConsumeLast',
           'tradeConsumeAmount',
           'tradeIntegralAmount',
-          'tradeApplyDate'
+          'tradeApplyDate',
+          'contactInfoMobile'
         ]
         this.table.tableData = res.data.datas.map((item) => {
           for (const key in item) {
@@ -537,6 +542,7 @@ export default {
       }
     }
     .lossingCustomer_table_box {
+      margin-top: 20px;
       .client_box {
         display: flex;
         align-items: center;

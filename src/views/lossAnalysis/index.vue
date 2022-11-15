@@ -82,7 +82,17 @@
     <div class="A_sectorChart_box">
       <div class="A_leftChart_box">
         <div class="hearder_box">
-          <span class="title"><span>机构对比</span><span class="wire"></span></span>
+          <span class="title"><span>机构对比</span><span class="wire"></span>
+            <a-tooltip placement="right">
+              <template #title>
+                <div class="title_box">
+                  <div>更新频率:</div>
+                  <div>每两分钟更新一次</div>
+                </div>
+              </template>
+              <div class="icon">?</div>
+            </a-tooltip>
+          </span>
           <div class="input_box">
             <span
               class="search_box"
@@ -129,7 +139,17 @@
       </div>
       <div class="A_rightChart_box">
         <div class="hearder_box">
-          <span class="title"><span>门店对比</span><span class="wire"></span></span>
+          <span class="title"><span>门店对比</span><span class="wire"></span>
+            <a-tooltip placement="right">
+              <template #title>
+                <div class="title_box">
+                  <div>更新频率:</div>
+                  <div>每两分钟更新一次</div>
+                </div>
+              </template>
+              <div class="icon">?</div>
+            </a-tooltip>
+          </span>
           <div class="input_box">
             <span
               class="search_box"
@@ -188,6 +208,18 @@
             class="wire"
             v-if="table.tab == index"
           ></div>
+        </div>
+        <div class="table_title_box">
+          <span class="title">数据更新频次</span>
+          <a-tooltip placement="right">
+            <template #title>
+              <div class="title_box">
+                <div>更新频率:</div>
+                <div>每五分钟更新一次</div>
+              </div>
+            </template>
+            <div class="icon">?</div>
+          </a-tooltip>
         </div>
       </div>
       <div class="table_search_box">
@@ -265,7 +297,6 @@
           :columns="table.columns[table.tab]"
           :data-source="table.tableData"
           :pagination="table.pagination"
-          :row-selection="{selectedRowKeys:table.rowSelection,onChange: onSelectChange}"
           :scroll="{ x: 1500}"
           @change="handleTableChange"
           ref="table"
@@ -402,6 +433,12 @@ export default {
         tab: 0,
         options: [
           {
+            dataZoom: {
+              type: 'inside',
+              show: true,
+              start: 0,
+              end: 100
+            },
             tooltip: {
               trigger: 'axis',
               axisPointer: {
@@ -1023,8 +1060,7 @@ export default {
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '30', '50']
         },
-        tableData: [],
-        rowSelection: []
+        tableData: []
       },
       timer: ''
     }
@@ -1059,7 +1095,7 @@ export default {
         ...e
       }
       wastageContactCake(obj).then((res) => {
-        console.log(res)
+        // console.log(res)
         if (type == 'employee_agency_id') {
           this.sectorChart.leftChart.options.series[0].data = res.data.data.map((item) => {
             const obj = {}
@@ -1105,9 +1141,6 @@ export default {
     },
     getSearch () {},
     reset () {},
-    onSelectChange (e) {
-      this.table.rowSelection = e
-    },
     handleTableChange (pagination, filters, sorter, extra) {
       console.log(pagination, filters, sorter, extra)
     },
@@ -1116,9 +1149,9 @@ export default {
       if (this.lineChart.tab != 0) {
         obj.tradeStatusStr = '是'
       }
-      console.log(obj)
+      // console.log(obj)
       wastageContactLine(obj).then((res) => {
-        console.log(res)
+        // console.log(res)
         this.lineChart.options[this.lineChart.tab].xAxis.data = res.data.xData
         this.lineChart.options[this.lineChart.tab].series = this.lineChart.options[this.lineChart.tab].series.map(
           (item, index) => {
@@ -1283,6 +1316,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     .A_leftChart_box {
+      margin-bottom: 16px;
       box-sizing: border-box;
       padding: 16px 20px 14px 16px;
       width: 49%;
@@ -1296,6 +1330,8 @@ export default {
         display: flex;
         align-items: center;
         .title {
+          display: flex;
+          align-items: center;
           flex-shrink: 0;
           position: relative;
           font-size: 16px;
@@ -1312,7 +1348,22 @@ export default {
             height: 10px;
             background: #03b976;
           }
+
+          .icon {
+            font-size: 10px;
+            margin-left: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            color: #03b976;
+            border: 1px solid #03b976;
+          }
         }
+
         .input_box {
           margin-left: auto;
           display: flex;
@@ -1345,6 +1396,7 @@ export default {
       }
     }
     .A_rightChart_box {
+      margin-bottom: 16px;
       box-sizing: border-box;
       flex-shrink: 0;
       padding: 16px 20px 14px 16px;
@@ -1357,6 +1409,8 @@ export default {
         display: flex;
         align-items: center;
         .title {
+          display: flex;
+          align-items: center;
           flex-shrink: 0;
           position: relative;
           font-size: 16px;
@@ -1372,6 +1426,20 @@ export default {
             width: 2px;
             height: 10px;
             background: #03b976;
+          }
+
+          .icon {
+            font-size: 10px;
+            margin-left: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            color: #03b976;
+            border: 1px solid #03b976;
           }
         }
         .input_box {
@@ -1407,7 +1475,6 @@ export default {
     }
   }
   .A_table_box {
-    margin-top: 16px;
     width: 100%;
     height: 710px;
     background: #ffffff;
@@ -1442,6 +1509,33 @@ export default {
           border-radius: 4px;
           background: #03b976;
         }
+      }
+    }
+    .table_title_box {
+      display: flex;
+      align-items: center;
+      .title {
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        font-family: PingFang SC-Regular, PingFang SC;
+        font-weight: 400;
+        color: #03b976;
+        line-height: 24px;
+      }
+
+      .icon {
+        font-size: 10px;
+        margin-left: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        color: #03b976;
+        border: 1px solid #03b976;
       }
     }
     .table_search_box {
