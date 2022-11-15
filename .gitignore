@@ -21,4 +21,3 @@ debug.log*
 *.sln
 *.sw*
 package-lock.json
-vue.config.js
