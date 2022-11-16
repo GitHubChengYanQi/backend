@@ -11,10 +11,7 @@
       <template slot="title">
         选择部门/成员
       </template>
-      <div class="tipsStyle" v-if="transferTip">
-        <div>可将选中的客户转接给其他员工，进行后续服务</div>
-        <div>注意:90天内客户只能被转接一次，一个客户最多只能被转接两次详情</div>
-      </div>
+
       <div class="content">
         <div class="fl">
           <!-- tree -->
@@ -28,7 +25,6 @@
             @expand="onExpand"
             :autoExpandParent="autoExpandParent"
             :replaceFields="replaceFields"
-            :fieldNames="fieldNames"
             @check="onCheck"
             checkable
           >
@@ -90,16 +86,6 @@ export default {
     placeholder: {
       type: String,
       default: '请输入搜索项'
-    },
-    fieldNames: {
-      type: Object,
-      default: () => {
-        return { children: 'children', title: 'title', key: 'key' }
-      }
-    },
-    transferTip: {
-      type: Boolean,
-      default: false
     }
   },
   watch: {
@@ -300,14 +286,6 @@ export default {
 <style lang="less" scoped>
 :deep(.ant-modal-body) {
   padding: 0px;
-}
-.tipsStyle{
-  background: #effaff;
-  border-radius: 3px;
-  padding: 9px 16px;
-  font-size: 13px;
-  color: rgba(0,0,0,.65);
-  line-height: 17px;
 }
 .content {
   width: 100%;
