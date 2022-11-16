@@ -28,7 +28,7 @@ export default {
       FileTypeArr: [
         '',
         ['jpg', 'png', 'jpeg'],
-        ['mp3', 'amr'],
+        ['amr'],
         ['mp4'],
         ['doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'txt', 'pdf', 'xmind', 'zip', 'rar']
       ],
