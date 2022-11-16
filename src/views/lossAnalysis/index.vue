@@ -879,8 +879,8 @@ export default {
             {
               align: 'center',
               title: '员工数量',
+              sorter: true,
               dataIndex: 'tag',
-              scopedSlots: { customRender: 'tag' },
               width: 150
             },
             {
@@ -1083,10 +1083,10 @@ export default {
     setValue (e, key, i) {
       this.search[i][key] = e
       const data = this.search[i]
-      if (e == 'lineChart') {
+      if (i == 'lineChartData') {
         this.getLineData(this.getNewSearch(data))
       } else {
-        this.getCakeData(e == 'leftChartData' ? 'employee_agency_id' : 'employee_outlet_id', this.getNewSearch(data))
+        this.getCakeData(i == 'leftChartData' ? 'employee_agency_id' : 'employee_outlet_id', this.getNewSearch(data))
       }
     },
     getCakeData (type, e = {}) {
@@ -1227,7 +1227,7 @@ export default {
     width: 100%;
     .A_lineChart_header {
       width: 100%;
-      min-width: 1120px;
+      min-width: 800px;
       background: #ffffff;
       border-radius: 8px;
       box-sizing: 16px;
@@ -1256,7 +1256,7 @@ export default {
         .lineChart_search_box {
           margin-left: auto;
           display: flex;
-          height: 30px;
+          flex-wrap: wrap;
           .search_box {
             display: flex;
             align-items: center;

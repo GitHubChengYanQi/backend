@@ -252,7 +252,7 @@ export default {
         this.keys = []
         this.rows = []
         this.$emit('input', [])
-        this.$emit('getValue', [])
+        this.$emit('getVal', [])
       } else {
         const keys = []
         for (let i = 0; i < e.length; i++) {
