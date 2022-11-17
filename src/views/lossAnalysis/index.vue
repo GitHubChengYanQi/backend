@@ -255,6 +255,7 @@
         <div class="button_box">
           <a-button
             class="button"
+            v-permission="'/lossAnalysis/index@search'"
             @click="getSearch"
           >查询</a-button>
           <a-button
@@ -270,6 +271,7 @@
             <a-button
               class="button"
               type="primary"
+              v-permission="'/lossAnalysis/index@exports'"
               @click.prevent
             >导出</a-button>
             <template #overlay>
@@ -277,7 +279,7 @@
                 <a-menu-item style="border-bottom:1px solid #ccc;">
                   <div
                     class="down_select"
-                    @click="exportsElxe()"
+                    @click="exportsElxe(2)"
                   >导出当前页</div>
                 </a-menu-item>
                 <a-menu-item>
@@ -291,8 +293,13 @@
           </a-dropdown>
         </div>
       </div>
-      <div class="table_box">
+      <div
+        class="table_box"
+        v-for="item in 3"
+        :key="item"
+      >
         <a-table
+          v-if="item - 1 == table.tab"
           :row-key="record => record.id"
           :columns="table.columns[table.tab]"
           :data-source="table.tableData"
@@ -308,7 +315,8 @@
 </template>
 
 <script>
-import { wastageContactLine, wastageContactCake } from '@/api/lossAnalysis.js'
+import { wastageContactLine, wastageContactCake, wastageContactCalc, wastageContactCome } from '@/api/lossAnalysis.js'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
 
 export default {
   data () {
@@ -387,46 +395,31 @@ export default {
             {
               title: '所属机构',
               type: 'selct_checkbox',
-              key: 'selection_mechanism',
+              key: 'employeeAgencyId',
               placeholder: '请选择机构'
-            },
-            {
-              title: '选择时间',
-              type: 'date',
-              key: 'select_time'
             }
           ],
           1: [
             {
               title: '所属门店',
               type: 'selct_checkbox',
-              key: 'select_store',
+              key: 'employeeOutletId',
               placeholder: '请选择门店'
-            },
-            {
-              title: '选择时间',
-              type: 'date',
-              key: 'select_time'
             }
           ],
           2: [
             {
               title: '所属员工',
               type: 'model',
-              key: 'select_staff',
+              key: 'employeeInfoId',
               placeholder: '请选择员工'
-            },
-            {
-              title: '选择时间',
-              type: 'date',
-              key: 'select_time'
             }
           ]
         },
         tableData: {
-          0: { selection_mechanism: [], select_time: [] },
-          1: { select_store: [], select_time: [] },
-          2: { select_staff: [], select_time: [] }
+          0: { employeeAgencyId: [] },
+          1: { employeeOutletId: [] },
+          2: { employeeInfoId: [] }
         }
       },
       lineChart: {
@@ -777,87 +770,87 @@ export default {
             {
               align: 'center',
               title: '机构名称',
-              dataIndex: 'phone',
+              dataIndex: 'employeeAgencyName',
               width: 150
             },
             {
               align: 'center',
               title: '员工数量',
               sorter: true,
-              dataIndex: 'tag',
+              // sortOrder: this.table.order.columnKey === 'name' && this.table.order,
+              dataIndex: 'infoEmployeeCount',
               width: 150
             },
             {
               align: 'center',
               title: '总客户数',
               sorter: true,
-              dataIndex: 'add_time',
+              dataIndex: 'infoContactCount',
               width: 150
             },
             {
               align: 'center',
               title: '总流失客户数',
               sorter: true,
-              dataIndex: 'subsidiary_organ',
+              dataIndex: 'contactLoseCount',
               width: 150
             },
             {
               align: 'center',
               title: '总流失率',
-              dataIndex: 'subsidiary_stores',
+              dataIndex: 'contactLoseRatio',
               width: 150
             },
             {
               align: 'center',
               title: '总流失会员数',
               sorter: true,
-              dataIndex: 'subsidiary_staff',
+              dataIndex: 'fellowLoseCount',
               width: 150
             },
             {
               align: 'center',
               title: '流失会员占比',
-              dataIndex: 'is_staff',
+              dataIndex: 'fellowLoseRatio',
               width: 150
             },
             {
               align: 'center',
               title: '员工删除客户流失人数',
               sorter: true,
-              dataIndex: 'loss_why',
+              dataIndex: 'deleteClientCount',
               width: 200
             },
             {
               align: 'center',
               title: '员工删除客户流失占比',
-              dataIndex: 'warn_code_name',
+              dataIndex: 'deleteClientRatio',
               width: 200
             },
             {
               align: 'center',
               title: '客户删除员工流失人数',
               sorter: true,
-              dataIndex: 'last_time',
+              dataIndex: 'deleteStaffCount',
               width: 200
             },
             {
               align: 'center',
               title: '客户删除员工流失占比',
-              dataIndex: 'detect_code_name',
+              dataIndex: 'deleteStaffRatio',
               width: 200
             },
             {
               align: 'center',
               sorter: true,
               title: '离职继承失败流失人数',
-              dataIndex: 'integral',
+              dataIndex: 'deleteOverCount',
               width: 200
             },
             {
               align: 'center',
               title: '离职继承失败流失占比',
-              dataIndex: 'is_open',
-              scopedSlots: { customRender: 'is_open' },
+              dataIndex: 'deleteOverRatio',
               fixed: 'right',
               width: 200
             }
@@ -866,93 +859,91 @@ export default {
             {
               align: 'center',
               title: '门店名称',
-              dataIndex: 'client',
-              scopedSlots: { customRender: 'client' },
+              dataIndex: 'employeeOutletName',
               width: 150
             },
             {
               align: 'center',
               title: '所属机构',
-              dataIndex: 'phone',
+              dataIndex: 'employeeAgencyName',
               width: 150
             },
             {
               align: 'center',
               title: '员工数量',
               sorter: true,
-              dataIndex: 'tag',
+              dataIndex: 'infoEmployeeCount',
               width: 150
             },
             {
               align: 'center',
               sorter: true,
               title: '总客户数',
-              dataIndex: 'add_time',
+              dataIndex: 'infoContactCount',
               width: 150
             },
             {
               align: 'center',
               sorter: true,
               title: '总流失客户数',
-              dataIndex: 'subsidiary_organ',
+              dataIndex: 'contactLoseCount',
               width: 150
             },
             {
               align: 'center',
               title: '总流失率',
-              dataIndex: 'subsidiary_stores',
+              dataIndex: 'contactLoseRatio',
               width: 150
             },
             {
               align: 'center',
               title: '总流失会员数',
-              dataIndex: 'subsidiary_staff',
+              dataIndex: 'fellowLoseCount',
               width: 150
             },
             {
               align: 'center',
               title: '流失会员占比',
-              dataIndex: 'is_staff',
+              dataIndex: 'fellowLoseRatio',
               width: 150
             },
             {
               align: 'center',
               sorter: true,
               title: '员工删除客户流失人数',
-              dataIndex: 'loss_why',
+              dataIndex: 'deleteClientCount',
               width: 200
             },
             {
               align: 'center',
               title: '员工删除客户流失占比',
-              dataIndex: 'warn_code_name',
+              dataIndex: 'deleteClientRatio',
               width: 200
             },
             {
               align: 'center',
               sorter: true,
               title: '客户删除员工流失人数',
-              dataIndex: 'last_time',
+              dataIndex: 'deleteStaffCount',
               width: 200
             },
             {
               align: 'center',
               title: '客户删除员工流失占比',
-              dataIndex: 'detect_code_name',
+              dataIndex: 'deleteStaffRatio',
               width: 200
             },
             {
               align: 'center',
               sorter: true,
               title: '离职继承失败流失人数',
-              dataIndex: 'integral',
+              dataIndex: 'deleteOverCount',
               width: 200
             },
             {
               align: 'center',
               title: '离职继承失败流失占比',
-              dataIndex: 'is_open',
-              scopedSlots: { customRender: 'is_open' },
+              dataIndex: 'deleteOverRatio',
               fixed: 'right',
               width: 200
             }
@@ -961,27 +952,25 @@ export default {
             {
               align: 'center',
               title: '员工名称',
-              dataIndex: 'client',
-              scopedSlots: { customRender: 'client' },
+              dataIndex: 'employeeInfoName',
               width: 150
             },
             {
               align: 'center',
               title: '所属门店',
-              dataIndex: 'phone',
+              dataIndex: 'employeeOutletName',
               width: 150
             },
             {
               align: 'center',
               title: '所属机构',
-              dataIndex: 'tag',
-              scopedSlots: { customRender: 'tag' },
+              dataIndex: 'employeeAgencyName',
               width: 150
             },
             {
               align: 'center',
               title: '总客户数',
-              dataIndex: 'add_time',
+              dataIndex: 'infoContactCount',
               sorter: true,
               width: 150
             },
@@ -989,65 +978,64 @@ export default {
               align: 'center',
               title: '总流失客户数',
               sorter: true,
-              dataIndex: 'subsidiary_organ',
+              dataIndex: 'contactLoseCount',
               width: 150
             },
             {
               align: 'center',
               title: '总流失率',
-              dataIndex: 'subsidiary_stores',
+              dataIndex: 'contactLoseRatio',
               width: 150
             },
             {
               align: 'center',
               title: '总流失会员数',
-              dataIndex: 'subsidiary_staff',
+              dataIndex: 'fellowLoseCount',
               width: 150
             },
             {
               align: 'center',
               title: '流失会员占比',
-              dataIndex: 'is_staff',
+              dataIndex: 'fellowLoseRatio',
               width: 150
             },
             {
               align: 'center',
               title: '员工删除客户流失人数',
               sorter: true,
-              dataIndex: 'loss_why',
+              dataIndex: 'deleteClientCount',
               width: 200
             },
             {
               align: 'center',
               title: '员工删除客户流失占比',
-              dataIndex: 'warn_code_name',
+              dataIndex: 'deleteClientRatio',
               width: 200
             },
             {
               align: 'center',
               title: '客户删除员工流失人数',
               sorter: true,
-              dataIndex: 'last_time',
+              dataIndex: 'deleteStaffCount',
               width: 200
             },
             {
               align: 'center',
               title: '客户删除员工流失占比',
-              dataIndex: 'detect_code_name',
+              dataIndex: 'deleteStaffRatio',
               width: 200
             },
             {
               align: 'center',
               title: '离职继承失败流失人数',
-              dataIndex: 'integral',
+              dataIndex: 'deleteOverCount',
               sorter: true,
               width: 200
             },
             {
               align: 'center',
               title: '离职继承失败流失占比',
-              dataIndex: 'is_open',
-              scopedSlots: { customRender: 'is_open' },
+              dataIndex: 'deleteOverRatio',
               fixed: 'right',
               width: 200
             }
@@ -1060,9 +1048,11 @@ export default {
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '30', '50']
         },
-        tableData: []
+        tableData: [],
+        order: {}
       },
-      timer: ''
+      timer: '',
+      tableTimer: ''
     }
   },
   created () {
@@ -1070,10 +1060,12 @@ export default {
     this.getCakeData('employee_agency_id')
     this.getCakeData('employee_outlet_id')
     this.createdTimer()
+    this.getTableData()
   },
   methods: {
     createdTimer () {
       this.timer = setInterval(this.update, 120000)
+      this.tableTimer = setInterval(this.getTableData, 300000)
     },
     update () {
       this.getLineData(this.getNewSearch(this.search.lineChartData))
@@ -1135,14 +1127,95 @@ export default {
     },
     setTableTab (e) {
       this.table.tab = e
+      this.reset()
+      this.getTableData()
     },
     exportsElxe (e) {
-      console.log(e)
+      this.getTableData(e)
     },
-    getSearch () {},
-    reset () {},
-    handleTableChange (pagination, filters, sorter, extra) {
-      console.log(pagination, filters, sorter, extra)
+    getSearch () {
+      this.getTableData()
+    },
+    getTableData (e = 0) {
+      const typeArr = ['employee_agency_id', 'employee_outlet_id', 'employee_info_id']
+      const { pagination } = this.table
+      const { tab, order } = this.table
+      const { tableData } = this.search
+      const searchKey = {
+        infoEmployeeCount: 'info_employee_count',
+        infoContactCount: 'info_contact_coun',
+        contactLoseCount: 'contact_lose_count',
+        fellowLoseCount: 'fellow_lose_count',
+        deleteClientCount: 'delete_client_count',
+        deleteStaffCount: 'delete_staff_count',
+        deleteOverCount: 'delete_over_count'
+      }
+
+      const obj = {
+        calcType: typeArr[tab]
+      }
+      if (e != 1) {
+        obj.current = pagination.current
+        obj.size = pagination.pageSize
+      }
+      if (order.order) {
+        obj.order = searchKey[order.columnKey]
+        obj.queue = order.order == 'ascend'
+      }
+      const saerchArr = ['employeeAgencyId', 'employeeOutletId', 'employeeInfoId']
+      if (tableData[tab][saerchArr[tab]].length > 0) {
+        // 需要特殊处理
+        if (saerchArr[tab] == 'employeeInfoId') {
+          obj[saerchArr[tab]] = tableData[tab][saerchArr[tab]].join(',')
+        } else {
+          obj[saerchArr[tab]] = tableData[tab][saerchArr[tab]]
+            .map((item) => {
+              return item.value
+            })
+            .join(',')
+        }
+      }
+      console.log(obj)
+      if (e == 0) {
+        wastageContactCalc(obj).then((res) => {
+          console.log(res)
+          this.table.tableData = res.data.datas.map((item) => {
+            const keyArr = [
+              'contactLoseRatio',
+              'fellowLoseRatio',
+              'deleteClientRatio',
+              'deleteStaffRatio',
+              'deleteOverRatio'
+            ]
+            for (const key in item) {
+              if (keyArr.includes(key)) {
+                item[key] = item[key] + '%'
+              }
+            }
+            return item
+          })
+          this.table.pagination.total = res.data.total
+        })
+      } else {
+        wastageContactCome(obj).then((res) => {
+          callDownLoadByBlob(res, '流失客户信息')
+        })
+      }
+    },
+    reset () {
+      this.search.tableData = {
+        0: { employeeAgencyId: [] },
+        1: { employeeOutletId: [] },
+        2: { employeeInfoId: [] }
+      }
+      this.table.order = {}
+      this.getTableData()
+    },
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.table.pagination.current = current
+      this.table.pagination.pageSize = pageSize
+      this.table.order = sorter
+      this.getTableData()
     },
     getLineData (e = {}) {
       const obj = { ...e }
@@ -1190,6 +1263,7 @@ export default {
   },
   beforeDestroy () {
     clearInterval(this.timer)
+    clearInterval(this.tableTimer)
   }
 }
 </script>
@@ -1476,7 +1550,7 @@ export default {
   }
   .A_table_box {
     width: 100%;
-    height: 710px;
+    min-height: 710px;
     background: #ffffff;
     border-radius: 8px;
     .table_tab_box {
