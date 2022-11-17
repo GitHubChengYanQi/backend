@@ -16,3 +16,20 @@ export function wastageContactCake (data) {
     data
   })
 }
+
+export function wastageContactCalc (data) {
+  return request({
+    url: '/wastage_contact/calc',
+    method: 'post',
+    data
+  })
+}
+
+export function wastageContactCome (data) {
+  return request({
+    url: '/wastage_contact/come',
+    method: 'post',
+    data,
+    responseType: 'blob'
+  })
+}

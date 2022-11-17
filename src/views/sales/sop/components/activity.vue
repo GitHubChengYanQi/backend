@@ -90,13 +90,6 @@ export default {
           align: 'center',
           width: 200,
           all: true
-        },
-        {
-          title: '未开始客户数',
-          dataIndex: 'notBeginNum',
-          align: 'center',
-          width: 200,
-          all: true
         }
       ],
       tablePagination: {},
@@ -141,7 +134,7 @@ export default {
           width: 250
         },
         {
-          title: '未发客户数',
+          title: '未完成客户数',
           align: 'center',
           dataIndex: 'unsentNum',
           width: 250
