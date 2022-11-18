@@ -242,6 +242,7 @@ export default {
       }
       tempTaskList.push(tempInfo)
       this.currentTimeId = tempInfo.tempId
+      this.selectSopItemIdx = this.currentTimeId
       this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
     },
     // 获取详情
@@ -255,6 +256,7 @@ export default {
         this.employeeIds = this.setEmpIdArray(this.addInfo.empIds)
         this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
         this.currentTimeId = this.addInfo.listTaskInfo[0].id
+        this.selectSopItemIdx = this.currentTimeId
       }).catch(error => {
         console.log(error)
         this.loadingStatus = false

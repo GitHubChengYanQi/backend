@@ -381,6 +381,7 @@ export default {
       }
       tempTaskList.push(tempInfo)
       this.currentTimeId = tempInfo.tempId
+      this.selectSopItemIdx = this.currentTimeId
       this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
       this.$set(this.addInfo, 'lableVal', '')
       this.$set(this.addInfo, 'excludeLable', '')
@@ -406,6 +407,7 @@ export default {
         this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
         console.log(this.addInfo.selectTagList, 'this.addInfo.selectTagList')
         this.currentTimeId = this.addInfo.listTaskInfo[0].id
+        this.selectSopItemIdx = this.currentTimeId
         this.getTagListData()
       }).catch(error => {
         console.log(error)
