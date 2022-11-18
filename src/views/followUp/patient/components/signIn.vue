@@ -433,4 +433,10 @@ export default {
   height: 23px;
   margin-bottom: 4px;
 }
+.labelBox{
+  width:400px;
+  span{
+    margin-bottom:10px;
+  }
+}
 </style>

@@ -30,10 +30,10 @@
         </div>
         <div class="line multiple">
           <span class="label">
-            <span style="color: red">*</span>客户条件
+            <span style="color: red">*</span>筛选客户
           </span>
           <div class="selectBox">
-            <div class="filterListBox">
+            <!-- <div class="filterListBox">
               <a-select v-model="addInfo.optionType" style="width: 200px">
                 <a-select-option :value="1">客户阶段</a-select-option>
               </a-select>
@@ -49,7 +49,7 @@
                   :value="item.code"
                 >{{ item.name }}</a-select-option>
               </a-select>
-            </div>
+            </div> -->
             <div class="filterListBox">
               <span class="selectBtn" @click="showBox(0)">
                 <span
@@ -381,6 +381,7 @@ export default {
       }
       tempTaskList.push(tempInfo)
       this.currentTimeId = tempInfo.tempId
+      this.selectSopItemIdx = this.currentTimeId
       this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
       this.$set(this.addInfo, 'lableVal', '')
       this.$set(this.addInfo, 'excludeLable', '')
@@ -406,6 +407,7 @@ export default {
         this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
         console.log(this.addInfo.selectTagList, 'this.addInfo.selectTagList')
         this.currentTimeId = this.addInfo.listTaskInfo[0].id
+        this.selectSopItemIdx = this.currentTimeId
         this.getTagListData()
       }).catch(error => {
         console.log(error)

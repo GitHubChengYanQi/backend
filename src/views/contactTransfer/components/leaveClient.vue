@@ -10,14 +10,9 @@
                 <a-input v-model="screenData.contactName" placeholder="请输入客户姓名"></a-input>
               </a-form-item>
             </a-col>
-            <a-col :lg="6" style="display:none;">
+            <a-col :lg="6" >
               <a-form-item label="所属员工：" :labelCol="{ lg: { span: 7 } }" :wrapperCol="{ lg: { span: 17 } }">
-                <selectPersonnel
-                  v-model="screenData.employeeId"
-                  :multiple="true"
-                  :num="1"
-                  :type="'selector'"
-                />
+                <a-input v-model="screenData.employeeName" placeholder="请输入员工姓名"></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="6">
@@ -48,12 +43,21 @@
             <span class="f-blod">上次同步时间：{{ data.lastUpdateTime }}</span>
           </div>
           <div class="fr">
-            <a-button
-              type="primary"
-              ghost
-              @click="allocation"
-              v-permission="'/contactTransfer/resignIndex@allocation'"
-            >分配客户</a-button>
+            <!--            <a-button-->
+            <!--              type="primary"-->
+            <!--              ghost-->
+            <!--              @click="allocation"-->
+            <!--              v-permission="'/contactTransfer/resignIndex@allocation'"-->
+            <!--            >分配客户</a-button>-->
+            <SelectPersonnel
+              v-model="treeData"
+              @getVal="acceptData"
+              type="buttonGhost"
+              name="分配客户"
+              :multiple="false"
+              :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+              :transferTip="true"
+              v-permission="'/contactTransfer/resignIndex@allocation'" />
             <a-button type="primary" ghost @click="$router.push('/contactTransfer/resignAllotRecord')" v-permission="'/contactTransfer/resignIndex@resignAllotRecord'">分配记录</a-button>
             <a-button type="primary" ghost @click="updateTo" v-permission="'/contactTransfer/resignIndex@updateTo'">同步</a-button>
             <selectStaff ref="choiceStaff" @change="acceptData" />
@@ -65,7 +69,6 @@
           :columns="columns"
           :data-source="tableData"
           :pagination="pagination"
-          :pageSizeOptions="['10', '20', '30', '50']"
           :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
           :scroll="{ x: 1500 }"
           @change="handleTableChange"
@@ -294,11 +297,12 @@ export default {
      * 接收组件传值
      * @param {*} e
      */
-    acceptData (e) {
+    acceptData (e = []) {
+      if (!e.length) return
       const params = {
         type: 1,
         list: '',
-        takeoverUserId: e
+        takeoverUserId: e[0]
       }
       const arr = this.selectedRows
       const ids = []
@@ -343,14 +347,15 @@ export default {
 
   .table-head {
     height: 50px;
-
+    display: flex;
+    flex-direction: row;
     & > div {
       width: 50%;
     }
 
     .fl {
       float: left;
-
+      width: 50%;
       span {
         font-size: 14px;
         margin-right: 10px;
@@ -362,8 +367,13 @@ export default {
     }
 
     .fr {
-      float: right;
+      width: 50%;
+      flex-direction: row;
+      //float: right;
       text-align: right;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
 
       & > * {
         margin-left: 10px;

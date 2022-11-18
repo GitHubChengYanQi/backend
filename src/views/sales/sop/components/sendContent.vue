@@ -118,6 +118,7 @@
       :getContainer="() => $refs['send_content_container']"
     >
       <a-textarea v-model="contentText" autoSize placeholder="请输入内容" />
+      <span class="len">{{ contentText.length ? contentText.length : '0' }}/1000</span>
       <template slot="footer">
         <a-button @click="closeContentTextModal()">取消</a-button>
         <a-button type="primary" @click="confirmContentText">确定</a-button>
@@ -842,6 +843,10 @@ export default {
       padding-top: 0;
       .ant-input {
         min-height: 100px;
+      }
+      .len {
+        display: block;
+        text-align: end;
       }
     }
   }

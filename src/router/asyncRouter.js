@@ -5,6 +5,32 @@ export const routeList = {
     component: () => import('@/views/corp/index'),
     meta: { title: '企业微信授权' }
   },
+  '/dict/dictData': {
+    path: '/dict/dictData',
+    name: 'dictData',
+    component: () => import('@/views/dict/dictData'),
+    meta: { title: '普通字典' }
+  },
+  '/dict/dictDataDetail': {
+    path: '/dict/dictDataDetail',
+    name: 'dictDataDetail',
+    hidden: true,
+    component: () => import('@/views/dict/dictDataDetail'),
+    meta: { title: '普通字典详情' }
+  },
+  '/dict/dictTreeType': {
+    path: '/dict/dictTreeType',
+    name: 'dictTreeType',
+    component: () => import('@/views/dict/dictTreeType'),
+    meta: { title: '多级字典分类' }
+  },
+  '/dict/dictTreeDict': {
+    path: '/dict/dictTreeDict',
+    name: 'dictTreeDict',
+    hidden: true,
+    component: () => import('@/views/dict/dictTreeDict'),
+    meta: { title: '多级字典详情' }
+  },
   '/corp/create': {
     path: '/corp/create',
     name: 'corpCreate',
@@ -554,12 +580,12 @@ export const routeList = {
     hidden: true,
     meta: { title: '修改群SOP' }
   },
-  '/salesManagement/userSop': {
-    path: '/salesManagement/userSop',
-    name: 'userSop',
-    component: () => import('@/views/salesManagement/userSop'),
-    meta: { title: '客户SOP' }
-  },
+  // '/salesManagement/userSop': {
+  //   path: '/salesManagement/userSop',
+  //   name: 'userSop',
+  //   component: () => import('@/views/salesManagement/userSop'),
+  //   meta: { title: '客户SOP' }
+  // },
   '/salesManagement/addSop': {
     path: '/salesManagement/addSop',
     name: 'addSop',

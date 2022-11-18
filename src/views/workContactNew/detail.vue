@@ -40,7 +40,7 @@
 
         <div class="tag">
           <div class="flex">
-            <div class="title">企业标签：</div>
+            <div class="title">客户标签：</div>
             <div class="tags" v-if="data.contactCorpTag.length">
               <span v-for="group in data.contactCorpTag" :key="group.id">
                 <a-tag v-for="tag in group.tags" :key="tag.tagId">{{ tag.tagName }}</a-tag>
@@ -68,7 +68,36 @@
           <!--            </div>-->
           <!--          </div>-->
         </div>
+        <div class="tag" v-if="currentEmployee.employeeId">
+          <div class="flex">
+            <div class="title">个人标签：</div>
+            <div class="tags" v-if="data.employeeCustomLabelList.length">
+              <span v-for="group in data.employeeCustomLabelList" :key="group.id">
+                <a-tag>{{ group.tagName }}</a-tag>
+              </span>
+              <!--              <span v-if="currentEmployee.employeeId" @click="tagsEdit" style="color: #1890ff;cursor: pointer;"><a-icon type="edit" />编辑</span>-->
+            </div>
+            <div class="tags" v-else>
+              暂无标签
+              <!--              <span v-if="currentEmployee.employeeId" @click="tagsEdit" style="color: #1890ff;cursor: pointer;"><a-icon type="edit" />编辑</span>-->
+            </div>
+          </div>
+          <!--          <div class="flex" style="margin-top: 15px;">-->
+          <!--            <div class="title">个人标签：</div>-->
+          <!--            <div class="tags" v-if="data.contactEmployeeTag.length">-->
 
+          <!--              <a-tag v-for="tag in data.contactEmployeeTag" :key="tag.id">-->
+          <!--                {{ tag.name }}-->
+          <!--              </a-tag>-->
+
+          <!--              <span v-if="currentEmployee.employeeId" @click="personalTagsEdit" style="color: #1890ff;cursor: pointer;"><a-icon type="edit" />编辑</span>-->
+          <!--            </div>-->
+          <!--            <div class="tags" v-else>-->
+          <!--              暂无标签-->
+          <!--              <span v-if="currentEmployee.employeeId" @click="personalTagsEdit" style="color: #1890ff;cursor: pointer;"><a-icon type="edit" />编辑</span>-->
+          <!--            </div>-->
+          <!--          </div>-->
+        </div>
         <div class="step">
           <div class="mt8" v-if="!stepLoading">
             <div class="item flex" v-for="v in stepData" :key="v.employeeId">

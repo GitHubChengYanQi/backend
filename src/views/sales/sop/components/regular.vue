@@ -28,6 +28,18 @@
           </div>
         </template>
       </div>
+      <div slot="showExecuteVal" slot-scope="text">
+        <a-popover title="执行字段">
+          <template slot="content">
+            <div class="labelBox">
+              {{ text }}
+            </div>
+          </template>
+          <a-tag type="button">
+            查看
+          </a-tag>
+        </a-popover>
+      </div>
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
@@ -103,13 +115,6 @@ export default {
           align: 'center',
           width: 200,
           all: true
-        },
-        {
-          title: '未开始客户数',
-          dataIndex: 'notBeginNum',
-          align: 'center',
-          width: 200,
-          all: true
         }
       ],
       tablePagination: {},
@@ -139,7 +144,8 @@ export default {
           title: '执行字段',
           align: 'center',
           dataIndex: 'showExecuteVal',
-          width: 250
+          width: 250,
+          scopedSlots: { customRender: 'showExecuteVal' }
         },
         {
           title: '启用',
@@ -155,7 +161,7 @@ export default {
           width: 250
         },
         {
-          title: '未发客户数',
+          title: '未完成客户数',
           align: 'center',
           dataIndex: 'unsentNum',
           width: 250
@@ -389,4 +395,10 @@ export default {
 </style>
 <style lang="less" scoped>
 @import '../index.less';
+.labelBox{
+  width:400px;
+  span{
+    margin-bottom:10px;
+  }
+}
 </style>

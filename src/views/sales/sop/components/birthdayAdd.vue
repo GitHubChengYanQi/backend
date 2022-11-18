@@ -74,7 +74,7 @@
               >
                 <a-select-option :value="affiliationItem.code" v-for="affiliationItem in returnFilter(addInfo.listSearchInfo[bigIndex].lableStageType)" :key="affiliationItem.code">{{ affiliationItem.name }}</a-select-option>
               </a-select>
-              <div v-if="((addInfo.listSearchInfo[bigIndex].containEmptyType !== 'empty') && (addInfo.listSearchInfo[bigIndex].containEmptyType !== 'noempty'))">
+              <div style="min-width: 200px" v-if="((addInfo.listSearchInfo[bigIndex].containEmptyType !== 'empty') && (addInfo.listSearchInfo[bigIndex].containEmptyType !== 'noempty'))">
                 <div class="selectTags" v-if="addInfo.listSearchInfo[bigIndex].lableStageType == '1'" @click="showBox(bigIndex)">
                   <span class="emptyBtn" v-if="!(addInfo.listSearchInfo[bigIndex].tagsList && (addInfo.listSearchInfo[bigIndex].tagsList.length))">选择标签</span>
                   <span class="label_input_title" v-for="(tagsItem, tagsIndex) in addInfo.listSearchInfo[bigIndex].tagsList" :key="tagsIndex">
@@ -440,7 +440,7 @@ export default {
       await getDictData(params).then(response => {
         this.loadingStatus = false
         console.log(response, '大类数据')
-        this.bigCateList = response.data
+        this.bigCateList = response.data.filter(item => item.name === '标签')
         // this.bigCateList = response.data.map(item => {
         //   item.code = Number(item.code)
         //   return item
@@ -503,6 +503,7 @@ export default {
         this.employeeIds = this.setEmpIdArray(this.addInfo.empIds)
         this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
         this.currentTimeId = this.addInfo.listTaskInfo[0].id
+        this.selectSopItemIdx = this.currentTimeId
       }).catch(error => {
         console.log(error)
         this.loadingStatus = false
@@ -536,6 +537,7 @@ export default {
       // }
       tempTaskList.push(tempInfo)
       this.currentTimeId = tempInfo.tempId
+      this.selectSopItemIdx = this.currentTimeId
       this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
       this.setDefaultCustomerMethod()
     },
