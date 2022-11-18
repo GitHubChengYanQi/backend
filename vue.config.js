@@ -122,7 +122,7 @@ const vueConfig = {
     // development server port 8000
     disableHostCheck: true,
     port: 8000,
-    host: 'localhost',
+    // host: 'localhost',
     open: true,
     overlay: {
       warnings: false,

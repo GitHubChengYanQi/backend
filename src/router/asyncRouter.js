@@ -35,7 +35,7 @@ export const routeList = {
     path: '/corp/create',
     name: 'corpCreate',
     // hidden: true,
-    component: () => import(/* webpackChunkName: "corpCreate" */'@/views/corp/create'),
+    component: () => import(/* webpackChunkName: "corpCreate" */ '@/views/corp/create'),
     meta: { title: '添加企业' }
   },
   '/corp/configManage': {
@@ -465,6 +465,26 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/clientFollow/addRule'),
     meta: { title: '添加规则' }
+  },
+  '/clientFollow/momentsOperation': {
+    path: '/clientFollow/momentsOperation',
+    name: 'momentsOperation',
+    component: () => import('@/views/clientFollow/momentsOperation'),
+    meta: { title: '朋友圈运营' }
+  },
+  '/clientFollow/momentsOperation/add': {
+    path: '/clientFollow/momentsOperation/add',
+    name: 'momentsAdd',
+    hidden: true,
+    component: () => import('@/views/clientFollow/momentsEdit'),
+    meta: { title: '创建朋友圈' }
+  },
+  '/clientFollow/momentsOperation/edit': {
+    path: '/clientFollow/momentsOperation/edit',
+    name: 'momentsEdit',
+    hidden: true,
+    component: () => import('@/views/clientFollow/momentsEdit'),
+    meta: { title: '编辑朋友圈' }
   },
   '/sales/sop': {
     path: '/sales/sop',

@@ -184,7 +184,7 @@ const getSource = (t) => {
   } else if (t === '3') {
     return '设备'
   } else if (t === '4') {
-    return '后端管理平台'
+    return '管理后台'
   } else return t
 }
 
