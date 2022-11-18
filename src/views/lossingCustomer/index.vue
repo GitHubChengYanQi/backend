@@ -111,7 +111,7 @@
                 <div class="client_info">
                   <div class="nickname f-blod fz13">
                     <a-tooltip>
-                      {{  row.contactInfoNick?.length > 0 ? row.contactInfoNick : '--' }}
+                      {{  row.contactInfoName?.length > 0 ? row.contactInfoName : '--' }}
                     </a-tooltip>
                   </div>
                   <div class="rek fz12">
