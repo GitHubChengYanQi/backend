@@ -72,10 +72,22 @@
         </div>
         <div class="A_lineChart">
           <v-chart
+            v-if="state.lineChartState"
             style="width:100%;height:100%"
             :options="lineChart.options[lineChart.tab]"
             ref="chars"
           ></v-chart>
+          <div
+            class="no_data_box"
+            v-else
+          >
+            <img
+              style="width:200px;height:auto;margin-bottom:5px;"
+              :src="require('@/assets/no_data.png')"
+              alt=""
+            >
+            <span>暂无数据</span>
+          </div>
         </div>
       </div>
     </div>
@@ -132,9 +144,21 @@
         </div>
         <div class="leftChart">
           <v-chart
+            v-if="state.leftChartState"
             style="width:100%;height:100%"
             :options="sectorChart.leftChart.options"
           ></v-chart>
+          <div
+            class="no_data_box"
+            v-else
+          >
+            <img
+              style="width:200px;height:auto;margin-bottom:5px;"
+              :src="require('@/assets/no_data.png')"
+              alt=""
+            >
+            <span>暂无数据</span>
+          </div>
         </div>
       </div>
       <div class="A_rightChart_box">
@@ -189,9 +213,21 @@
         </div>
         <div class="rightChart">
           <v-chart
+            v-if="state.rightChartState"
             style="width:100%;height:100%"
             :options="sectorChart.rightChart.options"
           ></v-chart>
+          <div
+            class="no_data_box"
+            v-else
+          >
+            <img
+              style="width:200px;height:auto;margin-bottom:5px;"
+              :src="require('@/assets/no_data.png')"
+              alt=""
+            >
+            <span>暂无数据</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1052,7 +1088,12 @@ export default {
         order: {}
       },
       timer: '',
-      tableTimer: ''
+      tableTimer: '',
+      state: {
+        lineChartState: false,
+        leftChartState: false,
+        rightChartState: false
+      }
     }
   },
   created () {
@@ -1089,6 +1130,7 @@ export default {
       wastageContactCake(obj).then((res) => {
         // console.log(res)
         if (type == 'employee_agency_id') {
+          this.state.leftChartState = res.data.data.length > 0
           this.sectorChart.leftChart.options.series[0].data = res.data.data.map((item) => {
             const obj = {}
             obj.name = item[0]
@@ -1101,6 +1143,7 @@ export default {
             return obj
           })
         } else {
+          this.state.rightChart = res.data.data.length > 0
           this.sectorChart.rightChart.options.series[0].data = res.data.data.map((item) => {
             const obj = {}
             obj.name = item[0]
@@ -1134,6 +1177,7 @@ export default {
       this.getTableData(e)
     },
     getSearch () {
+      this.table.pagination.current = 1
       this.getTableData()
     },
     getTableData (e = 0) {
@@ -1209,6 +1253,8 @@ export default {
         2: { employeeInfoId: [] }
       }
       this.table.order = {}
+      this.table.pagination.current = 1
+      this.table.pagination.pageSize = 10
       this.getTableData()
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
@@ -1225,6 +1271,7 @@ export default {
       // console.log(obj)
       wastageContactLine(obj).then((res) => {
         // console.log(res)
+        this.state.lineChartState = res.data.xData.length > 0
         this.lineChart.options[this.lineChart.tab].xAxis.data = res.data.xData
         this.lineChart.options[this.lineChart.tab].series = this.lineChart.options[this.lineChart.tab].series.map(
           (item, index) => {
@@ -1381,6 +1428,18 @@ export default {
       .A_lineChart {
         width: 100%;
         height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .no_data_box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-family: PingFang SC-Regular, PingFang SC;
+          font-weight: 400;
+        }
       }
     }
   }
@@ -1467,6 +1526,18 @@ export default {
       .leftChart {
         width: 100%;
         height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .no_data_box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-family: PingFang SC-Regular, PingFang SC;
+          font-weight: 400;
+        }
       }
     }
     .A_rightChart_box {
@@ -1545,6 +1616,18 @@ export default {
       .rightChart {
         width: 100%;
         height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .no_data_box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-family: PingFang SC-Regular, PingFang SC;
+          font-weight: 400;
+        }
       }
     }
   }

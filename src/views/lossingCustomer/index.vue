@@ -398,6 +398,7 @@ export default {
       })
     },
     getSearch () {
+      this.table.pagination.current = 1
       this.getTable()
     },
     reset () {

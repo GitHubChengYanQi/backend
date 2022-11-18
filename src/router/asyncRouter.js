@@ -560,12 +560,12 @@ export const routeList = {
     hidden: true,
     meta: { title: '修改群SOP' }
   },
-  '/salesManagement/userSop': {
-    path: '/salesManagement/userSop',
-    name: 'userSop',
-    component: () => import('@/views/salesManagement/userSop'),
-    meta: { title: '客户SOP' }
-  },
+  // '/salesManagement/userSop': {
+  //   path: '/salesManagement/userSop',
+  //   name: 'userSop',
+  //   component: () => import('@/views/salesManagement/userSop'),
+  //   meta: { title: '客户SOP' }
+  // },
   '/salesManagement/addSop': {
     path: '/salesManagement/addSop',
     name: 'addSop',
