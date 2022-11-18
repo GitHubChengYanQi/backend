@@ -111,7 +111,7 @@
                 <div class="client_info">
                   <div class="nickname f-blod fz13">
                     <a-tooltip>
-                      {{  row.contactInfoName?.length > 0 ? row.contactInfoName : '--' }}
+                      {{  row.contactInfoNick?.length > 0 ? row.contactInfoNick : '--' }}
                     </a-tooltip>
                   </div>
                   <div class="rek fz12">
@@ -571,6 +571,13 @@ export default {
         }
       }
     }
+  }
+}
+
+.labelBox {
+  width:400px;
+  span{
+    margin-bottom:10px;
   }
 }
 </style>
