@@ -2,6 +2,7 @@
 node_modules
 /dist
 yarn.lock
+vue.config.js
 # local env files
 #.env
 .env.local

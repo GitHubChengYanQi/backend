@@ -122,7 +122,7 @@ const vueConfig = {
     // development server port 8000
     disableHostCheck: true,
     port: 8000,
-    host: 'localhost',
+    // host: 'localhost',
     open: true,
     overlay: {
       warnings: false,
@@ -130,7 +130,7 @@ const vueConfig = {
     },
     proxy: {
       '/api': {
-        target: 'https://apijavascrm.yifeijiankang.com/',
+        target: 'https://devjavascrm.yifeijiankang.com/',
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.248:6007/',
         // target: 'http://124.70.77.92:6007/',
