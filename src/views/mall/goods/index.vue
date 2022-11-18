@@ -94,7 +94,8 @@
           :scroll="{ x: 1500}"
           @change="handleTableChange">
           <div
-            slot="status">
+            slot="status"
+            slot-scope="record">
             <template>
               <a-switch
                 :checked="record.status == 1"
