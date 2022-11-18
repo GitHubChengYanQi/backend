@@ -122,7 +122,7 @@ const vueConfig = {
     // development server port 8000
     disableHostCheck: true,
     port: 8000,
-    host: 'localhost',
+    // host: 'localhost',
     open: true,
     overlay: {
       warnings: false,
@@ -130,8 +130,12 @@ const vueConfig = {
     },
     proxy: {
       '/api': {
-        target: 'https://apijavascrm.yifeijiankang.com/', // 测试
-        // target: 'https://devjavascrm.yifeijiankang.com/', // 开发
+<<<<<<< HEAD
+        target: 'https://devjavascrm.yifeijiankang.com/',
+=======
+        // target: 'https://apijavascrm.yifeijiankang.com/', // 测试
+        target: 'https://devjavascrm.yifeijiankang.com/', // 开发
+>>>>>>> f6d44c82ca6ad37b9d4f8c6b1e976d43c95f07e7
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.253:6007/',
         // target: 'http://124.70.77.92:6007/',
