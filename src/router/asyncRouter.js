@@ -607,6 +607,20 @@ export const routeList = {
     component: () => import('@/views/riskEarlyWarning/creatingScoringTemplate'),
     meta: { title: '新建评分模型' }
   },
+  // 商城-商品库
+  '/mall/goods': {
+    path: '/mall/goods',
+    name: '商品库',
+    component: () => import('@/views/mall/goods/index'),
+    meta: { title: '商品库' }
+  },
+  // 商城-联合用药
+  '/mall/combination': {
+    path: '/mall/combination',
+    name: '联合用药',
+    component: () => import('@/views/mall/combination/index'),
+    meta: { title: '联合用药' }
+  },
   // 客户跟进-公司话术
   '/speechcraft/company': {
     path: '/speechcraft/company',
