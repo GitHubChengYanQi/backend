@@ -1,13 +1,62 @@
 <template>
   <div>
-    111111111
+    <a-form-model
+      ref="ruleForm"
+      :model="form"
+      :rules="rules"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-form-model-item ref="name" label="联合用药名称" prop="name">
+        <a-input
+          v-model="form.name"
+          @blur="
+            () => {
+              $refs.name.onFieldBlur();
+            }
+          "
+        />
+      </a-form-model-item>
+      <a-form-model-item label="选择分类" prop="region">
+        <a-cascader :options="options" placeholder="Please select" @change="onChange" />
+      </a-form-model-item>
+      
+      <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
+        <a-textarea disabled>1111</a-textarea>
+      </a-form-model-item>
+
+      <a-form-model-item label="设置主药及辅药">
+        <a-button @click="addDrug" type="primary">添加辅助用药</a-button>
+      </a-form-model-item>
+
+      <a-form-model-item class="drugItem" label="主药">
+        <selectDrug></selectDrug>
+      </a-form-model-item>
+
+      <a-form-model-item class="drugItem" v-for="(item,index) in otherList" :key="index" :label="`辅助用药${numMap[index+1]}`">
+        <a-button class="del" type="danger" @click="delFn(index)">删除</a-button>
+        <selectDrug></selectDrug>
+      </a-form-model-item>
+
+      
+      <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
+        <a-button @click="resetForm">
+          取消
+        </a-button>
+        <a-button type="primary" style="margin-left: 10px;" @click="onSubmit">
+          保存
+        </a-button>
+      </a-form-model-item>
+    </a-form-model>
   </div>
 </template>
 
 <script>
-import { contactDetail, contactDetailStat, contactDetailExport } from '@/api/actor'
-import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import selectDrug from './selectDrug.vue'
 export default {
+  components:{
+    selectDrug
+  },
   props: {
     data: {
       type: Object,
@@ -30,166 +79,115 @@ export default {
   },
   data () {
     return {
-      loading: false,
-      id: '',
-      createdAt: '',
-      columns: [
+      labelCol: { span: 4 },
+      wrapperCol: { span: 14 },
+      otherList: [{}],
+      form: {
+        name: '',
+        region: undefined,
+        date1: undefined,
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: '',
+      },
+      options: [
         {
-          title: '协作人',
-          dataIndex: 'collaboratorName',
-          align: 'center',
-          width: 200
+          value: 'zhejiang',
+          label: 'Zhejiang',
+          children: [
+            {
+              value: 'hangzhou',
+              label: 'Hangzhou',
+              children: [
+                {
+                  value: 'xihu',
+                  label: 'West Lake',
+                },
+              ],
+            },
+          ],
         },
         {
-          title: '协作人所属机构',
-          dataIndex: 'collaboratorDepartmentName',
-          width: 80,
-          align: 'left',
-          scopedSlots: { customRender: 'collaboratorDepartmentName' }
+          value: 'jiangsu',
+          label: 'Jiangsu',
+          children: [
+            {
+              value: 'nanjing',
+              label: 'Nanjing',
+              children: [
+                {
+                  value: 'zhonghuamen',
+                  label: 'Zhong Hua Men',
+                },
+              ],
+            },
+          ],
         },
-        {
-          title: '协作人所属门店',
-          dataIndex: 'collaboratorStoreName',
-          align: 'left',
-          width: 100,
-          scopedSlots: { customRender: 'collaboratorStoreName' }
-        },
-        // {
-        //   title: '规则创建时间',
-        //   dataIndex: 'ruleCreatedTime',
-        //   align: 'center',
-        //   width: 80
-        // },
-        // {
-        //   title: '规则起始时间',
-        //   dataIndex: 'ruleStartTime',
-        //   align: 'center',
-        //   width: 80
-        // },
-        {
-          title: '订单笔数',
-          dataIndex: 'orderNum',
-          sorter: true,
-          align: 'center',
-          width: 100
-        },
-        {
-          title: '订单提成金额',
-          dataIndex: 'orderCommissionAmount',
-          align: 'center',
-          width: 80
-        },
-        {
-          title: '主维护人佣金',
-          dataIndex: 'maintainerAmount',
-          align: 'center',
-          width: 100
-        },
-        {
-          title: '协作人佣金',
-          dataIndex: 'collaboratorAmount',
-          align: 'center',
-          width: 100
-        }
       ],
-      tableData: [],
-      record: {},
-      pagination: {
-        total: 0,
-        current: 1,
-        pageSize: 10,
-        showSizeChanger: true,
-        pageSizeOptions: ['10', '20', '30', '50']
+      rules: {
+        name: [
+          { required: true, message: 'Please input Activity name', trigger: 'blur' },
+          { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
+        ]
+      },
+      numMap: {
+        1: 'A',
+        2: 'B',
+        3: 'C',
+        4: 'D',
+        5: 'E',
+        6: 'F',
+        7: 'G',
+        8: 'H',
+        9: 'I',
+        10: 'J'
       }
     }
   },
   methods: {
-    /**
-     * 拉取统计数据
-     */
-    contactDetailStat () {
-      const params = {
-        page: this.pagination.current,
-        perPage: this.pagination.pageSize,
-        contactId: this.id
-      }
-      contactDetailStat(params).then(res => {
-        this.record = res.data
-      })
+    onChange () {
+
     },
-    /**
-     * 拉取列表
-     */
-    getTableData () {
-      this.loading = true
-      const params = {
-        page: this.pagination.current,
-        perPage: this.pagination.pageSize,
-        contactId: this.id,
-        sort: this.pagination.sort
-      }
-      contactDetail(params).then((res) => {
-        this.loading = false
-        this.tableData = res.data.records
-        this.pagination.total = res.data.total
-      })
+    addDrug() {
+      this.otherList.push({})
     },
-    /**
-     * 表格监听事件
-     */
-    handleTableChange (pagination, filters, sorter) {
-      let orderSort = ''
-      if (sorter.order == 'ascend') {
-        orderSort = `${sorter.field}Asc`
+    delFn(index){
+      const len = this.otherList.length
+      if (len === 1) {
+        this.$message.error('至少保留一条数据！')
       } else {
-        orderSort = `${sorter.field}Desc`
+        this.otherList.splice(index,1)
       }
-      this.pagination.current = pagination.current
-      this.pagination.pageSize = pagination.pageSize
-      this.pagination.sort = orderSort
-      this.getTableData()
-      this.contactDetailStat()
     },
-    /**
-     * 导出
-     */
-    exportFn () {
-      this.loading = true
-      const param = {
-        page: this.pagination.current,
-        perPage: this.pagination.pageSize,
-        contactId: this.id
-      }
-      contactDetailExport(param).then((res) => {
-        this.loading = false
-        callDownLoadByBlob(res, '客户协作人详情')
-      })
+    onSubmit() {
+      this.$refs.ruleForm.validate(valid => {
+        if (valid) {
+          alert('submit!');
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    resetForm() {
+      
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-  h2{
-    font-size:18px;
-    i{
-      margin-right:10px;
-      cursor:pointer;
+  .drugItem{
+    position: relative;
+    .del{
+      position: absolute;
+      right:10px;
+      top:0;
     }
-  }
-  .head{
-    height:60px;
-    .fl{
-      float:left;
-      span{
-        margin-right:10px;
-      }
-    }
-    .fr{
-      float:right;
-      span{
-        margin-right:10px;
-      }
+    /deep/ .ant-form-item-control-wrapper{
+      background:#f9f9f9;
+      padding: 10px 0 0 10px;
     }
   }
 </style>
