@@ -167,6 +167,7 @@ export default {
     padding: 20px;
     box-sizing: border-box;
     height: calc(100vh - 250px);
+    overflow: auto;
     .txt{
       span{
         display:block;

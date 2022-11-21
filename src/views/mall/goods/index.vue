@@ -111,7 +111,7 @@
             class="action"
             slot-scope="text, record">
             <template>
-              <a @click="detailFn(record)" v-permission="'/mall/goods@edit'">编辑</a>
+              <a @click="editFn(record)" v-permission="'/mall/goods@edit'">编辑</a>
               <a @click="detailFn(record)" v-permission="'/mall/goods@detail'">详情</a>
             </template>
           </div>
@@ -124,10 +124,12 @@
     <!-- edit -->
     <a-modal v-model="showEdit" title="编辑">
       <a-form :label-col="{ span: 5 }" :wrapper-col="{ span: 17 }">
-        <a-row>
-          <a-col :span="12">药品名称：美林</a-col>
-          <a-col :span="12">批准文号：国药准字H19980087</a-col>
-        </a-row>
+        <a-form-item label="药品名称">
+          <span>美林</span>
+        </a-form-item>
+        <a-form-item label="批准文号">
+          <span>国药准字H19980087</span>
+        </a-form-item>
         <a-form-item label="药品通用名">
           <a-select
             mode="multiple"
@@ -154,17 +156,16 @@
     <!-- end edit -->
 
     <!-- detail -->
-    <a-drawer
-      width="80%"
-      title="详情"
-      placement="right"
-      v-if="visible"
-      :closable="true"
+    <a-modal
+      width="70%"
+      title="商品详情"
       :visible="visible"
-      @close="onClose"
+      :confirm-loading="confirmLoading"
+      :footer="null"
+      @cancel="onClose"
     >
       <detail :data="curParam" />
-    </a-drawer>
+    </a-modal>
     <!-- end detail -->
   </div>
 </template>
@@ -431,6 +432,14 @@ export default {
     detailFn (record) {
       this.curParam = record
       this.visible = true
+    },
+    /**
+     * 
+     * @param {编辑} record 
+     */
+    editFn (record) {
+      this.curParam = record
+      this.showEdit = true
     },
     onClose () {
       this.curParam = {}
