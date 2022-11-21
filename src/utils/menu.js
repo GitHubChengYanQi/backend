@@ -104,6 +104,10 @@ export function setBreadcrumb (path, data) {
     13: {
       path: ['/dict/dictTreeDict'],
       returnPath: '/dict/dictTreeType'
+    },
+    14: {
+      path: ['/clientFollow/momentsOperation/add', '/clientFollow/momentsOperation/edit'],
+      returnPath: '/clientFollow/momentsOperation'
     }
   }
 

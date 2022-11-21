@@ -1,15 +1,18 @@
 <template>
   <div class="momentsOperation_edit-page-container" ref="momentsOperation_edit-page-container">
     <div class="must formBox preview" style="padding-top: 50px;">
-      <div class="sendMomments" @click="sendMomments">保存</div>
+      <div
+        :class="isDisabled ? 'sendMomments sendMommentsDisabled' : 'sendMomments'"
+        @click="isDisabled ? disabledClickHandle() : sendMomments()">保存</div>
       <div class="leftForm">
         <div class="formItem mutiple">
           <span class="label">选择执行员工</span>
           <div class="values">
+            <div v-if="isDisabled" class="disabledBox" style="width: 180px;height: 30px" @click="disabledClickHandle" />
             <selectPersonnel
               v-if="treeData"
               :record="treeData"
-              class="selectPersonnelCom"
+              :class="isDisabled ? 'selectPersonnelCom selectPersonnelComDisabled' : 'selectPersonnelCom'"
               type="button"
               name="选择成员"
               v-model="employeeIds"
@@ -20,12 +23,13 @@
           <span class="label">选取客户</span>
           <div class="values">
             <div class="selectUserBox">
-              <a-radio-group v-model="selectUserType">
+              <a-radio-group v-model="selectUserType" :disabled="isDisabled">
                 <a-radio :value="1">筛选客户</a-radio>
                 <a-radio :value="2">全部客户</a-radio>
               </a-radio-group>
             </div>
             <div class="includesLableBox" v-if="selectUserType === 1">
+              <div v-if="isDisabled" class="disabledBox" @click="disabledClickHandle" />
               <span class="til">包含所有标签:</span>
               <div class="selectLabelBox">
                 <span class="selectBtn" @click="showBox(0, 'selectTagList')">
@@ -39,7 +43,11 @@
             </div>
             <div class="finallyNum">
               预计送达客户数: {{ expectedNum }} 个
-              <span class="reload" @click="reloadExpectNum" v-permission="'/moments/countcontact#post'">刷新</span>
+              <span
+                v-if="!isDisabled"
+                class="reload"
+                @click="getMomentsItemExpectedNum"
+                v-permission="'/moments/countcontact#post'">刷新</span>
             </div>
           </div>
         </div>
@@ -52,10 +60,16 @@
                 v-model="content"
                 placeholder="请输入"
                 :maxLength="2000"
+                :disabled="isDisabled"
                 :auto-size="{ minRows: 5, maxRows: 10 }" />
               <span class="numCount">{{ content.length }} / 2000</span>
             </div>
             <div class="mediasBox">
+              <div
+                v-if="isDisabled"
+                class="disabledBox"
+                style="height: 100px;top:-10px;"
+                @click="disabledClickHandle" />
               <div class="pics" v-if="mediaType === 'photo'">
                 <div class="picItem" v-for="(item, index) in photos" :key="index">
                   <img :src="item.url" alt="" class="pic">
@@ -89,29 +103,29 @@
               </div>
             </div>
             <div class="handleBox">
-              <div
-                v-for="(item, index) in handleBtnArr"
-                :key="index"
-                :class="mediaType ? 'handleBtn disabled' : 'handleBtn'"
-                @click="chooseSendType(item.type)">+ {{
-                  item.name
-                }}</div>
-              <!-- <div
-                class="disabledBox"
-                v-if="!isControlerDisabled"
-                @click="$message.warn('执行后不可修改！')"></div> -->
+              <div style="display: flex;position: relative;">
+                <div v-if="isDisabled" class="disabledBox" @click="disabledClickHandle" />
+                <div
+                  v-for="(item, index) in handleBtnArr"
+                  :key="index"
+                  :class="mediaType ? 'handleBtn disabled' : 'handleBtn'"
+                  @click="chooseSendType(item.type)">+ {{
+                    item.name
+                  }}</div>
+              </div>
             </div>
           </div>
         </div>
         <div class="formItem">
           <span class="label">群发时间</span>
           <div class="values" style="display: flex;align-items:center;">
-            <a-radio-group v-model="sendDateType">
+            <a-radio-group v-model="sendDateType" :disabled="isDisabled">
               <a-radio :value="1">立即发送</a-radio>
               <a-radio :value="2">定时发送</a-radio>
             </a-radio-group>
             <div class="chooseSendDate" v-if="sendDateType === 2">
               <a-date-picker
+                :disabled="isDisabled"
                 dropdownClassName="momentsOperation_edit-page-container-dateItem"
                 :allowClear="false"
                 :showToday="false"
@@ -173,6 +187,7 @@
           <p class="desc">点赞本朋友圈的客户，打上以下标签</p>
           <div class="selectLabelBox">
             <span class="selectBtn" @click="showBox(0, 'likeAddLabel')">
+              <div v-if="isDisabled" class="disabledBox" @click="disabledClickHandle" />
               <span class="emptyBtn" v-if="likeAddLabel.length == 0">+ 添加标签</span>
               <span class="label_input_title" v-for="(item, index) in likeAddLabel" :key="index">
                 {{ item.name }}
@@ -183,6 +198,7 @@
           <p class="desc">评论本朋友圈的客户，打上以下标签</p>
           <div class="selectLabelBox">
             <span class="selectBtn" @click="showBox(0, 'commentLabel')">
+              <div v-if="isDisabled" class="disabledBox" @click="disabledClickHandle" />
               <span class="emptyBtn" v-if="commentLabel.length == 0">+ 添加标签</span>
               <span class="label_input_title" v-for="(item, index) in commentLabel" :key="index">
                 {{ item.name }}
@@ -252,7 +268,7 @@ export default {
   data () {
     return {
       isDone: false,
-      isEdit: false,
+      isDisabled: false,
       date: moment().format('YYYY-MM-DD HH:MM'),
       treeData: [],
       // 企业成员选择
@@ -312,7 +328,6 @@ export default {
   },
   created () {
     if (this.$route.query.id) {
-      this.isEdit = true
       this.getInfo(this.$route.query.id)
     }
   },
@@ -399,12 +414,9 @@ export default {
       this.$refs.labelSelect.idArr = filterIdArr
       this.$refs.labelSelect.inputArr = filterInputArr
     },
-    reloadExpectNum () {
-      console.log('reloadExpectNum')
-    },
     // 发送内容集合
     // 选择单个发送类型
-    chooseSendType (type, isEdit = false) {
+    chooseSendType (type) {
       if (type === 'photo') {
         this.uploadPhotoType = 'addContent'
         this.openSelectPhoto('addContent')
@@ -569,11 +581,11 @@ export default {
       this.closeLinkModal()
     },
     modalLinkEdit () {
-      if (this.mediaFormLibrary) {
-        this.contentLibraryModalShow = true
-      } else {
-        this.contentLinkModalShow = true
-      }
+      // if (this.mediaFormLibrary) {
+      //   this.contentLibraryModalShow = true
+      // } else {
+      this.contentLinkModalShow = true
+      // }
     },
     deleteLink () {
       this.mediaType = ''
@@ -696,14 +708,23 @@ export default {
     },
     // 获取最新的预计人数
     async getMomentsItemExpectedNum () {
-      if (this.employeeIds.length || (!this.selectTagList.length && this.selectUserType === 2) || (this.selectTagList.length && this.selectUserType === 1)) {
-        const res = await getMomentsItemExpectedNumReq({
-          empids: this.employeeIds.join(','),
-          tagids: this.selectTagList.map(it => it.id).join(',')
-        })
-        this.expectedNum = res.data.count
+      if (!this.employeeIds.length) {
+        return
       }
+
+      const res = await getMomentsItemExpectedNumReq({
+        empids: this.employeeIds.join(','),
+        tagids: this.selectTagList.map(it => it.id).join(',')
+      })
+      this.expectedNum = res.data.count
     }
+  },
+  disabledClickHandle (e) {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
+    this.$message.warn('该任务已在进行中，无法更改！')
   }
 }
 </script>
@@ -734,6 +755,10 @@ export default {
       color: rgba(0, 0, 0, 0.6);
       text-shadow: none;
     }
+  }
+
+  .selectPersonnelComDisabled {
+    pointer-events: none;
   }
 
   .contentLinkModal {

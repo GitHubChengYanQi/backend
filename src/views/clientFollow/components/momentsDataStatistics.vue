@@ -18,14 +18,10 @@
         <div class="item">
           <span class="label">选择成员</span>
           <selectPersonnel
-            style="margin-top: 5px;"
-            v-if="treeData"
-            :record="treeData"
-            class="selectPersonnelCom"
-            type="button"
-            name="选择成员"
-            v-model="searchObj.employeeIds"
-            @getVal="e => {this.searchObj.employeeIds = e}" />
+            style="margin-top: 5px;width:200px"
+            :changeId="true"
+            :num="1"
+            v-model="searchObj.employeeIds"/>
         </div>
         <div class="item">
           <span class="label">任务类型</span>
@@ -35,7 +31,7 @@
           </a-select>
         </div>
         <div class="btns" style="margin-top: 5px;">
-          <a-button type="primary" style="width: 80px;" @click="handleSearch">查询</a-button>
+          <a-button type="primary" style="width: 80px;" @click="handleSearch()">查询</a-button>
           <a-button @click="resetChartSearch" style="width: 80px;margin: 0 10px;">重置</a-button>
         </div>
       </div>
@@ -284,9 +280,8 @@ export default {
           oldD.series.push({
             name: '对比员工',
             type: 'line',
-            areaStyle: {
-              color: 'rgb(150 114 203)',
-              opacity: 0.8
+            lineStyle: {
+              color: 'rgb(89 30 181)'
             },
             itemStyle: {
               color: 'rgb(89 30 181)'
@@ -300,8 +295,11 @@ export default {
       }
       this.defaultEchartOptions = oldD
     },
-    handleSearch (...args) {
-      this.getChartData(...args)
+    handleSearch (t) {
+      this.getChartData(t)
+      if (this.contrastIds.length && t !== 'emp') {
+        this.handleSearch('emp')
+      }
     },
     resetChartSearch () {
       this.searchObj = {

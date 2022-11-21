@@ -24,12 +24,14 @@
       <a-button type="primary" style=" height: 30px;" @click="getTableList()">查询</a-button>
       <a-button
         style="margin-left: 10px; height: 30px;"
-        @click="() => {this.searchObj = {
-          time_type: '1',
-          date: [],
-          content: '',
-          status: undefined
-        };this.getTableList()}">重置</a-button>
+        @click="() => {
+          this.searchObj = {
+            time_type: '1',
+            date: [],
+            content: '',
+            status: undefined
+          }; this.getTableList()
+        }">重置</a-button>
       <div class="rigBox">
         <a-button type="primary" @click="createMoments" v-permission="'/moments/add#post'">创建朋友圈</a-button>
         <a-dropdown style="margin-left: 10px;width: 90px;">
@@ -39,7 +41,6 @@
               <a-menu-item>
                 <span @click="getTableList('exp_cur')">导出当前</span>
               </a-menu-item>
-              <!-- v-permission="''" -->
               <a-menu-item>
                 <span @click="getTableList('exp_all')">导出全部</span>
               </a-menu-item>
@@ -63,8 +64,15 @@
       <div slot="operation" slot-scope="text, record">
         <div class="btns">
           <span class="btn" @click="editItem(text)" v-permission="'/moments/edit#post'">编辑</span>
-          <span class="btn" @click="$refs['MomentsTableItemInfoToastRef'].open(record)" v-permission="'/moments/emplist#post'">详情</span>
-          <span class="btn" @click="handleDelete(text)" v-permission="'/moments/delete#post'">删除</span>
+          <span
+            class="btn"
+            @click="$refs['MomentsTableItemInfoToastRef'].open(record)"
+            v-permission="'/moments/emplist#post'">详情</span>
+          <span
+            v-if="record.status === '未开始'"
+            class="btn"
+            @click="handleDelete(text)"
+            v-permission="'/moments/delete#post'">删除</span>
         </div>
       </div>
     </a-table>
@@ -241,14 +249,20 @@ export default {
           this.$message.success('删除成功')
           this.getTableList()
         },
-        onCancel () {}
+        onCancel () { }
       })
     }
   }
 }
 </script>
 <style lang='less'>
-
+.momentsOperation-component_Container {
+  .tableBox {
+    .ant-table {
+      background-color: #fff;
+    }
+  }
+}
 </style>
 <style lang='less' scoped>
 @import './momentsTable.less';
