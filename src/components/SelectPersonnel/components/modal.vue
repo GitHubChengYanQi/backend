@@ -124,6 +124,7 @@ export default {
       }
     },
     handleCancel () {
+      this.searchStr = ''
       this.$emit('output', JSON.parse(sessionStorage.getItem(this.$parent.curId)), 'cancel')
       sessionStorage.removeItem(this.$parent.curId)
       this.modalShow = false
