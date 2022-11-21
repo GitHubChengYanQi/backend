@@ -1143,7 +1143,7 @@ export default {
             return obj
           })
         } else {
-          this.state.rightChart = res.data.data.length > 0
+          this.state.rightChartState = res.data.data.length > 0
           this.sectorChart.rightChart.options.series[0].data = res.data.data.map((item) => {
             const obj = {}
             obj.name = item[0]
