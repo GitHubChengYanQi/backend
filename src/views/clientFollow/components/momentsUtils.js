@@ -176,9 +176,8 @@ export const chartDefaultOptions = {
     {
       name: '朋友圈发表量',
       type: 'line',
-      areaStyle: {
-        color: 'rgb(43 111 253)',
-        opacity: 0.6
+      lineStyle: {
+        color: 'rgb(43 111 253)'
       },
       itemStyle: {
         color: 'rgb(43 111 253)'
