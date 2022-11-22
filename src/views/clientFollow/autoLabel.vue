@@ -277,8 +277,7 @@ export default {
         { title: '关键词打标签', permission: '/clientFollow/autoLabel/keyword', hidden: true },
         { title: '客户入群行为打标签', permission: '/clientFollow/autoLabel/group' },
         { title: '分时段打标签', permission: '/clientFollow/autoLabel/date' },
-        { title: '数值打标签', permission: '/clientFollow/autoLabel/number' },
-        { title: '消费属性打标签', permission: '/clientFollow/autoLabel/expend' }
+        { title: '数值打标签', permission: '/clientFollow/autoLabel/number' }
       ],
       permissionButtonData: {
         addRule: ['', '/groupAutoLabel/add@post', '/timeAutoLabel/add@post', '/numberAutoLabel/add@post'],
@@ -487,54 +486,6 @@ export default {
             width: 200,
             scopedSlots: { customRender: 'operation' }
           }
-        ],
-        [
-          {
-            align: 'center',
-            title: '规则名称',
-            dataIndex: 'name',
-            width: 150
-          },
-          {
-            align: 'center',
-            title: '创建人',
-            dataIndex: 'createBy',
-            width: 150
-          },
-          {
-            align: 'center',
-            title: '创建时间',
-            dataIndex: 'createTime',
-            width: 150
-          },
-          {
-            align: 'center',
-            title: '已打标签数',
-            dataIndex: 'labeledNum',
-            width: 150
-          },
-          {
-            align: 'center',
-            title: '添加的标签',
-            dataIndex: 'labelIdNameGroup',
-            scopedSlots: { customRender: 'labelIdNameGroup' },
-            width: 150
-          },
-          {
-            align: 'center',
-            title: '规则状态',
-            dataIndex: 'status',
-            scopedSlots: { customRender: 'status' },
-            width: 150
-          },
-          {
-            align: 'center',
-            title: '操作',
-            dataIndex: 'operation',
-            fixed: 'right',
-            width: 200,
-            scopedSlots: { customRender: 'operation' }
-          }
         ]
       ],
       tableData: [],
@@ -623,7 +574,7 @@ export default {
         perPage: this.pagination.pageSize
       }
       console.log(obj)
-      const apiArr = ['', groupAutoLabelIndex, timeAutoLabelIndex, numberAutoLabelIndex, numberAutoLabelIndex]
+      const apiArr = ['', groupAutoLabelIndex, timeAutoLabelIndex, numberAutoLabelIndex]
       apiArr[this.table](obj).then((res) => {
         console.log(res)
         this.tableData = res.data.list

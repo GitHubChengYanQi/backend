@@ -18,6 +18,10 @@
     height: 50px;
     cursor: pointer;
   }
+  .sendMommentsDisabled{
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: no-drop;
+  }
   .title {
     font-weight: bold;
     .say {
@@ -27,6 +31,8 @@
   }
   .leftForm {
     width: 65%;
+    padding: 5px;
+    position: relative;
   }
   .rigPhone {
     display: flex;
@@ -179,12 +185,14 @@
     }
     .values {
       flex: 1;
+      position: relative;
       .includesLableBox {
         margin-top: 15px;
         display: flex;
         align-items: flex-start;
         background-color: #f9f9f9;
         padding: 15px 10px;
+        position: relative;
         .til {
           width: 120px;
           margin-top: 5px;
@@ -201,6 +209,7 @@
           align-items: center;
           border-radius: 3px;
           border: 1px dashed #8a8a8a;
+          position: relative;
           cursor: pointer;
           flex-wrap: wrap;
           .emptyBtn {
@@ -275,6 +284,7 @@
         }
       }
       .mediasBox {
+        position: relative;
         margin: 30px 0;
         .pics {
           display: flex;
@@ -429,4 +439,14 @@
   opacity: 0;
   width: 1px;
   height: 1px;
+}
+.disabledBox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  cursor: no-drop;
 }
