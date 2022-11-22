@@ -573,4 +573,11 @@ export default {
     }
   }
 }
+
+.labelBox{
+  width:400px;
+  span{
+    margin-bottom:10px;
+  }
+}
 </style>
