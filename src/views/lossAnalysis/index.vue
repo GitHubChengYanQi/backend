@@ -1,6 +1,6 @@
 <template>
   <div class="lossAnalysis_page">
-    <div class="A_header_title">
+    <div class="lossAnalysis_header_title">
       <span>
         数据更新频次
       </span>
@@ -15,9 +15,9 @@
       </a-tooltip>
 
     </div>
-    <div class="A_lineChart_box">
-      <div class="A_lineChart_header">
-        <div class="A_lineChart_search">
+    <div class="lossAnalysis_lineChart_box">
+      <div class="lossAnalysis_lineChart_header">
+        <div class="lossAnalysis_lineChart_search">
           <span class="title"><span>流失分析</span><span class="wire"></span></span>
           <span class="lineChart_search_box">
             <span
@@ -56,7 +56,7 @@
             </span>
           </span>
         </div>
-        <div class="A_lineChart_tabBox">
+        <div class="lossAnalysis_lineChart_tabBox">
           <span
             class="lineChart_tab"
             @click="setLineChartTab(index)"
@@ -70,7 +70,7 @@
             ></div>
           </span>
         </div>
-        <div class="A_lineChart">
+        <div class="lossAnalysis_lineChart">
           <v-chart
             v-if="state.lineChartState"
             style="width:100%;height:100%"
@@ -78,7 +78,7 @@
             ref="chars"
           ></v-chart>
           <div
-            class="no_data_box"
+            class="no_datlossAnalysis_box"
             v-else
           >
             <img
@@ -91,8 +91,8 @@
         </div>
       </div>
     </div>
-    <div class="A_sectorChart_box">
-      <div class="A_leftChart_box">
+    <div class="lossAnalysis_sectorChart_box">
+      <div class="lossAnalysis_leftChart_box">
         <div class="hearder_box">
           <span class="title"><span>机构对比</span><span class="wire"></span>
             <a-tooltip placement="right">
@@ -149,7 +149,7 @@
             :options="sectorChart.leftChart.options"
           ></v-chart>
           <div
-            class="no_data_box"
+            class="no_datlossAnalysis_box"
             v-else
           >
             <img
@@ -161,7 +161,7 @@
           </div>
         </div>
       </div>
-      <div class="A_rightChart_box">
+      <div class="lossAnalysis_rightChart_box">
         <div class="hearder_box">
           <span class="title"><span>门店对比</span><span class="wire"></span>
             <a-tooltip placement="right">
@@ -218,7 +218,7 @@
             :options="sectorChart.rightChart.options"
           ></v-chart>
           <div
-            class="no_data_box"
+            class="no_datlossAnalysis_box"
             v-else
           >
             <img
@@ -231,7 +231,7 @@
         </div>
       </div>
     </div>
-    <div class="A_table_box">
+    <div class="lossAnalysis_table_box">
       <div class="table_tab_box">
         <div
           class="tab_box"
@@ -1319,7 +1319,7 @@ export default {
 .lossAnalysis_page {
   width: 100%;
   position: relative;
-  .A_header_title {
+  .lossAnalysis_header_title {
     position: absolute;
     top: -36px;
     left: 165px;
@@ -1344,16 +1344,16 @@ export default {
       border: 1px solid #03b976;
     }
   }
-  .A_lineChart_box {
+  .lossAnalysis_lineChart_box {
     width: 100%;
-    .A_lineChart_header {
+    .lossAnalysis_lineChart_header {
       width: 100%;
       min-width: 800px;
       background: #ffffff;
       border-radius: 8px;
       box-sizing: 16px;
       padding: 16px 48px 48px 16px;
-      .A_lineChart_search {
+      .lossAnalysis_lineChart_search {
         display: flex;
         align-items: center;
         .title {
@@ -1400,7 +1400,7 @@ export default {
           }
         }
       }
-      .A_lineChart_tabBox {
+      .lossAnalysis_lineChart_tabBox {
         width: 100%;
         height: 33px;
         display: flex;
@@ -1425,13 +1425,13 @@ export default {
           }
         }
       }
-      .A_lineChart {
+      .lossAnalysis_lineChart {
         width: 100%;
         height: 500px;
         display: flex;
         align-items: center;
         justify-content: center;
-        .no_data_box {
+        .no_datlossAnalysis_box {
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1443,12 +1443,12 @@ export default {
       }
     }
   }
-  .A_sectorChart_box {
+  .lossAnalysis_sectorChart_box {
     margin-top: 16px;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    .A_leftChart_box {
+    .lossAnalysis_leftChart_box {
       margin-bottom: 16px;
       box-sizing: border-box;
       padding: 16px 20px 14px 16px;
@@ -1529,7 +1529,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        .no_data_box {
+        .no_datlossAnalysis_box {
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1540,7 +1540,7 @@ export default {
         }
       }
     }
-    .A_rightChart_box {
+    .lossAnalysis_rightChart_box {
       margin-bottom: 16px;
       box-sizing: border-box;
       flex-shrink: 0;
@@ -1619,7 +1619,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        .no_data_box {
+        .no_datlossAnalysis_box {
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1631,7 +1631,7 @@ export default {
       }
     }
   }
-  .A_table_box {
+  .lossAnalysis_table_box {
     width: 100%;
     min-height: 710px;
     background: #ffffff;

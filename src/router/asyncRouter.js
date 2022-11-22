@@ -740,5 +740,11 @@ export const routeList = {
     name: '流失分析',
     component: () => import('@/views/lossAnalysis/index'),
     meta: { title: '流失分析' }
+  },
+  '/groupTag/index': {
+    path: '/groupTag/index',
+    name: '群标签',
+    component: () => import('@/views/groupTag/index'),
+    meta: { title: '群标签' }
   }
 }
