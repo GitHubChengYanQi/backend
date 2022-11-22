@@ -496,6 +496,46 @@ export const routeList = {
       course: true
     }
   },
+  '/sop/clusterSop': {
+    path: '/sop/clusterSop',
+    name: '群SOP',
+    component: () => import('@/views/sales/sop/clusterSop'),
+    meta: { title: '群SOP' }
+  },
+  '/sop/addClusterSop': {
+    path: '/sop/addClusterSop',
+    name: '新增群SOP',
+    component: () => import('@/views/sales/sop/addClusterSop'),
+    hidden: true,
+    meta: { title: '新增群SOP' }
+  },
+  '/sop/editClusterSop': {
+    path: '/sop/editClusterSop',
+    name: '修改群SOP',
+    component: () => import('@/views/sales/sop/addClusterSop'),
+    hidden: true,
+    meta: { title: '修改群SOP' }
+  },
+  '/sop/clusterCalendar': {
+    path: '/sop/clusterCalendar',
+    name: '群日历',
+    component: () => import('@/views/sales/sop/clusterCalendar'),
+    meta: { title: '群日历' }
+  },
+  '/sop/addClusterCalendar': {
+    path: '/sop/addClusterCalendar',
+    name: '新增群日历',
+    component: () => import('@/views/sales/sop/addClusterCalendar'),
+    hidden: true,
+    meta: { title: '新增群日历' }
+  },
+  '/sop/editClusterCalendar': {
+    path: '/sop/editClusterCalendar',
+    name: '修改群日历',
+    component: () => import('@/views/sales/sop/addClusterCalendar'),
+    hidden: true,
+    meta: { title: '修改群日历' }
+  },
   '/sales/generalAdd': {
     path: '/sales/generalAdd',
     name: 'generalAdd',
