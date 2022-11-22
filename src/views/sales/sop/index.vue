@@ -9,7 +9,6 @@
       <regular v-if="active==='Regular'" :activeInfo="getAciveMethod('Regular')"/>
       <friend v-if="active==='Friend'" :activeInfo="getAciveMethod('Friend')"/>
       <birthday v-if="active==='Birthday'" :activeInfo="getAciveMethod('Birthday')"/>
-      <!-- <cluster v-if="active==='Cluster'" :activeInfo="getAciveMethod('Cluster')"/> -->
     </div>
   </div>
 </template>
@@ -20,7 +19,6 @@ import activity from './components/activity'
 import regular from './components/regular'
 import friend from './components/friend'
 import birthday from './components/birthday'
-// import cluster from './components/cluster'
 export default {
   components: {
     general,
@@ -58,11 +56,6 @@ export default {
           name: '生日SOP',
           explan: '客户生日时，给客户发送指定的生日祝福'
         }
-        // {
-        //   id: 'Cluster',
-        //   name: '群SOP',
-        //   explan: '员工根据任务，通过群发助手一键群发内容到客户群'
-        // }
       ]
     }
   },

@@ -108,6 +108,18 @@ export function setBreadcrumb (path, data) {
     14: {
       path: ['/clientFollow/momentsOperation/add', '/clientFollow/momentsOperation/edit'],
       returnPath: '/clientFollow/momentsOperation'
+    },
+    15: {
+      path: ['/sop/addClusterSop', '/sop/editClusterSop'],
+      returnPath: '/sop/clusterSop'
+    },
+    16: {
+      path: ['/sop/addClusterCalendar', '/sop/editClusterCalendar'],
+      returnPath: '/sop/clusterCalendar'
+    },
+    17: {
+      path: ['/mall/combination/edit', '/mall/combination/add'],
+      returnPath: '/mall/combination'
     }
   }
 

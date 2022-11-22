@@ -1,7 +1,11 @@
 <template>
   <div>
-    <topHeader :activeInfo="activeInfo" @operation="goOperation" @search="goSearch"/>
+    <topHeader
+      :activeInfo="activeInfo"
+      @operation="goOperation"
+      @search="goSearch"/>
     <a-table
+      :loading="tableLoading"
       class="tableBox"
       :row-key="record => record.id"
       :data-source="tableData"
@@ -25,6 +29,7 @@ import topHeader from './topHeader'
 export default {
   data () {
     return {
+      tableLoading: false, // 列表加载状态
       // 列表数据
       tableData: [],
       // 列表表头
@@ -75,10 +80,6 @@ export default {
   },
   components: {
     topHeader
-  },
-  beforeDestroy () {
-    console.log('页面销毁前')
-    sessionStorage.setItem('activeType', 'Cluster')
   },
   methods: {
     // 操作数据

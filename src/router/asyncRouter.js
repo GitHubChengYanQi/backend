@@ -496,6 +496,46 @@ export const routeList = {
       course: true
     }
   },
+  '/sop/clusterSop': {
+    path: '/sop/clusterSop',
+    name: '群SOP',
+    component: () => import('@/views/sales/sop/clusterSop'),
+    meta: { title: '群SOP' }
+  },
+  '/sop/addClusterSop': {
+    path: '/sop/addClusterSop',
+    name: '新增群SOP',
+    component: () => import('@/views/sales/sop/addClusterSop'),
+    hidden: true,
+    meta: { title: '新增群SOP' }
+  },
+  '/sop/editClusterSop': {
+    path: '/sop/editClusterSop',
+    name: '修改群SOP',
+    component: () => import('@/views/sales/sop/addClusterSop'),
+    hidden: true,
+    meta: { title: '修改群SOP' }
+  },
+  '/sop/clusterCalendar': {
+    path: '/sop/clusterCalendar',
+    name: '群日历',
+    component: () => import('@/views/sales/sop/clusterCalendar'),
+    meta: { title: '群日历' }
+  },
+  '/sop/addClusterCalendar': {
+    path: '/sop/addClusterCalendar',
+    name: '新增群日历',
+    component: () => import('@/views/sales/sop/addClusterCalendar'),
+    hidden: true,
+    meta: { title: '新增群日历' }
+  },
+  '/sop/editClusterCalendar': {
+    path: '/sop/editClusterCalendar',
+    name: '修改群日历',
+    component: () => import('@/views/sales/sop/addClusterCalendar'),
+    hidden: true,
+    meta: { title: '修改群日历' }
+  },
   '/sales/generalAdd': {
     path: '/sales/generalAdd',
     name: 'generalAdd',
@@ -626,6 +666,34 @@ export const routeList = {
     name: 'creatingScoringTemplate',
     component: () => import('@/views/riskEarlyWarning/creatingScoringTemplate'),
     meta: { title: '新建评分模型' }
+  },
+  // 商城-商品库
+  '/mall/goods': {
+    path: '/mall/goods',
+    name: '商品库',
+    component: () => import('@/views/mall/goods/index'),
+    meta: { title: '商品库' }
+  },
+  // 商城-联合用药
+  '/mall/combination': {
+    path: '/mall/combination',
+    name: '联合用药',
+    component: () => import('@/views/mall/combination/index'),
+    meta: { title: '联合用药' }
+  },
+  '/mall/combination/edit': {
+    hidden: true,
+    path: '/mall/combination/edit',
+    name: '新增联合用药',
+    component: () => import('@/views/mall/combination/components/combinedDetail'),
+    meta: { title: '新增联合用药' }
+  },
+  '/mall/combination/add': {
+    hidden: true,
+    path: '/mall/combination/add',
+    name: '编辑联合用药',
+    component: () => import('@/views/mall/combination/components/combinedDetail'),
+    meta: { title: '编辑联合用药' }
   },
   // 客户跟进-公司话术
   '/speechcraft/company': {
