@@ -3,7 +3,7 @@
     <div class="must formBox preview" style="padding-top: 50px;">
       <div
         :class="isDisabled ? 'sendMomments sendMommentsDisabled' : 'sendMomments'"
-        @click="isDisabled ? disabledClickHandle() : sendMomments()">保存</div>
+        @click="isDisabled ? disabledClickHandle() : send()">保存</div>
       <div class="leftForm">
         <div class="formItem mutiple">
           <span class="label">选择执行员工</span>
@@ -56,19 +56,20 @@
           <div class="values">
             <div class="textareaBox">
               <a-textarea
+                ref="textareaRef"
                 class="textarea"
                 v-model="content"
                 placeholder="请输入"
-                :maxLength="2000"
+                :maxLength="1000"
                 :disabled="isDisabled"
                 :auto-size="{ minRows: 5, maxRows: 10 }" />
-              <span class="numCount">{{ content.length }} / 2000</span>
+              <span class="numCount">{{ content.length }} / 1000</span>
             </div>
             <div class="mediasBox">
               <div
                 v-if="isDisabled"
                 class="disabledBox"
-                style="height: 100px;top:-10px;"
+                :style="mediaType ? {height: '100px',top:'-10px'} : {}"
                 @click="disabledClickHandle" />
               <div class="pics" v-if="mediaType === 'photo'">
                 <div class="picItem" v-for="(item, index) in photos" :key="index">
@@ -269,6 +270,7 @@ export default {
     return {
       isDone: false,
       isDisabled: false,
+      sendBol: true,
       date: moment().format('YYYY-MM-DD HH:MM'),
       treeData: [],
       // 企业成员选择
@@ -324,6 +326,9 @@ export default {
     },
     selectTagList (e) {
       this.getMomentsItemExpectedNum()
+    },
+    employeeIds () {
+      this.getMomentsItemExpectedNum()
     }
   },
   created () {
@@ -340,7 +345,7 @@ export default {
   beforeRouteLeave (_, __, next) {
     // 导航离开当前路由的时候被调用，this可以被访问到
     // 编辑完成直接退出
-    if (this.isDone) {
+    if (this.isDone || this.isDisabled) {
       next()
       return
     }
@@ -377,11 +382,11 @@ export default {
       this.chooseSendDate = data.group_time
       this.commentLabel = data.commentlab_text
       this.likeAddLabel = data.likelab_text
+      this.isDisabled = data.status !== 0
     },
     // 成员选择
     employeeIdsChange (e) {
       this.employeeIds = e
-      this.getMomentsItemExpectedNum()
     },
     // 选择标签回调用父组件事件集
     showBox (e, targetLables) {
@@ -624,7 +629,7 @@ export default {
       const content = this.modalLibraryObj.temporaryStroageArr[0].content
       if (type === 'text') {
         const str = this.content + content.content
-        this.content = str.slice(0, 2000)
+        this.content = str.slice(0, 1000)
       } else {
         if (type === 'photo') {
           const mapLibraryPhotos = this.modalLibraryObj.temporaryStroageArr.map(it => ({
@@ -661,6 +666,11 @@ export default {
       console.log(e, ' e')
       this.modalLibraryObj.temporaryStroageArr = e
     },
+    send () {
+      if (this.sendBol) {
+        this.sendMomments()
+      }
+    },
     async sendMomments () {
       if (!this.employeeIds.length) {
         this.$message.warning('请选择执行员工！')
@@ -670,11 +680,13 @@ export default {
         return
       } else if (!this.content.trim()) {
         this.$message.warning('请输入内容！')
+        this.$refs['textareaRef'].focus()
         return
       } else if (this.sendDateType === 2 && !this.chooseSendDate) {
         this.$message.warning('请选择发送时间！')
         return
       }
+      this.sendBol = false
       const obj = {
         emp_ids: this.employeeIds.join(','),
         select_type: this.selectUserType,
@@ -691,24 +703,28 @@ export default {
       if (this.sendDateType === 2) {
         obj.group_time = this.chooseSendDate
       }
-
-      if (this.$route.query.id) {
-        obj.id = this.$route.query.id
-        await setMomentsItemInfoReq(obj)
-        console.log(obj, 'obj')
-        this.$message.success('编辑成功！')
-      } else {
-        await addMomentsItemReq(obj)
-        this.$message.success('添加成功！')
+      try {
+        if (this.$route.query.id) {
+          obj.id = this.$route.query.id
+          await setMomentsItemInfoReq(obj)
+          console.log(obj, 'obj')
+          this.$message.success('编辑成功！')
+        } else {
+          await addMomentsItemReq(obj)
+          this.$message.success('添加成功！')
+        }
+      } catch (_) {
+        this.sendBol = true
       }
       this.isDone = true
       this.$nextTick(() => {
         this.$router.go(-1)
+        this.sendBol = true
       })
     },
     // 获取最新的预计人数
     async getMomentsItemExpectedNum () {
-      if (!this.employeeIds.length) {
+      if (!this.employeeIds.length && this.expectedNum === 0) {
         return
       }
 
@@ -717,14 +733,14 @@ export default {
         tagids: this.selectTagList.map(it => it.id).join(',')
       })
       this.expectedNum = res.data.count
+    },
+    disabledClickHandle (e) {
+      if (e) {
+        e.stopPropagation()
+        e.preventDefault()
+      }
+      this.$message.warn('该任务已在进行中，无法更改！')
     }
-  },
-  disabledClickHandle (e) {
-    if (e) {
-      e.stopPropagation()
-      e.preventDefault()
-    }
-    this.$message.warn('该任务已在进行中，无法更改！')
   }
 }
 </script>
