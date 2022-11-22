@@ -108,6 +108,10 @@ export function setBreadcrumb (path, data) {
     14: {
       path: ['/clientFollow/momentsOperation/add', '/clientFollow/momentsOperation/edit'],
       returnPath: '/clientFollow/momentsOperation'
+    },
+    15: {
+      path: ['/mall/combination/edit', '/mall/combination/add'],
+      returnPath: '/mall/combination'
     }
   }
 
