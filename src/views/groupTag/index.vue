@@ -54,7 +54,32 @@
         </template>
       </a-tree>
     </div>
-    <div class="A_right_box"></div>
+    <div class="A_right_box">
+
+      <div class="A_content_box">
+        <div class="A_header_box">
+          <div
+            class="title"
+            :style="index + 1 != titleData.length ? {color:'#ccc'}:{}"
+            v-for="(item,index) in titleData"
+            :key="index"
+          >
+            <span class="icon">
+              <img
+                class="img"
+                :src=" index == 0 ? require('@/assets/branch_start.svg') : require('@/assets/branch_icon.svg')"
+                alt=""
+              >
+            </span>
+            {{ item }}
+            <span
+              class="division"
+              v-if="index + 1 < titleData.length"
+            >></span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -110,7 +135,8 @@ export default {
           ]
         }
       ],
-      selectKey: []
+      selectKey: [],
+      titleData: ['客户群标签', '二级分类', '三级分类']
     }
   },
   methods: {
@@ -156,6 +182,45 @@ export default {
     margin-left: 10px;
     flex-grow: 1;
     background-color: #fff;
+    box-sizing: border-box;
+    padding: 15px;
+    .A_content_box {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #ccc;
+      .A_header_box {
+        box-sizing: border-box;
+        padding-left: 25px;
+        width: 100%;
+        min-height: 45px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        border-bottom: 1px solid #ccc;
+        .title {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.8980392156862745);
+
+          .icon {
+            width: 14px;
+            margin-right: 5px;
+            position: relative;
+            .img {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+            }
+          }
+          .division {
+            color: #ccc;
+            margin: 0 5px;
+          }
+        }
+      }
+    }
   }
 }
 </style>
