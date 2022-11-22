@@ -116,6 +116,10 @@ export function setBreadcrumb (path, data) {
     16: {
       path: ['/sop/addClusterCalendar', '/sop/editClusterCalendar'],
       returnPath: '/sop/clusterCalendar'
+    },
+    17: {
+      path: ['/mall/combination/edit', '/mall/combination/add'],
+      returnPath: '/mall/combination'
     }
   }
 
