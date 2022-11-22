@@ -11,6 +11,7 @@
           <span class="search_input">
             <a-input
               class="input"
+              :maxLength="35"
               v-model="search.data[item.key]"
               :placeholder="item.placeholder"
               v-if="item.type == 'input'"
