@@ -61,7 +61,7 @@
             type="primary"
             :loading="loading"
             v-permission="'/mall/combined@add'"
-            @click="exportFn()">新增</a-button>
+            @click="addFn()">新增</a-button>
         </div>
       </div>
       <a-table
@@ -136,35 +136,19 @@
     </div>
     <!--end table-->
 
-    <!-- detail -->
-    <a-drawer
-      width="80%"
-      title="新增联合用药"
-      placement="right"
-      v-if="visible"
-      :closable="true"
-      :visible="visible"
-      @close="onClose"
-    >
-      <combinedDetail :data="curParam" />
-    </a-drawer>
-    <!-- end detail -->
   </div>
 </template>
 
 <script>
 import moment from 'moment'
-import combinedDetail from './combinedDetail.vue'
-import { relList, userRelExport } from '@/api/actor'
+// import combinedDetail from './combinedDetail.vue'
+import { relList } from '@/api/actor'
 import { deepClone } from '@/utils/util'
-import { callDownLoadByBlob } from '@/utils/downloadUtil'
 export default {
   components: {
-    combinedDetail
   },
   data () {
     return {
-      visible: false,
       loading: false,
       selectedRowKeys: [], // 选中key
       selectedRows: [], // 选中row
@@ -376,41 +360,26 @@ export default {
       this.screenData.createdAtEnd = moment(value[1]).format('YYYY-MM-DD')
     },
     /**
-     * 详情
+     * 编辑
      */
     detailFn (record) {
-      this.curParam = record
-      this.visible = true
-    },
-    onClose () {
-      this.curParam = {}
-      this.visible = false
+      this.$router.push({
+        path: '/mall/combination/edit'
+      })
     },
     /**
-     * 导出
+     * 新增
      */
-    exportFn () {
-      this.loading = true
-      const param = {
-        ...this.screenData
-      }
-      if (this.selectedRowKeys.length > 0) {
-        param.contactIds = this.selectedRowKeys.join(',')
-      } else {
-        param.contactIds = this.selectedRowKeys.join(',')
-        param.storeIds = this.storeIds.length !== 0 ? this.storeIds.join(',') : ''
-        param.maintainerIds = this.screenData.maintainerIds ? this.screenData.maintainerIds.join(',') : ''
-      }
-      userRelExport(param).then((res) => {
-        this.loading = false
-        callDownLoadByBlob(res, '客户协作人')
+    addFn () {
+      this.$router.push({
+        path: '/mall/combination/add'
       })
     },
     /**
      * 部门回调
      */
     getDept (e) {
-      this.storeIds = e
+      console.log(e)
     }
   }
 }

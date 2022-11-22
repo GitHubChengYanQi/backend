@@ -434,8 +434,8 @@ export default {
       this.visible = true
     },
     /**
-     * 
-     * @param {编辑} record 
+     *
+     * @param {编辑} record
      */
     editFn (record) {
       this.curParam = record

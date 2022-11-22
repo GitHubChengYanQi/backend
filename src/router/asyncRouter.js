@@ -641,6 +641,20 @@ export const routeList = {
     component: () => import('@/views/mall/combination/index'),
     meta: { title: '联合用药' }
   },
+  '/mall/combination/edit': {
+    hidden: true,
+    path: '/mall/combination/edit',
+    name: '新增联合用药',
+    component: () => import('@/views/mall/combination/components/combinedDetail'),
+    meta: { title: '新增联合用药' }
+  },
+  '/mall/combination/add': {
+    hidden: true,
+    path: '/mall/combination/add',
+    name: '编辑联合用药',
+    component: () => import('@/views/mall/combination/components/combinedDetail'),
+    meta: { title: '编辑联合用药' }
+  },
   // 客户跟进-公司话术
   '/speechcraft/company': {
     path: '/speechcraft/company',

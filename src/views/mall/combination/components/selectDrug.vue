@@ -47,39 +47,39 @@ export default {
       immediate: true,
       deep: true,
       handler (val) {
-        
+
       }
     }
   },
   data () {
     return {
-      show:false,
+      show: false,
       list: []
     }
   },
   methods: {
-    handleChange(value) {
-      console.log(`selected ${value}`);
+    handleChange (value) {
+      console.log(`selected ${value}`)
       this.show = false
       this.list.push({
         name: value
       })
     },
-    handleBlur() {
-      console.log('blur');
+    handleBlur () {
+      console.log('blur')
     },
-    handleFocus() {
-      console.log('focus');
+    handleFocus () {
+      console.log('focus')
     },
-    filterOption(input, option) {
+    filterOption (input, option) {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      );
+      )
     },
-    handleAdd(){
+    handleAdd () {
       this.show = true
     },
-    handleDelete(e) {
+    handleDelete (e) {
       console.log(e)
     }
   }
