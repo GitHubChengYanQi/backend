@@ -211,8 +211,8 @@
       </div>
     </div>
 
-    <input type="file" accept="image/jpeg" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
-    <input type="file" accept="video/*" ref="uploadVideo" @change="uploadVideo" class="uploadFileInp" />
+    <input type="file" accept="image/png, image/jpg" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
+    <input type="file" accept="video/mp4" ref="uploadVideo" @change="uploadVideo" class="uploadFileInp" />
 
     <a-modal
       title="新增链接"
@@ -225,11 +225,10 @@
       <div class="modalFormBox">
         <div class="line">
           <a-input v-model="modalLinkObj.title" placeholder="请输入链接标题（必填）" />
-          <span class="len">{{ modalLinkObj.title.length || '0' }}/200</span>
+          <span class="len">{{ modalLinkObj.title.length || '0' }}/42</span>
         </div>
         <div class="line">
           <a-input v-model="modalLinkObj.url" placeholder="输入http或https开头的链接地址（必填）" />
-          <span class="len">{{ modalLinkObj.url.length || '0' }}/500</span>
         </div>
         <div class="line textarea">
           <a-textarea v-model="modalLinkObj.desc" autoSize placeholder="请输入内容简介（选填）" />
@@ -257,7 +256,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import moment from 'moment'
-import { upLoad } from '@/api/common'
+import { departmentEmp, upLoad } from '@/api/common'
 import LabelSelect from './components/LabelSelect.vue'
 import { defaultLinkObj, defaultLibraryObj, isUrl, getLibraryMediaType, disabledBeforeDate, getMediaData, returnLabelJSONData } from './components/momentsUtils'
 import { addMomentsItemReq, getMomentsItemInfoReq, setMomentsItemInfoReq, getMomentsItemExpectedNumReq } from '@/api/momentsOperation'
@@ -329,11 +328,22 @@ export default {
     },
     employeeIds () {
       this.getMomentsItemExpectedNum()
+    },
+    'modalLinkObj.title' (e) {
+      if (e.length > 42) {
+        this.modalLinkObj.title = e.slice(0, 42)
+      }
+    },
+    'modalLinkObj.desc' (e) {
+      if (e.length > 170) {
+        this.modalLinkObj.desc = e.slice(0, 170)
+      }
     }
   },
   created () {
     if (this.$route.query.id) {
       this.getInfo(this.$route.query.id)
+      this.getDepartmentEmp()
     }
   },
   computed: {
@@ -740,6 +750,11 @@ export default {
         e.preventDefault()
       }
       this.$message.warn('该任务已在进行中，无法更改！')
+    },
+    // 获取员工列表
+    async getDepartmentEmp () {
+      const { data } = await departmentEmp()
+      this.treeData = data
     }
   }
 }
@@ -820,6 +835,7 @@ export default {
         .textarea {
           .ant-input {
             min-height: 100px;
+            padding-right: 10px;
           }
 
           .len {
