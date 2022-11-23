@@ -21,7 +21,13 @@
           <a-select-option value="2">已完成</a-select-option>
         </a-select>
       </div>
-      <a-button type="primary" style=" height: 30px;" @click="getTableList()">查询</a-button>
+      <a-button
+        type="primary"
+        style=" height: 30px;"
+        @click="() => {
+          this.pagination.current = 1
+          getTableList()
+        }">查询</a-button>
       <a-button
         style="margin-left: 10px; height: 30px;"
         @click="() => {
@@ -69,7 +75,6 @@
             @click="$refs['MomentsTableItemInfoToastRef'].open(record)"
             v-permission="'/moments/emplist#post'">详情</span>
           <span
-            v-if="record.status === '未开始'"
             class="btn"
             @click="handleDelete(text)"
             v-permission="'/moments/delete#post'">删除</span>

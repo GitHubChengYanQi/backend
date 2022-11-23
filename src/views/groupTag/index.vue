@@ -1,14 +1,17 @@
 <template>
-  <div class="A_page">
-    <div class="A_left_box">
+  <div class="groupTag_page">
+    <div class="groupTag_left_box">
       <a-input-search
-        v-model="search"
-        @search="getGroup"
+        v-model="searchStr"
+        @search="onSearch"
         style="margin-bottom: 8px"
         placeholder="请输入分组名称"
       />
       <a-tree
+        v-if="groupData.length"
         :treeData="groupData"
+        @expand="onExpand"
+        :expandedKeys="expandedKeys"
         :defaultExpandAll="true"
         @select="getGroups"
       >
@@ -17,7 +20,15 @@
           slot-scope="item"
         >
           <div class="tree-view-item">
-            <span class="tree-view-left">{{ item.title }}</span>
+            <span
+              class="tree-view-left"
+              v-html="
+                item.title.replace(
+                  new RegExp(searchValue, 'g'),
+                  '<span style=color:#f50>' + searchValue + '</span>'
+                )
+              "
+            ></span>
             <span
               class="tree-view-right"
               v-if="selectKey.includes(item.key)"
@@ -34,17 +45,35 @@
                 />
                 <template #overlay>
                   <a-menu>
-                    <a-menu-item style="border-bottom:1px solid #ccc;">
+                    <a-menu-item v-if="item.operation ? item.operation.includes(0) : false">
                       <div
                         class="down_select"
-                        @click="exportsElxe(2)"
-                      >导出当前页</div>
+                        @click="setGroup(0)"
+                      >新建子分类</div>
                     </a-menu-item>
-                    <a-menu-item>
+                    <a-menu-item v-if="item.operation ? item.operation.includes(1) : false">
                       <div
                         class="down_select"
-                        @click="exportsElxe(1)"
-                      >导出所有</div>
+                        @click="setGroup(1)"
+                      >修改分类</div>
+                    </a-menu-item>
+                    <a-menu-item v-if="item.operation ? item.operation.includes(2) : false">
+                      <div
+                        class="down_select"
+                        @click="setGroup(2)"
+                      >删除分类</div>
+                    </a-menu-item>
+                    <a-menu-item v-if="item.operation ? item.operation.includes(3) : false">
+                      <div
+                        class="down_select"
+                        @click="setGroup(3)"
+                      >向上移动</div>
+                    </a-menu-item>
+                    <a-menu-item v-if="item.operation ? item.operation.includes(4) : false">
+                      <div
+                        class="down_select"
+                        @click="setGroup(4)"
+                      >向下移动</div>
                     </a-menu-item>
                   </a-menu>
                 </template>
@@ -54,10 +83,9 @@
         </template>
       </a-tree>
     </div>
-    <div class="A_right_box">
-
-      <div class="A_content_box">
-        <div class="A_header_box">
+    <div class="groupTag_right_box">
+      <div class="groupTag_content_box">
+        <div class="groupTag_header_box">
           <div
             class="title"
             :style="index + 1 != titleData.length ? {color:'#ccc'}:{}"
@@ -78,22 +106,69 @@
             >></span>
           </div>
         </div>
+        <div class="groupTag_content">
+          <span
+            class="add_box"
+            v-if="add.addState"
+            @click="()=>{
+              add.addState = !add.addState
+            }"
+          >
+            <span class="add_icon">+</span>
+            <span class="add_txt">添加标签</span>
+          </span>
+          <span
+            class="input_box"
+            v-else
+          >
+            <a-input
+              v-model="add.addInput"
+              style="height:24px"
+              placeholder="请输入"
+            ></a-input>
+          </span>
+          <span
+            class="tab_box"
+            v-for="(item,index) in tabArr"
+            :key="index"
+          ><span class="tab_txt">{{ item }}</span><span
+            class="tab_icon"
+            @click="delTab(index)"
+          >+</span></span>
+        </div>
       </div>
     </div>
+    <a-modal
+      v-model="modelData.state"
+      :title="modelData.title"
+      width="591px"
+      @ok="setName"
+      @cancel="()=>{
+        modelData.state = false
+      }"
+    >
+      <div class="model_input_box">
+        <span class="model_input_title"> <span class="model_input_icon">* </span> 标签组名称：</span>
+        <a-input class="modelData.input"></a-input>
+      </div>
+    </a-modal>
   </div>
+
 </template>
 
 <script>
 export default {
   data () {
     return {
-      search: '',
+      expandedKeys: ['99230713'],
+      backupsExpandedKeys: [],
+      searchStr: '',
+      searchValue: '',
       groupData: [
         {
           key: '99230713',
           title: '客户群标签',
-          id: '1',
-          // ⚠️重点这这里⚠️每一条数据上都添加scopedSlots属性
+          operation: [0], // 要展示的操作 0 ， 1， 2， 3，4
           scopedSlots: {
             title: 'custom'
           },
@@ -101,7 +176,6 @@ export default {
             {
               key: '99230992',
               title: '华东区域',
-              id: '2',
               scopedSlots: {
                 title: 'custom'
               },
@@ -136,29 +210,149 @@ export default {
         }
       ],
       selectKey: [],
-      titleData: ['客户群标签', '二级分类', '三级分类']
+      titleData: ['客户群标签', '二级分类', '三级分类'],
+      add: {
+        addState: true,
+        addInput: ''
+      },
+      tabArr: [],
+      modelData: {
+        title: '新增标签组',
+        state: false,
+        input: ''
+      }
     }
   },
+  mounted () {
+    document.addEventListener('click', this.setselectdiv)
+  },
+  destroyed () {
+    document.removeEventListener('click', this.setselectdiv)
+  },
   methods: {
-    getGroup () {
-      console.log(this.search)
+    setName () {},
+    setGroup (e) {
+      if (e == 0 || e == 1) {
+        this.modelData.title = e == 0 ? '新增标签组' : '修改标签组'
+        this.modelData.state = true
+      } else if (e == 2) {
+        this.$confirm({
+          title: '提示',
+          content: '是否删除',
+          okText: '确认',
+          cancelText: '取消',
+          onOk: () => {},
+          onCancel () {}
+        })
+      } else {
+      }
+    },
+    onSearch () {
+      this.searchValue = this.searchStr
+      if (this.searchValue === '') {
+        this.expandedKeys = []
+      } else {
+        this.expandedKeys = []
+        this.backupsExpandedKeys = []
+        const candidateKeysList = this.getkeyList(this.searchValue, this.groupData, [])
+        candidateKeysList.forEach((item) => {
+          const key = this.getParentKey(item, this.groupData)
+          // eslint-disable-next-line no-shadow
+          if (key && !this.backupsExpandedKeys.some((item) => item === key)) {
+            this.backupsExpandedKeys.push(key)
+          }
+        })
+        const { length } = this.backupsExpandedKeys
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < length; i++) {
+          this.getAllParentKey(this.backupsExpandedKeys[i], this.groupData)
+        }
+        this.expandedKeys = this.backupsExpandedKeys.slice()
+      }
+    }, // 获取节点中含有value的所有key集合
+    getkeyList (value, tree, keyList) {
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < tree.length; i++) {
+        const node = tree[i]
+        if (node.title.indexOf(value) > -1) {
+          keyList.push(node.key)
+        }
+        if (node.children) {
+          this.getkeyList(value, node.children, keyList)
+        }
+      }
+      return keyList
+    },
+    // 该递归主要用于获取key的父亲节点的key值
+    getParentKey (key, tree) {
+      let parentKey
+      let temp
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < tree.length; i++) {
+        const node = tree[i]
+        if (node.children) {
+          if (node.children.some((item) => item.key === key)) {
+            parentKey = node.key
+            // eslint-disable-next-line no-cond-assign
+          } else if ((temp = this.getParentKey(key, node.children))) {
+            parentKey = temp
+          }
+        }
+      }
+      return parentKey
+    },
+    // 获取该节点的所有祖先节点
+    getAllParentKey (key, tree) {
+      let parentKey
+      if (key) {
+        parentKey = this.getParentKey(key, tree)
+        if (parentKey) {
+          if (
+            !this.backupsExpandedKeys.some(
+              (item) => item === parentKey
+            )
+          ) {
+            this.backupsExpandedKeys.push(parentKey)
+          }
+          this.getAllParentKey(parentKey, tree)
+        }
+      }
+    },
+    onExpand (expandedKeys) {
+      this.expandedKeys = expandedKeys
+      this.autoExpandParent = false
     },
     getGroups (e) {
       this.selectKey = e
     },
     getSelect (e) {
       console.log(e)
+    },
+    delTab (e) {
+      this.tabArr = this.tabArr.filter((item, index) => {
+        return index != e
+      })
+    },
+    setselectdiv (e) {
+      const thisClassName = e.target.className
+      if (this.add.addState) return
+      const txt = ['input_box', 'add_box', 'add_txt', 'add_icon', 'ant-input']
+      if (!txt.includes(thisClassName)) {
+        this.add.addState = true
+        this.tabArr = [...this.tabArr, this.add.addInput]
+        this.add.addInput = ''
+      }
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.A_page {
+.groupTag_page {
   width: 100%;
   height: 100%;
   display: flex;
-  .A_left_box {
+  .groupTag_left_box {
     width: 230px;
     overflow: auto;
     height: 744px;
@@ -178,17 +372,19 @@ export default {
       }
     }
   }
-  .A_right_box {
+  .groupTag_right_box {
     margin-left: 10px;
     flex-grow: 1;
     background-color: #fff;
     box-sizing: border-box;
     padding: 15px;
-    .A_content_box {
+    .groupTag_content_box {
+      display: flex;
+      flex-direction: column;
       width: 100%;
       height: 100%;
       border: 1px solid #ccc;
-      .A_header_box {
+      .groupTag_header_box {
         box-sizing: border-box;
         padding-left: 25px;
         width: 100%;
@@ -220,6 +416,75 @@ export default {
           }
         }
       }
+      .groupTag_content {
+        flex-grow: 1;
+        box-sizing: border-box;
+        padding: 40px 25px;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        .add_box {
+          cursor: pointer;
+          margin-right: 20px;
+          margin-bottom: 10px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          padding: 0 15px;
+          border-radius: 5px;
+          background-color: #e7e7e7;
+          font-size: 13px;
+          color: rgb(51, 51, 51);
+          .add_icon {
+            transform: translateY(-2px);
+            width: 13px;
+            margin-right: 5px;
+            font-size: 18px;
+            font-weight: 800;
+          }
+        }
+        .input_box {
+          width: 90px;
+          height: 24px;
+        }
+        .tab_box {
+          position: relative;
+          margin-right: 20px;
+          margin-bottom: 10px;
+          min-width: 84px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          padding: 0 15px;
+          border-radius: 5px;
+          background-color: #e7e7e7;
+          font-size: 13px;
+          color: rgb(51, 51, 51);
+          .tab_txt {
+            margin-right: 5px;
+          }
+          .tab_icon {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            right: 2px;
+            transform: translateY(-50%) rotate(45deg);
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+}
+.model_input_box {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  .model_input_title {
+    font-size: 13px;
+    white-space: nowrap;
+    .model_input_icon {
+      color: red;
     }
   }
 }
