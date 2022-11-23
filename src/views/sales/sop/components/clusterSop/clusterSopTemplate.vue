@@ -135,7 +135,14 @@ export default {
     // 重置
     goReset () {},
     // 创建sop模板
-    goAdd () {},
+    goAdd () {
+      this.$router.push({
+        path: '/sop/addClusterSop',
+        query: {
+          id: -1
+        }
+      })
+    },
     // 添加群聊
     addGroupChat () {},
     // 复制
