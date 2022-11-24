@@ -853,5 +853,12 @@ export const routeList = {
     component: () => import('@/views//groupsOperation/joinGroupSaying/edit'),
     meta: { title: '编辑欢迎语' },
     hidden: true
+  },
+  '/groupMess/setGroup': {
+    path: '/groupMess/setGroup',
+    name: '新建群群发',
+    hidden: true,
+    component: () => import('@/views/groupMess/setGroup'),
+    meta: { title: '新建群群发' }
   }
 }

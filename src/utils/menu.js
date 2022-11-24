@@ -128,6 +128,10 @@ export function setBreadcrumb (path, data) {
     19: {
       path: ['/groupsOperation/joinGroupSaying/add', '/groupsOperation/joinGroupSaying/edit'],
       returnPath: '/groupsOperation/joinGroupSaying/index'
+    },
+    20: {
+      path: ['/groupMess/setGroup'],
+      returnPath: '/groupMess/index'
     }
   }
 

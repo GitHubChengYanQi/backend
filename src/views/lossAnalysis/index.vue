@@ -1170,6 +1170,7 @@ export default {
     },
     setTableTab (e) {
       this.table.tab = e
+      this.table.tableData = []
       this.reset()
       this.getTableData()
     },
