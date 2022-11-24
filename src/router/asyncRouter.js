@@ -820,5 +820,12 @@ export const routeList = {
     name: '群群发',
     component: () => import('@/views/groupMess/index'),
     meta: { title: '群群发' }
+  },
+  '/groupMess/setGroup': {
+    path: '/groupMess/setGroup',
+    name: '新建群群发',
+    hidden: true,
+    component: () => import('@/views/groupMess/setGroup'),
+    meta: { title: '新建群群发' }
   }
 }

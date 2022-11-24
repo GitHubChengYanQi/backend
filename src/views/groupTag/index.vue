@@ -149,7 +149,11 @@
     >
       <div class="model_input_box">
         <span class="model_input_title"> <span class="model_input_icon">* </span> 标签组名称：</span>
-        <a-input class="modelData.input"></a-input>
+        <a-input
+          v-model="modelData.input"
+          :maxLength="20"
+        ></a-input>
+        <span class="hint">{{ modelData.input.length + '/20' }}</span>
       </div>
     </a-modal>
   </div>
@@ -307,11 +311,7 @@ export default {
       if (key) {
         parentKey = this.getParentKey(key, tree)
         if (parentKey) {
-          if (
-            !this.backupsExpandedKeys.some(
-              (item) => item === parentKey
-            )
-          ) {
+          if (!this.backupsExpandedKeys.some((item) => item === parentKey)) {
             this.backupsExpandedKeys.push(parentKey)
           }
           this.getAllParentKey(parentKey, tree)
@@ -481,11 +481,18 @@ export default {
   display: flex;
   align-items: center;
   .model_input_title {
+    position: relative;
     font-size: 13px;
     white-space: nowrap;
     .model_input_icon {
       color: red;
     }
+  }
+  .hint {
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translate(0, -50%);
   }
 }
 </style>

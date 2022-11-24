@@ -1,10 +1,10 @@
 <template>
-  <div class="A_page">
-    <a-card class="A_card">
-      <div class="A_content">
-        <div class="A_search_box">
+  <div class="groupMess_page">
+    <a-card class="groupMess_card">
+      <div class="groupMess_content">
+        <div class="groupMess_search_box">
           <span
-            class="A_search"
+            class="groupMess_search"
             v-for="(item,index) in search.inputType"
             :key="index"
           >
@@ -28,7 +28,7 @@
               ></a-input>
             </span>
           </span>
-          <div class="A_search_button">
+          <div class="groupMess_search_button">
             <a-button
               type="primary"
               class="button"
@@ -41,11 +41,11 @@
             <a-button
               type="primary"
               class="goPage"
-              @click="goPage"
+              @click="goPage(0)"
             >新建群聊</a-button>
           </div>
         </div>
-        <div class="A_table_box">
+        <div class="groupMess_table_box">
           <a-table
             :row-key="record => record.id"
             :columns="table.columns"
@@ -62,7 +62,7 @@
               <template>
                 <a-button
                   type="link"
-                  @click="goPage(0,record)"
+                  @click="goPage(3,record)"
                 >详情</a-button>
                 <a-button
                   type="link"
@@ -107,7 +107,7 @@ export default {
         ],
         data: {
           name: '',
-          state: '0'
+          state: ''
         }
       },
       selectArr: {
@@ -197,6 +197,7 @@ export default {
     reset () {},
     goPage (e, id) {
       console.log(e, id)
+      this.$router.push(`/groupMess/setGroup?id=${id}`)
     },
     remove (e) {
       this.$confirm({
@@ -220,18 +221,18 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.A_page {
+.groupMess_page {
   width: 100%;
-  .A_card {
+  .groupMess_card {
     width: 100%;
-    .A_content {
+    .groupMess_content {
       width: 100%;
-      .A_search_box {
+      .groupMess_search_box {
         width: 100%;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        .A_search {
+        .groupMess_search {
           margin-bottom: 20px;
           flex: 0 0 20%;
           display: flex;
@@ -249,7 +250,7 @@ export default {
             }
           }
         }
-        .A_search_button {
+        .groupMess_search_button {
           display: flex;
           justify-content: space-between;
           margin-left: 20px;
