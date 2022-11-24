@@ -26,8 +26,8 @@
         <div class="item">
           <span class="label">任务类型</span>
           <a-select v-model="searchObj.type" style="width: 120px">
-            <a-select-option value="1">企业发表</a-select-option>
-            <a-select-option value="2">自主下发</a-select-option>
+            <a-select-option value="0">企业发表</a-select-option>
+            <a-select-option value="1">自主下发</a-select-option>
           </a-select>
         </div>
         <div class="btns" style="margin-top: 5px;">
@@ -48,13 +48,10 @@
         <v-chart v-if="defaultEchartOptions.xAxis[0].data.length" style="width: 100%;" :options="defaultEchartOptions" ref="chart"></v-chart>
         <div class="contranstLine">
           <selectPersonnel
-            v-if="treeData"
-            :record="treeData"
-            class="selectPersonnelCom selectPersonnelCom_dashed"
-            type="button"
-            name="选择成员"
-            v-model="contrastIds"
-            @getVal="contrastIdsChange" />
+            style="width:200px"
+            :changeId="true"
+            :num="1"
+            v-model="contrastIds"/>
           <div class="show"><div class="dot"></div>对比员工</div>
         </div>
       </div>
@@ -76,20 +73,16 @@
         <div class="item">
           <span class="label">选择成员</span>
           <selectPersonnel
-            style="margin-top: 5px;"
-            v-if="treeData"
-            :record="treeData"
-            class="selectPersonnelCom"
-            type="button"
-            name="选择成员"
-            v-model="statisticsSearchObj.employeeIds"
-            @getVal="(e) => {this.statisticsSearchObj.employeeIds = e}" />
+            style="width:200px;"
+            :changeId="true"
+            :num="1"
+            v-model="statisticsSearchObj.employeeIds"/>
         </div>
         <div class="item">
           <span class="label">任务类型</span>
           <a-select v-model="statisticsSearchObj.type" style="width: 120px">
-            <a-select-option value="1">企业发表</a-select-option>
-            <a-select-option value="2">自主下发</a-select-option>
+            <a-select-option value="0">企业发表</a-select-option>
+            <a-select-option value="1">自主下发</a-select-option>
           </a-select>
         </div>
         <div class="btns" style="margin-top: 5px;">
@@ -312,7 +305,7 @@ export default {
     chartLineChange (index) {
       const { theme, name } = this.lineArrs[index]
       this.defaultEchartOptions.series[0].name = name
-      this.defaultEchartOptions.series[0].areaStyle.color = `rgb(${theme})`
+      this.defaultEchartOptions.series[0].lineStyle.color = `rgb(${theme})`
       this.defaultEchartOptions.series[0].itemStyle.color = `rgb(${theme})`
       this.handleSearch()
       if (this.contrastIds.length) {

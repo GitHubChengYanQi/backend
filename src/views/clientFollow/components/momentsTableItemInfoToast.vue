@@ -116,6 +116,13 @@ export default {
       }
     }
   },
+  watch: {
+    visible (e) {
+      if (!e) {
+        this.status = '0'
+      }
+    }
+  },
   created () { },
   methods: {
     open (data) {
