@@ -120,6 +120,14 @@ export function setBreadcrumb (path, data) {
     17: {
       path: ['/mall/combination/edit', '/mall/combination/add'],
       returnPath: '/mall/combination'
+    },
+    18: {
+      path: ['/groupsOperation/groupList/groupItemDetail'],
+      returnPath: '/groupsOperation/groupList/index'
+    },
+    19: {
+      path: ['/groupsOperation/joinGroupSaying/add', '/groupsOperation/joinGroupSaying/edit'],
+      returnPath: '/groupsOperation/joinGroupSaying/index'
     }
   }
 

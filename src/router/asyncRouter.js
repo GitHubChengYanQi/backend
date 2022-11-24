@@ -820,5 +820,38 @@ export const routeList = {
     name: '群群发',
     component: () => import('@/views/groupMess/index'),
     meta: { title: '群群发' }
+  },
+  '/groupsOperation/groupList/index': {
+    path: '/groupsOperation/groupList/index',
+    name: '群列表',
+    component: () => import('@/views/groupsOperation/groupList/index'),
+    meta: { title: '群列表' }
+  },
+  '/groupsOperation/groupList/groupItemDetail': {
+    path: '/groupsOperation/groupList/groupItemDetail',
+    name: '客户群详情',
+    component: () => import('@/views/groupsOperation/groupList/groupItemDetail'),
+    meta: { title: '客户群详情' },
+    hidden: true
+  },
+  '/groupsOperation/joinGroupSaying/index': {
+    path: '/groupsOperation/joinGroupSaying/index',
+    name: '入群欢迎语',
+    component: () => import('@/views//groupsOperation/joinGroupSaying/index'),
+    meta: { title: '入群欢迎语' }
+  },
+  '/groupsOperation/joinGroupSaying/add': {
+    path: '/groupsOperation/joinGroupSaying/add',
+    name: '创建欢迎语',
+    component: () => import('@/views//groupsOperation/joinGroupSaying/edit'),
+    meta: { title: '创建欢迎语' },
+    hidden: true
+  },
+  '/groupsOperation/joinGroupSaying/edit': {
+    path: '/groupsOperation/joinGroupSaying/edit',
+    name: '编辑欢迎语',
+    component: () => import('@/views//groupsOperation/joinGroupSaying/edit'),
+    meta: { title: '编辑欢迎语' },
+    hidden: true
   }
 }
