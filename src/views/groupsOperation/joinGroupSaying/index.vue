@@ -22,7 +22,7 @@
             {{ text }}
           </div>
         </div>
-        <div slot="operation" slot-scope="text, record">
+        <div slot="operation" slot-scope="text">
           <div class="btns">
             <span class="btn" @click="$router.push(`/groupsOperation/groupList/groupItemDetail`)">编辑</span>
             <span

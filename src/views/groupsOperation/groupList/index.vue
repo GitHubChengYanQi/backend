@@ -101,7 +101,8 @@
             {{ item }}
           </div>
         </div>
-        <div slot="operation" slot-scope="text, record">
+        <!-- text, record -->
+        <div slot="operation" slot-scope="">
           <div class="btns">
             <span class="btn" @click="groupItemSettingModal.visible = true">设置</span>
             <span class="btn" @click="$router.push(`/groupsOperation/groupList/groupItemDetail`)">详情</span>

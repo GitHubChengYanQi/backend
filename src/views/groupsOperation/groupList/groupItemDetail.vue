@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { disabledBeforeDate, searchDateItemRanges, chartDefaultOptions, returnChartData } from '../groupUtils'
+import { disabledBeforeDate, searchDateItemRanges, chartDefaultOptions } from '../groupUtils'
 
 const dayNum = 1000 * 60 * 60 * 24
 const maxDayNum = dayNum * 365 // 最大搜索天数不超过一年
