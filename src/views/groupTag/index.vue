@@ -11,6 +11,7 @@
         v-if="groupData.length"
         :treeData="groupData"
         @expand="onExpand"
+        :selectedKeys="selectKey"
         :expandedKeys="expandedKeys"
         :defaultExpandAll="true"
         @select="getGroups"
@@ -48,31 +49,31 @@
                     <a-menu-item v-if="item.operation ? item.operation.includes(0) : false">
                       <div
                         class="down_select"
-                        @click="setGroup(0)"
+                        @click="setGroup(0,item)"
                       >新建子分类</div>
                     </a-menu-item>
                     <a-menu-item v-if="item.operation ? item.operation.includes(1) : false">
                       <div
                         class="down_select"
-                        @click="setGroup(1)"
+                        @click="setGroup(1,item)"
                       >修改分类</div>
                     </a-menu-item>
                     <a-menu-item v-if="item.operation ? item.operation.includes(2) : false">
                       <div
                         class="down_select"
-                        @click="setGroup(2)"
+                        @click="setGroup(2,item)"
                       >删除分类</div>
                     </a-menu-item>
                     <a-menu-item v-if="item.operation ? item.operation.includes(3) : false">
                       <div
                         class="down_select"
-                        @click="setGroup(3)"
+                        @click="setGroup(3,item)"
                       >向上移动</div>
                     </a-menu-item>
                     <a-menu-item v-if="item.operation ? item.operation.includes(4) : false">
                       <div
                         class="down_select"
-                        @click="setGroup(4)"
+                        @click="setGroup(4,item)"
                       >向下移动</div>
                     </a-menu-item>
                   </a-menu>
@@ -84,7 +85,7 @@
       </a-tree>
     </div>
     <div class="groupTag_right_box">
-      <div class="groupTag_content_box">
+      <div class="groupTag_content_box" v-if="selectKey.length > 0">
         <div class="groupTag_header_box">
           <div
             class="title"
@@ -145,15 +146,16 @@
       @ok="setName"
       @cancel="()=>{
         modelData.state = false
+        modelData.unitName = ''
       }"
     >
       <div class="model_input_box">
         <span class="model_input_title"> <span class="model_input_icon">* </span> 标签组名称：</span>
         <a-input
-          v-model="modelData.input"
+          v-model="modelData.unitName"
           :maxLength="20"
         ></a-input>
-        <span class="hint">{{ modelData.input.length + '/20' }}</span>
+        <span class="hint">{{ modelData.unitName.length + '/20' }}</span>
       </div>
     </a-modal>
   </div>
@@ -161,58 +163,22 @@
 </template>
 
 <script>
+import {
+  workRoomLabelTree,
+  workRoomLabelSave,
+  workRoomLabelDrop,
+  workRoomLabelLoad,
+  workRoomLabelMove
+} from '@/api/groupTag.js'
+
 export default {
   data () {
     return {
-      expandedKeys: ['99230713'],
+      expandedKeys: [],
       backupsExpandedKeys: [],
       searchStr: '',
       searchValue: '',
-      groupData: [
-        {
-          key: '99230713',
-          title: '客户群标签',
-          operation: [0], // 要展示的操作 0 ， 1， 2， 3，4
-          scopedSlots: {
-            title: 'custom'
-          },
-          children: [
-            {
-              key: '99230992',
-              title: '华东区域',
-              scopedSlots: {
-                title: 'custom'
-              },
-              children: [
-                {
-                  key: '99230112',
-                  title: '杭州万科',
-                  scopedSlots: {
-                    title: 'custom'
-                  },
-                  children: []
-                }
-              ]
-            },
-            {
-              key: '99230993',
-              title: '华南区域',
-              scopedSlots: {
-                title: 'custom'
-              },
-              children: []
-            },
-            {
-              key: '99231020',
-              title: '华北区域',
-              scopedSlots: {
-                title: 'custom'
-              },
-              children: []
-            }
-          ]
-        }
-      ],
+      groupData: [],
       selectKey: [],
       titleData: ['客户群标签', '二级分类', '三级分类'],
       add: {
@@ -223,9 +189,13 @@ export default {
       modelData: {
         title: '新增标签组',
         state: false,
-        input: ''
+        unitName: '',
+        operation: 0
       }
     }
+  },
+  created () {
+    this.getTree()
   },
   mounted () {
     document.addEventListener('click', this.setselectdiv)
@@ -234,11 +204,53 @@ export default {
     document.removeEventListener('click', this.setselectdiv)
   },
   methods: {
-    setName () {},
-    setGroup (e) {
+    getTree () {
+      const obj = {}
+      workRoomLabelTree(obj).then((res) => {
+        console.log(res)
+        this.groupData = [res.data.root]
+        this.expandedKeys = [res.data.root.key]
+      })
+    },
+    setName () {
+      const { unitName, operation } = this.modelData
+      const obj = {
+        unitName
+      }
+      if (operation == 0) {
+        obj.parentId = this.selectKey[0]
+      } else {
+        obj.id = this.selectKey[0]
+      }
+      console.log(obj)
+      workRoomLabelSave(obj).then((res) => {
+        console.log(res)
+        this.getTree()
+        this.modelData.state = false
+      })
+    },
+    moveGroup (id) {
+      const obj = {
+        id
+      }
+      workRoomLabelMove(obj).then(res => {
+        console.log(res)
+      })
+    },
+    delGrop (id) {
+      const obj = {
+        id
+      }
+      workRoomLabelDrop(obj).then((res) => {
+        console.log(res)
+      })
+    },
+    setGroup (e, item) {
+      this.modelData.operation = e
       if (e == 0 || e == 1) {
         this.modelData.title = e == 0 ? '新增标签组' : '修改标签组'
         this.modelData.state = true
+        this.modelData.unitName = e == 0 ? '' : item.title
       } else if (e == 2) {
         this.$confirm({
           title: '提示',
@@ -322,8 +334,17 @@ export default {
       this.expandedKeys = expandedKeys
       this.autoExpandParent = false
     },
-    getGroups (e) {
-      this.selectKey = e
+    getGroups (id) {
+      this.selectKey = id
+      this.getTag()
+    },
+    getTag () {
+      const obj = {
+        id: this.selectKey[0]
+      }
+      workRoomLabelLoad(obj).then((res) => {
+        console.log(res)
+      })
     },
     getSelect (e) {
       console.log(e)
@@ -338,6 +359,13 @@ export default {
       if (this.add.addState) return
       const txt = ['input_box', 'add_box', 'add_txt', 'add_icon', 'ant-input']
       if (!txt.includes(thisClassName)) {
+        const obj = {
+          itemName: this.add.addInput,
+          parentId: this.selectKey[0]
+        }
+        workRoomLabelSave(obj).then((res) => {
+          console.log(res)
+        })
         this.add.addState = true
         this.tabArr = [...this.tabArr, this.add.addInput]
         this.add.addInput = ''

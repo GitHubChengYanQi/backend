@@ -16,3 +16,27 @@ export function workRoomLabelSave (data) {
     data
   })
 }
+
+export function workRoomLabelDrop (data) {
+  return request({
+    url: 'work_room_label/drop',
+    method: 'post',
+    data
+  })
+}
+
+export function workRoomLabelLoad (data) {
+  return request({
+    url: 'work_room_label/load',
+    method: 'post',
+    data
+  })
+}
+
+export function workRoomLabelMove (data) {
+  return request({
+    url: 'work_room_label/move',
+    method: 'post',
+    data
+  })
+}
