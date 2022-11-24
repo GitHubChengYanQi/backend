@@ -26,8 +26,8 @@
         <div class="item">
           <span class="label">任务类型</span>
           <a-select v-model="searchObj.type" style="width: 120px">
-            <a-select-option value="1">企业发表</a-select-option>
-            <a-select-option value="2">自主下发</a-select-option>
+            <a-select-option value="0">企业发表</a-select-option>
+            <a-select-option value="1">自主下发</a-select-option>
           </a-select>
         </div>
         <div class="btns" style="margin-top: 5px;">
@@ -81,8 +81,8 @@
         <div class="item">
           <span class="label">任务类型</span>
           <a-select v-model="statisticsSearchObj.type" style="width: 120px">
-            <a-select-option value="1">企业发表</a-select-option>
-            <a-select-option value="2">自主下发</a-select-option>
+            <a-select-option value="0">企业发表</a-select-option>
+            <a-select-option value="1">自主下发</a-select-option>
           </a-select>
         </div>
         <div class="btns" style="margin-top: 5px;">
@@ -305,7 +305,7 @@ export default {
     chartLineChange (index) {
       const { theme, name } = this.lineArrs[index]
       this.defaultEchartOptions.series[0].name = name
-      this.defaultEchartOptions.series[0].areaStyle.color = `rgb(${theme})`
+      this.defaultEchartOptions.series[0].lineStyle.color = `rgb(${theme})`
       this.defaultEchartOptions.series[0].itemStyle.color = `rgb(${theme})`
       this.handleSearch()
       if (this.contrastIds.length) {
