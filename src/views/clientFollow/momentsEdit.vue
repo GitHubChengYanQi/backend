@@ -94,7 +94,7 @@
               <div class="linkBox" v-else-if="mediaType === 'link'">
                 <div class="lef">
                   <span class="til">{{ modalLinkObj.title }}</span>
-                  <span class="desc">{{ modalLinkObj.desc }}</span>
+                  <div class="desc">{{ modalLinkObj.desc }}</div>
                 </div>
                 <img :src="modalLinkObj.pic.url" alt class="image" />
                 <div class="handleBtns">
@@ -211,7 +211,7 @@
       </div>
     </div>
 
-    <input type="file" accept="image/png, image/jpg" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
+    <input type="file" accept="image/png,image/jpg" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
     <input type="file" accept="video/mp4" ref="uploadVideo" @change="uploadVideo" class="uploadFileInp" />
 
     <a-modal
@@ -673,7 +673,6 @@ export default {
     },
     // 素材库选择Change
     librarySelectChange (e) {
-      console.log(e, ' e')
       this.modalLibraryObj.temporaryStroageArr = e
     },
     send () {
@@ -688,12 +687,15 @@ export default {
       } else if (this.selectUserType === 1 && !this.selectTagList.length) {
         this.$message.warning('请选择筛选条件！')
         return
-      } else if (!this.content.trim()) {
+      } else if (!this.content.trim() && !this.mediaType) {
         this.$message.warning('请输入内容！')
         this.$refs['textareaRef'].focus()
         return
       } else if (this.sendDateType === 2 && !this.chooseSendDate) {
         this.$message.warning('请选择发送时间！')
+        return
+      } else if (this.expectedNum === 0) {
+        this.$message.warning('预计送达客户数为0，朋友圈不能创建！')
         return
       }
       this.sendBol = false

@@ -197,7 +197,7 @@ export default {
     reset () {},
     goPage (e, id) {
       console.log(e, id)
-      this.$router.push(`/groupMess/setGroup?id=${id}`)
+      this.$router.push(`/groupMess/setGroup?type=${e}`)
     },
     remove (e) {
       this.$confirm({

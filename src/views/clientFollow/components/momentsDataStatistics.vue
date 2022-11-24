@@ -13,7 +13,7 @@
             :disabled-date="e => disabledBeforeDate(e, 'date', true)"
             :disabled-time="e => disabledBeforeDate(e, 'time', true)"
             :allowClear="false"
-            @change="(_, values) => {this.searchObj.date = values}" />
+            @change="(_, values) => { this.searchObj.date = values }" />
         </div>
         <div class="item">
           <span class="label">选择成员</span>
@@ -21,7 +21,7 @@
             style="margin-top: 5px;width:200px"
             :changeId="true"
             :num="1"
-            v-model="searchObj.employeeIds"/>
+            v-model="searchObj.employeeIds" />
         </div>
         <div class="item">
           <span class="label">任务类型</span>
@@ -45,14 +45,16 @@
             <div class="dot" :style="`background: rgb(${item.theme});`"></div>{{ item.name }}
           </div>
         </div>
-        <v-chart v-if="defaultEchartOptions.xAxis[0].data.length" style="width: 100%;" :options="defaultEchartOptions" ref="chart"></v-chart>
+        <v-chart
+          v-if="defaultEchartOptions.xAxis[0].data.length"
+          style="width: 100%;"
+          :options="defaultEchartOptions"
+          ref="chart"></v-chart>
         <div class="contranstLine">
-          <selectPersonnel
-            style="width:200px"
-            :changeId="true"
-            :num="1"
-            v-model="contrastIds"/>
-          <div class="show"><div class="dot"></div>对比员工</div>
+          <selectPersonnel style="width:200px" :changeId="true" :num="1" v-model="contrastIds" />
+          <div class="show">
+            <div class="dot"></div>对比员工
+          </div>
         </div>
       </div>
     </div>
@@ -68,15 +70,11 @@
             format="YYYY-MM-DD HH:mm"
             :ranges="searchDateItemRanges"
             :allowClear="false"
-            @change="(_, values) => {this.statisticsSearchObj.date = values}" />
+            @change="(_, values) => { this.statisticsSearchObj.date = values }" />
         </div>
         <div class="item">
           <span class="label">选择成员</span>
-          <selectPersonnel
-            style="width:200px;"
-            :changeId="true"
-            :num="1"
-            v-model="statisticsSearchObj.employeeIds"/>
+          <selectPersonnel style="width:200px;" :changeId="true" :num="1" v-model="statisticsSearchObj.employeeIds" />
         </div>
         <div class="item">
           <span class="label">任务类型</span>
@@ -86,7 +84,10 @@
           </a-select>
         </div>
         <div class="btns" style="margin-top: 5px;">
-          <a-button type="primary" style="width: 80px;" @click="handleStatisticsSearch">查询</a-button>
+          <a-button
+            type="primary"
+            style="width: 80px;"
+            @click="() => { this.pagination.current = 1; this.handleStatisticsSearch() }">查询</a-button>
           <a-button style="width: 80px;margin: 0 10px;" @click="resettTableListSearch">重置</a-button>
           <a-dropdown style="width: 100px;">
             <a-button type="primary" v-permission="'/moments/exportChartEmpExcel#post'">导出</a-button>
@@ -371,6 +372,7 @@ export default {
   border-radius: 5px;
   padding: 20px;
   background-color: #fff;
+
   .selectPersonnelCom {
     .ant-btn {
       width: 180px;
@@ -395,8 +397,9 @@ export default {
     }
   }
 }
-.momentsDataStatistics-page-container_rangePickerDropdown{
-  .ant-calendar-footer{
+
+.momentsDataStatistics-page-container_rangePickerDropdown {
+  .ant-calendar-footer {
     padding: 0 6px;
   }
 }

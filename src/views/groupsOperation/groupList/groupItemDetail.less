@@ -1,0 +1,77 @@
+.groupOperation_itemDetail-page-container {
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  .cardsBox {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    .cardItem {
+      width: 23%;
+      height: 110px;
+      padding: 8px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      .num {
+        margin-top: 20px;
+        font-size: 19px;
+        font-weight: bold;
+      }
+    }
+    .card1 {
+      background-color: #5ca9f8;
+    }
+    .card2 {
+      background-color: #f5c74a;
+    }
+    .card3 {
+      background-color: #8d8df7;
+    }
+    .card4 {
+      background-color: #e8718e;
+    }
+  }
+}
+.echartsContainer {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 0 50px;
+  .searchLine {
+    padding: 0 20px;
+  }
+  .echartsBox {
+    position: relative;
+    width: 100%;
+    .switchLineType {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      right: 55px;
+      top: 20px;
+      z-index: 2;
+      .items {
+        display: flex;
+        align-items: center;
+        margin-left: 20px;
+        cursor: pointer;
+        .dot {
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          margin-right: 5px;
+        }
+      }
+      .disabled {
+        .dot {
+          background: #d7d7d7 !important;
+        }
+      }
+    }
+  }
+}
+.detailTableDataBox {
+  .title {
+    margin-bottom: 10px;
+  }
+}
