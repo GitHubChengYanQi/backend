@@ -1,9 +1,7 @@
 <template>
   <div id="addSop_Page_Container" ref="addSop_Page_Container">
     <a-spin :spinning="loadingStatus">
-      <!-- 群发助手新增 -->
       <div class="chooseUsersContainer">
-        <!-- <div class="disabledBox" v-if="addInfo.invalidState === 2" @click="$message.warn('执行后不可修改！')"></div> -->
         <div class="line">
           <span class="label">
             <span style="color: red">*</span>
@@ -14,8 +12,8 @@
             <span class="len">{{ addInfo.sopName && addInfo.sopName.length ? addInfo.sopName.length :'0' }}/18</span>
           </div>
         </div>
-        <div class="execution" v-if="pageTypeId === -1" @click="sendSop()" v-permission="'/sopFriend/add@post'">开始执行</div>
-        <div class="execution" v-else @click="sendSop()" v-permission="'/sopFriend/update@post'">开始执行</div>
+        <div class="execution" v-if="pageTypeId === -1" @click="sendSop()">保存</div>
+        <div class="execution" v-else @click="sendSop()">保存</div>
       </div>
       <div class="sendSOPInfoContainer">
         <div class="sendSOPList" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length">
@@ -40,39 +38,10 @@
               <span style="color: red;font-weight: 500;">*</span>发送时间
             </div>
             <div class="pickerBox" style="display: inline-block;position:relative">
-              <!-- <div
-              class="disabledBox"
-              v-if="addInfo.listTaskInfo && addInfo.listTaskInfo[selectSopItemIndex] && addInfo.listTaskInfo[selectSopItemIndex].invalidState === 2"
-              @click="$message.warn('执行后不可修改！')"
-            ></div> -->
               <div class="chooseDateBox1">
                 <p class="tip">当客户条件为所选内容时</p>
                 <div class="chooseDateBoxRadio">
-                  <!-- <div class="line-wrapper">
-                    <a-radio
-                      :checked="+addInfo.listTaskInfo[selectSopItemIndex].sendType === 1"
-                      @click="chooseDateRadioClick(1)"
-                    />当天
-                    <a-input-number
-                      v-model="addInfo.listTaskInfo[selectSopItemIndex].sendHour"
-                      :min="0"
-                      :max="23"
-                      style="width: 70px;"
-                      @blur="dateNumberChange($event, addInfo.listTaskInfo[selectSopItemIndex].sendType)"
-                    />小时
-                    <a-input-number
-                      v-model="addInfo.listTaskInfo[selectSopItemIndex].sendMinute"
-                      :min="addInfo.listTaskInfo[selectSopItemIndex].sendMinute === 0 ? 3 : 1"
-                      :max="59"
-                      style="width: 60px;"
-                      @blur="dateNumberChange($event, addInfo.listTaskInfo[selectSopItemIndex].sendType)"
-                    />分钟后发送
-                  </div> -->
                   <div class="line-wrapper">
-                    <!-- <a-radio
-                      :checked="+addInfo.listTaskInfo[selectSopItemIndex].sendType === 2"
-                      @click="chooseDateRadioClick(2)"
-                    /> -->
                     第
                     <a-input-number
                       v-model="addInfo.listTaskInfo[selectSopItemIndex].sendDayNum"
@@ -81,7 +50,6 @@
                       style="width: 70px;"
                       @blur="dateNumberChange($event, addInfo.listTaskInfo[selectSopItemIndex].sendType)"
                     />天
-                    <!-- sendTime -->
                     <a-time-picker
                       :allowClear="false"
                       v-model="addInfo.listTaskInfo[selectSopItemIndex].sendTime"
@@ -106,8 +74,7 @@
 </template>
 
 <script>
-import { disabledBeforeDate } from './sopUtils'
-// import { getFriendDetail, addFriendSop, editFriendSop } from '@/api/salers'
+// import { addSopTemplateMethod, getSopTemplateDetailMethod, editSopTemplateMethod } from '@/api/cluster'
 import SendContent from './components/sendContent.vue'
 export default {
   name: 'AddClusterSop',
@@ -116,8 +83,8 @@ export default {
   },
   data () {
     return {
+      // 显示加载中
       loadingStatus: false,
-      disabledBeforeDate,
       isSopEdit: false, // 判断页面是否被编辑过
       selectSopItemIdx: '', // 选中的时间id
       selectSopItemIndex: '', // 时间标签选择下标
@@ -135,6 +102,18 @@ export default {
   created () {
     this.pageTypeId = Number(this.$route.query.id)
     this.initMethod()
+  },
+  // 页面销毁前
+  beforeDestroy () {
+    console.log('新增群SOP模板页面销毁前')
+    console.log(this.$router, '看看能得到路由么')
+    const nextRouterLink = this.$router.currentRoute.path
+    console.log(nextRouterLink, 'nextRouterLink')
+    if (nextRouterLink.indexOf('clusterSop') === -1) {
+      // 跳转的路由,非群SOP模板页
+      sessionStorage.removeItem('sopTemplatePage')
+    }
+    // sessionStorage.removeItem('activeType')
   },
   watch: {
     'addInfo.sopName' (e) {
@@ -196,9 +175,6 @@ export default {
       const tempInfo = {
         sort: (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length > 0) ? this.addInfo.listTaskInfo.length + 1 : '1',
         tempId: new Date().getTime(),
-        // sendType: 1, // 默认为当天
-        // sendHour: '0', // 默认为当天0小时
-        // sendMinute: '10', // 默认为当天10分钟
         sendDayNum: 1, // 默认传空
         sendTime: '10:00', // 默认传空
         sendContentList: []
@@ -232,13 +208,7 @@ export default {
     // 返回时间列表字符串
     returnSopText (item) {
       console.log(item, '对当前的item进行组合处理')
-      let headText = ''
-      if (item.sendType === 1) {
-        headText = `当天${item.sendHour}小时${item.sendMinute}分钟后发送`
-      } else {
-        headText = `第${item.sendDayNum}天${item.sendTime}发送`
-      }
-      return headText
+      return `第${item.sendDayNum}天${item.sendTime}发送`
     },
     // 单击所选择的时间点
     chooseSopItem (info, index) {
@@ -264,11 +234,7 @@ export default {
       const tempInfo = {
         sort: (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length > 0) ? this.addInfo.listTaskInfo.length + 1 : '1',
         tempId: new Date().getTime(),
-        sendType: 1, // 默认为当天
-        sendHour: '0', // 默认为当天0小时
-        sendMinute: '10', // 默认为当天10分钟
-        sendDayNum: '', // 默认传空
-        sendTime: '', // 默认传空
+        sendTime: '10:00',
         sendContentList: []
       }
       this.addInfo.listTaskInfo.push(tempInfo)
@@ -311,16 +277,6 @@ export default {
               that.selectSopItemIdx = nowSopList[0].tempId ? nowSopList[0].tempId : nowSopList[0].id
               that.selectSopItemIndex = 0
             } else {
-              // console.log(selectId, nowSopList)
-              // 删除的元素为非选中的元素
-              // const selectIndex = nowSopList.findIndex(item => {
-              //   if (item.tempId) {
-              //     item.tempId = selectId
-              //   } else {
-              //     item.id = selectId
-              //   }
-              //   return item
-              // })
               const selectIndex = nowSopList.findIndex(item => (item.tempId ? item.tempId === selectId : item.id === selectId))
               console.log('删除后加的元素')
               // debugger
@@ -335,17 +291,6 @@ export default {
               that.selectSopItemIdx = nowSopList[0].tempId ? nowSopList[0].tempId : nowSopList[0].id
               that.selectSopItemIndex = 0
             } else {
-              // console.log(selectId, nowSopList)
-              // 删除的元素为非选中的元素
-              // const selectIndex = nowSopList.findIndex(item => {
-              //   if (item.tempId) {
-              //     item.tempId = selectId
-              //   } else {
-              //     item.id = selectId
-              //   }
-              //   return item
-              //   // item.id === selectId
-              // })
               const selectIndex = nowSopList.findIndex(item => (item.tempId ? item.tempId === selectId : item.id === selectId))
               console.log('删除之前的元素')
               // debugger
@@ -353,30 +298,9 @@ export default {
               that.selectSopItemIdx = nowSopList[selectIndex].tempId ? nowSopList[selectIndex].tempId : nowSopList[selectIndex].id
             }
           }
-          // this.sopList = nowSopList
-          // that.$emit('update:timeArray', nowSopList)
           this.$set(this.addInfo, 'listTaskInfo', nowSopList)
         }
       })
-    },
-    // 单击选择所选内容
-    chooseDateRadioClick (value) {
-      console.log(value, 'value')
-      if (this.addInfo.listTaskInfo[this.selectSopItemIndex].sendType === Number(value)) {
-        // 状态没变,无需触发
-      } else {
-        if (value === 2) {
-          // 选中为第几天
-          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendDayNum = 1
-          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendTime = '10:00'
-        } else {
-          // 选中为第几天
-          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendHour = 0
-          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendMinute = 10
-        }
-      }
-      this.addInfo.listTaskInfo[this.selectSopItemIndex].sendType = Number(value)
-      this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
     },
     // 开始执行
     sendSop () {
@@ -449,41 +373,12 @@ export default {
 }
 </script>
   <style lang='less' scoped>
-  .disabledBox {
-  cursor: no-drop !important;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.1);
-  z-index: 1;
-  display: flex;
-  justify-content: flex-end;
-  .executionDisableBox {
-    // position: absolute;
-    // right: 0;
-    // top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #4074f6;
-    color: #fff;
-    width: 120px;
-    height: 50px;
-    cursor: pointer;
-  }
-}
 .chooseUsersContainer {
   background-color: #fff;
   padding: 20px;
   border-radius: 5px;
   position: relative;
   overflow: hidden;
-  .isControlerDisabledClass {
-    cursor: no-drop !important;
-    background-color: #f5f5f5;
-  }
   .line {
     display: flex;
     align-items: center;
@@ -507,147 +402,6 @@ export default {
         top: 50%;
         transform: translate(0, -50%);
       }
-    }
-    .selectBox {
-      max-width: 90%;
-      position: relative;
-      .selectBtn {
-        min-width: 180px;
-        min-height: 30px;
-        display: flex;
-        align-items: center;
-        border-radius: 3px;
-        border: 1px dashed #8a8a8a;
-        cursor: pointer;
-        flex-wrap: wrap;
-        .emptyBtn {
-          width: 100%;
-          text-align: center;
-        }
-
-        .label_input_title {
-          margin: 4px;
-          padding: 0 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 28px;
-          color: rgba(0, 0, 0, 0.65);
-          font-size: 14px;
-          background: #f7f7f7;
-          border-radius: 4px;
-          border: 1px solid #e9e9e9;
-          .delete {
-            margin-left: 5px;
-            line-height: 20px;
-            font-size: 20px;
-            transform: rotate(45deg);
-
-            &:hover {
-              color: #0052d9;
-            }
-          }
-        }
-      }
-      .selectList {
-        width: 100%;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-      }
-      .operationMode {
-        position: absolute;
-        left: -30px;
-        top: 50%;
-        transform: translate(0, -50%);
-        display: flex;
-        flex-direction: column;
-        span {
-          width: 20px;
-          height: 20px;
-          background-color: #d8d8d8;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 5px;
-          cursor: pointer;
-        }
-        .active {
-          background-color: #232323;
-          color: #fff;
-        }
-      }
-      .filterListBox {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        .selectTags {
-          min-width: 150px;
-          min-height: 36px;
-          border-radius: 3px;
-          border: 1px solid #d9d9d9;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          text-indent: 10px;
-          flex-wrap: wrap;
-          max-width: 600px;
-          .emptyBtn {
-            width: 100%;
-            text-align: center;
-          }
-
-          .label_input_title {
-            margin: 4px;
-            padding: 0 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 28px;
-            color: rgba(0, 0, 0, 0.65);
-            font-size: 14px;
-            background: #f7f7f7;
-            border-radius: 4px;
-            border: 1px solid #e9e9e9;
-            .delete {
-              margin-left: 5px;
-              line-height: 20px;
-              font-size: 20px;
-              transform: translate(0, -4px) rotate(45deg);
-
-              &:hover {
-                color: #0052d9;
-              }
-            }
-          }
-        }
-        .handle {
-          margin-left: 5px;
-          width: 25px;
-          height: 25px;
-          border-radius: 50%;
-          background-color: #d7d7d7;
-          display: flex;
-          justify-content: center;
-          font-size: 19px;
-          color: #666666;
-          font-weight: 300;
-          line-height: 23px;
-          cursor: pointer;
-        }
-      }
-    }
-    .reload {
-      color: #4074f5;
-      cursor: pointer;
-      margin-left: 5px;
-    }
-  }
-  .multiple {
-    align-items: flex-start;
-    .label {
-      margin-top: 5px;
     }
   }
   .execution {
