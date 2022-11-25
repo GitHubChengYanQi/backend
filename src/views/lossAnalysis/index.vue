@@ -98,8 +98,7 @@
             <a-tooltip placement="right">
               <template #title>
                 <div class="title_box">
-                  <div>更新频率:</div>
-                  <div>每两分钟更新一次</div>
+                  <div>单个机构流失数/所选机构总流失数</div>
                 </div>
               </template>
               <div class="icon">?</div>
@@ -167,8 +166,7 @@
             <a-tooltip placement="right">
               <template #title>
                 <div class="title_box">
-                  <div>更新频率:</div>
-                  <div>每两分钟更新一次</div>
+                  <div>单个门店流失数/所选门店总流失数</div>
                 </div>
               </template>
               <div class="icon">?</div>
@@ -806,6 +804,7 @@ export default {
             {
               align: 'center',
               title: '机构名称',
+              fixed: 'left',
               dataIndex: 'employeeAgencyName',
               width: 150
             },
@@ -887,7 +886,6 @@ export default {
               align: 'center',
               title: '离职继承失败流失占比',
               dataIndex: 'deleteOverRatio',
-              fixed: 'right',
               width: 200
             }
           ],
@@ -895,6 +893,7 @@ export default {
             {
               align: 'center',
               title: '门店名称',
+              fixed: 'left',
               dataIndex: 'employeeOutletName',
               width: 150
             },
@@ -980,7 +979,6 @@ export default {
               align: 'center',
               title: '离职继承失败流失占比',
               dataIndex: 'deleteOverRatio',
-              fixed: 'right',
               width: 200
             }
           ],
@@ -988,6 +986,7 @@ export default {
             {
               align: 'center',
               title: '员工名称',
+              fixed: 'left',
               dataIndex: 'employeeInfoName',
               width: 150
             },
@@ -1072,7 +1071,6 @@ export default {
               align: 'center',
               title: '离职继承失败流失占比',
               dataIndex: 'deleteOverRatio',
-              fixed: 'right',
               width: 200
             }
           ]

@@ -7,6 +7,11 @@
             <span style="color: red;font-weight: 500;">*</span>发送内容
           </span>
           <div class="handleBox">
+            <!--:class="(
+                  (item.type === 'text' && sopList[selectSopItemIdx].content.some(it => it.type === 'text')) ||
+                  sopList[selectSopItemIdx].content.length === 10) ?
+                  'handleBtn disabled' :
+                  'handleBtn'"  -->
             <div
               v-for="(item, index) in handleBtnArr"
               :class="((sendContentArray.length === 10 || (sendContentArray.findIndex(it => (it.type === 1 && item.type === 'text')) != -1)) || isDisableEdit === true)?
@@ -31,9 +36,11 @@
             <div class="idx">{{ index + 1 }}</div>
             <div :class="`content ${item.type === 1 ? 'text' : ''}`" v-if="item.type === 1">{{ item.textData }}</div>
             <div :class="`content ${item.type === 2 ? 'image': ''}`" v-else-if="item.type === 2">
+              <!-- style="max-width:100%;max-height:300px" -->
               <img :src="item.photoUrl" alt />
             </div>
             <div :class="`content ${item.type === 3 ? 'video' : ''}`" v-else-if="item.type === 3">
+              <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
               <div class="poster" v-if="item.showPoster">{{ returnErrorText(item.videoUrl) }}</div>
               <video :src="item.videoUrl" @error="videoLoadErr(index)" alt />
             </div>
@@ -57,6 +64,7 @@
                 <span class="say">小程序</span>
               </div>
             </div>
+            <!-- v-if="sopList[selectSopItemIdx].isEdit" -->
             <div class="handlesBox" v-if="sendContentArray && sendContentArray[selectSopItemIdx] && isDisableEdit === false">
               <img
                 src="../images/move.svg"
@@ -64,6 +72,7 @@
                 :class="index === 0 ? 'icon move disabled' : 'icon move'"
                 @click="handleMoveClick(index, 'up')"
               />
+              <!-- (sendContentArray[selectSopItemIdx].content.length - 1) === index ? 'icon move disabled' : 'icon move' -->
               <img
                 src="../images/move.svg"
                 style="transform: rotate(180deg)"
@@ -98,6 +107,7 @@
       @change="uploadVideo"
       class="uploadFileInp"
     />
+    <!-- :getContainer="() => $refs['addSop_Page_Container']" -->
     <a-modal
       title="添加文本"
       :maskClosable="false"
@@ -246,6 +256,7 @@ export default {
       isSopEditStatus: false,
       chooseEditIndex: '', // 当前选择编辑的下标
       submitType: '', // 提交状态,新增与修改
+      sopList: [],
       selectSopItemIdx: 0,
       sendContentArray: [],
       // 链接/小程序上传类型
@@ -431,6 +442,9 @@ export default {
     },
     // 视频错误时显示
     videoLoadErr (index) {
+      // const nowD = deepClonev2(this.sopList)
+      // nowD[this.selectSopItemIdx].content[index].showPoster = true
+      // this.sopList = nowD
       this.sendContentArray[index].showPoster = true
       this.$emit('update:contentArray', this.sendContentArray)
     },
@@ -921,8 +935,7 @@ export default {
         align-items: center;
       }
     }
-  }
-  .sendContent {
+    .sendContent {
       margin-top: 10px;
       background-color: #fff;
       padding: 20px;
@@ -1102,6 +1115,7 @@ export default {
         }
       }
     }
+  }
 }
 
 .uploadFileInp {

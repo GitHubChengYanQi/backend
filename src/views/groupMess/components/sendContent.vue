@@ -1,10 +1,13 @@
 <template>
-  <div id="send_content_container" ref="send_content_container">
+  <div
+    id="send_content_container"
+    ref="send_content_container"
+  >
     <div class="sendSOPInfoContainer">
       <div class="sendContent">
         <div class="tilBar">
           <span class="til">
-            <span style="color: red;font-weight: 500;">*</span>发送内容
+            群发素材（最多可上传9个）
           </span>
           <div class="handleBox">
             <div
@@ -29,41 +32,89 @@
             :key="index"
           >
             <div class="idx">{{ index + 1 }}</div>
-            <div :class="`content ${item.type === 1 ? 'text' : ''}`" v-if="item.type === 1">{{ item.textData }}</div>
-            <div :class="`content ${item.type === 2 ? 'image': ''}`" v-else-if="item.type === 2">
-              <img :src="item.photoUrl" alt />
+            <div
+              :class="`content ${item.type === 1 ? 'text' : ''}`"
+              v-if="item.type === 1"
+            >{{ item.textData }}</div>
+            <div
+              :class="`content ${item.type === 2 ? 'image': ''}`"
+              v-else-if="item.type === 2"
+            >
+              <!-- style="max-width:100%;max-height:300px" -->
+              <img
+                :src="item.photoUrl"
+                alt
+              />
             </div>
-            <div :class="`content ${item.type === 3 ? 'video' : ''}`" v-else-if="item.type === 3">
-              <div class="poster" v-if="item.showPoster">{{ returnErrorText(item.videoUrl) }}</div>
-              <video :src="item.videoUrl" @error="videoLoadErr(index)" alt />
+            <div
+              :class="`content ${item.type === 3 ? 'video' : ''}`"
+              v-else-if="item.type === 3"
+            >
+              <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
+              <div
+                class="poster"
+                v-if="item.showPoster"
+              >{{ returnErrorText(item.videoUrl) }}</div>
+              <video
+                :src="item.videoUrl"
+                @error="videoLoadErr(index)"
+                alt
+              />
             </div>
-            <div :class="`content ${item.type === 4 ? 'link' : ''}`" v-else-if="item.type === 4">
+            <div
+              :class="`content ${item.type === 4 ? 'link' : ''}`"
+              v-else-if="item.type === 4"
+            >
               <div class="lef">
                 <span class="til">{{ item.linkTitle }}</span>
                 <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
                 <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
               </div>
-              <img :src="item.linkPhoto" alt class="image" />
+              <img
+                :src="item.linkPhoto"
+                alt
+                class="image"
+              />
             </div>
-            <div :class="`content ${item.type === 5 ? 'embed' : ''}`" v-else-if="item.type === 5">
+            <div
+              :class="`content ${item.type === 5 ? 'embed' : ''}`"
+              v-else-if="item.type === 5"
+            >
               <div class="line">
-                <img src="../images/miniProgramIcon.svg" alt class="icon" />
+                <img
+                  src="../images/miniProgramIcon.svg"
+                  alt
+                  class="icon"
+                />
                 <span class="til">{{ '小程序标题' }}</span>
               </div>
               <div class="line desc">{{ item.appShow }}</div>
-              <img :src="item.appPhoto" alt class="image" />
+              <img
+                :src="item.appPhoto"
+                alt
+                class="image"
+              />
               <div class="line">
-                <img src="../images/miniProgramIcon.svg" alt class="icon" />
+                <img
+                  src="../images/miniProgramIcon.svg"
+                  alt
+                  class="icon"
+                />
                 <span class="say">小程序</span>
               </div>
             </div>
-            <div class="handlesBox" v-if="sendContentArray && sendContentArray[selectSopItemIdx] && isDisableEdit === false">
+            <!-- v-if="sopList[selectSopItemIdx].isEdit" -->
+            <div
+              class="handlesBox"
+              v-if="sendContentArray && sendContentArray[selectSopItemIdx] && isDisableEdit === false"
+            >
               <img
                 src="../images/move.svg"
                 alt
                 :class="index === 0 ? 'icon move disabled' : 'icon move'"
                 @click="handleMoveClick(index, 'up')"
               />
+              <!-- (sendContentArray[selectSopItemIdx].content.length - 1) === index ? 'icon move disabled' : 'icon move' -->
               <img
                 src="../images/move.svg"
                 style="transform: rotate(180deg)"
@@ -77,7 +128,12 @@
                 class="icon"
                 @click="handleEditClick(item, index)"
               />
-              <img src="../images/del.svg" alt class="icon" @click="handleDelClick(index)" />
+              <img
+                src="../images/del.svg"
+                alt
+                class="icon"
+                @click="handleDelClick(index)"
+              />
             </div>
           </div>
         </div>
@@ -98,6 +154,7 @@
       @change="uploadVideo"
       class="uploadFileInp"
     />
+    <!-- :getContainer="() => $refs['addSop_Page_Container']" -->
     <a-modal
       title="添加文本"
       :maskClosable="false"
@@ -107,15 +164,22 @@
       @cancel="closeContentTextModal()"
       :getContainer="() => $refs['send_content_container']"
     >
-      <a-textarea v-model="contentText" autoSize placeholder="请输入内容" />
+      <a-textarea
+        v-model="contentText"
+        autoSize
+        placeholder="请输入内容"
+      />
       <span class="len">{{ contentText.length ? contentText.length : '0' }}/1000</span>
       <template slot="footer">
         <a-button @click="closeContentTextModal()">取消</a-button>
-        <a-button type="primary" @click="confirmContentText">确定</a-button>
+        <a-button
+          type="primary"
+          @click="confirmContentText"
+        >确定</a-button>
       </template>
     </a-modal>
     <a-modal
-      title="新增链接"
+      title="添加网页链接"
       :maskClosable="false"
       :width="600"
       :visible="contentLinkModalShow"
@@ -125,15 +189,27 @@
     >
       <div class="formBox">
         <div class="line">
-          <a-input v-model="contentLinkObj.linkTitle" placeholder="请输入链接标题（必填）" />
-          <span class="len">{{ (contentLinkObj.linkTitle && contentLinkObj.linkTitle.length) ? contentLinkObj.linkTitle.length : '0' }}/200</span>
+          <a-input
+            :maxLength="42"
+            v-model="contentLinkObj.linkTitle"
+            placeholder="请输入链接标题（必填）"
+          />
+          <span class="len">{{ (contentLinkObj.linkTitle && contentLinkObj.linkTitle.length) ? contentLinkObj.linkTitle.length : '0' }}/42</span>
         </div>
         <div class="line">
-          <a-input v-model="contentLinkObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
-          <span class="len">{{ (contentLinkObj.linkUrl && contentLinkObj.linkUrl.length) ? contentLinkObj.linkUrl.length : '0' }}/500</span>
+          <a-input
+            v-model="contentLinkObj.linkUrl"
+            placeholder="输入http或https开头的链接地址（必填）"
+          />
         </div>
         <div class="line textarea">
-          <a-textarea v-model="contentLinkObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
+          <a-textarea
+            v-model="contentLinkObj.linkShow"
+            autoSize
+            style="resize:none;"
+            :maxLength="170"
+            placeholder="请输入内容简介（选填）"
+          />
           <span class="len">{{ (contentLinkObj.linkShow && contentLinkObj.linkShow.length) ? contentLinkObj.linkShow.length : '0' }}/170</span>
         </div>
       </div>
@@ -152,14 +228,15 @@
         <span class="tip">图片限制在2MB以内</span>
       </div>
       <template slot="footer">
+        <a-button @click="closeLinkModal()">取消</a-button>
         <a-button
-          @click="closeLinkModal()"
-        >取消</a-button>
-        <a-button type="primary" @click="confirmContentLink">确定</a-button>
+          type="primary"
+          @click="confirmContentLink"
+        >确定</a-button>
       </template>
     </a-modal>
     <a-modal
-      title="新增小程序"
+      title="添加小程序链接"
       :maskClosable="false"
       :width="600"
       :visible="contentMiniModalShow"
@@ -167,18 +244,14 @@
       @cancel="closeMiniModal()"
       :getContainer="() => $refs['send_content_container']"
     >
-      <p class="tip top">
-        请填写企业微信后台绑定的小程序，否则会造成发送失败
-        <!-- <a
-          class="click"
-          href="https://www.yuque.com/docs/share/9def95f9-bce5-4c66-b800-9f3cbef4fe50"
-          target="_blank"
-        >查看如何绑定</a> -->
-      </p>
       <div class="formBox">
         <div class="line">
-          <a-input v-model="contentMiniObj.appId" placeholder="输入小程序APPID（必填）" />
-          <span class="len">{{ contentMiniObj.appId && contentMiniObj.appId.length ? contentMiniObj.appId.length :'0' }}/200</span>
+          <a-input
+            v-model="contentMiniObj.appId"
+            :maxLength="45"
+            placeholder="输入小程序APPID（必填）"
+          />
+          <span class="len">{{ contentMiniObj.appId && contentMiniObj.appId.length ? contentMiniObj.appId.length :'0' }}/45</span>
           <p class="tip">
             <!-- <a
               class="click"
@@ -188,19 +261,22 @@
           </p>
         </div>
         <div class="line">
-          <a-input v-model="contentMiniObj.appUrl" placeholder="输入小程序页面路径（必填）" />
-          <span class="len">{{ contentMiniObj.appUrl && contentMiniObj.appUrl ? contentMiniObj.appUrl.length :'0' }}/500</span>
+          <a-input
+            v-model="contentMiniObj.appUrl"
+            placeholder="输入小程序页面路径（必填）"
+          />
           <p class="tip">
-            <!-- <a
-              class="click"
-              href="https://www.yuque.com/docs/share/dd225b88-7778-463e-82a2-37bff08e1119"
-              target="_blank"
-            >如何获取小程序路径</a> -->
           </p>
         </div>
         <div class="line textarea">
-          <a-textarea v-model="contentMiniObj.appShow" autoSize placeholder="输入小程序的描述（必填）" />
-          <span class="len">{{ contentMiniObj.appShow && contentMiniObj.appShow.length ? contentMiniObj.appShow.length :'0' }}/170</span>
+          <a-textarea
+            v-model="contentMiniObj.appShow"
+            autoSize
+            :maxLength="20"
+            style="resize: none;"
+            placeholder="输入小程序的描述（必填）"
+          />
+          <span class="len">{{ contentMiniObj.appShow && contentMiniObj.appShow.length ? contentMiniObj.appShow.length :'0' }}/20</span>
         </div>
       </div>
       <div class="pic">
@@ -218,14 +294,20 @@
         <span class="photoTip">图片限制在2MB以内</span>
       </div>
       <template slot="footer">
+        <a-button @click="closeMiniModal()">取消</a-button>
         <a-button
-          @click="closeMiniModal()"
-        >取消</a-button>
-        <a-button type="primary" @click="confirmContentMini">确定</a-button>
+          type="primary"
+          @click="confirmContentMini"
+        >确定</a-button>
       </template>
     </a-modal>
     <!-- 添加素材库弹窗 -->
-    <a-modal v-model="contentLibraryModalShow" centered @ok="handleAddLibraryOk" width="95%">
+    <a-modal
+      v-model="contentLibraryModalShow"
+      centered
+      @ok="handleAddLibraryOk"
+      width="95%"
+    >
       <MediumGroup
         :is-component="true"
         v-if="contentLibraryModalShow"
@@ -235,10 +317,7 @@
   </div>
 </template>
 <script>
-// transformTaskItemEntry, transformTaskDate,
-import { handleBtnArr, isUrl } from '../sopUtils'
-// import { deepClonev2 } from '@/utils/util'
-// import { userSopTaskItemSettingReq } from '@/api/salesManagement'
+import { handleBtnArr, isUrl } from './sopUtils'
 import { upLoad } from '@/api/common'
 export default {
   data () {
@@ -246,6 +325,7 @@ export default {
       isSopEditStatus: false,
       chooseEditIndex: '', // 当前选择编辑的下标
       submitType: '', // 提交状态,新增与修改
+      sopList: [],
       selectSopItemIdx: 0,
       sendContentArray: [],
       // 链接/小程序上传类型
@@ -269,7 +349,7 @@ export default {
     }
   },
   components: {
-    'MediumGroup': () => import('@/views/mediumGroup/index.vue')
+    MediumGroup: () => import('@/views/mediumGroup/index.vue')
   },
   props: {
     isDisableEdit: {
@@ -353,22 +433,13 @@ export default {
     chooseSendType (type) {
       if (this.isDisableEdit) {
         return
-      } else if (this.sendContentArray.length === 10) {
-        this.$message.warn('最多只可添加10条内容！')
-        return
-      } else if (this.sendContentArray.some(it => it.type === 1) && type === 'text') {
-        this.$message.warn('只能添加一条文本内容！')
+      } else if (this.sendContentArray.length === 9) {
+        this.$message.warn('最多只可添加9条内容！')
         return
       }
-      // console.log(this.sendContentArray, 'sendContentArray')
-      // console.log(this.sendContentArray.some(it => it.type === 1))
-      // debugger
       this.submitType = 'add'
       console.log(type, 'type')
       switch (type) {
-        case 'text':
-          this.contentTextModalShow = true
-          break
         case 'image':
           this.chooseImage()
           break
@@ -431,6 +502,9 @@ export default {
     },
     // 视频错误时显示
     videoLoadErr (index) {
+      // const nowD = deepClonev2(this.sopList)
+      // nowD[this.selectSopItemIdx].content[index].showPoster = true
+      // this.sopList = nowD
       this.sendContentArray[index].showPoster = true
       this.$emit('update:contentArray', this.sendContentArray)
     },
@@ -517,12 +591,12 @@ export default {
     },
     // 处理素材库数组
     dealLibraryArrayMethod () {
-      if (this.contentLibraryArray.some(it => it.type === '文件' || it.type === '音频')) {
+      if (this.contentLibraryArray.some((it) => it.type === '文件' || it.type === '音频')) {
         this.$message.warning('暂不支持文件、音频类型素材！')
         return
       }
-      if ((this.sendContentArray.length + this.contentLibraryArray.length) > 10) {
-        this.$message.warning('发送条数不能超过十条！')
+      if (this.sendContentArray.length + this.contentLibraryArray.length > 9) {
+        this.$message.warning('发送条数不能超过九条！')
         return
       }
       for (const item of this.contentLibraryArray) {
@@ -562,7 +636,7 @@ export default {
             textData: item.content.content
           }
           // 查看列表中是否存在文本
-          const tempIndex = this.sendContentArray.findIndex(it => it.type === 1)
+          const tempIndex = this.sendContentArray.findIndex((it) => it.type === 1)
           if (tempIndex === -1) {
             // 不存在,就加一个
             this.sendContentArray.push(textInfo)
@@ -588,7 +662,7 @@ export default {
     async handleMoveClick (index, type) {
       if (type === 'up' && index === 0) {
         return
-      } else if (type === 'down' && index === (this.sendContentArray.length - 1)) {
+      } else if (type === 'down' && index === this.sendContentArray.length - 1) {
         return
       }
       // 先生成一个全新的数组
@@ -744,8 +818,9 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" >
 #send_content_container {
+  width: 100%;
   .contentLinkModal {
     .ant-modal-body {
       display: flex;
@@ -836,272 +911,191 @@ export default {
       }
     }
   }
-
 }
 .sendSOPInfoContainer {
   width: 100%;
   margin-top: 10px;
   display: flex;
-  .sendSOPList {
-    border-radius: 5px;
-    padding: 20px;
-    width: 300px;
-    height: 460px;
+  .sendContent {
+    margin-top: 10px;
     background-color: #fff;
-    overflow-y: auto;
-    .sopItem {
-      height: 35px;
-      width: 100%;
+    padding: 20px;
+    border-radius: 5px;
+    width: 100%;
+    min-height: 350px;
+    .tilBar {
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      text-indent: 15px;
-      cursor: pointer;
-      border-radius: 5px;
-      position: relative;
-      .del {
-        display: none;
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        align-items: center;
-        justify-content: center;
-        transform: translate(0, -50%);
-      }
-    }
-    .sopItem:hover {
-      .del {
-        display: flex;
-      }
-    }
-    .active {
-      background: #eef2fc;
-      color: #4074f6;
-    }
-    .addSop {
-      margin-bottom: 20px;
-      width: 100%;
-      height: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      border: 1px dashed #8a8a8a;
-      cursor: pointer;
-    }
-  }
-  .sendItemContent {
-    margin-left: 10px;
-    flex: 1;
-    height: 100%;
-    .chooseSendDate {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #cdcdcd;
       .til {
         font-weight: 600;
-        margin-bottom: 10px;
       }
-      .chooseDateBox1 {
-        .chooseDateBoxRadio {
-          display: flex;
-          flex-direction: column;
-          .line-wrapper {
-            margin-bottom: 10px;
-            .ant-time-picker {
-              width: 120px;
-            }
-          }
-        }
-      }
-      .chooseDateBox2 {
+      .handleBox {
+        width: auto;
         display: flex;
-        align-items: center;
+        position: relative;
+        .handleBtn {
+          margin-left: 5px;
+          border-radius: 3px;
+          padding: 5px 15px;
+          border: 1px solid #a9a9a9;
+          cursor: pointer;
+          color: rgb(28, 28, 28);
+        }
+        .handleBtn:first-child {
+          margin-left: 0;
+        }
+        .disabled {
+          opacity: 0.5;
+          cursor: no-drop;
+        }
       }
     }
-  }
-  .sendContent {
-      margin-top: 10px;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
+    .contentBox {
       width: 100%;
-      min-height: 350px;
-      .tilBar {
-        margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      .contentItem {
         display: flex;
+        padding: 5px;
+        width: 100%;
         align-items: center;
-        justify-content: space-between;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #cdcdcd;
-        .til {
-          font-weight: 600;
-        }
-        .handleBox {
-          width: auto;
+        border-radius: 5px;
+
+        .idx {
+          width: 25px;
+          height: 25px;
           display: flex;
-          position: relative;
-          .handleBtn {
-            margin-left: 5px;
-            border-radius: 3px;
-            padding: 5px 15px;
-            border: 1px solid #a9a9a9;
-            cursor: pointer;
-            color: rgb(28, 28, 28);
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: #eef2fc;
+          color: #4074f6;
+        }
+        .content {
+          max-width: 750px;
+          margin-left: 10px;
+        }
+        .text {
+          word-wrap: break-word;
+          padding: 5px 0;
+        }
+        .image,
+        .video {
+          img,
+          video {
+            max-height: 300px;
+            max-width: 100%;
           }
-          .handleBtn:first-child {
-            margin-left: 0;
+        }
+        .video {
+          position: relative;
+          .poster {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+        .link {
+          width: 250px;
+          height: 80px;
+          border: 1px solid #cdcdcd;
+          border-radius: 5px;
+          flex: none;
+          padding: 10px;
+          display: flex;
+          .lef {
+            width: 160px;
+            margin-right: 10px;
+            font-size: 13px;
+            .til {
+              width: 100%;
+              color: #4074f6;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              display: inline-block;
+            }
+            .desc {
+              width: 100%;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+            }
+          }
+          .image {
+            flex: 1;
+            height: 100%;
+            max-width: 58px;
+          }
+        }
+        .embed {
+          width: 230px;
+          border: 1px solid #cdcdcd;
+          flex: none;
+          display: flex;
+          flex-direction: column;
+          padding: 8px 10px;
+          .line {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            .icon {
+              width: 17px;
+              height: 17px;
+            }
+            .til {
+              color: #4074f6;
+            }
+          }
+          .desc {
+            font-size: 13px;
+            margin-top: 3px;
+          }
+          .image {
+            height: 180px;
+            margin: 3px 0;
+          }
+        }
+        .handlesBox {
+          display: none;
+          // display: flex;
+          margin: auto;
+          margin-right: 30px;
+          .icon {
+            width: 30px;
+            height: 30px;
+            margin-left: 10px;
+            cursor: pointer;
+          }
+          .move {
+            width: 35px;
+            height: 35px;
           }
           .disabled {
-            opacity: 0.5;
             cursor: no-drop;
           }
         }
       }
-      .contentBox {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        .contentItem {
+      .contentItem:hover {
+        background-color: #2a66ff1f;
+        .handlesBox {
           display: flex;
-          padding: 5px;
-          width: 100%;
-          align-items: center;
-          border-radius: 5px;
-
-          .idx {
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #eef2fc;
-            color: #4074f6;
-          }
-          .content {
-            max-width: 750px;
-            margin-left: 10px;
-          }
-          .text {
-            word-wrap: break-word;
-            padding: 5px 0;
-          }
-          .image,
-          .video {
-            img,
-            video {
-              max-height: 300px;
-              max-width: 100%;
-            }
-          }
-          .video {
-            position: relative;
-            .poster {
-              position: absolute;
-              left: 50%;
-              top: 50%;
-              transform: translate(-50%, -50%);
-              background: rgba(0, 0, 0, 0.1);
-              width: 100%;
-              height: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-          }
-          .link {
-            width: 250px;
-            height: 80px;
-            border: 1px solid #cdcdcd;
-            border-radius: 5px;
-            flex: none;
-            padding: 10px;
-            display: flex;
-            .lef {
-              width: 160px;
-              margin-right: 10px;
-              font-size: 13px;
-              .til {
-                width: 100%;
-                color: #4074f6;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-                display: inline-block;
-              }
-              .desc {
-                width: 100%;
-                display: -webkit-box;
-                -webkit-box-orient: vertical;
-                -webkit-line-clamp: 2;
-                overflow: hidden;
-              }
-            }
-            .image {
-              flex: 1;
-              height: 100%;
-              max-width: 58px;
-            }
-          }
-          .embed {
-            width: 230px;
-            border: 1px solid #cdcdcd;
-            flex: none;
-            display: flex;
-            flex-direction: column;
-            padding: 8px 10px;
-            .line {
-              width: 100%;
-              display: flex;
-              align-items: center;
-              .icon {
-                width: 17px;
-                height: 17px;
-              }
-              .til {
-                color: #4074f6;
-              }
-            }
-            .desc {
-              font-size: 13px;
-              margin-top: 3px;
-            }
-            .image {
-              height: 180px;
-              margin: 3px 0;
-            }
-          }
-          .handlesBox {
-            display: none;
-            // display: flex;
-            margin: auto;
-            margin-right: 30px;
-            .icon {
-              width: 30px;
-              height: 30px;
-              margin-left: 10px;
-              cursor: pointer;
-            }
-            .move {
-              width: 35px;
-              height: 35px;
-            }
-            .disabled {
-              cursor: no-drop;
-            }
-          }
-        }
-        .contentItem:hover {
-          background-color: #2a66ff1f;
-          .handlesBox {
-            display: flex;
-          }
         }
       }
     }
+  }
 }
 
 .uploadFileInp {

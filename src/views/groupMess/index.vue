@@ -195,9 +195,17 @@ export default {
     },
     getSearch () {},
     reset () {},
-    goPage (e, id) {
-      console.log(e, id)
-      this.$router.push(`/groupMess/setGroup?id=${id}`)
+    goPage (e, item = { id: false }) {
+      console.log(e, item)
+      if (e != 3) {
+        if (item.id) {
+          this.$router.push(`/groupMess/setGroup?type=${e}&id=${item.id}`)
+        } else {
+          this.$router.push(`/groupMess/setGroup?type=${e}`)
+        }
+      } else {
+        this.$router.push(`/groupMess/taskInfo?type=${e}&id=${item.id}`)
+      }
     },
     remove (e) {
       this.$confirm({

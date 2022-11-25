@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div id="cluster_template_container" ref="cluster_template_container">
+    <button @click="addGroupChat()">添加群聊</button>
     <div class="searchLine">
       <div class="searchBox">
         <div class="item">
@@ -52,6 +53,69 @@
         </template>
       </div>
     </a-table>
+    <a-modal
+      title="添加群聊"
+      :maskClosable="false"
+      :width="1400"
+      :visible="addGroupChatShowStatus"
+      class="addGroupChatClass"
+      @cancel="closeGroupChat()"
+      :getContainer="() => $refs['cluster_template_container']"
+    >
+      <span>选择执行群(SOP话术将推送给群主,由群主发送到所选择的群)</span>
+      <div class="filter-input-row flex-between">
+        <div class="item">
+          <div class="title">群主：</div>
+          <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.personName"/>
+        </div>
+        <div class="item">
+          <div class="title">群名称：</div>
+          <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.personName"/>
+        </div>
+        <div class="item">
+          <div class="title">标签：</div>
+          <a-select
+            placeholder="请选择"
+            v-model="groupChatSearchInfo.tagType"
+            style="width: 200px"
+          >
+            <a-select-option :value="tagsTypeItem.id" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
+          </a-select>
+          <SelectTagInput v-model="groupChatSearchInfo.tags" :screentags="true" :changeId="true" ref="SelectTagInput" />
+        </div>
+        <div class="item">
+          <div class="title">群创建日期：</div>
+          <a-range-picker
+            style="width: 265px"
+            v-model="groupChatSearchInfo.time"
+            format="YYYY-MM-DD"
+            :placeholder="['开始日期', '结束日期']"
+          />
+        </div>
+        <div class="item">
+          <a-button type="primary" @click="confirmGroupChat()">查询</a-button>
+          <a-button @click="confirmGroupChat()">重置</a-button>
+        </div>
+
+      </div>
+      <a-table
+        :row-key="record => record.id"
+        :loading="groupChatLoading"
+        :columns="groupChatColumns"
+        :data-source="groupChatDataList"
+        :pagination="groupChatPagination"
+        :pageSizeOptions="['10', '20', '30', '50']"
+        :row-selection="{ selectedRowKeys: groupChatSelectedRowKeys, onChange: onGroupChatSelectChange }"
+        :scroll="{ x: 1500 }"
+        @change="groupChatHandleTableChange"
+      ></a-table>
+      <template slot="footer">
+        <a-button
+          @click="closeGroupChat()"
+        >取消</a-button>
+        <a-button type="primary" @click="confirmGroupChat()">确定</a-button>
+      </template>
+    </a-modal>
   </div>
 </template>
 
@@ -61,6 +125,20 @@ export default {
   name: 'ClusterSopTemplate',
   data () {
     return {
+      groupChatSelectedRowKeys: [],
+      groupChatSearchInfo: {}, // 群聊查询对象
+      // 添加群聊弹框显示状态
+      addGroupChatShowStatus: false,
+      tagsTypeList: [
+        {
+          id: 0,
+          name: '同时满足'
+        },
+        {
+          id: 1,
+          name: '至少满足一项'
+        }
+      ],
       // 表格加载效果
       tableLoading: false,
       // 表格数据
@@ -99,6 +177,55 @@ export default {
           all: true
         }
       ],
+      groupChatLoading: false, // 添加群聊弹框列表加载
+      groupChatDataList: [],
+      groupChatColumns: [
+        {
+          title: '群名称',
+          dataIndex: 'groupName',
+          align: 'center',
+          width: 150
+        },
+        {
+          title: '群主',
+          dataIndex: 'personName',
+          align: 'center',
+          width: 150
+        },
+        {
+          title: '创建时间',
+          dataIndex: 'createDate',
+          align: 'center',
+          width: 150
+        },
+        {
+          title: '群标签',
+          dataIndex: 'tags',
+          align: 'center',
+          width: 150
+        },
+        {
+          title: '执行中的SOP',
+          dataIndex: 'openingSop',
+          align: 'center',
+          width: 150
+        },
+        {
+          title: '执行中的群日历',
+          dataIndex: 'openingCalendar',
+          align: 'center',
+          width: 150
+        }
+      ],
+      // 群聊弹框分页信息
+      groupChatPagination: {
+        total: 0,
+        current: 1,
+        pageSize: 10,
+        showSizeChanger: true,
+        showQuickJumper: true,
+        pageSizeOptions: ['10', '20', '30', '50']
+      },
       // 分页对象
       pagination: {
         total: 0,
@@ -114,6 +241,19 @@ export default {
     this.departmentEmp()
   },
   methods: {
+    // 群聊列表切换选中状态
+    onGroupChatSelectChange () {},
+    // 群聊列表分页信息
+    groupChatHandleTableChange () {},
+    onSelectChange () {},
+    // 关闭添加群聊弹框
+    closeGroupChat () {
+      this.addGroupChatShowStatus = false
+    },
+    // 提交添加群聊
+    confirmGroupChat () {
+      console.log('提交添加群聊')
+    },
     // 拉取部门数据
     departmentEmp () {
       departmentEmp().then(res => {
@@ -144,7 +284,10 @@ export default {
       })
     },
     // 添加群聊
-    addGroupChat () {},
+    addGroupChat () {
+      this.addGroupChatShowStatus = true
+      this.groupChatSearchInfo.tagType = 0
+    },
     // 复制
     copyItem () {},
     // 删除sop
@@ -169,7 +312,7 @@ export default {
       .item {
         display: flex;
         align-items: center;
-        margin-right: 20px;
+        margin-right: 15px;
         .selectPersonnelCom {
           width: 200px;
           margin-left: 10px;
@@ -199,6 +342,20 @@ export default {
         border-radius: 4px;
         color: #fff;
       }
+    }
+  }
+  .filter-input-row {
+    .item {
+      display: flex;
+      align-items: center;
+      .title {
+        flex-shrink: 0;
+        text-align: left;
+        width: auto;
+      }
+    }
+    .ant-btn:nth-last-child(1) {
+      margin-left: 4px;
     }
   }
 </style>
