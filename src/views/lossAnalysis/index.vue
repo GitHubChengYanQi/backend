@@ -806,6 +806,7 @@ export default {
             {
               align: 'center',
               title: '机构名称',
+              fixed: 'left',
               dataIndex: 'employeeAgencyName',
               width: 150
             },
@@ -887,7 +888,6 @@ export default {
               align: 'center',
               title: '离职继承失败流失占比',
               dataIndex: 'deleteOverRatio',
-              fixed: 'right',
               width: 200
             }
           ],
@@ -895,6 +895,7 @@ export default {
             {
               align: 'center',
               title: '门店名称',
+              fixed: 'left',
               dataIndex: 'employeeOutletName',
               width: 150
             },
@@ -980,7 +981,6 @@ export default {
               align: 'center',
               title: '离职继承失败流失占比',
               dataIndex: 'deleteOverRatio',
-              fixed: 'right',
               width: 200
             }
           ],
@@ -988,6 +988,7 @@ export default {
             {
               align: 'center',
               title: '员工名称',
+              fixed: 'left',
               dataIndex: 'employeeInfoName',
               width: 150
             },
@@ -1072,7 +1073,6 @@ export default {
               align: 'center',
               title: '离职继承失败流失占比',
               dataIndex: 'deleteOverRatio',
-              fixed: 'right',
               width: 200
             }
           ]

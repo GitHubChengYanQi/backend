@@ -282,6 +282,7 @@ export default {
             align: 'center',
             title: '客户',
             dataIndex: 'contactInfoName',
+            fixed: 'left',
             scopedSlots: { customRender: 'contactInfoName' },
             width: 150
           },
@@ -369,7 +370,6 @@ export default {
             align: 'center',
             title: '成为会员时间',
             dataIndex: 'tradeApplyDate',
-            fixed: 'right',
             width: 200
           }
         ],

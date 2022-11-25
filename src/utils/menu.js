@@ -122,7 +122,7 @@ export function setBreadcrumb (path, data) {
       returnPath: '/mall/combination'
     },
     18: {
-      path: ['/groupMess/setGroup'],
+      path: ['/groupMess/setGroup', '/groupMess/taskInfo'],
       returnPath: '/groupMess/index'
     }
   }

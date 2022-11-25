@@ -1,17 +1,17 @@
 <template>
-  <div class="A_page">
-    <a-card class="A_card">
-      <div class="A_content">
-        <div class="A_left">
+  <div class="setGroup_page">
+    <a-card class="setGroup_card">
+      <div class="setGroup_content">
+        <div class="setGroup_left">
           <div
-            class="A_input_box"
+            class="setGroup_input_box"
             v-for="(item,index) in input.inputArr"
             :style="item.type == 'sendBox'? {alignItems:'flex-start'}:{} "
             :key="index"
           >
             <div class="title"><span class="hint">*</span><span class="txt">{{ item.title }}</span></div>
             <div
-              class="A_input"
+              class="setGroup_input"
               :style="item.type == 'selectBox'? {width:'100%'}:{} "
             >
               <!-- 输入框 -->
@@ -84,11 +84,11 @@
                           >{{ items }}</li>
                         </ul>
                       </template>
-                      <img
+                      <!-- <img
                         class="expression_icon"
                         :src="require('@/assets/expression.svg')"
                         alt=""
-                      >
+                      > -->
                     </a-popover><span class="txt">{{ input.data.textear.length + '/1000' }}</span>
                   </div>
                 </div>
@@ -107,7 +107,7 @@
             @click="setMess"
           >保存</a-button>
         </div>
-        <div class="A_right">
+        <div class="setGroup_right">
           <div class="title">
             预览：客户群收到的消息
           </div>
@@ -117,6 +117,83 @@
               :src="require('@/assets/preview.png')"
               alt=""
             >
+            <div class="content_box">
+              <div
+                class="box"
+                v-for="(item,index) in contentArray"
+                :key="index"
+              >
+                <div
+                  class="image"
+                  v-if="item.type === 2"
+                >
+                  <!-- style="max-width:100%;max-height:300px" -->
+                  <img
+                    class="img"
+                    :src="item.photoUrl"
+                    alt
+                  />
+                </div>
+                <div
+                  class="video"
+                  v-if="item.type === 3"
+                >
+                  <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
+                  <div
+                    class="poster"
+                    v-if="item.showPoster"
+                  >{{ returnErrorText(item.videoUrl) }}</div>
+                  <video
+                    class="poster"
+                    :src="item.videoUrl"
+                    @error="videoLoadErr(index)"
+                    alt
+                  />
+                </div>
+                <div
+                  class="link"
+                  v-if="item.type === 4"
+                >
+                  <div class="lef">
+                    <span class="til">{{ item.linkTitle }}</span>
+                    <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
+                    <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                  </div>
+                  <img
+                    :src="item.linkPhoto"
+                    alt
+                    class="image"
+                  />
+                </div>
+                <div
+                  class="embed"
+                  v-else-if="item.type === 5"
+                >
+                  <div class="line">
+                    <img
+                      src="./images/miniProgramIcon.svg"
+                      alt
+                      class="icon"
+                    />
+                    <span class="til">{{ '小程序标题' }}</span>
+                  </div>
+                  <div class="line desc">{{ item.appShow }}</div>
+                  <img
+                    :src="item.appPhoto"
+                    alt
+                    class="image"
+                  />
+                  <div class="line">
+                    <img
+                      src="./images/miniProgramIcon.svg"
+                      alt
+                      class="icon"
+                    />
+                    <span class="say">小程序</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -157,6 +234,13 @@ export default {
   created () {},
   methods: {
     moment,
+    returnErrorText (url) {
+      return '暂不支持显示 .avi 格式的视频'
+    },
+    videoLoadErr (index) {
+      this.contentArray[index].showPoster = true
+      this.$emit('update:contentArray', this.contentArray)
+    },
     onChange (value, dateString) {
       this.input.data.date = dateString
     },
@@ -177,16 +261,17 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.A_page {
+.setGroup_page {
   width: 100%;
-  .A_card {
+  .setGroup_card {
     width: 100%;
-    .A_content {
+    .setGroup_content {
       width: 100%;
       display: flex;
+      flex-wrap: wrap;
 
-      .A_left {
-        .A_input_box {
+      .setGroup_left {
+        .setGroup_input_box {
           margin-bottom: 35px;
           width: 100%;
           display: flex;
@@ -203,7 +288,7 @@ export default {
               color: red;
             }
           }
-          .A_input {
+          .setGroup_input {
             .input {
               position: relative;
               width: 500px;
@@ -299,7 +384,7 @@ export default {
           margin-left: 90px;
         }
       }
-      .A_right {
+      .setGroup_right {
         flex-grow: 1;
         display: flex;
         flex-direction: column;
@@ -312,10 +397,118 @@ export default {
           color: #333333;
         }
         .preview {
+          position: relative;
           margin-top: 20px;
           .preview_img {
             width: 291px;
             height: auto;
+          }
+          .content_box {
+            position: absolute;
+            top: 71px;
+            left: 0;
+            width: 100%;
+            height: 489px;
+            overflow: auto;
+            // background-color: pink;
+            .box {
+              min-width: 200px;
+              min-height: 50px;
+              border-radius: 10px;
+              margin-bottom: 20px;
+            }
+            .image {
+              max-width: 200px;
+              min-height: 50px;
+              .img {
+                background-color: #fff;
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: 100%;
+              }
+            }
+            .video {
+              max-width: 200px;
+              min-height: 100px;
+              position: relative;
+              .poster {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background: #fff;
+                width: 100%;
+                height: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+            }
+            .link {
+              width: 250px;
+              height: 80px;
+              border: 1px solid #cdcdcd;
+              background-color: #fff;
+              border-radius: 5px;
+              flex: none;
+              padding: 10px;
+              display: flex;
+              .lef {
+                width: 160px;
+                margin-right: 10px;
+                font-size: 13px;
+                .til {
+                  width: 100%;
+                  color: #4074f6;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  display: inline-block;
+                }
+                .desc {
+                  width: 100%;
+                  display: -webkit-box;
+                  -webkit-box-orient: vertical;
+                  -webkit-line-clamp: 2;
+                  overflow: hidden;
+                }
+              }
+              .image {
+                flex: 1;
+                height: 100%;
+                max-width: 58px;
+              }
+            }
+            .embed {
+              background-color: #fff;
+              width: 230px;
+              border: 1px solid #cdcdcd;
+              flex: none;
+              display: flex;
+              flex-direction: column;
+              padding: 8px 10px;
+              .line {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                .icon {
+                  width: 17px;
+                  height: 17px;
+                }
+                .til {
+                  color: #4074f6;
+                }
+              }
+              .desc {
+                font-size: 13px;
+                margin-top: 3px;
+              }
+              .image {
+                height: 180px;
+                margin: 3px 0;
+              }
+            }
           }
         }
       }
