@@ -122,300 +122,31 @@
       :maskClosable="false"
       :width="1000"
       :visible="sendContentModalShow"
-      class="sendContentModal"
       @cancel="closeSendContentModal()"
       :getContainer="() => $refs['div_wrapper_container']"
     >
-      <div>
-        <a-form layout="horizontal">
-          <a-form-item label="发送时间" :labelCol="{span: 4}" :wrapperCol="{span: 14}">
-            <a-date-picker
-              dropdownClassName="addSop_Page_Container_selectSopItemDateBox"
-              :allowClear="false"
-              :showToday="false"
-              v-model="sendTime"
-              valueFormat="YYYY-MM-DD HH:mm"
-              format="YYYY-MM-DD HH:mm"
-              show-time
-              :getPopupContainer="() => $refs['div_wrapper_container']"
-              @change="sendDateChange"
-            />
-          </a-form-item>
-          <a-form-item label="内容标题" :labelCol="{span: 4}" :wrapperCol="{span: 20}">
-            <a-input v-model="addInfo.title" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
-          </a-form-item>
-        </a-form>
-        <div class="sendCalendarSOPInfoContainer">
-          <div class="sendContent">
-            <div class="tilBar">
-              <span class="til">
-                <span style="color: red;font-weight: 500;">*</span>发送内容
-              </span>
-              <div class="handleBox">
-                <div
-                  v-for="(item, index) in handleCalendarBtnArr"
-                  :class="((sendCalendarContentArray.length === 10 || (sendCalendarContentArray.findIndex(it => (it.type === 1 && item.type === 'text')) != -1)) || isCalendarDisableEdit === true)?
-                    'handleBtn disabled' :
-                    'handleBtn'"
-                  :key="index"
-                  @click="chooseCalendarSendType(item.type)"
-                >+ {{ item.name }}</div>
-                <div
-                  class="disabledBox"
-                  v-if="isCalendarDisableEdit === true"
-                  @click="$message.warn('执行后不可修改！')"
-                ></div>
-              </div>
-            </div>
-            <div class="contentBox">
-              <div
-                class="contentItem"
-                v-for="(item, index) in sendCalendarContentArray"
-                :key="index"
-              >
-                <div class="idx">{{ index + 1 }}</div>
-                <div :class="`content ${item.type === 1 ? 'text' : ''}`" v-if="item.type === 1">{{ item.textData }}</div>
-                <div :class="`content ${item.type === 2 ? 'image': ''}`" v-else-if="item.type === 2">
-                  <img :src="item.photoUrl" alt />
-                </div>
-                <div :class="`content ${item.type === 3 ? 'video' : ''}`" v-else-if="item.type === 3">
-                  <div class="poster" v-if="item.showPoster">{{ returnCalendarErrorText(item.videoUrl) }}</div>
-                  <video :src="item.videoUrl" @error="videoCalendarLoadErr(index)" alt />
-                </div>
-                <div :class="`content ${item.type === 4 ? 'link' : ''}`" v-else-if="item.type === 4">
-                  <div class="lef">
-                    <span class="til">{{ item.linkTitle }}</span>
-                    <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                    <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
-                  </div>
-                  <img :src="item.linkPhoto" alt class="image" />
-                </div>
-                <div :class="`content ${item.type === 5 ? 'embed' : ''}`" v-else-if="item.type === 5">
-                  <div class="line">
-                    <img src="./images/miniProgramIcon.svg" alt class="icon" />
-                    <span class="til">{{ '小程序标题' }}</span>
-                  </div>
-                  <div class="line desc">{{ item.appShow }}</div>
-                  <img :src="item.appPhoto" alt class="image" />
-                  <div class="line">
-                    <img src="./images/miniProgramIcon.svg" alt class="icon" />
-                    <span class="say">小程序</span>
-                  </div>
-                </div>
-                <div class="handlesBox" v-if="sendCalendarContentArray && sendCalendarContentArray[selectCalendarSopItemIdx] && isCalendarDisableEdit === false">
-                  <img
-                    src="./images/move.svg"
-                    alt
-                    :class="index === 0 ? 'icon move disabled' : 'icon move'"
-                    @click="handleCalendarMoveClick(index, 'up')"
-                  />
-                  <img
-                    src="./images/move.svg"
-                    style="transform: rotate(180deg)"
-                    alt
-                    :class="(sendCalendarContentArray.length - 1 === index) ? 'icon move disabled' : 'icon move'"
-                    @click="handleCalendarMoveClick(index, 'down')"
-                  />
-                  <img
-                    src="./images/edit.svg"
-                    alt
-                    class="icon"
-                    @click="handleCalendarEditClick(item, index)"
-                  />
-                  <img src="./images/del.svg" alt class="icon" @click="handleCalendarDelClick(index)" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <input
-          type="file"
-          accept="image/jpeg, image/png"
-          ref="uploadCalendarPhotoRef"
-          @change="uploadCalendarPhoto"
-          class="uploadFileInp"
-        />
-        <input
-          type="file"
-          accept="video/*"
-          ref="uploadCalendarVideoRef"
-          @change="uploadCalendarVideo"
-          class="uploadFileInp"
-        />
-        <!-- :getContainer="() => $refs['addSop_Page_Container']" -->
-        <!-- div_wrapper_container -->
-        <a-modal
-          title="添加文本"
-          :maskClosable="false"
-          :width="600"
-          :visible="contentCalendarTextModalShow"
-          class="contentTextModal"
-          @cancel="closeCalendarContentTextModal()"
-          :getContainer="() => $refs['div_wrapper_container']"
-        >
-          <a-textarea v-model="contentCalendarText" autoSize placeholder="请输入内容" />
-          <span class="len">{{ contentCalendarText.length ? contentCalendarText.length : '0' }}/1000</span>
-          <template slot="footer">
-            <a-button @click="closeCalendarContentTextModal()">取消</a-button>
-            <a-button type="primary" @click="confirmCalendarContentText">确定</a-button>
-          </template>
-        </a-modal>
-        <a-modal
-          title="新增链接"
-          :maskClosable="false"
-          :width="600"
-          :visible="contentCalendarLinkModalShow"
-          @cancel="closeCalendarLinkModal()"
-          :getContainer="() => $refs['div_wrapper_container']"
-        >
-          <div class="contentLinkModal">
-            <div class="formBox">
-              <div class="line">
-                <a-input v-model="contentCalendarLinkObj.linkTitle" placeholder="请输入链接标题（必填）" />
-                <span class="len">{{ (contentCalendarLinkObj.linkTitle && contentCalendarLinkObj.linkTitle.length) ? contentCalendarLinkObj.linkTitle.length : '0' }}/200</span>
-              </div>
-              <div class="line">
-                <a-input v-model="contentCalendarLinkObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
-                <span class="len">{{ (contentCalendarLinkObj.linkUrl && contentCalendarLinkObj.linkUrl.length) ? contentCalendarLinkObj.linkUrl.length : '0' }}/500</span>
-              </div>
-              <div class="line textarea">
-                <a-textarea v-model="contentCalendarLinkObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
-                <span class="len">{{ (contentCalendarLinkObj.linkShow && contentCalendarLinkObj.linkShow.length) ? contentCalendarLinkObj.linkShow.length : '0' }}/170</span>
-              </div>
-            </div>
-            <div class="pic">
-              <div
-                class="addPic image"
-                v-if="!contentCalendarLinkObj.linkPhoto"
-                @click="openCalendarSelectPhoto('addLinkPhoto')"
-              >+</div>
-              <img
-                class="image"
-                v-else
-                :src="contentCalendarLinkObj.linkPhoto"
-                @click="openCalendarSelectPhoto('addLinkPhoto')"
-              />
-              <span class="tip">图片限制在2MB以内</span>
-            </div>
-          </div>
-          <!-- <div class="formBox">
-            <div class="line">
-              <a-input v-model="contentCalendarLinkObj.linkTitle" placeholder="请输入链接标题（必填）" />
-              <span class="len">{{ (contentCalendarLinkObj.linkTitle && contentCalendarLinkObj.linkTitle.length) ? contentCalendarLinkObj.linkTitle.length : '0' }}/200</span>
-            </div>
-            <div class="line">
-              <a-input v-model="contentCalendarLinkObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
-              <span class="len">{{ (contentCalendarLinkObj.linkUrl && contentCalendarLinkObj.linkUrl.length) ? contentCalendarLinkObj.linkUrl.length : '0' }}/500</span>
-            </div>
-            <div class="line textarea">
-              <a-textarea v-model="contentCalendarLinkObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
-              <span class="len">{{ (contentCalendarLinkObj.linkShow && contentCalendarLinkObj.linkShow.length) ? contentCalendarLinkObj.linkShow.length : '0' }}/170</span>
-            </div>
-          </div>
-          <div class="pic">
-            <div
-              class="addPic image"
-              v-if="!contentCalendarLinkObj.linkPhoto"
-              @click="openCalendarSelectPhoto('addLinkPhoto')"
-            >+</div>
-            <img
-              class="image"
-              v-else
-              :src="contentCalendarLinkObj.linkPhoto"
-              @click="openCalendarSelectPhoto('addLinkPhoto')"
-            />
-            <span class="tip">图片限制在2MB以内</span>
-          </div> -->
-          <template slot="footer">
-            <a-button
-              @click="closeCalendarLinkModal()"
-            >取消</a-button>
-            <a-button type="primary" @click="confirmCalendarContentLink">确定</a-button>
-          </template>
-        </a-modal>
-        <a-modal
-          title="新增小程序"
-          :maskClosable="false"
-          :width="600"
-          :visible="contentCalendarMiniModalShow"
-          @cancel="closeCalendarMiniModal()"
-          :getContainer="() => $refs['div_wrapper_container']"
-        >
-          <div class="contentLinkModal">
-            <p class="tip top">
-              请填写企业微信后台绑定的小程序，否则会造成发送失败
-            <!-- <a
-          class="click"
-          href="https://www.yuque.com/docs/share/9def95f9-bce5-4c66-b800-9f3cbef4fe50"
-          target="_blank"
-        >查看如何绑定</a> -->
-            </p>
-            <div class="formBox">
-              <div class="line">
-                <a-input v-model="contentCalendarMiniObj.appId" placeholder="输入小程序APPID（必填）" />
-                <span class="len">{{ contentCalendarMiniObj.appId && contentCalendarMiniObj.appId.length ? contentCalendarMiniObj.appId.length :'0' }}/200</span>
-                <p class="tip">
-                <!-- <a
-              class="click"
-              href="https://www.yuque.com/docs/share/6b55b4d7-7e59-4a0a-bdd6-fb4dd0d2f2e5"
-              target="_blank"
-            >如何获取APPID</a> -->
-                </p>
-              </div>
-              <div class="line">
-                <a-input v-model="contentCalendarMiniObj.appUrl" placeholder="输入小程序页面路径（必填）" />
-                <span class="len">{{ contentCalendarMiniObj.appUrl && contentCalendarMiniObj.appUrl ? contentCalendarMiniObj.appUrl.length :'0' }}/500</span>
-                <p class="tip">
-                <!-- <a
-              class="click"
-              href="https://www.yuque.com/docs/share/dd225b88-7778-463e-82a2-37bff08e1119"
-              target="_blank"
-            >如何获取小程序路径</a> -->
-                </p>
-              </div>
-              <div class="line textarea">
-                <a-textarea v-model="contentCalendarMiniObj.appShow" autoSize placeholder="输入小程序的描述（必填）" />
-                <span class="len">{{ contentCalendarMiniObj.appShow && contentCalendarMiniObj.appShow.length ? contentCalendarMiniObj.appShow.length :'0' }}/170</span>
-              </div>
-            </div>
-            <div class="pic">
-              <div
-                class="addPic image"
-                v-if="!contentCalendarMiniObj.appPhoto"
-                @click="openCalendarSelectPhoto('addMiniPhoto')"
-              >+</div>
-              <img
-                class="image"
-                v-else
-                :src="contentCalendarMiniObj.appPhoto"
-                @click="openCalendarSelectPhoto('addMiniPhoto')"
-              />
-              <span class="photoTip">图片限制在2MB以内</span>
-            </div>
-          </div>
-
-          <template slot="footer">
-            <a-button
-              @click="closeCalendarMiniModal()"
-            >取消</a-button>
-            <a-button type="primary" @click="confirmCalendarContentMini">确定</a-button>
-          </template>
-        </a-modal>
-        <!-- 添加素材库弹窗 -->
-        <a-modal v-model="contentCalendarLibraryModalShow" centered @ok="handleCalendarAddLibraryOk" width="95%">
-          <MediumGroup
-            :is-component="true"
-            v-if="contentCalendarLibraryModalShow"
-            @materialSelect="libraryCalendarSelectChange"
+      <a-form layout="horizontal" labelAligin="left">
+        <a-form-item label="发送时间" :labelCol="{span: 2}" :wrapperCol="{span: 21}">
+          <a-date-picker
+            dropdownClassName="addSop_Page_Container_selectSopItemDateBox"
+            :allowClear="false"
+            :showToday="false"
+            v-model="sendTime"
+            valueFormat="YYYY-MM-DD HH:mm"
+            format="YYYY-MM-DD HH:mm"
+            show-time
+            :getPopupContainer="() => $refs['div_wrapper_container']"
+            @change="sendDateChange"
           />
-        </a-modal>
-        <!-- <SendContent
+        </a-form-item>
+        <a-form-item label="内容标题" :labelCol="{span: 2}" :wrapperCol="{span: 21}">
+          <a-input v-model="addInfo.title" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
+        </a-form-item>
+      </a-form>
+      <SendContent
         :contentArray.sync="contentArray"
         :isSopEdit.sync="isSopEdit"
-        :isDisableEdit="false"/> -->
-      </div>
-
+        :isDisableEdit="false"/>
       <template slot="footer">
         <a-button
           @click="closeCalendarSendContentModal()"
@@ -1409,15 +1140,13 @@ export default {
     // }
   }
   .contentTextModal {
-    .ant-modal-body {
-      padding-top: 0;
-      .ant-input {
-        min-height: 100px;
-      }
-      .len {
-        display: block;
-        text-align: end;
-      }
+    padding-top: 0;
+    .ant-input {
+      min-height: 100px;
+    }
+    .len {
+      display: block;
+      text-align: end;
     }
   }
 }
