@@ -98,8 +98,7 @@
             <a-tooltip placement="right">
               <template #title>
                 <div class="title_box">
-                  <div>更新频率:</div>
-                  <div>每两分钟更新一次</div>
+                  <div>单个机构流失数/所选机构总流失数</div>
                 </div>
               </template>
               <div class="icon">?</div>
@@ -167,8 +166,7 @@
             <a-tooltip placement="right">
               <template #title>
                 <div class="title_box">
-                  <div>更新频率:</div>
-                  <div>每两分钟更新一次</div>
+                  <div>单个门店流失数/所选门店总流失数</div>
                 </div>
               </template>
               <div class="icon">?</div>
