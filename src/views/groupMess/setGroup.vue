@@ -123,75 +123,84 @@
                 v-for="(item,index) in contentArray"
                 :key="index"
               >
-                <div
-                  class="image"
-                  v-if="item.type === 2"
-                >
-                  <!-- style="max-width:100%;max-height:300px" -->
+                <div class="user">
                   <img
-                    class="img"
-                    :src="item.photoUrl"
-                    alt
-                  />
+                    src="./images/user.png"
+                    alt=""
+                  >
                 </div>
-                <div
-                  class="video"
-                  v-if="item.type === 3"
-                >
-                  <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
+                <div class="content">
                   <div
-                    class="poster"
-                    v-if="item.showPoster"
-                  >{{ returnErrorText(item.videoUrl) }}</div>
-                  <video
-                    class="poster"
-                    :src="item.videoUrl"
-                    @error="videoLoadErr(index)"
-                    alt
-                  />
-                </div>
-                <div
-                  class="link"
-                  v-if="item.type === 4"
-                >
-                  <div class="lef">
-                    <span class="til">{{ item.linkTitle }}</span>
-                    <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                    <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
-                  </div>
-                  <img
-                    :src="item.linkPhoto"
-                    alt
                     class="image"
-                  />
-                </div>
-                <div
-                  class="embed"
-                  v-else-if="item.type === 5"
-                >
-                  <div class="line">
+                    v-if="item.type === 2"
+                  >
+                    <!-- style="max-width:100%;max-height:300px" -->
                     <img
-                      src="./images/miniProgramIcon.svg"
+                      class="img"
+                      :src="item.photoUrl"
                       alt
-                      class="icon"
                     />
-                    <span class="til">{{ '小程序标题' }}</span>
                   </div>
-                  <div class="line desc">{{ item.appShow }}</div>
-                  <img
-                    :src="item.appPhoto"
-                    alt
-                    class="image"
-                  />
-                  <div class="line">
-                    <img
-                      src="./images/miniProgramIcon.svg"
+                  <div
+                    class="video"
+                    v-if="item.type === 3"
+                  >
+                    <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
+                    <div
+                      class="poster"
+                      v-if="item.showPoster"
+                    >{{ returnErrorText(item.videoUrl) }}</div>
+                    <video
+                      class="poster"
+                      :src="item.videoUrl"
+                      @error="videoLoadErr(index)"
                       alt
-                      class="icon"
                     />
-                    <span class="say">小程序</span>
+                  </div>
+                  <div
+                    class="link"
+                    v-if="item.type === 4"
+                  >
+                    <div class="lef">
+                      <span class="til">{{ item.linkTitle }}</span>
+                      <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span>
+                      <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
+                    </div>
+                    <img
+                      :src="item.linkPhoto"
+                      alt
+                      class="image"
+                    />
+                  </div>
+                  <div
+                    class="embed"
+                    v-else-if="item.type === 5"
+                  >
+                    <div class="line">
+                      <img
+                        src="./images/miniProgramIcon.svg"
+                        alt
+                        class="icon"
+                      />
+                      <span class="til">{{ '小程序标题' }}</span>
+                    </div>
+                    <div class="line desc">{{ item.appShow }}</div>
+                    <img
+                      :src="item.appPhoto"
+                      alt
+                      class="image"
+                    />
+                    <div class="line">
+                      <img
+                        src="./images/miniProgramIcon.svg"
+                        alt
+                        class="icon"
+                      />
+                      <span class="say">小程序</span>
+                    </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -400,7 +409,7 @@ export default {
           position: relative;
           margin-top: 20px;
           .preview_img {
-            width: 291px;
+            width: 350px;
             height: auto;
           }
           .content_box {
@@ -408,7 +417,8 @@ export default {
             top: 71px;
             left: 0;
             width: 100%;
-            height: 489px;
+            padding-top: 10px;
+            height: 600px;
             overflow: auto;
             // background-color: pink;
             .box {
@@ -416,97 +426,99 @@ export default {
               min-height: 50px;
               border-radius: 10px;
               margin-bottom: 20px;
-            }
-            .image {
-              max-width: 200px;
-              min-height: 50px;
-              .img {
-                background-color: #fff;
-                width: auto;
-                height: auto;
-                max-width: 100%;
-                max-height: 100%;
-              }
-            }
-            .video {
-              max-width: 200px;
-              min-height: 100px;
-              position: relative;
-              .poster {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                background: #fff;
-                width: 100%;
-                height: auto;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-            }
-            .link {
-              width: 250px;
-              height: 80px;
-              border: 1px solid #cdcdcd;
-              background-color: #fff;
-              border-radius: 5px;
-              flex: none;
-              padding: 10px;
               display: flex;
-              .lef {
-                width: 160px;
-                margin-right: 10px;
-                font-size: 13px;
-                .til {
-                  width: 100%;
-                  color: #4074f6;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  display: inline-block;
+
+              .content {
+                position: relative;
+                .video {
+                  max-width: 200px;
+                  min-height: 100px;
+                  .poster {
+                    background: #fff;
+                    width: 100%;
+                    height: auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  }
                 }
-                .desc {
-                  width: 100%;
-                  display: -webkit-box;
-                  -webkit-box-orient: vertical;
-                  -webkit-line-clamp: 2;
-                  overflow: hidden;
+                .link {
+                  width: 250px;
+                  height: 80px;
+                  border: 1px solid #cdcdcd;
+                  background-color: #fff;
+                  border-radius: 5px;
+                  flex: none;
+                  padding: 10px;
+                  display: flex;
+                  .lef {
+                    width: 160px;
+                    margin-right: 10px;
+                    font-size: 13px;
+                    .til {
+                      width: 100%;
+                      color: #4074f6;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      display: inline-block;
+                    }
+                    .desc {
+                      width: 100%;
+                      white-space: nowrap;
+                      display: -webkit-box;
+                      -webkit-box-orient: vertical;
+                      -webkit-line-clamp: 2;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                  }
+                  .image {
+                    flex: 1;
+                    height: 100%;
+                    max-width: 58px;
+                  }
                 }
-              }
-              .image {
-                flex: 1;
-                height: 100%;
-                max-width: 58px;
-              }
-            }
-            .embed {
-              background-color: #fff;
-              width: 230px;
-              border: 1px solid #cdcdcd;
-              flex: none;
-              display: flex;
-              flex-direction: column;
-              padding: 8px 10px;
-              .line {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                .icon {
-                  width: 17px;
-                  height: 17px;
+                .embed {
+                  background-color: #fff;
+                  width: 230px;
+                  border: 1px solid #cdcdcd;
+                  flex: none;
+                  display: flex;
+                  flex-direction: column;
+                  padding: 8px 10px;
+                  .line {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    .icon {
+                      width: 17px;
+                      height: 17px;
+                    }
+                    .til {
+                      color: #4074f6;
+                    }
+                  }
+                  .desc {
+                    font-size: 13px;
+                    margin-top: 3px;
+                  }
+                  .image {
+                    height: 180px;
+                    margin: 3px 0;
+                  }
                 }
-                .til {
-                  color: #4074f6;
+                .image {
+                  max-width: 200px;
+                  min-height: 50px;
+                  .img {
+                    background-color: #fff;
+                    width: auto;
+                    height: auto;
+                    max-width: 100%;
+                    max-height: 100%;
+                  }
                 }
-              }
-              .desc {
-                font-size: 13px;
-                margin-top: 3px;
-              }
-              .image {
-                height: 180px;
-                margin: 3px 0;
               }
             }
           }

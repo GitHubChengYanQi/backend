@@ -136,7 +136,7 @@ export default {
   data () {
     return {
       searchObj: {
-        date: [moment().add(-1, 'years').format('YYYY-MM-D HH:mm'), moment().format('YYYY-MM-D HH:mm')],
+        date: [moment().add(-6, 'days').startOf('day'), moment().endOf('day')],
         employeeIds: [],
         type: ''
       },
@@ -170,7 +170,7 @@ export default {
       contrastIds: [],
       // 统计
       statisticsSearchObj: {
-        date: [moment().add(-1, 'years').format('YYYY-MM-D HH:mm'), moment().format('YYYY-MM-D HH:mm')],
+        date: [moment().add(-6, 'days').startOf('day'), moment().endOf('day')],
         employeeIds: [],
         type: ''
       },

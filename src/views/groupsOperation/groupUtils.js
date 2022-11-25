@@ -112,3 +112,21 @@ export const returnChartData = (data) => {
   }
   return { xName, xData }
 }
+
+export const defaultLinkObj = {
+  title: '',
+  url: '',
+  desc: '',
+  pic: ''
+}
+// 是否为一个地址
+export const isUrl = (val) => {
+  // eslint-disable-next-line no-useless-escape
+  const str = /^(http|https):\/\/[\S]+$/
+  const reg = new RegExp(str)
+  return reg.test(val)
+}
+export const defaultLibraryObj = {
+  temporaryStroageArr: [],
+  selectArr: []
+}

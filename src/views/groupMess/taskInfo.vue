@@ -20,6 +20,17 @@
                 class="btn_box"
                 :style="`background-color:${info.btnState[info.data.btn].color}`"
               >{{ info.btnState[info.data.btn].txt }}</span>
+              <span
+                class="hint"
+                v-if="info.data.btn == 3"
+              >
+                <img
+                  style="margin-right:10px;"
+                  :src="require('@/assets/warning.svg')"
+                  alt=""
+                >
+                任务创建失败，发送内容的小程序appid账号错误，请重新检查配置。
+              </span>
             </span>
             <span
               class="content"
@@ -32,7 +43,12 @@
               >
                 {{ info.state[items] + (indexs + 1 != info.data[item.key].length ? '+' : '') }}
               </span>
-              <span class="btn">预览消息</span>
+              <span
+                class="btn"
+                @click="()=>{
+                  keepState = true
+                }"
+              >预览消息</span>
             </span>
             <span
               class="txt"
@@ -70,6 +86,112 @@
         </div>
       </div>
     </a-card>
+    <div
+      class="A_keep_out"
+      @mousewheel="mousewheel"
+      v-if="keepState"
+    >
+      <div class="preview">
+        <div class="header">
+          客户群名称
+          <span
+            class="close"
+            @click="()=>{
+              keepState =false
+            }"
+          >+</span>
+        </div>
+        <div
+          class="content_box"
+          @mousewheel="previewMouse"
+        >
+          <div
+            class="box"
+            v-for="(item,index) in contentArray"
+            :key="index"
+          >
+            <div class="user">
+              <img
+                src="./images/user.png"
+                alt=""
+              >
+            </div>
+            <div class="content">
+              <div
+                class="image"
+                v-if="item.type === 2"
+              >
+                <!-- style="max-width:100%;max-height:300px" -->
+                <img
+                  class="img"
+                  :src="item.photoUrl"
+                  alt
+                />
+              </div>
+              <div
+                class="video"
+                v-if="item.type === 3"
+              >
+                <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
+                <div
+                  class="poster"
+                  v-if="item.showPoster"
+                >{{ returnErrorText(item.videoUrl) }}</div>
+                <video
+                  class="poster"
+                  :src="item.videoUrl"
+                  @error="videoLoadErr(index)"
+                  alt
+                />
+              </div>
+              <div
+                class="link"
+                v-if="item.type === 4"
+              >
+                <div class="lef">
+                  <span class="til">{{ item.linkTitle }}</span>
+                  <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span>
+                  <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
+                </div>
+                <img
+                  :src="item.linkPhoto"
+                  alt
+                  class="image"
+                />
+              </div>
+              <div
+                class="embed"
+                v-else-if="item.type === 5"
+              >
+                <div class="line">
+                  <img
+                    src="./images/miniProgramIcon.svg"
+                    alt
+                    class="icon"
+                  />
+                  <span class="til">{{ '小程序标题' }}</span>
+                </div>
+                <div class="line desc">{{ item.appShow }}</div>
+                <img
+                  :src="item.appPhoto"
+                  alt
+                  class="image"
+                />
+                <div class="line">
+                  <img
+                    src="./images/miniProgramIcon.svg"
+                    alt
+                    class="icon"
+                  />
+                  <span class="say">小程序</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -105,7 +227,7 @@ export default {
           createTime: '2022年11月18日 17:12:31',
           startTime: '2022年11月18日 17:12:31',
           content: [0, 1, 2, 3],
-          btn: '0'
+          btn: '3'
         },
         state: ['文本内容', '【图片】', '【链接】', '【小程序】'],
         btnState: [
@@ -131,9 +253,44 @@ export default {
         tab: 0,
         tabArr: ['未执行', '已执行', '无法执行'],
         columns: {
-          0: [],
-          1: [],
-          2: []
+          0: [
+            {
+              title: '员工',
+              dataIndex: 'mumber'
+            },
+            {
+              title: '预计送达客户群数',
+              dataIndex: 'predict_group'
+            }
+          ],
+          1: [
+            {
+              title: '员工',
+              dataIndex: 'mumber'
+            },
+            {
+              title: '预计送达客户群数',
+              dataIndex: 'predict_group'
+            },
+            {
+              title: '实际送达客户群数',
+              dataIndex: 'practical_group'
+            },
+            {
+              title: '送达时间',
+              dataIndex: 'time'
+            }
+          ],
+          2: [
+            {
+              title: '员工',
+              dataIndex: 'mumber'
+            },
+            {
+              title: '无法执行客户群数',
+              dataIndex: 'none_group'
+            }
+          ]
         },
         tableData: [],
         pagination: {
@@ -145,16 +302,56 @@ export default {
           pageSizeOptions: ['10', '20', '30', '50']
         },
         rowSelection: []
-      }
+      },
+      contentArray: [
+        {
+          photoUrl:
+            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693752676040231493.png?Expires=1984735267&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=Vbv9%2FEoIhKsZz5CFyeMV8zM4Yfw%3D',
+          type: 2
+        },
+        {
+          videoUrl:
+            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693754284570386334.mp4?Expires=1984735428&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=4ynJHymKtRozos1yf5mXd41D8%2B8%3D',
+          type: 3
+        },
+        {
+          linkPhoto:
+            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693754423090183565.png?Expires=1984735442&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=8IIQl2pxtpfgDoBbpxANyO1Wo1E%3D',
+          linkShow: '21312',
+          linkTitle: '12312',
+          linkUrl: 'http://jira.yifeijiankang.com:8021/secure/Dashboard.jspa',
+          type: 4
+        },
+        {
+          appId: '21321',
+          appPhoto:
+            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693755678710249817.png?Expires=1984735568&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=d6Y1gV4UPC5v%2B1n7RlteZCups8Q%3D',
+          appShow: '32123',
+          appUrl: '21312',
+          type: 5
+        }
+      ],
+      keepState: false
     }
   },
   methods: {
+    videoLoadErr (index) {
+      console.log(index)
+      this.contentArray[index].showPoster = true
+      this.$emit('update:contentArray', this.contentArray)
+    },
     setTab (e) {
       this.table.tab = e
+    },
+    previewMouse (e) {
+      e.stopPropagation()
     },
     exportsElxe () {},
     onSelectChange (e) {
       this.table.rowSelection = e
+    },
+    mousewheel (e) {
+      e.preventDefault()
     },
     handleTableChange ({ current }) {
       this.pagination.pageSize = arguments[0].pageSize
@@ -176,6 +373,7 @@ export default {
       padding: 20px 0;
       border-bottom: 1px solid #ccc;
       .A_info_box {
+        width: 100%;
         display: flex;
         align-items: center;
         font-size: 14px;
@@ -190,15 +388,34 @@ export default {
         .info_content {
           flex-shrink: 1;
           white-space: nowrap;
+          .button {
+            display: flex;
+            align-items: center;
+
+            .btn_box {
+              display: flex;
+              align-items: center;
+              margin-left: 10px;
+              padding: 2px 10px;
+              border-radius: 5px;
+              width: 75px;
+              height: 35px;
+              color: #fff;
+            }
+            .hint {
+              display: flex;
+              align-items: center;
+              font-size: 14px;
+              color: rgba(0, 0, 0, 0.8980392156862745);
+              margin-left: 20px;
+              max-width: 817px;
+              padding: 15px 20px;
+              border-radius: 5px;
+              background-color: rgba(249, 224, 199, 1);
+            }
+          }
         }
-        .btn_box {
-          margin-left: 10px;
-          padding: 2px 10px;
-          border-radius: 5px;
-          min-width: 75px;
-          height: 35px;
-          color: #fff;
-        }
+
         .btn {
           margin-left: 20px;
           cursor: pointer;
@@ -222,6 +439,156 @@ export default {
         }
         .button {
           margin-left: auto;
+        }
+      }
+    }
+  }
+  .A_keep_out {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 100%;
+    height: 100vh;
+    .preview {
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 384px;
+      height: 628px;
+      border-radius: 20px;
+      margin-top: 20px;
+      background-color: #e8eaed;
+      .header {
+        position: relative;
+        font-size: 15px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px 20px 0 0;
+        width: 100%;
+        height: 60px;
+        background-color: #5286d9;
+        .close {
+          cursor: pointer;
+          position: absolute;
+          top: 50%;
+          right: 20px;
+          font-size: 22px;
+          transform: rotate(45deg) translate(-50%, -50%);
+        }
+      }
+      .content_box {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        padding-top: 10px;
+        height: 550px;
+        overflow: auto;
+        // background-color: pink;
+        .box {
+          min-width: 200px;
+          min-height: 50px;
+          border-radius: 10px;
+          margin-bottom: 20px;
+          display: flex;
+
+          .content {
+            position: relative;
+            .video {
+              max-width: 200px;
+              min-height: 100px;
+              .poster {
+                background: #fff;
+                width: 100%;
+                height: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+            }
+            .link {
+              width: 250px;
+              height: 80px;
+              border: 1px solid #cdcdcd;
+              background-color: #fff;
+              border-radius: 5px;
+              flex: none;
+              padding: 10px;
+              display: flex;
+              .lef {
+                width: 160px;
+                margin-right: 10px;
+                font-size: 13px;
+                .til {
+                  width: 100%;
+                  color: #4074f6;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  display: inline-block;
+                }
+                .desc {
+                  width: 100%;
+                  white-space: nowrap;
+                  display: -webkit-box;
+                  -webkit-box-orient: vertical;
+                  -webkit-line-clamp: 2;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+              }
+              .image {
+                flex: 1;
+                height: 100%;
+                max-width: 58px;
+              }
+            }
+            .embed {
+              background-color: #fff;
+              width: 230px;
+              border: 1px solid #cdcdcd;
+              flex: none;
+              display: flex;
+              flex-direction: column;
+              padding: 8px 10px;
+              .line {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                .icon {
+                  width: 17px;
+                  height: 17px;
+                }
+                .til {
+                  color: #4074f6;
+                }
+              }
+              .desc {
+                font-size: 13px;
+                margin-top: 3px;
+              }
+              .image {
+                height: 180px;
+                margin: 3px 0;
+              }
+            }
+            .image {
+              max-width: 200px;
+              min-height: 50px;
+              .img {
+                background-color: #fff;
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: 100%;
+              }
+            }
+          }
         }
       }
     }
