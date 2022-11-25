@@ -85,7 +85,7 @@
       </a-tree>
     </div>
     <div class="groupTag_right_box">
-      <div class="groupTag_content_box" v-if="selectKey.length > 0">
+      <div class="groupTag_content_box" v-if="selectKey.length > 0 && selectKey[0] != '0'">
         <div class="groupTag_header_box">
           <div
             class="title"
@@ -124,7 +124,7 @@
           >
             <a-input
               v-model="add.addInput"
-              style="height:24px"
+              style="height:24px;"
               placeholder="请输入"
             ></a-input>
           </span>
@@ -132,9 +132,9 @@
             class="tab_box"
             v-for="(item,index) in tabArr"
             :key="index"
-          ><span class="tab_txt">{{ item }}</span><span
+          ><span class="tab_txt">{{ item.itemName }}</span><span
             class="tab_icon"
-            @click="delTab(index)"
+            @click="delTab(item.id)"
           >+</span></span>
         </div>
       </div>
@@ -246,6 +246,7 @@ export default {
       })
     },
     setGroup (e, item) {
+      console.log(e, item)
       this.modelData.operation = e
       if (e == 0 || e == 1) {
         this.modelData.title = e == 0 ? '新增标签组' : '修改标签组'
@@ -257,7 +258,14 @@ export default {
           content: '是否删除',
           okText: '确认',
           cancelText: '取消',
-          onOk: () => {},
+          onOk: () => {
+            const obj = {
+              id: item.key
+            }
+            workRoomLabelDrop(obj).then(res => {
+              this.getTree()
+            })
+          },
           onCancel () {}
         })
       } else {
@@ -336,22 +344,25 @@ export default {
     },
     getGroups (id) {
       this.selectKey = id
+      if (this.selectKey[0] == '0' || this.selectKey.length == 0) return
       this.getTag()
     },
     getTag () {
       const obj = {
         id: this.selectKey[0]
       }
+      console.log(obj)
       workRoomLabelLoad(obj).then((res) => {
         console.log(res)
+        this.tabArr = res.data.datas
       })
     },
-    getSelect (e) {
-      console.log(e)
-    },
     delTab (e) {
-      this.tabArr = this.tabArr.filter((item, index) => {
-        return index != e
+      const obj = {
+        id: e
+      }
+      workRoomLabelDrop(obj).then(res => {
+        this.getTag()
       })
     },
     setselectdiv (e) {
@@ -359,15 +370,16 @@ export default {
       if (this.add.addState) return
       const txt = ['input_box', 'add_box', 'add_txt', 'add_icon', 'ant-input']
       if (!txt.includes(thisClassName)) {
-        const obj = {
-          itemName: this.add.addInput,
-          parentId: this.selectKey[0]
+        if (this.selectKey.length > 0 && this.add.addInput.length > 0) {
+          const obj = {
+            itemName: this.add.addInput,
+            parentId: this.selectKey[0]
+          }
+          workRoomLabelSave(obj).then((res) => {
+            this.getTag()
+          })
         }
-        workRoomLabelSave(obj).then((res) => {
-          console.log(res)
-        })
         this.add.addState = true
-        this.tabArr = [...this.tabArr, this.add.addInput]
         this.add.addInput = ''
       }
     }
@@ -470,8 +482,12 @@ export default {
             font-size: 18px;
             font-weight: 800;
           }
+          .add_txt {
+            white-space: nowrap;
+          }
         }
         .input_box {
+          margin-right: 20px;
           width: 90px;
           height: 24px;
         }

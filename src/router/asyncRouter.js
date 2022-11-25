@@ -860,5 +860,12 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/groupMess/setGroup'),
     meta: { title: '新建群群发' }
+  },
+  '/groupMess/taskInfo': {
+    path: '/groupMess/taskInfo',
+    name: '任务详情',
+    hidden: true,
+    component: () => import('@/views/groupMess/taskInfo'),
+    meta: { title: '任务详情' }
   }
 }
