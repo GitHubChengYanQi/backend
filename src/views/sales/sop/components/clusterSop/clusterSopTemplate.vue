@@ -1,22 +1,22 @@
 <template>
   <div id="cluster_template_container" ref="cluster_template_container">
-    <button @click="addGroupChat()">添加群聊</button>
+    <button @click="addGroupChat()">临时测试添加群聊</button>
     <div class="searchLine">
       <div class="searchBox">
         <div class="item">
           <span>SOP名称:</span>
-          <a-input placeholder="请输入SOP名称" v-model="searchValue" class="inputClass" />
+          <a-input placeholder="请输入SOP名称" v-model="searchInfo.sopName" class="inputClass" />
           <!-- style="width: 200px; height: 35px" -->
         </div>
         <div class="item">
           <span>创建人:</span>
+          <!-- v-if="treeData" :record="treeData" -->
           <selectPersonnel
-            v-if="treeData"
-            :record="treeData"
             class="selectPersonnelCom"
-            name="选择成员"
-            v-model="employeeIds"
-            @getVal="employeeIdsChange"
+            name="请选择创建者"
+            :changeId="true"
+            :num="1"
+            v-model="searchInfo.employeeIds"
           />
         </div>
         <a-button
@@ -35,13 +35,13 @@
     </div>
     <a-table
       :loading="tableLoading"
-      class="tableBox"
       :row-key="record => record.id"
       :data-source="tableData"
       :columns="tableColumns"
       :pagination="pagination"
+      class="tableBox"
       :scroll="{ x: 1500}"
-      @change="getChangeList">
+      @change="handleTableChange">
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
@@ -120,11 +120,13 @@
 </template>
 
 <script>
-import { departmentEmp } from '@/api/common.js'
+// import { getSopTemplateListMethod, deleteSopTemplateMethod } from '@/api/cluster'
+import { getTempSopList, deleteSopTemplateMethod } from '@/api/cluster'
 export default {
   name: 'ClusterSopTemplate',
   data () {
     return {
+      searchInfo: {}, // 查询列表对象
       groupChatSelectedRowKeys: [],
       groupChatSearchInfo: {}, // 群聊查询对象
       // 添加群聊弹框显示状态
@@ -154,13 +156,7 @@ export default {
           title: 'SOP名称',
           dataIndex: 'sopName',
           align: 'center',
-          width: 150
-        },
-        {
-          title: '创建人',
-          dataIndex: 'createdByName',
-          align: 'center',
-          width: 150
+          width: 200
         },
         {
           title: '创建时间',
@@ -169,9 +165,15 @@ export default {
           width: 200
         },
         {
+          title: '创建人',
+          dataIndex: 'createdByName',
+          align: 'center',
+          width: 200
+        },
+        {
           title: '操作',
           align: 'center',
-          width: 200,
+          width: 250,
           fixed: 'right',
           scopedSlots: { customRender: 'options' },
           all: true
@@ -226,7 +228,7 @@ export default {
         showQuickJumper: true,
         pageSizeOptions: ['10', '20', '30', '50']
       },
-      // 分页对象
+      // 模板页面分页对象
       pagination: {
         total: 0,
         current: 1,
@@ -238,9 +240,56 @@ export default {
     }
   },
   created () {
-    this.departmentEmp()
+    // 获取缓存中的页码
+    const tempPage = sessionStorage.getItem('sopTemplatePage')
+    if (tempPage) {
+      this.$set(this.pagination, 'current', Number(tempPage))
+    } else {
+      this.$set(this.pagination, 'current', 1)
+    }
+    this.getTableData()
   },
   methods: {
+    // 获取数据
+    async getTableData () {
+      // 临时注释掉
+      // this.tableLoading = true
+      // const params = {
+      //   sopName: this.searchInfo.sopName,
+      //   idsStr: this.searchInfo.employeeIds.join(','),
+      //   page: this.pagination.current,
+      //   perPage: this.pagination.pageSize
+      // }
+      // console.log(params, '查询数据提交接口的对象')
+      // await getSopTemplateListMethod(params).then(response => {
+      //   this.tableLoading = false
+      //   console.log(response, '获取字典列表数据')
+      //   this.tableData = response.data.records
+      //   this.$set(this.pagination, 'total', Number(response.data.total))
+      //   this.$set(this.pagination, 'current', Number(response.data.current))
+      //   if (this.tableData.length === 0) {
+      //     // 列表中没有数据
+      //     if (this.pagination.total !== 0) {
+      //       // 总数据有,但当前页没有
+      //       // 重新将页码换成1
+      //       this.$set(this.pagination, 'current', 1)
+      //       this.getTableData()
+      //     } else {
+      //       // 是真没有数据
+      //     }
+      //   }
+      // }).catch(() => {
+      //   this.tableLoading = false
+      // })
+      // 临时接收假数据
+      this.tableData = getTempSopList()
+    },
+    // 群SOP模板切换页码
+    handleTableChange ({ current, pageSize }) {
+      this.pagination.current = current
+      this.pagination.pageSize = pageSize
+      this.getTableData()
+    },
     // 群聊列表切换选中状态
     onGroupChatSelectChange () {},
     // 群聊列表分页信息
@@ -254,48 +303,86 @@ export default {
     confirmGroupChat () {
       console.log('提交添加群聊')
     },
-    // 拉取部门数据
-    departmentEmp () {
-      departmentEmp().then(res => {
-        this.treeData = res.data
-      }).catch(error => {
-        console.log(error)
-      })
-    },
-    // 切换员工选择
-    employeeIdsChange (e) {
-      console.log(e)
-    },
     // 切换列表,翻页
     getChangeList () {
 
     },
     // 搜索
-    goSearch () {},
+    goSearch () {
+      // 重新将页码换成1
+      this.$set(this.pagination, 'current', 1)
+      this.getTableData()
+    },
     // 重置
-    goReset () {},
-    // 创建sop模板
-    goAdd () {
-      this.$router.push({
-        path: '/sop/addClusterSop',
-        query: {
-          id: -1
-        }
-      })
+    goReset () {
+      // 重新将页码换成1
+      this.$set(this.pagination, 'current', 1)
+      this.searchInfo = {}
+      this.getTableData()
     },
     // 添加群聊
     addGroupChat () {
       this.addGroupChatShowStatus = true
       this.groupChatSearchInfo.tagType = 0
     },
-    // 复制
-    copyItem () {},
-    // 删除sop
-    deleteItem () {
-
+    // 创建sop模板
+    goAdd () {
+      // 将页码缓存移除
+      sessionStorage.removeItem('sopTemplatePage')
+      this.$router.push({
+        path: '/sop/addClusterSop',
+        query: {
+          id: -1,
+          type: 'add'
+        }
+      })
     },
-    // 编辑sop
-    editItem () {}
+    // 复制群SOP模板
+    copyItem (info) {
+      // 将页码缓存移除
+      sessionStorage.removeItem('sopTemplatePage')
+      this.$router.push({
+        path: '/sop/addClusterSop',
+        query: {
+          id: info.id,
+          type: 'copy'
+        }
+      })
+    },
+    // 删除群SOP模板
+    deleteItem (id) {
+      const params = { id }
+      this.$confirm({
+        title: '确定删除所选内容?',
+        // content: 'Some descriptions',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          deleteSopTemplateMethod(params).then(response => {
+            console.log(response, '删除数据')
+            if (response.code === 200) {
+              this.$message.success('删除成功')
+              // this.pageIndex = 1
+              // this.sopName = ''
+              this.getTableData()
+            }
+          })
+        }
+      })
+    },
+    // 编辑群sop模板
+    editItem (info) {
+      // 将当前的页码存入缓存中
+      sessionStorage.setItem('sopTemplatePage', this.pagination.current)
+      this.$router.push({
+        path: '/sop/editClusterSop',
+        query: {
+          id: info.id,
+          type: 'edit'
+        }
+      })
+    }
   }
 }
 </script>
@@ -344,6 +431,9 @@ export default {
       }
     }
   }
+.tableBox {
+  background-color: white;
+}
   .filter-input-row {
     .item {
       display: flex;
