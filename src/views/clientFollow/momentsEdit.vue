@@ -211,7 +211,7 @@
       </div>
     </div>
 
-    <input type="file" accept="image/png,image/jpg" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
+    <input type="file" accept="image/*" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
     <input type="file" accept="video/mp4" ref="uploadVideo" @change="uploadVideo" class="uploadFileInp" />
 
     <a-modal
@@ -474,7 +474,7 @@ export default {
       const splitArr = file.name.split('.')
 
       if (!['jpg', 'png'].includes(splitArr[splitArr.length - 1])) {
-        return this.$message.warn('请上传 jpg 格式的图片文件')
+        return this.$message.warn('请上传 jpg, png 格式的图片文件')
       }
       if (file.size > 10 * 1000 * 1000) {
         return this.$message.warn('请上传小于10MB的图片文件')

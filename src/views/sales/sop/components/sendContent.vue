@@ -119,37 +119,38 @@
       :maskClosable="false"
       :width="600"
       :visible="contentLinkModalShow"
-      class="contentLinkModal"
       @cancel="closeLinkModal()"
       :getContainer="() => $refs['send_content_container']"
     >
-      <div class="formBox">
-        <div class="line">
-          <a-input v-model="contentLinkObj.linkTitle" placeholder="请输入链接标题（必填）" />
-          <span class="len">{{ (contentLinkObj.linkTitle && contentLinkObj.linkTitle.length) ? contentLinkObj.linkTitle.length : '0' }}/200</span>
+      <div class="contentLinkModal">
+        <div class="formBox">
+          <div class="line">
+            <a-input v-model="contentLinkObj.linkTitle" placeholder="请输入链接标题（必填）" />
+            <span class="len">{{ (contentLinkObj.linkTitle && contentLinkObj.linkTitle.length) ? contentLinkObj.linkTitle.length : '0' }}/200</span>
+          </div>
+          <div class="line">
+            <a-input v-model="contentLinkObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
+            <span class="len">{{ (contentLinkObj.linkUrl && contentLinkObj.linkUrl.length) ? contentLinkObj.linkUrl.length : '0' }}/500</span>
+          </div>
+          <div class="line textarea">
+            <a-textarea v-model="contentLinkObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
+            <span class="len">{{ (contentLinkObj.linkShow && contentLinkObj.linkShow.length) ? contentLinkObj.linkShow.length : '0' }}/170</span>
+          </div>
         </div>
-        <div class="line">
-          <a-input v-model="contentLinkObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
-          <span class="len">{{ (contentLinkObj.linkUrl && contentLinkObj.linkUrl.length) ? contentLinkObj.linkUrl.length : '0' }}/500</span>
+        <div class="pic">
+          <div
+            class="addPic image"
+            v-if="!contentLinkObj.linkPhoto"
+            @click="openSelectPhoto('addLinkPhoto')"
+          >+</div>
+          <img
+            class="image"
+            v-else
+            :src="contentLinkObj.linkPhoto"
+            @click="openSelectPhoto('addLinkPhoto')"
+          />
+          <span class="tip">图片限制在2MB以内</span>
         </div>
-        <div class="line textarea">
-          <a-textarea v-model="contentLinkObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
-          <span class="len">{{ (contentLinkObj.linkShow && contentLinkObj.linkShow.length) ? contentLinkObj.linkShow.length : '0' }}/170</span>
-        </div>
-      </div>
-      <div class="pic">
-        <div
-          class="addPic image"
-          v-if="!contentLinkObj.linkPhoto"
-          @click="openSelectPhoto('addLinkPhoto')"
-        >+</div>
-        <img
-          class="image"
-          v-else
-          :src="contentLinkObj.linkPhoto"
-          @click="openSelectPhoto('addLinkPhoto')"
-        />
-        <span class="tip">图片限制在2MB以内</span>
       </div>
       <template slot="footer">
         <a-button
@@ -163,59 +164,60 @@
       :maskClosable="false"
       :width="600"
       :visible="contentMiniModalShow"
-      class="contentLinkModal"
       @cancel="closeMiniModal()"
       :getContainer="() => $refs['send_content_container']"
     >
       <p class="tip top">
         请填写企业微信后台绑定的小程序，否则会造成发送失败
         <!-- <a
-          class="click"
-          href="https://www.yuque.com/docs/share/9def95f9-bce5-4c66-b800-9f3cbef4fe50"
-          target="_blank"
-        >查看如何绑定</a> -->
+            class="click"
+            href="https://www.yuque.com/docs/share/9def95f9-bce5-4c66-b800-9f3cbef4fe50"
+            target="_blank"
+          >查看如何绑定</a> -->
       </p>
-      <div class="formBox">
-        <div class="line">
-          <a-input v-model="contentMiniObj.appId" placeholder="输入小程序APPID（必填）" />
-          <span class="len">{{ contentMiniObj.appId && contentMiniObj.appId.length ? contentMiniObj.appId.length :'0' }}/200</span>
-          <p class="tip">
-            <!-- <a
-              class="click"
-              href="https://www.yuque.com/docs/share/6b55b4d7-7e59-4a0a-bdd6-fb4dd0d2f2e5"
-              target="_blank"
-            >如何获取APPID</a> -->
-          </p>
+      <div class="contentLinkModal">
+        <div class="formBox">
+          <div class="line">
+            <a-input v-model="contentMiniObj.appId" placeholder="输入小程序APPID（必填）" />
+            <span class="len">{{ contentMiniObj.appId && contentMiniObj.appId.length ? contentMiniObj.appId.length :'0' }}/200</span>
+            <p class="tip">
+              <!-- <a
+                class="click"
+                href="https://www.yuque.com/docs/share/6b55b4d7-7e59-4a0a-bdd6-fb4dd0d2f2e5"
+                target="_blank"
+              >如何获取APPID</a> -->
+            </p>
+          </div>
+          <div class="line">
+            <a-input v-model="contentMiniObj.appUrl" placeholder="输入小程序页面路径（必填）" />
+            <span class="len">{{ contentMiniObj.appUrl && contentMiniObj.appUrl ? contentMiniObj.appUrl.length :'0' }}/500</span>
+            <p class="tip">
+              <!-- <a
+                class="click"
+                href="https://www.yuque.com/docs/share/dd225b88-7778-463e-82a2-37bff08e1119"
+                target="_blank"
+              >如何获取小程序路径</a> -->
+            </p>
+          </div>
+          <div class="line textarea">
+            <a-textarea v-model="contentMiniObj.appShow" autoSize placeholder="输入小程序的描述（必填）" />
+            <span class="len">{{ contentMiniObj.appShow && contentMiniObj.appShow.length ? contentMiniObj.appShow.length :'0' }}/170</span>
+          </div>
         </div>
-        <div class="line">
-          <a-input v-model="contentMiniObj.appUrl" placeholder="输入小程序页面路径（必填）" />
-          <span class="len">{{ contentMiniObj.appUrl && contentMiniObj.appUrl ? contentMiniObj.appUrl.length :'0' }}/500</span>
-          <p class="tip">
-            <!-- <a
-              class="click"
-              href="https://www.yuque.com/docs/share/dd225b88-7778-463e-82a2-37bff08e1119"
-              target="_blank"
-            >如何获取小程序路径</a> -->
-          </p>
+        <div class="pic">
+          <div
+            class="addPic image"
+            v-if="!contentMiniObj.appPhoto"
+            @click="openSelectPhoto('addMiniPhoto')"
+          >+</div>
+          <img
+            class="image"
+            v-else
+            :src="contentMiniObj.appPhoto"
+            @click="openSelectPhoto('addMiniPhoto')"
+          />
+          <span class="photoTip">图片限制在2MB以内</span>
         </div>
-        <div class="line textarea">
-          <a-textarea v-model="contentMiniObj.appShow" autoSize placeholder="输入小程序的描述（必填）" />
-          <span class="len">{{ contentMiniObj.appShow && contentMiniObj.appShow.length ? contentMiniObj.appShow.length :'0' }}/170</span>
-        </div>
-      </div>
-      <div class="pic">
-        <div
-          class="addPic image"
-          v-if="!contentMiniObj.appPhoto"
-          @click="openSelectPhoto('addMiniPhoto')"
-        >+</div>
-        <img
-          class="image"
-          v-else
-          :src="contentMiniObj.appPhoto"
-          @click="openSelectPhoto('addMiniPhoto')"
-        />
-        <span class="photoTip">图片限制在2MB以内</span>
       </div>
       <template slot="footer">
         <a-button
@@ -747,7 +749,6 @@ export default {
 <style lang="less">
 #send_content_container {
   .contentLinkModal {
-    .ant-modal-body {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -822,7 +823,6 @@ export default {
           height: 1px;
         }
       }
-    }
   }
   .contentTextModal {
     .ant-modal-body {
