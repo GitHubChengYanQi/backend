@@ -1,16 +1,14 @@
 <template>
   <div id="div_wrapper_container" ref="div_wrapper_container">
     <a-spin :spinning="loadingStatus">
-      <!-- 群发助手新增 -->
       <div class="chooseUsersContainer">
-        <!-- <div class="disabledBox" v-if="addInfo.invalidState === 2" @click="$message.warn('执行后不可修改！')"></div> -->
         <div class="line">
           <span class="label">
             <span style="color: red">*</span>
-            SOP名称
+            日历模板名称
           </span>
           <div class="input">
-            <a-input v-model="addInfo.sopName" placeholder="请输入SOP名称" @change="changeSopName"/>
+            <a-input v-model="addInfo.sopName" placeholder="请输入日历模板名称" @change="changeSopName"/>
             <span class="len">{{ addInfo.sopName && addInfo.sopName.length ? addInfo.sopName.length :'0' }}/18</span>
           </div>
         </div>
@@ -20,10 +18,10 @@
             选择发送日期
           </span>
           <div class="timeWrapper">
-            <a-calendar @select="chooseDateMethod" valueFormat="YYYY-MM-DD" v-if="currentShowTabId === 0">
+            <a-calendar @select.self="chooseDateMethod" valueFormat="YYYY-MM-DD" v-if="currentShowTabId === 0">
               <ul slot="dateCellRender" slot-scope="value" class="events">
-                <li v-for="item in getListData(value)" :key="item.id" class="singleDiv">
-                  <div>{{ item.content }}</div>
+                <li v-for="item in getListData(value)" :key="item.id" class="singleDiv" @click.stop="chooseTimeContent(item)">
+                  <div class="singleContentTaskDiv">{{ returnCalendarTask(item) }}</div>
                   <span class="delDiv">X</span>
                 </li>
               </ul>
@@ -72,36 +70,6 @@
                     <a-input v-model="addInfo.title" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
                   </a-form-item>
                 </a-form>
-                <!-- <div class="chooseSendDate" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length">
-                  <div class="til">
-                    <span style="color: red;font-weight: 500;">*</span>发送时间
-                  </div>
-                  <div class="pickerBox" style="display: inline-block;position:relative">
-                    <div class="chooseDateBox1">
-                      <p class="tip">当客户条件为所选内容时</p>
-                      <div class="chooseDateBoxRadio">
-                        <div class="line-wrapper">
-                          第
-                          <a-input-number
-                            v-model="addInfo.listTaskInfo[selectSopItemIndex].sendDayNum"
-                            :min="1"
-                            :max="100"
-                            style="width: 70px;"
-                            @blur="dateNumberChange($event, addInfo.listTaskInfo[selectSopItemIndex].sendType)"
-                          />天
-                          <a-time-picker
-                            :allowClear="false"
-                            v-model="addInfo.listTaskInfo[selectSopItemIndex].sendTime"
-                            valueFormat="HH:mm"
-                            format="HH:mm"
-                            @change="dateNumberChange($event, addInfo.listTaskInfo[selectSopItemIndex].sendType)"
-                          />发送
-                          <span class="tip">(注：第一天就是当天，过时不发送）</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
                 <SendContent
                   :contentArray.sync="contentArray"
                   :isSopEdit.sync="isSopEdit"
@@ -113,8 +81,8 @@
             </div>
           </div>
         </div>
-        <div class="execution" v-if="pageTypeId === -1" @click="sendSop()">开始执行</div>
-        <div class="execution" v-else @click="sendSop()">开始执行</div>
+        <div class="execution" v-if="pageTypeId === -1" @click="sendSop()">保存</div>
+        <div class="execution" v-else @click="sendSop()">保存</div>
       </div>
     </a-spin>
     <a-modal
@@ -149,7 +117,7 @@
         :isDisableEdit="false"/>
       <template slot="footer">
         <a-button
-          @click="closeCalendarSendContentModal()"
+          @click="closeSendContentModal()"
         >取消</a-button>
         <a-button type="primary" @click="confirmCalendarSendSure">确定</a-button>
       </template>
@@ -161,48 +129,20 @@
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import { Calendar } from 'ant-design-vue'
-import { disabledBeforeDate, handleBtnArr, isUrl } from './sopUtils'
 import SendContent from './components/sendContent.vue'
-import { upLoad } from '@/api/common'
+// import { addCalendarTemplateMethod, getCalendarTemplateDetailMethod, editCalendarTemplateMethod } from '@/api/cluster'
 moment.locale('zh-cn')
 export default {
   name: 'AddClusterCalendar',
   components: {
     SendContent,
-    aCalendar: Calendar,
-    'MediumGroup': () => import('@/views/mediumGroup/index.vue')
+    aCalendar: Calendar
   },
   data () {
     return {
-      isCalendarDisableEdit: false, // 日历弹框是否编辑状态
-      chooseCalendarEditIndex: '', // 当前选择编辑的下标
-      submitCalendarType: '', // 日历模式提交状态,新增与修改
-      selectCalendarSopItemIdx: 0,
-      sendCalendarContentArray: [], // 日历弹框内容数组
-      // 日历模式链接/小程序上传类型
-      uploadCalendarPhotoType: '',
-      // 用在日历模式弹框中
-      handleCalendarBtnArr: handleBtnArr,
-      // 添加文字弹框
-      contentCalendarTextModalShow: false,
-      contentCalendarText: '',
-      // 日历模式添加链接弹框
-      contentCalendarLinkModalShow: false,
-      // 日历模式新增链接对象
-      contentCalendarLinkObj: {},
-      // 日历模式添加小程序弹框
-      contentCalendarMiniModalShow: false,
-      // 日历模式新增小程序对象
-      contentCalendarMiniObj: {},
-      // 日历模式素材库选择数组
-      contentCalendarLibraryArray: [],
-      // 日历模式添加素材库弹框
-      contentCalendarLibraryModalShow: false,
       sendTime: '',
       // 发送内容设置弹框
       sendContentModalShow: false,
-      // 当前时间
-      currentDate: '',
       showTabList: [
         {
           id: 0,
@@ -217,7 +157,6 @@ export default {
       currentShowTabId: '',
       size: 'small',
       loadingStatus: false,
-      disabledBeforeDate,
       isSopEdit: false, // 判断页面是否被编辑过
       selectSopItemIdx: '', // 选中的时间id
       selectSopItemIndex: '', // 时间标签选择下标
@@ -236,8 +175,6 @@ export default {
     this.pageTypeId = Number(this.$route.query.id)
     // 默认展示日历视图
     this.currentShowTabId = 0
-    // 默认时间为当前时间
-    this.currentDate = moment().format('YYYY-MM-DD')
     this.initMethod()
   },
   watch: {
@@ -276,446 +213,12 @@ export default {
     }
   },
   methods: {
-    // 日历模式视频显示错误提示
-    returnCalendarErrorText (url) {
-      return '暂不支持显示 .avi 格式的视频'
+    // 关闭日历模式添加内容弹框
+    closeSendContentModal () {
+      this.sendContentModalShow = false
     },
-    // 日历模式链接或小程序上传图片
-    openCalendarSelectPhoto (type) {
-      this.$refs.uploadCalendarPhotoRef.value = ''
-      console.log(type, 'type')
-      this.uploadCalendarPhotoType = type
-      this.$nextTick(() => {
-        this.$refs['uploadCalendarPhotoRef'].click()
-      })
-    },
-    // 日历模式点击不同的标签,添加不同的内容
-    chooseCalendarSendType (type) {
-      if (this.isCalendarDisableEdit) {
-        return
-      } else if (this.sendCalendarContentArray.length === 10) {
-        this.$message.warn('最多只可添加10条内容！')
-        return
-      } else if (this.sendCalendarContentArray.some(it => it.type === 1) && type === 'text') {
-        this.$message.warn('只能添加一条文本内容！')
-        return
-      }
-      this.submitCalendarType = 'add'
-      console.log(type, 'type')
-      switch (type) {
-        case 'text':
-          this.contentCalendarTextModalShow = true
-          break
-        case 'image':
-          this.chooseCalendarImage()
-          break
-        case 'video':
-          this.chooseCalendarVideo()
-          break
-        case 'link':
-          this.contentCalendarLinkModalShow = true
-          break
-        case 'library':
-          this.contentCalendarLibraryModalShow = true
-          break
-        case 'embed':
-          this.contentCalendarMiniModalShow = true
-          break
-      }
-    },
-    // 日历模式提交文字
-    confirmCalendarContentText () {
-      console.log('提交')
-      if (!this.contentCalendarText) {
-        return this.$message.warn('请输入内容！')
-      }
-      if (this.submitCalendarType === 'add') {
-        const postInfo = {
-          type: 1,
-          textData: this.contentCalendarText
-        }
-        this.sendCalendarContentArray.push(postInfo)
-      } else {
-        this.sendCalendarContentArray[this.chooseCalendarEditIndex].textData = this.contentCalendarText
-      }
-      this.isCalendarSopEditStatus = true
-      this.submitCalendarType = ''
-      // 清空输入框内容,关闭弹框
-      this.closeCalendarContentTextModal()
-    },
-    // 日历模式关闭文字弹框
-    closeCalendarContentTextModal () {
-      this.contentCalendarTextModalShow = false
-      this.contentCalendarText = ''
-      this.submitCalendarType = ''
-    },
-    // 日历模式选择图片
-    chooseCalendarImage () {
-      this.$refs.uploadCalendarPhotoRef.value = ''
-      this.$nextTick(() => {
-        this.$refs['uploadCalendarPhotoRef'].click()
-      })
-    },
-    // 日历模式选择音频
-    chooseCalendarVideo () {
-      this.$refs.uploadCalendarVideoRef.value = ''
-      this.$nextTick(() => {
-        this.$refs['uploadCalendarVideoRef'].click()
-      })
-    },
-    // 日历模式视频错误时显示
-    videoCalendarLoadErr (index) {
-      this.sendCalendarContentArray[index].showPoster = true
-    },
-    // 日历模式提交链接
-    confirmCalendarContentLink () {
-      console.log('提交链接')
-      if (!this.contentCalendarLinkObj.linkTitle) {
-        return this.$message.warn('请输入链接标题！')
-      } else if (!this.contentCalendarLinkObj.linkUrl) {
-        return this.$message.warn('请输入链接地址！')
-      } else if (!isUrl(this.contentCalendarLinkObj.linkUrl)) {
-        return this.$message.warn('请输入正确的链接地址！')
-      } else if (!this.contentCalendarLinkObj.linkPhoto) {
-        return this.$message.warn('请上传封面图片！')
-      }
-      this.$set(this.contentCalendarLinkObj, 'type', 4)
-      // this.contentLinkModalShow = false
-      // this.sendContentArray.push(this.contentLinkObj)
-      // this.$emit('update:contentArray', this.sendContentArray)
-      this.isCalendarSopEditStatus = true
-      if (this.submitCalendarType === 'add') {
-        this.sendCalendarContentArray.push(this.contentCalendarLinkObj)
-      } else {
-        this.sendCalendarContentArray.splice(this.chooseCalendarEditIndex, 1, this.contentCalendarLinkObj)
-      }
-      this.contentCalendarLinkModalShow = false
-      this.submitCalendarType = ''
-      this.uploadCalendarPhotoType = ''
-      this.contentCalendarLinkObj = {}
-    },
-    // 日历模式关闭链接弹框
-    closeCalendarLinkModal () {
-      this.contentCalendarLinkModalShow = false
-      this.contentCalendarLinkObj = {}
-      this.submitCalendarType = ''
-      this.uploadCalendarPhotoType = ''
-    },
-    // 日历模式提交小程序
-    confirmCalendarContentMini () {
-      if (!this.contentCalendarMiniObj.appId) {
-        return this.$message.warn('请输入小程序appid！')
-      } else if (!this.contentCalendarMiniObj.appUrl) {
-        return this.$message.warn('请输入小程序页面路径！')
-      } else if (!this.contentCalendarMiniObj.appShow) {
-        return this.$message.warn('请输入小程序描述！')
-      } else if (!this.contentCalendarMiniObj.appPhoto) {
-        return this.$message.warn('请上传小程序封面图片！')
-      }
-      this.$set(this.contentCalendarMiniObj, 'type', 5)
-      if (this.submitCalendarType === 'add') {
-        this.sendCalendarContentArray.push(this.contentCalendarMiniObj)
-      } else {
-        this.sendCalendarContentArray.splice(this.chooseCalendarEditIndex, 1, this.contentCalendarMiniObj)
-      }
-      this.isCalendarSopEditStatus = true
-      this.contentCalendarMiniModalShow = false
-      this.submitCalendarType = ''
-      this.uploadCalendarPhotoType = ''
-      this.contentCalendarMiniObj = {}
-    },
-    // 日历模式关闭小程序弹框
-    closeCalendarMiniModal () {
-      this.contentCalendarMiniModalShow = false
-      this.contentCalendarMiniObj = {}
-      this.submitCalendarType = ''
-      this.uploadCalendarPhotoType = ''
-    },
-    // 日历模式添加素材框确认
-    handleCalendarAddLibraryOk () {
-      this.dealCalendarLibraryArrayMethod()
-    },
-    // 日历模式素材库选择Change
-    libraryCalendarSelectChange (e) {
-      console.log(e, '素材库选择的对象')
-      this.contentCalendarLibraryArray = e
-    },
-    // 日历模式处理素材库数组
-    dealCalendarLibraryArrayMethod () {
-      if (this.contentCalendarLibraryArray.some(it => it.type === '文件' || it.type === '音频')) {
-        this.$message.warning('暂不支持文件、音频类型素材！')
-        return
-      }
-      if ((this.sendCalendarContentArray.length + this.contentCalendarLibraryArray.length) > 10) {
-        this.$message.warning('发送条数不能超过十条！')
-        return
-      }
-      for (const item of this.contentCalendarLibraryArray) {
-        if (item.type === '图片') {
-          const imageInfo = {
-            type: 2,
-            photoUrl: item.content.imageFullPath
-          }
-          this.sendCalendarContentArray.push(imageInfo)
-        } else if (item.type === '小程序') {
-          const miniInfo = {
-            type: 5,
-            appId: item.content.appid,
-            appUrl: item.content.page,
-            appShow: item.content.maintitle,
-            appPhoto: item.content.imageFullPath
-          }
-          this.sendContentArray.push(miniInfo)
-        } else if (item.type === '图文') {
-          const linkInfo = {
-            type: 4,
-            linkTitle: item.content.maintitle,
-            linkPhoto: item.content.imageFullPath,
-            linkUrl: item.content.imageLink,
-            linkShow: item.content.description
-          }
-          this.sendCalendarContentArray.push(linkInfo)
-        } else if (item.type === '视频') {
-          const videoInfo = {
-            type: 3,
-            videoUrl: item.content.videoFullPath
-          }
-          this.sendCalendarContentArray.push(videoInfo)
-        } else if (item.type === '文本') {
-          const textInfo = {
-            type: 1,
-            textData: item.content.content
-          }
-          // 查看列表中是否存在文本
-          const tempIndex = this.sendCalendarContentArray.findIndex(it => it.type === 1)
-          if (tempIndex === -1) {
-            // 不存在,就加一个
-            this.sendCalendarContentArray.push(textInfo)
-          } else {
-            // 如果原文字信息的长度大于1000
-            if (this.sendCalendarContentArray[tempIndex].textData.length > 1000) {
-              this.$message.warn('原文字长度大于1000,无法添加')
-              return
-            } else {
-              // 存在,就与存在的拼接在一起,并截取到1000个字
-              const tempText = this.sendCalendarContentArray[tempIndex].textData + item.content.content
-              this.sendCalendarContentArray[tempIndex].textData = tempText.slice(0, 1000)
-            }
-          }
-        }
-      }
-      this.isCalendarSopEditStatus = true
-      this.contentCalendarLibraryModalShow = false
-    },
-    // 日历模式移动某一个item
-    async handleCalendarMoveClick (index, type) {
-      if (type === 'up' && index === 0) {
-        return
-      } else if (type === 'down' && index === (this.sendCalendarContentArray.length - 1)) {
-        return
-      }
-      // 先生成一个全新的数组
-      const nowArray = Object.assign([], this.sendCalendarContentArray)
-      // 得到全新的当前移动的对象
-      // const nowItemInfo = Object.assign([],nowArray[index])
-      // 先将当前选择的元素移除数组
-      const delItemInfo = nowArray.splice(index, 1)[0]
-      if (type === 'up') {
-        nowArray.splice(index - 1, 0, delItemInfo)
-      } else {
-        nowArray.splice(index + 1, 0, delItemInfo)
-      }
-      this.isCalendarSopEditStatus = true
-      this.sendCalendarContentArray = Object.assign([], nowArray)
-    },
-    // 日历模式编辑单个item
-    handleCalendarEditClick (info, index) {
-      this.chooseCalendarEditIndex = index
-      this.submitCalendarType = 'edit'
-      const singleType = info.type
-      if (singleType === 1) {
-        console.log(singleType, '编辑单个item')
-        this.contentCalendarText = info.textData
-        this.contentCalendarTextModalShow = true
-      } else if (singleType === 4) {
-        this.contentCalendarLinkObj = { ...info }
-        console.log(this.contentCalendarLinkObj, '编辑链接回显')
-        this.contentCalendarLinkModalShow = true
-      } else if (singleType === 5) {
-        this.contentCalenarMiniObj = { ...info }
-        this.contentCalendarMiniModalShow = true
-        console.log(this.contentCalendarLinkObj, '编辑小程序回显')
-      } else if (singleType === 2) {
-        this.chooseCalendarImage()
-      } else if (singleType === 3) {
-        this.chooseCalendarVideo()
-      }
-    },
-    // 日历模式删除某一个item
-    handleCalendarDelClick (index) {
-      const that = this
-      const nowD = Object.assign([], this.sendCalendarContentArray)
-      this.$confirm({
-        title: '确定删除所选内容?',
-        // content: 'Some descriptions',
-        okText: '确认删除',
-        okType: 'danger',
-        cancelText: '取消',
-        onOk: async () => {
-          nowD.splice(index, 1)
-          this.$message.success('删除成功')
-          that.sendCalendarContentArray = Object.assign([], nowD)
-          this.isCalendarSopEditStatus = true
-        }
-      })
-    },
-    // 日历模式上传图片
-    async uploadCalendarPhoto (e) {
-      console.log(e, '上传图片对象')
-      if (e && e.target && e.target.files.length !== 0) {
-        const file = e.target.files[0]
-        const fileArray = file.name.split('.')
-        const suffix = fileArray[fileArray.length - 1]
-        if (!['jpg', 'png'].includes(suffix)) {
-          return this.$message.warn('请上传 jpg, png 格式的图片文件')
-        }
-        if (file.size > 2 * 1000 * 1000) {
-          return this.$message.warn('请上传小于2MB的图片文件')
-        }
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        const res = await upLoad(formData)
-        // const params = {
-        //   imgUrl: res.data.fullPath,
-        //   mediaName: file.name
-        // }
-        // console.log(params, '返回的对象')
-        if (this.uploadCalendarPhotoType === 'addLinkPhoto') {
-          this.$set(this.contentCalendarLinkObj, 'linkPhoto', res.data.fullPath)
-          this.uploadCalendarPhotoType = ''
-          return
-        }
-        if (this.uploadCalendarPhotoType === 'addMiniPhoto') {
-          this.$set(this.contentCalendarMiniObj, 'appPhoto', res.data.fullPath)
-          this.uploadCalendarPhotoType = ''
-          return
-        }
-        const imageInfo = {
-          type: 2,
-          photoUrl: res.data.fullPath
-        }
-        if (this.submitCalendarType === 'add') {
-          this.sendCalendarContentArray.push(imageInfo)
-        } else {
-          this.sendCalendarContentArray.splice(this.chooseCalendarEditIndex, 1, imageInfo)
-        }
-        this.isCalendarSopEditStatus = true
-        this.submitCalendarType = ''
-        this.$refs.uploadCalendarPhotoRef.value = ''
-      } else {
-        console.log(e)
-      }
-    },
-    // 日历模式上传视频
-    async uploadCalendarVideo (e) {
-      console.log(e, '上传视频')
-      // debugger
-      if (e && e.target && e.target.files.length !== 0) {
-        const file = e.target.files[0]
-        if (file.size > 10 * 1000 * 1000) {
-          return this.$message.warn('请上传小于10MB的视频文件')
-        }
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        const res = await upLoad(formData)
-        const videoInfo = {
-          type: 3,
-          videoUrl: res.data.fullPath
-        }
-        if (this.submitCalendarType === 'add') {
-          this.sendCalendarContentArray.push(videoInfo)
-        } else {
-          this.sendCalendarContentArray.splice(this.chooseCalendarEditIndex, 1, videoInfo)
-        }
-        this.isCalendarSopEditStatus = true
-        this.$refs.uploadCalendarVideoRef.value = ''
-      } else {
-        console.log(e)
-      }
-    },
-    sendDateChange (val) {
-      console.log(val, '更新时间')
-    },
-    // 日历模式关闭设置发送内容弹框
-    closeCalendarSendContentModal () {
-      this.sendCalendarContentModalShow = false
-    },
-    // 日历模式添加发送内容点击确定
-    confirmCalendarSendSure () {
-      this.sendCalendarContentModalShow = true
-      console.log('点击确定添加发送内容')
-    },
-    getListData (value) {
-      let listData
-      switch (value.date()) {
-        case 8:
-          listData = [
-            { id: 0, content: '测试内容测试内容' },
-            { id: 1, content: '测试内容测试内容' }
-          ]
-          break
-        case 10:
-          listData = [
-            { id: 2, content: '测试内容测试内容' },
-            { id: 3, content: '测试内容测试内容' },
-            { id: 4, content: '测试内容测试内容' }
-          ]
-          break
-        case 15:
-          listData = [
-            { id: 5, content: '测试内容测试内容' },
-            { id: 6, content: '测试内容测试内容' },
-            { id: 7, content: '测试内容测试内容' },
-            { id: 8, content: '测试内容测试内容' },
-            { id: 9, content: '测试内容测试内容' },
-            { id: 10, content: '测试内容测试内容' }
-          ]
-          break
-        default:
-      }
-      return listData || []
-    },
-
-    getMonthData (value) {
-      if (value.month() === 8) {
-        return 1394
-      }
-    },
-    // 选择日期
-    chooseDateMethod (e) {
-      console.log(e, '选择日期')
-      this.sendContentModalShow = true
-    },
-    // 切换tab
-    changeTabMethod (info) {
-      this.currentShowTabId = info.id
-    },
-    onSelect (e) {
-      console.log(e, 'eeeee')
-    },
-    onPanelChange (value) {
-      console.log(value, 'value')
-    },
-    // 监听用户输入框输入
-    changeSopName () {
-      this.isSopEdit = true
-    },
-    dateNumberChange () {
-      this.isSopEdit = true
-    },
+    // 提交日历模式添加内容
+    confirmCalendarSendSure () {},
     // 初始化方法
     async initMethod () {
       this.selectSopItemIndex = 0
@@ -726,6 +229,82 @@ export default {
         // 修改
         this.getDetail(this.pageTypeId)
       }
+    },
+    sendDateChange (val) {
+      console.log(val, '更新时间')
+    },
+    // 返回日历模式中的task
+    returnCalendarTask (info) {
+      console.log(info, 'info')
+      return info.sendTime
+    },                    
+    getListData (value) { 
+      console.log(value, 'value')
+      let listData = []
+      if (this.pageTypeId === -1) {
+        // 为新增模式
+        const tempDate = moment(value).format('YYYY-MM-DD')
+        const currentDate = moment().format('YYYY-MM-DD')
+        switch (tempDate) {
+          case `${currentDate}`:
+            listData = [
+              {
+                tempId: new Date().getTime(),
+                sendTime: '10:00'
+              }
+            ]
+            break
+        }
+        return listData || []
+      }
+      // let listData
+      // switch (value.date()) {
+      //   case 8:
+      //     listData = [
+      //       { id: 0, content: '测试内容测试内容' },
+      //       { id: 1, content: '测试内容测试内容' }
+      //     ]
+      //     break
+      //   case 10:
+      //     listData = [
+      //       { id: 2, content: '测试内容测试内容' },
+      //       { id: 3, content: '测试内容测试内容' },
+      //       { id: 4, content: '测试内容测试内容' }
+      //     ]
+      //     break
+      //   case 15:
+      //     listData = [
+      //       { id: 5, content: '测试内容测试内容' },
+      //       { id: 6, content: '测试内容测试内容' },
+      //       { id: 7, content: '测试内容测试内容' },
+      //       { id: 8, content: '测试内容测试内容' },
+      //       { id: 9, content: '测试内容测试内容' },
+      //       { id: 10, content: '测试内容测试内容' }
+      //     ]
+      //     break
+      //   default:
+      // }
+      // return listData || []
+    },
+    // 日历模式选择日期
+    chooseDateMethod (e) {
+      console.log(e, '选择日期')
+      this.sendContentModalShow = true
+    },
+    // 日历模式选择日期中的任务
+    chooseTimeContent (info) {
+      console.log(info, '点击日期中的任务')
+    },
+    // 切换日历视图/列表视图tab
+    changeTabMethod (info) {
+      this.currentShowTabId = info.id
+    },
+    // 监听用户输入框输入
+    changeSopName () {
+      this.isSopEdit = true
+    },
+    dateNumberChange () {
+      this.isSopEdit = true
     },
     // 如果是新增,设置默认时间点
     setDefaultTime () {
@@ -753,7 +332,7 @@ export default {
       this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
       // this.loadingStatus = true
       // const params = { id }
-      // await getFriendDetail(params).then(response => {
+      // await getCalendarTemplateDetailMethod(params).then(response => {
       //   this.loadingStatus = false
       //   console.log(response)
       //   this.addInfo = response.data
@@ -986,209 +565,16 @@ export default {
 }
 </script>
   <style lang='less' scoped>
-  #div_wrapper_container {
-  .contentLinkModal {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      position: relative;
-      .tip {
-        margin: 0;
-        .click {
-          color: #4074f6;
-          cursor: pointer;
-        }
-      }
-      .top {
-        position: absolute;
-        top: 0;
-      }
-      .formBox {
-        width: 65%;
-        .line {
-          position: relative;
-          margin-bottom: 10px;
-          .ant-input {
-            height: 35px;
-            padding-right: 60px;
-          }
-          .len {
-            position: absolute;
-            right: 5px;
-            top: 8px;
-          }
-        }
-        .textarea {
-          .ant-input {
-            min-height: 100px;
-          }
-          .len {
-            bottom: 0;
-            transform: translate(0, 100%);
-          }
-        }
-      }
-      .pic {
-        flex: 1;
-        margin-left: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        .image {
-          width: 170px;
-          height: 170px;
-          border-radius: 5px;
-          overflow: hidden;
-          cursor: pointer;
-        }
-        .addPic {
-          border: 1px dashed #d1d1d1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 50px;
-          font-weight: 100;
-          color: #878787;
-        }
-        .photoTip {
-          margin-top: 5px;
-        }
-        .file {
-          position: fixed;
-          left: 100000px;
-          top: 100000px;
-          opacity: 0;
-          width: 1px;
-          height: 1px;
-        }
-      }
-    // .ant-modal-body {
-    //   display: flex;
-    //   justify-content: space-between;
-    //   align-items: flex-start;
-    //   position: relative;
-    //   .tip {
-    //     margin: 0;
-    //     .click {
-    //       color: #4074f6;
-    //       cursor: pointer;
-    //     }
-    //   }
-    //   .top {
-    //     position: absolute;
-    //     top: 0;
-    //   }
-    //   .formBox {
-    //     width: 65%;
-    //     .line {
-    //       position: relative;
-    //       margin-bottom: 10px;
-    //       .ant-input {
-    //         height: 35px;
-    //         padding-right: 60px;
-    //       }
-    //       .len {
-    //         position: absolute;
-    //         right: 5px;
-    //         top: 8px;
-    //       }
-    //     }
-    //     .textarea {
-    //       .ant-input {
-    //         min-height: 100px;
-    //       }
-    //       .len {
-    //         bottom: 0;
-    //         transform: translate(0, 100%);
-    //       }
-    //     }
-    //   }
-    //   .pic {
-    //     flex: 1;
-    //     margin-left: 20px;
-    //     display: flex;
-    //     flex-direction: column;
-    //     align-items: center;
-    //     .image {
-    //       width: 170px;
-    //       height: 170px;
-    //       border-radius: 5px;
-    //       overflow: hidden;
-    //       cursor: pointer;
-    //     }
-    //     .addPic {
-    //       border: 1px dashed #d1d1d1;
-    //       display: flex;
-    //       align-items: center;
-    //       justify-content: center;
-    //       font-size: 50px;
-    //       font-weight: 100;
-    //       color: #878787;
-    //     }
-    //     .photoTip {
-    //       margin-top: 5px;
-    //     }
-    //     .file {
-    //       position: fixed;
-    //       left: 100000px;
-    //       top: 100000px;
-    //       opacity: 0;
-    //       width: 1px;
-    //       height: 1px;
-    //     }
-    //   }
-    // }
-  }
-  .contentTextModal {
-    padding-top: 0;
-    .ant-input {
-      min-height: 100px;
-    }
-    .len {
-      display: block;
-      text-align: end;
-    }
-  }
-}
   ul,li {
     padding: 0;
     margin: 0;
   }
-  .disabledBox {
-  cursor: no-drop !important;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.1);
-  z-index: 1;
-  display: flex;
-  justify-content: flex-end;
-  .executionDisableBox {
-    // position: absolute;
-    // right: 0;
-    // top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #4074f6;
-    color: #fff;
-    width: 120px;
-    height: 50px;
-    cursor: pointer;
-  }
-}
 .chooseUsersContainer {
   background-color: #fff;
   padding: 20px;
   border-radius: 5px;
   position: relative;
   overflow: hidden;
-  .isControlerDisabledClass {
-    cursor: no-drop !important;
-    background-color: #f5f5f5;
-  }
   .line {
     display: flex;
     align-items: center;
@@ -1212,141 +598,6 @@ export default {
         top: 50%;
         transform: translate(0, -50%);
       }
-    }
-    .selectBox {
-      max-width: 90%;
-      position: relative;
-      .selectBtn {
-        min-width: 180px;
-        min-height: 30px;
-        display: flex;
-        align-items: center;
-        border-radius: 3px;
-        border: 1px dashed #8a8a8a;
-        cursor: pointer;
-        flex-wrap: wrap;
-        .emptyBtn {
-          width: 100%;
-          text-align: center;
-        }
-
-        .label_input_title {
-          margin: 4px;
-          padding: 0 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 28px;
-          color: rgba(0, 0, 0, 0.65);
-          font-size: 14px;
-          background: #f7f7f7;
-          border-radius: 4px;
-          border: 1px solid #e9e9e9;
-          .delete {
-            margin-left: 5px;
-            line-height: 20px;
-            font-size: 20px;
-            transform: rotate(45deg);
-
-            &:hover {
-              color: #0052d9;
-            }
-          }
-        }
-      }
-      .selectList {
-        width: 100%;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-      }
-      .operationMode {
-        position: absolute;
-        left: -30px;
-        top: 50%;
-        transform: translate(0, -50%);
-        display: flex;
-        flex-direction: column;
-        span {
-          width: 20px;
-          height: 20px;
-          background-color: #d8d8d8;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 5px;
-          cursor: pointer;
-        }
-        .active {
-          background-color: #232323;
-          color: #fff;
-        }
-      }
-      .filterListBox {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        .selectTags {
-          min-width: 150px;
-          min-height: 36px;
-          border-radius: 3px;
-          border: 1px solid #d9d9d9;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          text-indent: 10px;
-          flex-wrap: wrap;
-          max-width: 600px;
-          .emptyBtn {
-            width: 100%;
-            text-align: center;
-          }
-
-          .label_input_title {
-            margin: 4px;
-            padding: 0 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 28px;
-            color: rgba(0, 0, 0, 0.65);
-            font-size: 14px;
-            background: #f7f7f7;
-            border-radius: 4px;
-            border: 1px solid #e9e9e9;
-            .delete {
-              margin-left: 5px;
-              line-height: 20px;
-              font-size: 20px;
-              transform: translate(0, -4px) rotate(45deg);
-
-              &:hover {
-                color: #0052d9;
-              }
-            }
-          }
-        }
-        .handle {
-          margin-left: 5px;
-          width: 25px;
-          height: 25px;
-          border-radius: 50%;
-          background-color: #d7d7d7;
-          display: flex;
-          justify-content: center;
-          font-size: 19px;
-          color: #666666;
-          font-weight: 300;
-          line-height: 23px;
-          cursor: pointer;
-        }
-      }
-    }
-    .reload {
-      color: #4074f5;
-      cursor: pointer;
-      margin-left: 5px;
     }
   }
   .timeLine {
@@ -1400,9 +651,19 @@ export default {
           border-bottom: 1px solid #d8d8d8;
           margin-top: 2px;
           font-size: 12px;
+          display: flex;
+          align-items: center;
           &::nth-child(1) {
             margin-top: 0px;
           }
+          // .singleContentTaskDiv::before {
+          //   content: '';
+          //   display: block;
+          //   width: 4px;
+          //   height: 4px;
+          //   border-radius: 4px;
+          //   background-color: black;
+          // }
           .delDiv{
             width: 10px;
             height: 100%;
@@ -1415,18 +676,22 @@ export default {
             top: 0;
           }
           &:hover {
+            background-color: white;
             .delDiv {
               visibility: visible;
             }
           }
         }
+        .singleDiv::before {
+          content: '';
+          display: block;
+          width: 6px;
+          height: 6px;
+          border-radius: 6px;
+          margin-right: 2px;
+          background-color: black;
+        }
       }
-    }
-  }
-  .multiple {
-    align-items: flex-start;
-    .label {
-      margin-top: 5px;
     }
   }
   .execution {
@@ -1545,271 +810,6 @@ export default {
 
       }
 }
-.sendCalendarSOPInfoContainer {
-  width: 100%;
-  margin-top: 10px;
-  display: flex;
-  .sendSOPList {
-    border-radius: 5px;
-    padding: 20px;
-    width: 300px;
-    height: 460px;
-    background-color: #fff;
-    overflow-y: auto;
-    .sopItem {
-      height: 35px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      text-indent: 15px;
-      cursor: pointer;
-      border-radius: 5px;
-      position: relative;
-      .del {
-        display: none;
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        align-items: center;
-        justify-content: center;
-        transform: translate(0, -50%);
-      }
-    }
-    .sopItem:hover {
-      .del {
-        display: flex;
-      }
-    }
-    .active {
-      background: #eef2fc;
-      color: #4074f6;
-    }
-    .addSop {
-      margin-bottom: 20px;
-      width: 100%;
-      height: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      border: 1px dashed #8a8a8a;
-      cursor: pointer;
-    }
-  }
-  .sendContent {
-      margin-top: 10px;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      width: 100%;
-      min-height: 350px;
-      .tilBar {
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #cdcdcd;
-        .til {
-          font-weight: 600;
-        }
-        .handleBox {
-          width: auto;
-          display: flex;
-          position: relative;
-          .handleBtn {
-            margin-left: 5px;
-            border-radius: 3px;
-            padding: 5px 15px;
-            border: 1px solid #a9a9a9;
-            cursor: pointer;
-            color: rgb(28, 28, 28);
-          }
-          .handleBtn:first-child {
-            margin-left: 0;
-          }
-          .disabled {
-            opacity: 0.5;
-            cursor: no-drop;
-          }
-        }
-      }
-      .contentBox {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        .contentItem {
-          display: flex;
-          padding: 5px;
-          width: 100%;
-          align-items: center;
-          border-radius: 5px;
-
-          .idx {
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #eef2fc;
-            color: #4074f6;
-          }
-          .content {
-            max-width: 750px;
-            margin-left: 10px;
-          }
-          .text {
-            word-wrap: break-word;
-            padding: 5px 0;
-          }
-          .image,
-          .video {
-            img,
-            video {
-              max-height: 300px;
-              max-width: 100%;
-            }
-          }
-          .video {
-            position: relative;
-            .poster {
-              position: absolute;
-              left: 50%;
-              top: 50%;
-              transform: translate(-50%, -50%);
-              background: rgba(0, 0, 0, 0.1);
-              width: 100%;
-              height: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-          }
-          .link {
-            width: 250px;
-            height: 80px;
-            border: 1px solid #cdcdcd;
-            border-radius: 5px;
-            flex: none;
-            padding: 10px;
-            display: flex;
-            .lef {
-              width: 160px;
-              margin-right: 10px;
-              font-size: 13px;
-              .til {
-                width: 100%;
-                color: #4074f6;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-                display: inline-block;
-              }
-              .desc {
-                width: 100%;
-                display: -webkit-box;
-                -webkit-box-orient: vertical;
-                -webkit-line-clamp: 2;
-                overflow: hidden;
-              }
-            }
-            .image {
-              flex: 1;
-              height: 100%;
-              max-width: 58px;
-            }
-          }
-          .embed {
-            width: 230px;
-            border: 1px solid #cdcdcd;
-            flex: none;
-            display: flex;
-            flex-direction: column;
-            padding: 8px 10px;
-            .line {
-              width: 100%;
-              display: flex;
-              align-items: center;
-              .icon {
-                width: 17px;
-                height: 17px;
-              }
-              .til {
-                color: #4074f6;
-              }
-            }
-            .desc {
-              font-size: 13px;
-              margin-top: 3px;
-            }
-            .image {
-              height: 180px;
-              margin: 3px 0;
-            }
-          }
-          .handlesBox {
-            display: none;
-            // display: flex;
-            margin: auto;
-            margin-right: 30px;
-            .icon {
-              width: 30px;
-              height: 30px;
-              margin-left: 10px;
-              cursor: pointer;
-            }
-            .move {
-              width: 35px;
-              height: 35px;
-            }
-            .disabled {
-              cursor: no-drop;
-            }
-          }
-        }
-        .contentItem:hover {
-          background-color: #2a66ff1f;
-          .handlesBox {
-            display: flex;
-          }
-        }
-      }
-    }
-  .sendItemContent {
-    margin-left: 10px;
-    flex: 1;
-    height: 100%;
-    .chooseSendDate {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      .til {
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-      .chooseDateBox1 {
-        .chooseDateBoxRadio {
-          display: flex;
-          flex-direction: column;
-          .line-wrapper {
-            margin-bottom: 10px;
-            .ant-time-picker {
-              width: 120px;
-            }
-          }
-        }
-      }
-      .chooseDateBox2 {
-        display: flex;
-        align-items: center;
-      }
-    }
-  }
-}
 .uploadFileInp {
   position: fixed;
   left: -100000px;
@@ -1818,18 +818,4 @@ export default {
   width: 1px;
   height: 1px;
 }
-
-  // .addSop_Page_Container_selectSopItemDateBox {
-  //   .ant-calendar-time-picker-combobox {
-  //     .ant-calendar-time-picker-select {
-  //       width: 50%;
-  //     }
-  //     .ant-calendar-time-picker-select:last-child {
-  //       display: none;
-  //     }
-  //   }
-  // }
-  </style>
-  <!-- <style lang='less' scoped>
-  @import './addSop.less';
-  </style> -->
+</style>

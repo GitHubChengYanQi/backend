@@ -13,7 +13,13 @@
       <div class="filter-input-row flex-between">
         <div class="item">
           <div class="title">群主：</div>
-          <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.personName"/>
+          <selectPersonnel
+            class="selectPersonnelCom"
+            name="请选择创建者"
+            :changeId="true"
+            :num="1"
+            v-model="groupChatSearchInfo.employeeIds"
+          />
         </div>
         <div class="item">
           <div class="title">群名称：</div>
@@ -28,7 +34,7 @@
           >
             <a-select-option :value="tagsTypeItem.id" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
           </a-select>
-          <SelectTagInput v-model="groupChatSearchInfo.tags" :screentags="true" :changeId="true" ref="SelectTagInput" />
+          <SelectTagInput v-model="groupChatSearchInfo.workRoomTagIds" :screentags="true" :changeId="true" ref="SelectTagInput" />
         </div>
         <div class="item">
           <div class="title">群创建日期：</div>
@@ -40,8 +46,8 @@
           />
         </div>
         <div class="item">
-          <a-button type="primary" @click="confirmGroupChat()">查询</a-button>
-          <a-button @click="confirmGroupChat()">重置</a-button>
+          <a-button type="primary" @click="searchGroupChatMethod()">查询</a-button>
+          <a-button @click="resetGroupChatMethod()">重置</a-button>
         </div>
 
       </div>
@@ -67,6 +73,8 @@
 </template>
 
 <script>
+// import { getGroupChatListMethod } from '@/api/cluster'
+import moment from 'moment'
 export default {
   name: 'GroupChat',
   data () {
@@ -154,24 +162,11 @@ export default {
     showStatus () {
       this.addGroupChatShowStatus = this.showStatus
       if (this.addGroupChatShowStatus) {
-        this.groupChatDataList = [
-          {
-            workRoomId: 0,
-            roomName: '测试群1',
-            ownerName: '测试群主1',
-            sopNameListStr: '执行SOP1',
-            calendarNameListStr: '执行日历1',
-            createTime: '2022-10-30'
-          },
-          {
-            workRoomId: 1,
-            roomName: '测试群2',
-            ownerName: '测试群主2',
-            sopNameListStr: '执行SOP2',
-            calendarNameListStr: '执行日历2',
-            createTime: '2022-09-30'
-          }
-        ]
+        // getGroupChatListMethod(this.groupChatSearchInfo).then(response => {
+        //   console.log(response, '获取群聊列表')
+        // })
+        this.$set(this.groupChatSearchInfo, 'employeeIds', [])
+        this.getDataList()
       }
     }
   },
@@ -189,6 +184,26 @@ export default {
     console.log('组件卸载之前')
   },
   methods: {
+    getDataList () {
+      this.groupChatDataList = [
+        {
+          workRoomId: 0,
+          roomName: '测试群1',
+          ownerName: '测试群主1',
+          sopNameListStr: '执行SOP1',
+          calendarNameListStr: '执行日历1',
+          createTime: '2022-10-30'
+        },
+        {
+          workRoomId: 1,
+          roomName: '测试群2',
+          ownerName: '测试群主2',
+          sopNameListStr: '执行SOP2',
+          calendarNameListStr: '执行日历2',
+          createTime: '2022-09-30'
+        }
+      ]
+    },
     /**
      * 选择框的默认属性配置
      */
@@ -207,6 +222,20 @@ export default {
     // 群聊列表分页信息
     groupChatHandleTableChange () {},
     onSelectChange () {},
+    // 搜索群聊
+    searchGroupChatMethod () {
+      this.$set(this.groupChatSearchInfo, 'workRoomOwnerId', this.groupChatSearchInfo.employeeIds.length !== 0 ? this.groupChatSearchInfo.employeeIds.join(',') : '')
+      const tempTimeArray = this.groupChatSearchInfo.time
+      this.$set(this.groupChatSearchInfo, 'startTime', moment(tempTimeArray[0]).format('YYYY-MM-DD'))
+      this.$set(this.groupChatSearchInfo, 'endTime', moment(tempTimeArray[1]).format('YYYY-MM-DD'))
+      console.log(this.groupChatSearchInfo, 'groupChatSearchInfo')
+      // 执行搜索方法
+    },
+    // 重置搜索群聊
+    resetGroupChatMethod () {
+      this.groupChatSearchInfo = {}
+      // 执行搜索方法
+    },
     // 关闭添加群聊弹框
     closeGroupChat () {
       this.addGroupChatShowStatus = false
@@ -215,6 +244,7 @@ export default {
     // 提交添加群聊
     confirmGroupChat () {
       console.log('提交添加群聊')
+      this.$emit('submitGroupChat', this.groupChatSelectedRowKeys.join(','))
     }
   }
 }

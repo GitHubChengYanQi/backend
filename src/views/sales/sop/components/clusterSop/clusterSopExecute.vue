@@ -1,17 +1,14 @@
 <template>
   <div id="clusterExecute_Page_Container" ref="clusterExecute_Page_Container">
     <div class="leftContainer">
-      <div class="searchLine">
-        <div class="searchBox">
-          <div class="item">
-            <span>群名称:</span>
-            <a-input placeholder="请输入群名称" v-model="searchValue" class="inputClass" />
-            <!-- style="width: 200px; height: 35px" -->
-          </div>
-          <div class="item">
-            <span>SOP名称:</span>
-            <a-input placeholder="请输入SOP名称" v-model="searchValue" class="inputClass" />
-          </div>
+      <div class="leftContainerTop">
+        <a-form layout="inline">
+          <a-form-item label="群名称:">
+            <a-input placeholder="请输入群名称" v-model="searchInfo.clusterName" class="inputClass" />
+          </a-form-item>
+          <a-form-item label="SOP名称:">
+            <a-input placeholder="请输入SOP名称" v-model="searchInfo.sopName" class="inputClass" />
+          </a-form-item>
           <a-button
             type="primary"
             style="width: 54px;height: 34px;margin: 0 10px;"
@@ -21,7 +18,7 @@
             style="width: 54px;height: 34px;margin-right: 10px;"
             @click="goReset"
           >重置</a-button>
-        </div>
+        </a-form>
       </div>
       <a-table
         :loading="tableLoading"
@@ -31,7 +28,8 @@
         :columns="tableColumns"
         :pagination="pagination"
         :scroll="{ x: 1500}"
-        @change="getChangeList">
+        :row-selection="{ selectedRowKeys: selectedList, onSelect: chooseSelection, type: 'radio' }"
+        @change="handleTableChange">
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
@@ -43,41 +41,45 @@
     </div>
     <div class="rightContainer">
       <div class="rightTitleDiv">推送内容</div>
-      <div class="contentBox">
-        <div
-          class="contentItem"
-          v-for="(item, index) in sendContentArray"
-          :key="index"
-        >
-          <div class="idx">{{ index + 1 }}</div>
-          <div :class="`content ${item.type === 1 ? 'text' : ''}`" v-if="item.type === 1">{{ item.textData }}</div>
-          <div :class="`content ${item.type === 2 ? 'image': ''}`" v-else-if="item.type === 2">
-            <!-- style="max-width:100%;max-height:300px" -->
-            <img :src="item.photoUrl" alt />
+      <div class="sendContentList">
+        <div class="singleSendContent" v-for="(item, index) in sendArray" :key="item.id">
+          <div class="singleSendTitle">
+            <span style="font-weight: Bolder">第{{ index + 1 }}条:</span>
+            <span style="color: red">加入规则</span>
+            <span>{{ returnTimeText(item) }}</span>
           </div>
-          <div :class="`content ${item.type === 3 ? 'video' : ''}`" v-else-if="item.type === 3">
-            <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
-            <div class="poster" v-if="item.showPoster">{{ returnErrorText(item.videoUrl) }}</div>
-            <video :src="item.videoUrl" @error="videoLoadErr(index)" alt />
-          </div>
-          <div :class="`content ${item.type === 4 ? 'link' : ''}`" v-else-if="item.type === 4">
-            <div class="lef">
-              <span class="til">{{ item.linkTitle }}</span>
-              <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-              <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
-            </div>
-            <img :src="item.linkPhoto" alt class="image" />
-          </div>
-          <div :class="`content ${item.type === 5 ? 'embed' : ''}`" v-else-if="item.type === 5">
-            <div class="line">
-              <img src="../../images/miniProgramIcon.svg" alt class="icon" />
-              <span class="til">{{ '小程序标题' }}</span>
-            </div>
-            <div class="line desc">{{ item.appShow }}</div>
-            <img :src="item.appPhoto" alt class="image" />
-            <div class="line">
-              <img src="../../images/miniProgramIcon.svg" alt class="icon" />
-              <span class="say">小程序</span>
+          <div class="contentList">
+            <div class="singleContent" v-for="(singleContentItem, singleContentIndex) in item.sendContentList" :key="singleContentIndex">
+              <!-- 卡片内容，以描述性为主，可以是文字、图片或图文组合的形式。按业务需求进行自定义组合 -->
+              <div :class="`content ${singleContentItem.type === 1 ? 'text' : ''}`" v-if="singleContentItem.type === 1">{{ singleContentItem.textData }}</div>
+              <div :class="`content ${singleContentItem.type === 2 ? 'image': ''}`" v-else-if="singleContentItem.type === 2">
+                <div class="poster" v-if="singleContentItem.showImagePoster">{{ returnImageErrorText(singleContentItem.photoUrl) }}</div>
+                <img :src="singleContentItem.photoUrl" @error="imageLoadErr(index, singleContentIndex)" alt />
+              </div>
+              <div :class="`content ${singleContentItem.type === 3 ? 'video' : ''}`" v-else-if="singleContentItem.type === 3">
+                <div class="poster" v-if="singleContentItem.showVideoPoster">{{ returnVideoErrorText(singleContentItem.videoUrl) }}</div>
+                <video :src="singleContentItem.videoUrl" @error="videoLoadErr(index, singleContentIndex)" alt />
+              </div>
+              <div :class="`content ${singleContentItem.type === 4 ? 'link' : ''}`" v-else-if="singleContentItem.type === 4">
+                <div class="lef">
+                  <span class="til">{{ singleContentItem.linkTitle }}</span>
+                  <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkUrl: '' }}</span>
+                  <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkShow: '' }}</span>
+                </div>
+                <img :src="singleContentItem.linkPhoto" alt class="image" />
+              </div>
+              <div :class="`content ${singleContentItem.type === 5 ? 'embed' : ''}`" v-else-if="singleContentItem.type === 5">
+                <div class="line">
+                  <img src="../../images/miniProgramIcon.svg" alt class="icon" />
+                  <span class="til">{{ '小程序标题' }}</span>
+                </div>
+                <div class="line desc">{{ singleContentItem.appShow }}</div>
+                <img :src="singleContentItem.appPhoto" alt class="image" />
+                <div class="line">
+                  <img src="../../images/miniProgramIcon.svg" alt class="icon" />
+                  <span class="say">小程序</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -87,155 +89,22 @@
 </template>
 
 <script>
+import { getTempExecuteSopList, deleteExecutingSopMethod } from '@/api/cluster'
+// import { getExecutingSopListMethod, deleteExecutingSopMethod } from '@/api/cluster'
 export default {
   name: 'ClusterSopExecute',
-
   data () {
     return {
-      sendContentArray: [
-        {
-          'appId': '',
-          'appPhoto': '',
-          'appShow': '',
-          'appUrl': '',
-          'linkPhoto': '',
-          'linkShow': '',
-          'linkTitle': '',
-          'linkUrl': '',
-          'mediaId': '',
-          'photoUrl': '',
-          'sort': '',
-          'textData': 'tyherg',
-          'type': 1,
-          'videoUrl': ''
-        },
-        {
-          'appId': '',
-          'appPhoto': '',
-          'appShow': '',
-          'appUrl': '',
-          'linkPhoto': '',
-          'linkShow': '',
-          'linkTitle': '',
-          'linkUrl': '',
-          'mediaId': '',
-          'photoUrl': 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16672941616550425946.jpg?Expires=1669196294&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=fSXV0zXRklRh3F26M8TIEv%2FkC%2BA%3D',
-          'sort': '',
-          'textData': '',
-          'type': 2,
-          'videoUrl': ''
-        },
-        {
-          'appId': '',
-          'appPhoto': '',
-          'appShow': '',
-          'appUrl': '',
-          'linkPhoto': '',
-          'linkShow': '',
-          'linkTitle': '',
-          'linkUrl': '',
-          'mediaId': '',
-          'photoUrl': 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16672941665650473901.jpg?Expires=1669196294&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=TYGFV45pwBdHTVdi4RHkKESdQB8%3D',
-          'sort': '',
-          'textData': '',
-          'type': 2,
-          'videoUrl': ''
-        },
-        {
-          'appId': '',
-          'appPhoto': '',
-          'appShow': '',
-          'appUrl': '',
-          'linkPhoto': '',
-          'linkShow': '',
-          'linkTitle': '',
-          'linkUrl': '',
-          'mediaId': '',
-          'photoUrl': '',
-          'sort': '',
-          'textData': '',
-          'type': 3,
-          'videoUrl': 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16672941863590178957.mp4?Expires=1669196294&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=w0TWpe8Ir2k28eIcRlZ%2Bus5dg1A%3D'
-        },
-        {
-          'appId': '',
-          'appPhoto': '',
-          'appShow': '',
-          'appUrl': '',
-          'linkPhoto': 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16672942043510266707.jpg?Expires=1669196294&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=uLbP5TmpeR6PdGch9JGemGS%2BTZY%3D',
-          'linkShow': 'rtertgr5t',
-          'linkTitle': 'tertert',
-          'linkUrl': 'http://www.baidu.com',
-          'mediaId': '',
-          'photoUrl': '',
-          'sort': '',
-          'textData': '',
-          'type': 4,
-          'videoUrl': ''
-        },
-        {
-          'appId': 'rget',
-          'appPhoto': 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16672942157610933056.jpg?Expires=1669196294&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=l1BY%2BdwInjzQD5VQbxRrAOwZlgc%3D',
-          'appShow': 'egretg',
-          'appUrl': 'edrtre',
-          'linkPhoto': '',
-          'linkShow': '',
-          'linkTitle': '',
-          'linkUrl': '',
-          'mediaId': '',
-          'photoUrl': '',
-          'sort': '',
-          'textData': '',
-          'type': 5,
-          'videoUrl': ''
-        },
-        {
-          'appId': 'tetge',
-          'appPhoto': 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16672942331420746873.jpg?Expires=1669196294&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=C3brlWBSBvUMSPOnSzYFduENaME%3D',
-          'appShow': 'egyegt',
-          'appUrl': 'egegt',
-          'linkPhoto': '',
-          'linkShow': '',
-          'linkTitle': '',
-          'linkUrl': '',
-          'mediaId': '',
-          'photoUrl': '',
-          'sort': '',
-          'textData': '',
-          'type': 5,
-          'videoUrl': ''
-        },
-        {
-          'appId': 'egret',
-          'appPhoto': 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16672942597290638888.jpg?Expires=1669196294&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=hjEz13a0lZwpeM6fdjAKG1Ikn8M%3D',
-          'appShow': 'eghet',
-          'appUrl': 'eryge',
-          'linkPhoto': '',
-          'linkShow': '',
-          'linkTitle': '',
-          'linkUrl': '',
-          'mediaId': '',
-          'photoUrl': '',
-          'sort': '',
-          'textData': '',
-          'type': 5,
-          'videoUrl': ''
-        }
+      selectedList: [],
+      sendArray: [
       ],
-      contentList: [
-        {
-          id: 0,
-          time: '第一天0小时10分',
-          contentText: ''
-        }
-      ],
-      searchValue: '',
+      searchInfo: {},
       tableLoading: false,
       tableData: [],
       tableColumns: [
         {
           title: '群名称',
-          dataIndex: 'groupName',
+          dataIndex: 'clusterName',
           align: 'center',
           width: 150
         },
@@ -272,22 +141,128 @@ export default {
     }
   },
   created () {
+    this.getTableData()
   },
   mounted () {
 
   },
 
   methods: {
-    getChangeList () {},
-    goSearch () {},
-    goReset () {},
-    deleteItem () {},
+    // 返回文字信息
+    returnTimeText (info) {
+      return `第${info.sendDayNum}天${info.sendTimeRange}提醒发送`
+    },
+    returnVideoErrorText (url) {
+      return '暂不支持显示 .avi 格式的视频'
+    },
+    returnImageErrorText () {
+      return '图片地址错误,暂不显示'
+    },
+    // 单击某一行的回调
+    chooseSelection (record) {
+      console.log(record, '单击某一行的回调')
+      this.sendArray = record.listTaskInfo
+      const tempIdArray = []
+      tempIdArray.push(record.id)
+      this.selectedList = Object.assign([], tempIdArray)
+    },
+    // 获取数据
+    async getTableData () {
+      // 临时注释掉
+      // this.tableLoading = true
+      // const params = {
+      //   sopName: this.searchInfo.sopName,
+      //   clusterName: this.searchInfo.clusterName,
+      //   page: this.pagination.current,
+      //   perPage: this.pagination.pageSize
+      // }
+      // console.log(params, '查询数据提交接口的对象')
+      // await getExecutingSopListMethod(params).then(response => {
+      //   this.tableLoading = false
+      //   console.log(response, '获取字典列表数据')
+      //   this.tableData = response.data.records
+      //   this.$set(this.pagination, 'total', Number(response.data.total))
+      //   this.$set(this.pagination, 'current', Number(response.data.current))
+      //   if (this.tableData.length === 0) {
+      //     // 列表中没有数据
+      //     if (this.pagination.total !== 0) {
+      //       // 总数据有,但当前页没有
+      //       // 重新将页码换成1
+      //       this.$set(this.pagination, 'current', 1)
+      //       this.getTableData()
+      //     } else {
+      //       // 是真没有数据
+      //     }
+      //   }
+      // }).catch(() => {
+      //   this.tableLoading = false
+      // })
+      // 临时接收假数据
+      this.tableData = getTempExecuteSopList()
+      this.sendArray = this.tableData[0].listTaskInfo
+      const tempIdArray = []
+      tempIdArray.push(this.tableData[0].id)
+      this.selectedList = Object.assign([], tempIdArray)
+    },
+    // 群SOP模板切换页码
+    handleTableChange ({ current, pageSize }) {
+      this.pagination.current = current
+      this.pagination.pageSize = pageSize
+      this.getTableData()
+    },
+    // 搜索
+    goSearch () {
+      // 重新将页码换成1
+      this.$set(this.pagination, 'current', 1)
+      this.getTableData()
+    },
+    // 重置
+    goReset () {
+      // 重新将页码换成1
+      this.$set(this.pagination, 'current', 1)
+      // 清空搜索对象
+      this.searchInfo = {}
+      this.getTableData()
+    },
+    // 删除执行中的SOP
+    deleteItem (id) {
+      const params = { id }
+      this.$confirm({
+        title: '确定删除所选内容?',
+        // content: 'Some descriptions',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          deleteExecutingSopMethod(params).then(response => {
+            console.log(response, '删除数据')
+            if (response.code === 200) {
+              this.$message.success('删除成功')
+              // this.pageIndex = 1
+              // this.sopName = ''
+              this.getTableData()
+            }
+          })
+        }
+      })
+    },
     // 视频错误时显示
-    videoLoadErr (index) {
+    videoLoadErr (index, contentIndex) {
       // const nowD = deepClonev2(this.sopList)
       // nowD[this.selectSopItemIdx].content[index].showPoster = true
       // this.sopList = nowD
-      this.sendContentArray[index].showPoster = true
+      // this.sendArray[index].sendContentList[contentIndex].showPoster = true
+      this.$set(this.sendArray[index].sendContentList[contentIndex], 'showVideoPoster', true)
+      // this.$set(this.sendArray[index].sendContentList, '${contentIndex}', this.sendArray[index].sendContentList[contentIndex])
+    },
+    // 图片错误时显示
+    imageLoadErr (index, contentIndex) {
+      // const nowD = deepClonev2(this.sopList)
+      // nowD[this.selectSopItemIdx].content[index].showPoster = true
+      // this.sopList = nowD
+      // this.sendArray[index].sendContentList[contentIndex].showPoster = true
+      this.$set(this.sendArray[index].sendContentList[contentIndex], 'showImagePoster', true)
+      // this.$set(this.sendArray[index].sendContentList, '${contentIndex}', this.sendArray[index].sendContentList[contentIndex])
     }
   }
 }
@@ -301,52 +276,13 @@ export default {
     padding: 10px;
     justify-content: space-between;
     .leftContainer {
-      width: calc(100% - 510px);
+      width: calc(100% - 550px);
       background-color: white;
       height: auto;
       margin-right: 10px;
-      .searchLine {
-        width: calc(100% - 30px);
-        display: flex;
-        justify-content: space-between;
-        padding: 15px;
-        .searchBox {
-          display: flex;
-          align-items: center;
-          .item {
-            display: flex;
-            align-items: center;
-            margin-right: 20px;
-            .selectPersonnelCom {
-              width: 200px;
-              margin-left: 10px;
-            }
-            .inputClass {
-              width: 200px;
-              margin-left: 10px;
-            }
-          }
-        }
-        .explan {
-          margin-left: 20px;
-        }
-        .handlesBox {
-          margin-right: 10px;
-          .btn {
-            height: 40px;
-            padding: 0 15px;
-            font-family: 'FontAwesome', sans-serif;
-            font-weight: 400;
-            font-style: normal;
-            font-size: 15px;
-            color: #333333;
-            line-height: 40px;
-            cursor: pointer;
-            background-color: rgba(52, 112, 255, 1);
-            border-radius: 4px;
-            color: #fff;
-          }
-        }
+      padding: 20px;
+      .leftContainerTop {
+        margin-bottom: 10px;
       }
     }
     .rightContainer {
@@ -357,6 +293,26 @@ export default {
       overflow-y: auto;
       .rightTitleDiv {
         font-size: 16px;
+      }
+      .sendContentList {
+        margin-top: 20px;
+        .singleSendContent {
+          .singleSendTitle {
+            font-size: 15px;
+            span {
+              margin-right: 4px;
+            }
+          }
+          .contentList {
+            .singleContent {
+              margin-top: 10px;
+              border: 1px solid rgba(231, 231, 231, 1);
+              border-radius: 4px;
+              width: calc(100% - 40px);
+              padding: 10px 20px;
+            }
+          }
+        }
       }
       .contentBox {
         width: 100%;

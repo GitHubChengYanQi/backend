@@ -53,13 +53,13 @@
         </template>
       </div>
     </a-table>
-    <GroupChatList :showStatus.sync="addGroupChatShowStatus" :selectArrayString="selectArrayString"/>
+    <GroupChatList :showStatus.sync="addGroupChatShowStatus" :selectArrayString="selectArrayString" @submitGroupChat="submitGroupChat"/>
   </div>
 </template>
 
 <script>
-// import { getSopTemplateListMethod, deleteSopTemplateMethod } from '@/api/cluster'
-import { getTempSopList, deleteSopTemplateMethod } from '@/api/cluster'
+// import { getSopTemplateListMethod, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
+import { getTempSopList, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
 import GroupChatList from '../groupChat.vue'
 export default {
   name: 'ClusterSopTemplate',
@@ -68,6 +68,7 @@ export default {
   },
   data () {
     return {
+      bindGroupChatInfo: {}, // 群SOP模板绑定群聊对象
       selectArrayString: '',
       searchInfo: {}, // 查询列表对象
       // 表格加载效果
@@ -109,55 +110,6 @@ export default {
         }
       ],
       addGroupChatShowStatus: false,
-      groupChatLoading: false, // 添加群聊弹框列表加载
-      groupChatDataList: [],
-      groupChatColumns: [
-        {
-          title: '群名称',
-          dataIndex: 'groupName',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '群主',
-          dataIndex: 'personName',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'createDate',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '群标签',
-          dataIndex: 'tags',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '执行中的SOP',
-          dataIndex: 'openingSop',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '执行中的群日历',
-          dataIndex: 'openingCalendar',
-          align: 'center',
-          width: 150
-        }
-      ],
-      // 群聊弹框分页信息
-      groupChatPagination: {
-        total: 0,
-        current: 1,
-        pageSize: 10,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        pageSizeOptions: ['10', '20', '30', '50']
-      },
       // 模板页面分页对象
       pagination: {
         total: 0,
@@ -238,13 +190,22 @@ export default {
       this.getTableData()
     },
     // 添加群聊
-    addGroupChat () {
+    addGroupChat (info) {
       this.addGroupChatShowStatus = true
       const tempArray = []
       tempArray.push(0)
       this.selectArrayString = JSON.stringify(tempArray)
       console.log(this.selectArrayString, 'this.selectArrayString')
+      this.$set(this.bindGroupChatInfo, 'id', info.id)
       // this.groupChatSearchInfo.tagType = 0
+    },
+    // 绑定群聊回调
+    submitGroupChat (arrayText) {
+      console.log(arrayText, '提交的绑定群聊')
+      this.$set(this.bindGroupChatInfo, 'clusterIds', JSON.parse(arrayText))
+      bindSopTemplateMethod(this.bindGroupChatInfo).then(response => {
+        console.log(response, '绑定群聊返回状态')
+      })
     },
     // 创建sop模板
     goAdd () {
