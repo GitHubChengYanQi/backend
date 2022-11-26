@@ -237,8 +237,8 @@ export default {
     returnCalendarTask (info) {
       console.log(info, 'info')
       return info.sendTime
-    },                    
-    getListData (value) { 
+    },
+    getListData (value) {
       console.log(value, 'value')
       let listData = []
       if (this.pageTypeId === -1) {
