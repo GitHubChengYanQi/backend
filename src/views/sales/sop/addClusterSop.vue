@@ -83,6 +83,7 @@ export default {
   },
   data () {
     return {
+      pageType: '', // 当前页面状态
       // 显示加载中
       loadingStatus: false,
       isSopEdit: false, // 判断页面是否被编辑过
@@ -100,7 +101,14 @@ export default {
     }
   },
   created () {
-    this.pageTypeId = Number(this.$route.query.id)
+    this.pageType = this.$route.query.type
+    if (this.pageType === 'add') {
+      // 新增模式,无需处理
+      this.pageTypeId = -1
+    } else if (this.pageType === 'edit' || this.pageType === 'copy') {
+      // 修改模式/复制模式
+      this.pageTypeId = Number(this.$route.query.id)
+    }
     this.initMethod()
   },
   // 页面销毁前
@@ -192,7 +200,7 @@ export default {
       this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
       // this.loadingStatus = true
       // const params = { id }
-      // await getFriendDetail(params).then(response => {
+      // await getSopTemplateDetailMethod(params).then(response => {
       //   this.loadingStatus = false
       //   console.log(response)
       //   this.addInfo = response.data
@@ -340,7 +348,7 @@ export default {
     // 新增操作
     newDataMethod (info) {
       console.log(info, '新增操作')
-      // addFriendSop(info).then(response => {
+      // addSopTemplateMethod(info).then(response => {
       //   this.loadingStatus = false
       //   console.log(response, '新增操作')
       //   if (response.code === 200) {
@@ -356,7 +364,7 @@ export default {
     // 修改操作
     updataMethod (info) {
       console.log(info, '修改操作')
-      // editFriendSop(info).then(response => {
+      // editSopTemplateMethod(info).then(response => {
       //   this.loadingStatus = false
       //   console.log(response, '修改操作')
       //   if (response.code === 200) {
