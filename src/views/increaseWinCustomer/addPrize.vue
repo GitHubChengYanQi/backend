@@ -8,25 +8,29 @@
         <a-input
           v-model="addPrize.prizeName"
           placeholder="请输入奖品名称，最大长度50"
-          :max-length="50"></a-input>
+          :max-length="50"
+        ></a-input>
       </div>
       <div class="input_box">
         <span class="title">奖品码：</span>
         <a-input
           v-model="addPrize.prizeCode"
           placeholder="请输入奖品码，最大长度为20"
-          :max-length="20"></a-input>
+          :max-length="20"
+        ></a-input>
       </div>
       <div
         class="input_box"
-        style="align-items: flex-start;margin: 0 ;height: auto;">
+        style="align-items: flex-start;margin: 0 ;height: auto;"
+      >
         <span class="title">
           <span class="icon">*</span>奖品描述：
         </span>
         <div class="richText">
           <vue-quill-editor
             @editorChange="editorChange"
-            :value="content" />
+            :value="content"
+          />
         </div>
       </div>
       <div class="operation_box">
@@ -34,25 +38,30 @@
           class="preview"
           @click="() => {
             this.hiddentState = true
-          }">
+          }"
+        >
           <img
             src="@/assets/preview.jpg"
             alt
-            class="icon" />
+            class="icon"
+          />
           预览
         </div>
         <a-button
           type="primary"
-          @click="accomplish">完成</a-button>
+          @click="accomplish"
+        >完成</a-button>
       </div>
     </div>
     <div
       class="hiddent_box"
       v-if="hiddentState"
-      @mousewheel="mousewheel">
+      @mousewheel="mousewheel"
+    >
       <div
         class="preview_box"
-        @mousewheel="previewMouse">
+        @mousewheel="previewMouse"
+      >
         <div class="preview_header">
           <div class="preview_title">奖品详情预览效果</div>
           <img
@@ -61,16 +70,19 @@
             alt
             @click="() => {
               this.hiddentState = false
-            }" />
+            }"
+          />
         </div>
         <div class="preview_content">
           <img
             class="preview_phone"
             src="@/assets/phone.png"
-            alt />
+            alt
+          />
           <div
             class="ql-editor"
-            v-html="content"></div>
+            v-html="content"
+          ></div>
         </div>
       </div>
     </div>
@@ -97,7 +109,7 @@ export default {
     localStorage.removeItem('prizeDesc')
   },
   methods: {
-    editorChange: function (html) {
+    editorChange (html) {
       this.content = html
     },
     mousewheel (e) {

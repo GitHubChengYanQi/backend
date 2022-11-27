@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 树状图
 export function workRoomLabelTree (data) {
   return request({
-    url: '/work_room_label/tree',
+    url: 'work_room_label/tree',
     method: 'post',
     data
   })
