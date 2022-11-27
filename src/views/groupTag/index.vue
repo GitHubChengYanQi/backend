@@ -85,7 +85,10 @@
       </a-tree>
     </div>
     <div class="groupTag_right_box">
-      <div class="groupTag_content_box" v-if="selectKey.length > 0 && selectKey[0] != '0'">
+      <div
+        class="groupTag_content_box"
+        v-if="selectKey.length > 0 && selectKey[0] != '0'"
+      >
         <div class="groupTag_header_box">
           <div
             class="title"
@@ -229,12 +232,14 @@ export default {
         this.modelData.state = false
       })
     },
-    moveGroup (id) {
+    moveGroup (id, step) {
       const obj = {
-        id
+        id,
+        step
       }
-      workRoomLabelMove(obj).then(res => {
+      workRoomLabelMove(obj).then((res) => {
         console.log(res)
+        this.getTree()
       })
     },
     delGrop (id) {
@@ -262,13 +267,14 @@ export default {
             const obj = {
               id: item.key
             }
-            workRoomLabelDrop(obj).then(res => {
+            workRoomLabelDrop(obj).then((res) => {
               this.getTree()
             })
           },
           onCancel () {}
         })
       } else {
+        this.moveGroup(item.key, e == 3 ? 1 : -1)
       }
     },
     onSearch () {
@@ -361,7 +367,7 @@ export default {
       const obj = {
         id: e
       }
-      workRoomLabelDrop(obj).then(res => {
+      workRoomLabelDrop(obj).then((res) => {
         this.getTag()
       })
     },
