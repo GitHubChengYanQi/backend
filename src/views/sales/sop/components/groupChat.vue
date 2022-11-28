@@ -9,76 +9,77 @@
       @cancel="closeGroupChat()"
       :getContainer="() => $refs['group_chat_container']"
     >
-      <span>选择执行群(SOP话术将推送给群主,由群主发送到所选择的群)</span>
-      <div class="filter-input-row flex-between">
-        <div class="item">
-          <div class="title">群主：</div>
-          <selectPersonnel
-            class="selectPersonnelCom"
-            name="请选择创建者"
-            :changeId="true"
-            :num="1"
-            v-model="groupChatSearchInfo.employeeIds"
-          />
+      <a-spin :spinning="modalLoadingStatus">
+        <span>选择执行群(SOP话术将推送给群主,由群主发送到所选择的群)</span>
+        <div class="filter-input-row flex-between">
+          <div class="item">
+            <div class="title">群主：</div>
+            <selectPersonnel
+              class="selectPersonnelCom"
+              name="请选择创建者"
+              :changeId="true"
+              :num="1"
+              v-model="groupChatSearchInfo.employeeIds"
+            />
+          </div>
+          <div class="item">
+            <div class="title">群名称：</div>
+            <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.workRoomName"/>
+          </div>
+          <div class="item">
+            <div class="title">标签：</div>
+            <a-select
+              placeholder="请选择"
+              v-model="groupChatSearchInfo.tagType"
+              style="width: 200px"
+            >
+              <a-select-option :value="tagsTypeItem.id" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
+            </a-select>
+            <SelectTagInput v-model="groupChatSearchInfo.tagsList" :screentags="true" :changeId="true" ref="SelectTagInput" />
+          </div>
+          <div class="item">
+            <div class="title">群创建日期：</div>
+            <a-range-picker
+              style="width: 265px"
+              v-model="groupChatSearchInfo.time"
+              format="YYYY-MM-DD"
+              :placeholder="['开始日期', '结束日期']"
+            />
+          </div>
+          <div class="item">
+            <a-button type="primary" @click="searchGroupChatMethod()" v-permission="'/sopClusterTemplate/getClusterList@post'">查询</a-button>
+            <a-button @click="resetGroupChatMethod()" v-permission="'/sopClusterTemplate/getClusterList@post'">重置</a-button>
+          </div>
         </div>
-        <div class="item">
-          <div class="title">群名称：</div>
-          <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.personName"/>
-        </div>
-        <div class="item">
-          <div class="title">标签：</div>
-          <a-select
-            placeholder="请选择"
-            v-model="groupChatSearchInfo.tagType"
-            style="width: 200px"
-          >
-            <a-select-option :value="tagsTypeItem.id" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
-          </a-select>
-          <SelectTagInput v-model="groupChatSearchInfo.workRoomTagIds" :screentags="true" :changeId="true" ref="SelectTagInput" />
-        </div>
-        <div class="item">
-          <div class="title">群创建日期：</div>
-          <a-range-picker
-            style="width: 265px"
-            v-model="groupChatSearchInfo.time"
-            format="YYYY-MM-DD"
-            :placeholder="['开始日期', '结束日期']"
-          />
-        </div>
-        <div class="item">
-          <a-button type="primary" @click="searchGroupChatMethod()">查询</a-button>
-          <a-button @click="resetGroupChatMethod()">重置</a-button>
-        </div>
-
-      </div>
-      <a-table
-        :row-key="record => record.workRoomId"
-        :loading="groupChatLoading"
-        :columns="groupChatColumns"
-        :data-source="groupChatDataList"
-        :pagination="groupChatPagination"
-        :pageSizeOptions="['10', '20', '30', '50']"
-        :row-selection="{ selectedRowKeys: groupChatSelectedRowKeys, onChange: onGroupChatSelectChange, getCheckboxProps: getCheckboxProps }"
-        :scroll="{ x: 1500 }"
-        @change="groupChatHandleTableChange"
-      ></a-table>
+        <a-table
+          :row-key="record => record.workRoomId"
+          :columns="groupChatColumns"
+          :data-source="groupChatDataList"
+          :pagination="groupChatPagination"
+          :row-selection="{ selectedRowKeys: groupChatSelectedRowKeys, onChange: onGroupChatSelectChange, getCheckboxProps: getCheckboxProps }"
+          :scroll="{ x: 1500 }"
+          @change="groupChatHandleTableChange"
+        ></a-table>
+      </a-spin>
       <template slot="footer">
         <a-button
+          :disabled="modalLoadingStatus"
           @click="closeGroupChat()"
         >取消</a-button>
-        <a-button type="primary" @click="confirmGroupChat()">确定</a-button>
+        <a-button type="primary" :disabled="modalLoadingStatus" @click="confirmGroupChat" v-permission="'/sopClusterTemplate/sopBindCluster@post'">确定</a-button>
       </template>
     </a-modal>
   </div>
 </template>
 
 <script>
-// import { getGroupChatListMethod } from '@/api/cluster'
+import { getGroupChatListMethod } from '@/api/cluster'
 import moment from 'moment'
 export default {
   name: 'GroupChat',
   data () {
     return {
+      modalLoadingStatus: false, // 弹框加载中显示状态
       groupChatSelectedRowKeys: [],
       groupChatSearchInfo: {}, // 群聊查询对象
       // 添加群聊弹框显示状态
@@ -93,7 +94,6 @@ export default {
           name: '至少满足一项'
         }
       ],
-      groupChatLoading: false, // 添加群聊弹框列表加载
       groupChatDataList: [],
       groupChatColumns: [
         {
@@ -149,9 +149,11 @@ export default {
       type: Boolean,
       default: false
     },
-    selectArrayString: {
-      type: String,
-      default: ''
+    typeInfo: {
+      type: Object,
+      default: () => {
+        return {}
+      }
     }
   },
   watch: {
@@ -165,7 +167,12 @@ export default {
         // getGroupChatListMethod(this.groupChatSearchInfo).then(response => {
         //   console.log(response, '获取群聊列表')
         // })
+        this.modalLoadingStatus = true
         this.$set(this.groupChatSearchInfo, 'employeeIds', [])
+        this.$set(this.groupChatSearchInfo, 'tagsList', [])
+        this.$set(this.groupChatSearchInfo, 'tagsList', [])
+        this.$set(this.groupChatSearchInfo, 'templateId', this.typeInfo.id)
+        this.$set(this.groupChatSearchInfo, 'soptype', this.typeInfo.soptype)
         this.getDataList()
       }
     }
@@ -185,32 +192,44 @@ export default {
   },
   methods: {
     getDataList () {
-      this.groupChatDataList = [
-        {
-          workRoomId: 0,
-          roomName: '测试群1',
-          ownerName: '测试群主1',
-          sopNameListStr: '执行SOP1',
-          calendarNameListStr: '执行日历1',
-          createTime: '2022-10-30'
-        },
-        {
-          workRoomId: 1,
-          roomName: '测试群2',
-          ownerName: '测试群主2',
-          sopNameListStr: '执行SOP2',
-          calendarNameListStr: '执行日历2',
-          createTime: '2022-09-30'
-        }
-      ]
+      // this.groupChatDataList = [
+      //   {
+      //     workRoomId: 0,
+      //     roomName: '测试群1',
+      //     ownerName: '测试群主1',
+      //     sopNameListStr: '执行SOP1',
+      //     calendarNameListStr: '执行日历1',
+      //     createTime: '2022-10-30'
+      //   },
+      //   {
+      //     workRoomId: 1,
+      //     roomName: '测试群2',
+      //     ownerName: '测试群主2',
+      //     sopNameListStr: '执行SOP2',
+      //     calendarNameListStr: '执行日历2',
+      //     createTime: '2022-09-30'
+      //   }
+      // ]
+      const params = {
+        ...this.groupChatSearchInfo,
+        page: this.groupChatPagination.current,
+        perPage: this.groupChatPagination.pageSize
+      }
+      getGroupChatListMethod(params).then(response => {
+        console.log(response, '获取群聊列表')
+        this.groupChatDataList = response.data.list
+        this.modalLoadingStatus = false
+      })
     },
     /**
      * 选择框的默认属性配置
      */
     getCheckboxProps (record) {
+      console.log(record, 'record')
       return ({
         props: {
-          disabled: this.groupChatSelectedRowKeys.some(item => item === record.workRoomId)
+          // disabled: this.groupChatSelectedRowKeys.some(item => item === record.workRoomId)
+          disabled: record.checked === '1'
         }
       })
     },
@@ -220,15 +239,25 @@ export default {
       this.groupChatSelectedRowKeys = e
     },
     // 群聊列表分页信息
-    groupChatHandleTableChange () {},
+    groupChatHandleTableChange ({ current, pageSize }) {
+      this.groupChatPagination.current = current
+      this.groupChatPagination.pageSize = pageSize
+      this.getTableData()
+    },
     onSelectChange () {},
     // 搜索群聊
     searchGroupChatMethod () {
       this.$set(this.groupChatSearchInfo, 'workRoomOwnerId', this.groupChatSearchInfo.employeeIds.length !== 0 ? this.groupChatSearchInfo.employeeIds.join(',') : '')
       const tempTimeArray = this.groupChatSearchInfo.time
-      this.$set(this.groupChatSearchInfo, 'startTime', moment(tempTimeArray[0]).format('YYYY-MM-DD'))
-      this.$set(this.groupChatSearchInfo, 'endTime', moment(tempTimeArray[1]).format('YYYY-MM-DD'))
+      if (tempTimeArray.length !== 0) {
+        this.$set(this.groupChatSearchInfo, 'startTime', moment(tempTimeArray[0]).format('YYYY-MM-DD'))
+        this.$set(this.groupChatSearchInfo, 'endTime', moment(tempTimeArray[1]).format('YYYY-MM-DD'))
+      } else {
+        this.$delete(this.groupChatSearchInfo, 'startTime')
+        this.$delete(this.groupChatSearchInfo, 'endTime')
+      }
       console.log(this.groupChatSearchInfo, 'groupChatSearchInfo')
+      this.getDataList()
       // 执行搜索方法
     },
     // 重置搜索群聊
@@ -244,6 +273,10 @@ export default {
     // 提交添加群聊
     confirmGroupChat () {
       console.log('提交添加群聊')
+      console.log(this.groupChatSelectedRowKeys)
+      this.addGroupChatShowStatus = false
+      this.$emit('update:showStatus', this.addGroupChatShowStatus)
+      // debugger
       this.$emit('submitGroupChat', this.groupChatSelectedRowKeys.join(','))
     }
   }
