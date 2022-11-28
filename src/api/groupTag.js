@@ -16,7 +16,7 @@ export function workRoomLabelSave (data) {
     data
   })
 }
-
+// 删除
 export function workRoomLabelDrop (data) {
   return request({
     url: 'work_room_label/drop',
@@ -24,7 +24,7 @@ export function workRoomLabelDrop (data) {
     data
   })
 }
-
+// 标签详情
 export function workRoomLabelLoad (data) {
   return request({
     url: 'work_room_label/load',
@@ -32,7 +32,7 @@ export function workRoomLabelLoad (data) {
     data
   })
 }
-
+// 移动
 export function workRoomLabelMove (data) {
   return request({
     url: 'work_room_label/move',
