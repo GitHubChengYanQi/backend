@@ -16,3 +16,28 @@ export function workRoomShiftDrop (data) {
     data
   })
 }
+// 查询客户群数
+export function workRoomShiftRoom (data) {
+  return request({
+    url: 'work_room_shift/room',
+    method: 'post',
+    data
+  })
+}
+
+// 查询客户群数
+export function workRoomShiftFind (data) {
+  return request({
+    url: 'work_room_shift/find',
+    method: 'post',
+    data
+  })
+}
+// 编辑复制数据
+export function workRoomShiftLoad (data) {
+  return request({
+    url: 'work_room_shift/load',
+    method: 'post',
+    data
+  })
+}

@@ -87,6 +87,7 @@
 
 <script>
 import { getDict } from '@/api/common.js'
+import { workRoomShiftFind, workRoomShiftDrop } from '@/api/groupMess.js'
 
 export default {
   data () {
@@ -118,44 +119,44 @@ export default {
           {
             align: 'center',
             title: '任务名称',
-            dataIndex: 'employeeAgencyName',
+            dataIndex: 'name',
             width: 150
           },
           {
             align: 'center',
             title: '开始时间',
             sorter: true,
-            dataIndex: 'infoEmploye',
+            dataIndex: 'occur',
             width: 150
           },
           {
             align: 'center',
             title: '执行发送群主',
-            dataIndex: 'infoEmployee',
+            dataIndex: 'executeOwner',
             width: 150
           },
           {
             align: 'center',
             title: '未执行发送群主',
-            dataIndex: 'infoEmployeeC',
+            dataIndex: 'nonExecutionOwner',
             width: 150
           },
           {
             align: 'center',
             title: '已送达群聊',
-            dataIndex: 'infoEmployeeCo',
+            dataIndex: 'deliveryGroup',
             width: 150
           },
           {
             align: 'center',
             title: '未送达群聊',
-            dataIndex: 'infoEmployeeCou',
+            dataIndex: 'nonDeliveryGroup',
             width: 150
           },
           {
             align: 'center',
             title: '任务状态',
-            dataIndex: 'infoEmployeeCoun',
+            dataIndex: 'state',
             width: 150
           },
           {
@@ -168,20 +169,22 @@ export default {
             scopedSlots: { customRender: 'operation' }
           }
         ],
-        tableData: [{ id: '1' }],
+        tableData: [],
         pagination: {
           total: 0,
           current: 1,
           pageSize: 10,
           showSizeChanger: true,
           showTotal: (total) => `共${total}条数据 `,
-          pageSizeOptions: ['10', '20', '30', '50']
+          pageSizeOptions: ['10', '20', '30', '50'],
+          queue: false
         }
       }
     }
   },
   created () {
     this.getSelect('group_mess_state', 'state')
+    this.getTableData()
   },
   methods: {
     getSelect (e, key) {
@@ -193,8 +196,19 @@ export default {
         this.selectArr[key] = res.data
       })
     },
-    getSearch () {},
-    reset () {},
+    getSearch () {
+      this.table.pagination.current = 1
+      this.getTableData()
+    },
+    reset () {
+      this.search.data = {
+        name: '',
+        state: ''
+      }
+      this.table.pagination.current = 1
+      this.table.pagination.pageSize = 10
+      this.getTableData()
+    },
     goPage (e, item = { id: false }) {
       console.log(e, item)
       if (e != 3) {
@@ -213,17 +227,41 @@ export default {
         content: '是否确定删除规则？',
         okText: '确认',
         cancelText: '取消',
-        onOk: () => {},
+        onOk: () => {
+          workRoomShiftDrop({ id: e.id }).then(res => {
+            this.getTableData()
+          })
+        },
         onCancel () {}
       })
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.table.pagination.current = current
       this.table.pagination.pageSize = pageSize
-      this.table.order = sorter
+      this.table.pagination.queue = sorter.order == 'ascend'
       this.getTableData()
     },
-    getTableData () {}
+    getTableData () {
+      const { current, pageSize, queue } = this.table.pagination
+      const { data } = this.search
+      const obj = {
+        ...data,
+        queue,
+        current,
+        size: pageSize
+      }
+      console.log(obj)
+      workRoomShiftFind(obj).then((res) => {
+        console.log(res)
+        this.table.tableData = res.data.datas.map((item) => {
+          const arr = ['executeOwner', 'nonExecutionOwner', 'deliveryGroup', 'nonDeliveryGroup']
+          item.fruit.map((items, index) => {
+            item[arr[index]] = items
+          })
+          return item
+        })
+      })
+    }
   }
 }
 </script>

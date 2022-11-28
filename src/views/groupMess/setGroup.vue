@@ -38,8 +38,8 @@
                   <a-date-picker
                     :disabledDate="disabledDate"
                     show-time
+                    v-model="input.data.date"
                     placeholder="请选择日期时间"
-                    @change="onChange"
                     v-if="input.data[item.key] == 1"
                   />
                 </a-radio-group>
@@ -54,10 +54,13 @@
                     type="button"
                     name="+ 添加"
                     v-model="mumbersArr"
-                    @getVal="changeAssigneeIds"
+                    @getRows="changeAssigneeIds"
                   />
                 </span></div>
-                <div class="hint">预计送达客户群数：{{ 0 }}个 <span class="btn">刷新</span></div>
+                <div class="hint">预计送达客户群数：{{ total }}个 <span
+                  class="btn"
+                  @click="getNumber"
+                >刷新</span></div>
               </div>
               <!-- 内容 -->
               <div
@@ -68,7 +71,8 @@
                 <div class="textear_box">
                   <a-textarea
                     class="textear"
-                    v-model="input.data.textear"
+                    v-model="input.data.plain"
+                    @change="setPlain"
                     :maxLength="1000"
                     placeholder="请输入"
                   ></a-textarea>
@@ -89,7 +93,7 @@
                         :src="require('@/assets/expression.svg')"
                         alt=""
                       > -->
-                    </a-popover><span class="txt">{{ input.data.textear.length + '/1000' }}</span>
+                    </a-popover><span class="txt">{{ input.data.plain.length + '/1000' }}</span>
                   </div>
                 </div>
                 <div class="sendContent_box">
@@ -120,7 +124,7 @@
             <div class="content_box">
               <div
                 class="box"
-                v-for="(item,index) in contentArray"
+                v-for="(item,index) in previewArr"
                 :key="index"
               >
                 <div class="user">
@@ -130,6 +134,13 @@
                   >
                 </div>
                 <div class="content">
+                  <div
+                    class="text"
+                    v-if="item.type === 1"
+                  >
+                    <!-- style="max-width:100%;max-height:300px" -->
+                    {{ item.textData }}
+                  </div>
                   <div
                     class="image"
                     v-if="item.type === 2"
@@ -214,6 +225,7 @@
 import moment from 'moment'
 import EmojiLIst from './emoji.json'
 import SendContent from './components/sendContent.vue'
+import { workRoomShiftSave, workRoomShiftRoom, workRoomShiftLoad } from '@/api/groupMess.js'
 
 export default {
   components: {
@@ -224,46 +236,143 @@ export default {
       EmojiLIst,
       input: {
         inputArr: [
-          { title: '任务名称', type: 'input', key: 'taskName' },
+          { title: '任务名称', type: 'input', key: 'name' },
           { title: '选择群聊', type: 'selectBox' },
           { title: '发送内容', type: 'sendBox' },
           { title: '群发时间', type: 'radio', key: 'timeTab' }
         ],
         data: {
-          taskName: '',
+          name: '',
           timeTab: '0',
-          date: '',
-          textear: ''
+          date: null,
+          plain: ''
         }
       },
       mumbersArr: [],
-      contentArray: []
+      contentArray: [],
+      previewArr: [],
+      total: 0,
+      tableId: -1,
+      type: 0
     }
   },
-  created () {},
+  watch: {
+    contentArray: {
+      handler (val) {
+        if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+          this.previewArr = [this.previewArr[0], ...val]
+        } else {
+          this.previewArr = val
+        }
+      }
+    }
+  },
+  created () {
+    this.getUrl()
+  },
   methods: {
     moment,
+    getNumber () {
+      if (this.mumbersArr.length == 0) return
+      const obj = {
+        owner: this.mumbersArr.join(',')
+      }
+      workRoomShiftRoom(obj).then((res) => {
+        console.log(res)
+        this.total = res.data.total
+      })
+    },
+    getUrl () {
+      const object = {}
+      // 1.获取？后面的所有内容包括问号
+      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+
+      // 2.截取？后面的字符
+      const urlData = url.substr(1)
+      // name=嘻嘻&hobby=追剧
+      if (urlData.length === 0) return
+      const strs = urlData.split('&')
+      for (let i = 0; i < strs.length; i++) {
+        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      }
+      if (!object.hasOwnProperty('id')) return
+      this.tableId = object.id
+      this.type = object.type
+      this.getInfo()
+    },
+    getInfo () {
+      const obj = {
+        id: this.tableId
+      }
+      console.log(obj)
+      workRoomShiftLoad(obj).then((res) => {
+        console.log(res)
+        this.input.data.name = res.data.name
+        this.input.data.timeTab = res.data.occur == '2099-12-31 23:59' ? '0' : '1'
+        this.input.data.date = moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
+        this.mumbersArr = res.data.owner.split(',')
+        this.input.data.plain = res.data.plain
+        this.previewArr.unshift({
+          type: 1,
+          textData: res.data.plain,
+          isText: true
+        })
+        this.contentArray = res.data.stuff
+      })
+    },
+    setPlain (e) {
+      if (e.target.value.length > 0) {
+        if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+          this.previewArr[0].textData = e.target.value
+        } else {
+          this.previewArr.unshift({
+            type: 1,
+            textData: e.target.value,
+            isText: true
+          })
+        }
+      } else {
+      }
+    },
     returnErrorText (url) {
       return '暂不支持显示 .avi 格式的视频'
     },
     videoLoadErr (index) {
       this.contentArray[index].showPoster = true
-      this.$emit('update:contentArray', this.contentArray)
-    },
-    onChange (value, dateString) {
-      this.input.data.date = dateString
     },
     disabledDate (current) {
       return current && moment(current).valueOf() < moment().valueOf()
     },
     changeAssigneeIds (e) {
-      console.log(e)
+      const arr = e.map((item) => {
+        const obj = {}
+        obj.key = item.key
+        obj.title = item.title
+        return obj
+      })
+      console.log(arr)
     },
     insertFn (e) {
-      this.input.data.textear = this.input.data.textear + e
+      this.input.data.plain = this.input.data.plain + e
     },
     setMess () {
-      console.log(this.contentArray)
+      const { name, plain, timeTab, date } = this.input.data
+      const owner = this.mumbersArr.join(',')
+      const obj = {
+        name,
+        owner,
+        plain,
+        stuff: this.contentArray,
+        occur: timeTab == 0 ? '2099-12-31 23:59' : moment(date).format('YYYY-MM-DD HH:mm:ss')
+      }
+      if (this.tableId != -1 && this.type == 1) {
+        obj.id = this.tableId
+      }
+      console.log(obj)
+      workRoomShiftSave(obj).then((res) => {
+        console.log(res)
+        this.$router.push('/groupMess/index')
+      })
     }
   }
 }
@@ -518,6 +627,15 @@ export default {
                     max-width: 100%;
                     max-height: 100%;
                   }
+                }
+                .text {
+                  background-color: #fff;
+                  border-radius: 10px;
+                  padding: 10px;
+                  width: 200px;
+                  word-wrap: break-word;
+                  table-layout: fixed;
+                  word-break: break-all;
                 }
               }
             }
