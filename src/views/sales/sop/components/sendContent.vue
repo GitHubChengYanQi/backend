@@ -103,12 +103,13 @@
       :maskClosable="false"
       :width="600"
       :visible="contentTextModalShow"
-      class="contentTextModal"
       @cancel="closeContentTextModal()"
       :getContainer="() => $refs['send_content_container']"
     >
-      <a-textarea v-model="contentText" autoSize placeholder="请输入内容" />
-      <span class="len">{{ contentText.length ? contentText.length : '0' }}/1000</span>
+      <div class="contentTextModal">
+        <a-textarea v-model="contentText" autoSize placeholder="请输入内容" />
+        <span class="len">{{ contentText.length ? contentText.length : '0' }}/1000</span>
+      </div>
       <template slot="footer">
         <a-button @click="closeContentTextModal()">取消</a-button>
         <a-button type="primary" @click="confirmContentText">确定</a-button>
@@ -746,7 +747,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 #send_content_container {
   .contentLinkModal {
       display: flex;
@@ -825,103 +826,20 @@ export default {
       }
   }
   .contentTextModal {
-    .ant-modal-body {
-      padding-top: 0;
-      .ant-input {
-        min-height: 100px;
-      }
-      .len {
-        display: block;
-        text-align: end;
-      }
+    padding-top: 0;
+    .ant-input {
+      min-height: 100px;
+    }
+    .len {
+      display: block;
+      text-align: end;
     }
   }
-
 }
 .sendSOPInfoContainer {
   width: 100%;
   margin-top: 10px;
   display: flex;
-  .sendSOPList {
-    border-radius: 5px;
-    padding: 20px;
-    width: 300px;
-    height: 460px;
-    background-color: #fff;
-    overflow-y: auto;
-    .sopItem {
-      height: 35px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      text-indent: 15px;
-      cursor: pointer;
-      border-radius: 5px;
-      position: relative;
-      .del {
-        display: none;
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        align-items: center;
-        justify-content: center;
-        transform: translate(0, -50%);
-      }
-    }
-    .sopItem:hover {
-      .del {
-        display: flex;
-      }
-    }
-    .active {
-      background: #eef2fc;
-      color: #4074f6;
-    }
-    .addSop {
-      margin-bottom: 20px;
-      width: 100%;
-      height: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      border: 1px dashed #8a8a8a;
-      cursor: pointer;
-    }
-  }
-  .sendItemContent {
-    margin-left: 10px;
-    flex: 1;
-    height: 100%;
-    .chooseSendDate {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      .til {
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-      .chooseDateBox1 {
-        .chooseDateBoxRadio {
-          display: flex;
-          flex-direction: column;
-          .line-wrapper {
-            margin-bottom: 10px;
-            .ant-time-picker {
-              width: 120px;
-            }
-          }
-        }
-      }
-      .chooseDateBox2 {
-        display: flex;
-        align-items: center;
-      }
-    }
-  }
   .sendContent {
       margin-top: 10px;
       background-color: #fff;
@@ -1103,7 +1021,6 @@ export default {
       }
     }
 }
-
 .uploadFileInp {
   position: fixed;
   left: -100000px;
