@@ -1,6 +1,14 @@
 import moment from 'moment'
 export const returnLabelJSONData = (labels) => {
-  return JSON.stringify(labels.map(({ id, name }) => ({ id, name })))
+  if (!labels.length) return ''
+  return JSON.stringify(labels.map(({ id }) => (id)))
+}
+
+export const defaultMiniObj = {
+  appid: '',
+  path: '',
+  desc: '',
+  pic: {}
 }
 
 // 返回一个数字范围
@@ -89,7 +97,7 @@ export const chartDefaultOptions = {
   },
   series: [
     {
-      name: '朋友圈发表量',
+      name: '新增成员',
       type: 'line',
       lineStyle: {
         color: 'rgb(43 111 253)'
@@ -117,7 +125,7 @@ export const defaultLinkObj = {
   title: '',
   url: '',
   desc: '',
-  pic: ''
+  pic: {}
 }
 // 是否为一个地址
 export const isUrl = (val) => {
@@ -129,4 +137,103 @@ export const isUrl = (val) => {
 export const defaultLibraryObj = {
   temporaryStroageArr: [],
   selectArr: []
+}
+export function debounce (func, wait, immediate) {
+  var timeout, result
+  function debounce () {
+    var context = this; var args = arguments
+    if (timeout) clearTimeout(timeout)
+    if (immediate) {
+      var callNow = !timeout
+      timeout = setTimeout(function () {
+        result = func.apply(context, args)
+      }, wait)
+      if (callNow) result = func.apply(context, args)
+    } else {
+      timeout = setTimeout(function () {
+        result = func.apply(context, args)
+      }, wait)
+    }
+    return result
+  }
+  debounce.cancel = function () {
+    clearTimeout(timeout)
+    timeout = null
+  }
+  return debounce
+}
+
+// 获取正确的媒体数据格式
+/*
+  to 时 转化请求需要对象，form时，返回需要的结构
+*/
+export const getMediaData = (reqType, data) => {
+  if (reqType === 'to') {
+    const { content = {}, type } = data
+    let t
+    let files
+    let link = {}
+    if (type === 'image') {
+      t = 1
+      files = [content.path]
+    } else if (type === 'embed') {
+      t = 4
+      files = [content.pic.path]
+      link = {
+        appid: content.appid,
+        app_path: content.path,
+        app_text: content.desc
+      }
+    } else if (type === 'link') {
+      t = 3
+      files = [content.pic.path]
+      link = {
+        web_url: content.url,
+        web_title: content.title,
+        web_text: content.desc
+      }
+    }
+    return JSON.stringify({ type: t, files, ...link })
+  } else if (reqType === 'from') {
+    const startLen = 43 // 域名长度
+    const { type, files, ...link } = data
+    let mediaType, mediaData
+    if (type === 1) {
+      mediaType = 'image'
+      mediaData = {
+        imgUrl: files[0]
+      }
+    } else if (type === 3) {
+      mediaType = 'link'
+      mediaData = {
+        title: link.web_title,
+        url: link.web_url,
+        desc: link.web_text,
+        pic: { url: files[0] }
+      }
+    } else if (type === 4) {
+      mediaType = 'embed'
+      mediaData = {
+        appid: link.appid,
+        path: link.app_path,
+        desc: link.app_text,
+        pic: { url: files[0] }
+      }
+    }
+    return { type: mediaType, content: mediaData }
+  }
+}
+
+export const trasnfromOptions = (list) => {
+  const value = []
+  const newL = list.map(it => {
+    if (it.checked === '1') {
+      value.push(it.id)
+    }
+    return {
+      label: it.sopName,
+      value: it.id
+    }
+  })
+  return { list: newL, value }
 }

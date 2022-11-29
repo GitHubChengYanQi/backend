@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 树状图
+// 保存编辑
 export function workRoomShiftSave (data) {
   return request({
     url: 'work_room_shift/save',
@@ -25,7 +25,7 @@ export function workRoomShiftRoom (data) {
   })
 }
 
-// 查询客户群数
+// 列表
 export function workRoomShiftFind (data) {
   return request({
     url: 'work_room_shift/find',
@@ -39,5 +39,22 @@ export function workRoomShiftLoad (data) {
     url: 'work_room_shift/load',
     method: 'post',
     data
+  })
+}
+// 详情表格
+export function workRoomShiftBack (data) {
+  return request({
+    url: 'work_room_shift/back',
+    method: 'post',
+    data
+  })
+}
+// 导出
+export function workRoomShiftDown (data) {
+  return request({
+    url: 'work_room_shift/down',
+    method: 'post',
+    data,
+    responseType: 'blob'
   })
 }

@@ -41,7 +41,7 @@
                 v-for="(items,indexs) in info.data[item.key]"
                 :key="indexs"
               >
-                {{ info.state[items] + (indexs + 1 != info.data[item.key].length ? '+' : '') }}
+                {{ info.state[items - 1] + (indexs + 1 != info.data[item.key].length ? '+' : '') }}
               </span>
               <span
                 class="btn"
@@ -77,7 +77,7 @@
         <div class="A_table">
           <a-table
             :columns="table.columns[table.tab]"
-            :data-source="table.data"
+            :data-source="table.tableData"
             rowKey="id"
             :row-selection="{selectedRowKeys:table.rowSelection,onChange: onSelectChange}"
             :pagination="table.pagination"
@@ -117,6 +117,13 @@
               >
             </div>
             <div class="content">
+              <div
+                class="text"
+                v-if="item.type === 1"
+              >
+                <!-- style="max-width:100%;max-height:300px" -->
+                {{ item.textData }}
+              </div>
               <div
                 class="image"
                 v-if="item.type === 2"
@@ -196,6 +203,9 @@
 </template>
 
 <script>
+import { workRoomShiftLoad, workRoomShiftBack, workRoomShiftDown } from '@/api/groupMess.js'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
+
 export default {
   data () {
     return {
@@ -209,12 +219,12 @@ export default {
           {
             title: '创建时间：',
             type: 'txt',
-            key: 'createTime'
+            key: 'createdAt'
           },
           {
             title: '开始时间：',
             type: 'txt',
-            key: 'startTime'
+            key: 'occur'
           },
           {
             title: '消息内容：',
@@ -223,14 +233,18 @@ export default {
           }
         ],
         data: {
-          taskName: '测试123',
-          createTime: '2022年11月18日 17:12:31',
-          startTime: '2022年11月18日 17:12:31',
-          content: [0, 1, 2, 3],
-          btn: '3'
+          taskName: '',
+          createdAt: '',
+          occur: '',
+          content: [],
+          btn: '0'
         },
-        state: ['文本内容', '【图片】', '【链接】', '【小程序】'],
+        state: ['文本内容', '【图片】', '【视频】', '【链接】', '【小程序】'],
         btnState: [
+          {
+            txt: '任务待开始',
+            color: '#df742c'
+          },
           {
             txt: '正在进行',
             color: '#004dcc'
@@ -238,10 +252,6 @@ export default {
           {
             txt: '已完成',
             color: '#009e69'
-          },
-          {
-            txt: '任务待开始',
-            color: '#df742c'
           },
           {
             txt: '创建失败',
@@ -256,25 +266,25 @@ export default {
           0: [
             {
               title: '员工',
-              dataIndex: 'mumber'
+              dataIndex: 'name'
             },
             {
               title: '预计送达客户群数',
-              dataIndex: 'predict_group'
+              dataIndex: 'data$0'
             }
           ],
           1: [
             {
               title: '员工',
-              dataIndex: 'mumber'
+              dataIndex: 'name'
             },
             {
               title: '预计送达客户群数',
-              dataIndex: 'predict_group'
+              dataIndex: 'data$0'
             },
             {
               title: '实际送达客户群数',
-              dataIndex: 'practical_group'
+              dataIndex: 'data$1'
             },
             {
               title: '送达时间',
@@ -284,11 +294,11 @@ export default {
           2: [
             {
               title: '员工',
-              dataIndex: 'mumber'
+              dataIndex: 'name'
             },
             {
               title: '无法执行客户群数',
-              dataIndex: 'none_group'
+              dataIndex: 'data$0'
             }
           ]
         },
@@ -303,36 +313,13 @@ export default {
         },
         rowSelection: []
       },
-      contentArray: [
-        {
-          photoUrl:
-            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693752676040231493.png?Expires=1984735267&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=Vbv9%2FEoIhKsZz5CFyeMV8zM4Yfw%3D',
-          type: 2
-        },
-        {
-          videoUrl:
-            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693754284570386334.mp4?Expires=1984735428&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=4ynJHymKtRozos1yf5mXd41D8%2B8%3D',
-          type: 3
-        },
-        {
-          linkPhoto:
-            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693754423090183565.png?Expires=1984735442&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=8IIQl2pxtpfgDoBbpxANyO1Wo1E%3D',
-          linkShow: '21312',
-          linkTitle: '12312',
-          linkUrl: 'http://jira.yifeijiankang.com:8021/secure/Dashboard.jspa',
-          type: 4
-        },
-        {
-          appId: '21321',
-          appPhoto:
-            'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16693755678710249817.png?Expires=1984735568&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=d6Y1gV4UPC5v%2B1n7RlteZCups8Q%3D',
-          appShow: '32123',
-          appUrl: '21312',
-          type: 5
-        }
-      ],
-      keepState: false
+      contentArray: [],
+      keepState: false,
+      tableId: -1
     }
+  },
+  created () {
+    this.getUrl()
   },
   methods: {
     videoLoadErr (index) {
@@ -340,23 +327,98 @@ export default {
       this.contentArray[index].showPoster = true
       this.$emit('update:contentArray', this.contentArray)
     },
+    getUrl () {
+      const object = {}
+      // 1.获取？后面的所有内容包括问号
+      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+
+      // 2.截取？后面的字符
+      const urlData = url.substr(1)
+      // name=嘻嘻&hobby=追剧
+      if (urlData.length === 0) return
+      const strs = urlData.split('&')
+      for (let i = 0; i < strs.length; i++) {
+        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      }
+      if (!object.hasOwnProperty('id')) return
+      this.tableId = object.id
+      this.type = object.type
+      this.getTableData()
+      this.getInfo()
+    },
+    getInfo () {
+      const obj = {
+        id: this.tableId
+      }
+      console.log(obj)
+      workRoomShiftLoad(obj).then((res) => {
+        console.log(res)
+        const { data } = res
+        this.contentArray = [
+          {
+            type: 1,
+            textData: data.plain
+          },
+          ...data.stuff
+        ]
+        this.info.data.content = this.contentArray.map((item) => {
+          return item.type
+        })
+        this.info.data.taskName = data.name
+        this.info.data.occur = data.occur
+        this.info.data.createdAt = data.createdAt
+        this.info.data.btn = data.state - 1
+      })
+    },
     setTab (e) {
       this.table.tab = e
+      this.table.rowSelection = []
+      this.table.pagination.current = 1
+      this.table.pagination.pageSize = 10
+      this.getTableData()
     },
     previewMouse (e) {
       e.stopPropagation()
     },
-    exportsElxe () {},
+    exportsElxe () {
+      const obj = {
+        id: this.tableId,
+        index: this.table.tab,
+        kagi: this.table.rowSelection.join(',')
+      }
+      console.log(obj)
+      workRoomShiftDown(obj).then((res) => {
+        console.log(res)
+        callDownLoadByBlob(res, '群发数据')
+      })
+    },
     onSelectChange (e) {
       this.table.rowSelection = e
     },
     mousewheel (e) {
       e.preventDefault()
     },
-    handleTableChange ({ current }) {
-      this.pagination.pageSize = arguments[0].pageSize
-      this.pagination.current = current
+    handleTableChange ({ current, pageSize }) {
+      console.log(current, pageSize)
+      this.table.pagination.pageSize = pageSize
+      this.table.pagination.current = current
       this.getTableData()
+    },
+    getTableData () {
+      const { current, pageSize } = this.table.pagination
+      const obj = {
+        id: this.tableId,
+        index: this.table.tab,
+        current,
+        size: pageSize
+      }
+      const tabArr = ['todo', 'done', 'undo']
+      workRoomShiftBack(obj).then((res) => {
+        console.log(res)
+        this.table.tableData = res.data[tabArr[this.table.tab]]
+        console.log(this.table.tableData)
+        this.table.pagination.total = res.data.total
+      })
     }
   }
 }
@@ -395,10 +457,11 @@ export default {
             .btn_box {
               display: flex;
               align-items: center;
+              justify-content: center;
               margin-left: 10px;
               padding: 2px 10px;
               border-radius: 5px;
-              width: 75px;
+              min-width: 75px;
               height: 35px;
               color: #fff;
             }
@@ -587,6 +650,15 @@ export default {
                 max-width: 100%;
                 max-height: 100%;
               }
+            }
+            .text {
+              background-color: #fff;
+              border-radius: 10px;
+              padding: 10px;
+              width: 200px;
+              word-wrap: break-word;
+              table-layout: fixed;
+              word-break: break-all;
             }
           }
         }

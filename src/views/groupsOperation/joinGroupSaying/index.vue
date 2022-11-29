@@ -24,7 +24,12 @@
         </div>
         <div slot="operation" slot-scope="text">
           <div class="btns">
-            <span class="btn" @click="$router.push(`/groupsOperation/groupList/groupItemDetail`)">编辑</span>
+            <span
+              class="btn"
+              @click="$router.push({
+                path: `/groupsOperation/joinGroupSaying/edit`,
+                query: {id: text}
+              })">编辑</span>
             <span
               class="btn"
               @click="handleDelete(text)">删除</span>
@@ -36,6 +41,7 @@
 </template>
 
 <script>
+import { deleteJoinSayItemReq, getJoinSayListReq } from '@/api/groupsOperation'
 
 export default {
   name: '',
@@ -52,7 +58,7 @@ export default {
           title: '创建人',
           width: '20%',
           align: 'center',
-          dataIndex: 'creater'
+          dataIndex: 'create_user'
         },
         {
           title: '创建时间',
@@ -69,20 +75,7 @@ export default {
           scopedSlots: { customRender: 'operation' }
         }
       ],
-      tableData: [
-        {
-          content: '123123',
-          creater: 'Arthas',
-          create_time: '22-22-22-22: 22-222-22',
-          id: 1
-        },
-        {
-          content: '123123',
-          creater: 'Arthas',
-          create_time: '22-22-22-22: 22-222-22',
-          id: 2
-        }
-      ],
+      tableData: [],
       tableSortStr: '',
       pagination: {
         total: 0,
@@ -109,9 +102,9 @@ export default {
         order: this.tableSortStr
       }
       console.log(obj, 'obj')
-      // const { data } = await getMomentsListReq(obj)
-      // this.tableData = data.datas
-      // this.pagination.total = data.total
+      const { data } = await getJoinSayListReq(obj)
+      this.tableData = data.datas
+      this.pagination.total = data.total
     },
     handleTableChange ({ current, pageSize }, _, { columnKey, order }) {
       let str = ''
@@ -132,7 +125,7 @@ export default {
         okText: '确认',
         cancelText: '取消',
         onOk: async () => {
-          // await deleteMomentsItemReq({ id })
+          await deleteJoinSayItemReq({ id })
           this.$message.success('删除成功')
           this.getTableList()
         },

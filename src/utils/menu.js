@@ -124,6 +124,14 @@ export function setBreadcrumb (path, data) {
     18: {
       path: ['/groupMess/setGroup', '/groupMess/taskInfo'],
       returnPath: '/groupMess/index'
+    },
+    19: {
+      path: ['/groupsOperation/groupList/groupItemDetail'],
+      returnPath: '/groupsOperation/groupList/index'
+    },
+    20: {
+      path: ['/groupsOperation/joinGroupSaying/add', '/groupsOperation/joinGroupSaying/edit'],
+      returnPath: '/groupsOperation/joinGroupSaying/index'
     }
   }
 
@@ -149,6 +157,9 @@ export function setBreadcrumb (path, data) {
         }
         if (inner.path == '/riskEarlyWarning/creatingScoringTemplate' && data.id) {
           secondTitle = '编辑评分模型'
+        }
+        if (inner.path == '/groupMess/setGroup' && data.type != 0) {
+          secondTitle = data.type == 1 ? '编辑群群发' : '复制群群发'
         }
         if (backList.includes(inner.path)) {
           firstTitle = 'isBack'
