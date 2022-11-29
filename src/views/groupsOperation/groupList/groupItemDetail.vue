@@ -5,25 +5,25 @@
         <span class="til">
           今日新增成员数
         </span>
-        <span class="num">0</span>
+        <span class="num">{{ cardData.addIntoNum || 0 }}</span>
       </div>
       <div class="cardItem card2">
         <span class="til">
           今日退群成员数
         </span>
-        <span class="num">0</span>
+        <span class="num">{{ cardData.quitNum || 0 }}</span>
       </div>
       <div class="cardItem card3">
         <span class="til">
           当前群成员数
         </span>
-        <span class="num">0</span>
+        <span class="num">{{ cardData.curNum || 0 }}</span>
       </div>
       <div class="cardItem card4">
         <span class="til">
           累计退群成员数
         </span>
-        <span class="num">0</span>
+        <span class="num">{{ cardData.totalNum || 0 }}</span>
       </div>
     </div>
     <div class="echartsContainer">
@@ -71,7 +71,9 @@
 </template>
 
 <script>
-import { disabledBeforeDate, searchDateItemRanges, chartDefaultOptions } from '../groupUtils'
+import { disabledBeforeDate, searchDateItemRanges, chartDefaultOptions, returnChartData } from '../groupUtils'
+import { getGroupDetailTopInfoReq, getItemChartInfoReq, getItemChartdaysReq } from '@/api/groupsOperation'
+import { deepClonev2 } from '@/utils/util'
 
 const dayNum = 1000 * 60 * 60 * 24
 const maxDayNum = dayNum * 365 // 最大搜索天数不超过一年
@@ -80,6 +82,7 @@ export default {
   components: {},
   data () {
     return {
+      cardData: {},
       echartDate: [],
       selectLineType: 0,
       lineArrs: [
@@ -98,44 +101,36 @@ export default {
       tableColumns: [
         {
           title: '时间',
-          dataIndex: 'date',
+          dataIndex: 'day',
           align: 'center',
           width: '20%'
         },
         {
           title: '新增成员数',
-          dataIndex: 'num1',
+          dataIndex: 'add_into_num',
           align: 'center',
           width: '20%'
         },
         {
           title: '退群人数',
-          dataIndex: 'num2',
+          dataIndex: 'quit_num',
           align: 'center',
           width: '20%'
         },
         {
           title: '当前群成员数',
-          dataIndex: 'num3',
+          dataIndex: 'cur_num',
           align: 'center',
           width: '20%'
         },
         {
           title: '累计退群成员数',
-          dataIndex: 'num4',
+          dataIndex: 'total_num',
           align: 'center',
           width: '20%'
         }
       ],
-      tableData: [
-        {
-          date: '2022-12-12 22:@2:222',
-          num1: 1,
-          num2: 2,
-          num3: 3,
-          num4: 4
-        }
-      ],
+      tableData: [],
       // 分页对象
       pagination: {
         total: 0,
@@ -153,12 +148,22 @@ export default {
       this.chartLineChange(e)
     }
   },
-  created () { },
+  created () {
+    const id = this.$route.query.id
+    this.getFirstData(id)
+    this.getChartData(id)
+    // this.getTableList()
+  },
   methods: {
+    async getFirstData (id) {
+      const { data } = await getGroupDetailTopInfoReq({ id })
+      this.cardData = data
+    },
     handleSearch () {
       this.getChartData()
     },
-    getChartData () {
+    async getChartData () {
+      const id = this.$route.query.id
       const [starttime, endtime] = this.echartDate
       let timeType = '1'
       const targetNum = new Date(endtime).valueOf() - new Date(starttime).valueOf()
@@ -170,12 +175,20 @@ export default {
         timeType = '2'
       }
       const obj = {
-        time_type: timeType,
+        roomid: id,
+        // time_type: timeType,
         starttime,
         endtime,
         data_type: this.selectLineType + 1
       }
-      console.log(obj, 'obj')
+      const { data } = await getItemChartInfoReq(obj)
+      const { xName, xData } = returnChartData(data.days)
+      const oldD = deepClonev2(this.defaultEchartOptions)
+      oldD.xAxis[0].data = xName
+      oldD.series[0].data = xData
+      this.defaultEchartOptions = oldD
+      console.log(xName, xData, 'obj', data)
+      this.getTableList()
     },
     chartLineChange (index) {
       const { theme, name } = this.lineArrs[index]
@@ -189,13 +202,21 @@ export default {
       this.pagination.pageSize = pageSize
       this.getTableList()
     },
-    getTableList () {
+    async getTableList () {
+      const id = this.$route.query.id
       const { current, pageSize } = this.pagination
+      const [starttime, endtime] = this.echartDate
       const obj = {
+        roomid: id,
+        starttime,
+        endtime,
         current,
-        size: pageSize
+        size: pageSize,
+        data_type: this.selectLineType + 1
       }
-      console.log(obj, 'obj')
+      const { data } = await getItemChartdaysReq(obj)
+      this.tableData = data.datas
+      this.pagination.total = data.total
     }
   }
 }

@@ -15,22 +15,28 @@
           v-model="searchObj.name"
           show-search
           placeholder="请输入群名称"
-          style="width: 200px"
+          style="width: 120px"
           :default-active-first-option="false"
-          :show-arrow="false"
           :filter-option="false"
-          :not-found-content="null"
           :options="nameSearchOptions"
-          @search="handleSearch"
+          @search="searchChangeDebounceFn"
           @change="handleChange" />
       </div>
       <div class="searchItem">
         <span class="label">群标签：</span>
+        <a-select
+          style="width: 130px;"
+          ref="select"
+          v-model="searchObj.tagMatchType"
+        >
+          <a-select-option value="1">至少满足一项</a-select-option>
+          <a-select-option value="2">同时满足</a-select-option>
+        </a-select>
         <div class="selectLabelBox">
-          <span class="selectBtn" @click="showBox(0, 'searchObj.labels')">
+          <span class="selectBtn" @click="openGroupSelectModal('searchObj.labels')">
             <span class="emptyBtn" v-if="searchObj.labels.length == 0">+ 添加标签</span>
             <span class="label_input_title" v-for="(item, index) in searchObj.labels.slice(0, 2)" :key="index">
-              {{ item.name }}
+              {{ item.itemName }}
               <span class="delete" @click.stop="delTagHandle(item.id, index)">+</span>
             </span>
             <span class="label_input_title" v-if="searchObj.labels.length > 2">
@@ -42,6 +48,7 @@
       <div class="searchItem">
         <span class="label">群创建时间：</span>
         <a-range-picker
+          style="width:330px;"
           v-model="searchObj.date"
           :show-time="{ format: 'HH:mm' }"
           format="YYYY-MM-DD HH:mm"
@@ -60,7 +67,8 @@
             employeeIds: [],
             name: '',
             date: [],
-            labels: []
+            labels: [],
+            tagMatchType: '1'
           }; this.getTableList()
         }">重置</a-button>
     </div>
@@ -72,24 +80,13 @@
           <span class="refresh">更新数据</span>
         </div>
         <div class="rig">
-          <a-dropdown style="margin-left: 10px;width: 90px;">
-            <span class="btn">导出</span>
-            <template #overlay>
-              <a-menu>
-                <a-menu-item>
-                  <span @click="getTableList('exp_cur')">导出当前</span>
-                </a-menu-item>
-                <a-menu-item>
-                  <span @click="getTableList('exp_all')">导出全部</span>
-                </a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
+          <span class="btn" @click="getTableList(true)">导出</span>
           <span class="btn" @click="batchSettingLabels('add')">批量打标签</span>
           <span class="btn" @click="batchSettingLabels('remove')">批量移除标签</span>
         </div>
       </div>
       <a-table
+        :rowKey="record => record.workRoomId"
         :columns="tableColunms"
         :data-source="tableData"
         :scroll="{ x: 1300 }"
@@ -102,10 +99,15 @@
           </div>
         </div>
         <!-- text, record -->
-        <div slot="operation" slot-scope="">
+        <div slot="operation" slot-scope="text">
           <div class="btns">
-            <span class="btn" @click="groupItemSettingModal.visible = true">设置</span>
-            <span class="btn" @click="$router.push(`/groupsOperation/groupList/groupItemDetail`)">详情</span>
+            <span class="btn" @click="openSettingModel(text)">设置</span>
+            <span
+              class="btn"
+              @click="$router.push({
+                path: `/groupsOperation/groupList/groupItemDetail`,
+                query: {id:text }
+              })">详情</span>
           </div>
         </div>
       </a-table>
@@ -140,29 +142,38 @@
         </a-select>
       </div>
     </a-modal>
-    <label-select :state="chooseUserTagsModalShow" :addState="false" ref="labelSelect" />
+    <!-- <GroupTags :state="chooseUserTagsModalShow" :addState="false" ref="labelSelect" /> -->
+    <a-modal v-model="groupTagsModalShow" centered @ok="handleAddGroupTagsOk" width="60%">
+      <GroupTags v-model="groupTagsSelectList" />
+    </a-modal>
   </div>
 </template>
 
 <script>
-import LabelSelect from '@/views/clientFollow/components/LabelSelect.vue'
-import { returnLabelJSONData } from '../groupUtils'
+import GroupTags from '../components/tags.vue'
+import { getSearchGroupNameOptionsListReq, batchSetTagsReq, batchRemoveTagsReq, groupListExportReq, getListItemSettingInfoReq, saveListItemSettingInfoReq } from '@/api/groupsOperation'
+import { debounce, trasnfromOptions } from '../groupUtils'
+import { workRoomList } from '@/api/workRoom'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
 
 export default {
   name: '',
   components: {
-    'label-select': LabelSelect
+    GroupTags
   },
   data () {
     return {
+      namesss: '',
       searchObj: {
         employeeIds: [],
         name: '',
         date: [],
-        labels: []
+        labels: [],
+        tagMatchType: '1'
       },
       // 联想选择组
       nameSearchOptions: [],
+      searchChangeDebounceFn: debounce(this.handleSearch, 300),
       // 选择标签弹窗
       chooseUserTagsModalShow: false,
       // 标签赋值类型
@@ -171,39 +182,39 @@ export default {
         {
           title: '群名称',
           width: 120,
-          dataIndex: 'groupName',
+          dataIndex: 'roomName',
           align: 'center'
         },
         {
           title: '群主',
           width: 120,
           align: 'center',
-          dataIndex: 'name'
+          dataIndex: 'ownerName'
         },
         {
           title: '所属门店',
           width: 120,
           align: 'center',
-          dataIndex: 'from'
+          dataIndex: 'departName'
         },
         {
           title: '所属机构',
           width: 120,
           align: 'center',
-          dataIndex: 'from2'
+          dataIndex: 'parentDepart'
         },
         {
           title: '创建时间',
           width: 180,
           align: 'center',
           sorter: true,
-          dataIndex: 'create_time'
+          dataIndex: 'createTime'
         },
         {
           title: '群标签',
           width: 200,
           align: 'center',
-          dataIndex: 'groupLabels',
+          dataIndex: 'tagList',
           scopedSlots: { customRender: 'groupLabels' }
         },
         {
@@ -211,56 +222,31 @@ export default {
           width: 100,
           align: 'center',
           sorter: true,
-          dataIndex: 'num1'
+          dataIndex: 'memberNum'
         },
         {
           title: '当日入群数',
           width: 130,
           align: 'center',
           sorter: true,
-          dataIndex: 'num2'
+          dataIndex: 'inRoomNum'
         },
         {
           title: '当日退群数',
           width: 130,
           align: 'center',
           sorter: true,
-          dataIndex: 'num3'
+          dataIndex: 'outRoomNum'
         },
         {
           title: '操作',
           width: 130,
           align: 'center',
-          dataIndex: 'id',
+          dataIndex: 'workRoomId',
           scopedSlots: { customRender: 'operation' }
         }
       ],
-      tableData: [
-        {
-          id: 1,
-          groupName: 'group',
-          name: 'Arthas',
-          from: 'm78',
-          from2: '01',
-          create_time: '2022-23-12 33:33:33',
-          groupLabels: ['标签1', '标签2', '标签3'],
-          num1: 1,
-          num2: 2,
-          num3: 3
-        },
-        {
-          id: 2,
-          groupName: 'group',
-          name: 'Arthas',
-          from: 'm78',
-          from2: '01',
-          create_time: '2022-23-12 33:33:33',
-          groupLabels: [],
-          num1: 1,
-          num2: 2,
-          num3: 3
-        }
-      ],
+      tableData: [],
       tableSortStr: '',
       selectedTableRowKeys: [],
       pagination: {
@@ -272,6 +258,7 @@ export default {
         showTotal: (total, range) => `第 ${Math.ceil(range[1] / this.pagination.pageSize)}页/共${total}条数据 `
       },
       groupItemSettingModal: {
+        selectId: '',
         visible: false,
         dateSelect: [],
         dateOptions: [
@@ -307,43 +294,20 @@ export default {
             label: '33'
           }
         ]
-      }
+      },
+      groupTagsModalShow: false,
+      groupTagsSelectList: []
     }
   },
   computed: {},
-  watch: {},
-  created () { },
+  watch: {
+  },
+  created () {
+    this.getTableList()
+  },
   methods: {
     searchDateChange (_, values) {
       this.searchObj.date = values
-    },
-    // 选择标签回调用父组件事件集
-    showBox (e, targetLables) {
-      if (e != -1) {
-        let filterIdArr = []
-        let filterInputArr = []
-        if (e === 0 && targetLables === 'searchObj.labels') {
-          filterIdArr = this.searchObj.labels.map(item => item.id)
-          filterInputArr = this.searchObj.labels
-        }
-        this.$refs.labelSelect.idArr = filterIdArr
-        this.$refs.labelSelect.inputArr = filterInputArr
-        this.lablesModalType = targetLables
-      }
-      this.chooseUserTagsModalShow = !this.chooseUserTagsModalShow
-    },
-    // 标签弹窗确认
-    transmitLabel (e) {
-      if (this.lablesModalType === 'searchObj.labels') {
-        this.searchObj.labels = e
-      } else {
-        if (this.lablesModalType === 'add') {
-
-        } else if (this.lablesModalType === 'remove') {
-
-        }
-        console.log(this.lablesModalType, e)
-      }
     },
     // 删除item
     // -1 默认 -2 排除 -3 群组
@@ -357,38 +321,52 @@ export default {
       this.$refs.labelSelect.idArr = filterIdArr
       this.$refs.labelSelect.inputArr = filterInputArr
     },
-    handleSearch (val) {
-      console.log('handleSearch', val)
+    async handleSearch (val) {
+      if (!val) {
+        this.nameSearchOptions = []
+        return
+      }
+      const { data } = await getSearchGroupNameOptionsListReq({ name: val })
+      this.nameSearchOptions = data.map(it => ({ label: it.name, value: it.name }))
     },
     handleChange (val) {
       console.log('handleChange', val)
-      this.searchObj.name = val
     },
-    async getTableList (expstatus) {
-      const { date, employeeIds, labels, name } = this.searchObj
+    async getTableList (isExport) {
+      const { date, employeeIds, labels, name, tagMatchType } = this.searchObj
       const { current, pageSize } = this.pagination
       const obj = {
-        name,
-        starttime: date[0] || '',
-        endtime: date[1] || '',
-        employeeIds: employeeIds.join(','),
-        labels: returnLabelJSONData(labels),
-        current,
-        size: pageSize,
+        tagMatchType,
+        workRoomName: name,
+        workRoomOwnerId: employeeIds.join(','),
+        startTime: date[0] || '',
+        endTime: date[1] || '',
+        workRoomTagIds: labels.map(it => it.id).join(','),
+        page: current,
+        perPage: pageSize,
         order: this.tableSortStr
       }
-      if (expstatus) {
-        obj.expstatus = expstatus
-      }
-      console.log(obj, 'obj')
-      if (expstatus) {
-        // const data = await momentsListExportReq(obj)
-        // callDownLoadByBlob(data, '朋友圈任务列表')
+      if (isExport) {
+        console.log(this.selectedTableRowKeys, 'selectedTableRowKeys')
+        if (this.selectedTableRowKeys.length) {
+          obj.ids = this.selectedTableRowKeys.join(',')
+        }
+        const data = await groupListExportReq(this.handleParam(obj))
+        callDownLoadByBlob(data, '群列表')
       } else {
-        // const { data } = await getMomentsListReq(obj)
-        // this.tableData = data.datas
-        // this.pagination.total = data.total
+        const { data } = await workRoomList(this.handleParam(obj))
+        this.tableData = data.list
+        this.pagination.total = data.page.total
       }
+    },
+    handleParam (obj) {
+      for (const item in obj) {
+        const data = obj[item]
+        if (!data && data !== 0) {
+          delete obj[item]
+        }
+      }
+      return obj
     },
     onSelectTableItemChange (rows) {
       this.selectedTableRowKeys = rows
@@ -397,12 +375,20 @@ export default {
       let str = ''
       let first = ''
       if (columnKey) {
-        first = columnKey === 'start_time' ? 'Create' : 'Start'
+        if (columnKey === 'createTime') {
+          first = 'CreateAt'
+        } else if (columnKey === 'memberNum') {
+          first = 'Memnum'
+        } else if (columnKey === 'inRoomNum') {
+          first = 'Innum'
+        } else if (columnKey === 'outRoomNum') {
+          first = 'Outnum'
+        }
       }
       if (order === 'ascend') {
-        str = `${first}AtAsc`
+        str = `${first}Asc`
       } else if (order === 'descend') {
-        str = `${first}AtDesc`
+        str = `${first}Desc`
       }
       this.tableSortStr = str
       this.pagination.current = current
@@ -414,17 +400,67 @@ export default {
         this.$message.warn('请选择群聊')
         return
       }
-      this.showBox(0, t)
+      this.openGroupSelectModal(t)
     },
     handleCancel () {
       this.groupItemSettingModal.visible = false
       this.groupItemSettingModal.dateSelect = []
       this.groupItemSettingModal.sopSelect = []
     },
-    handleOk () {
+    async handleOk () {
       console.log(this.groupItemSettingModal.dateSelect, this.groupItemSettingModal.sopSelect)
-
-      // this.groupItemSettingModal.visible = false
+      await saveListItemSettingInfoReq({
+        id: this.groupItemSettingModal.selectId,
+        clusterTemplateIds: this.groupItemSettingModal.dateSelect,
+        calendarTemplateIds: this.groupItemSettingModal.sopSelect
+      })
+      this.$message.success('保存成功！')
+    },
+    async openSettingModel (id) {
+      this.groupItemSettingModal.visible = true
+      this.groupItemSettingModal.selectId = id
+      const res = await getListItemSettingInfoReq({ id })
+      const { clusterCalendarList = [], clusterTemplateList = [] } = res.data
+      const calendarObj = trasnfromOptions(clusterCalendarList)
+      this.groupItemSettingModal.dateOptions = calendarObj.list
+      this.groupItemSettingModal.dateSelect = calendarObj.value
+      const sopObj = trasnfromOptions(clusterTemplateList)
+      this.groupItemSettingModal.sopOptions = sopObj.list
+      this.groupItemSettingModal.sopSelect = sopObj.value
+    },
+    openGroupSelectModal (t) {
+      let filterInputArr = []
+      if (t === 'searchObj.labels') {
+        filterInputArr = this.searchObj.labels
+      }
+      this.groupTagsSelectList = filterInputArr
+      this.lablesModalType = t
+      this.groupTagsModalShow = true
+    },
+    // 标签弹窗确认
+    async handleAddGroupTagsOk () {
+      console.log('handleAddGroupTagsOk')
+      console.log(this.groupTagsSelectList, 'this.groupTagsSelectList')
+      if (this.lablesModalType === 'searchObj.labels') {
+        this.searchObj.labels = this.groupTagsSelectList
+      } else {
+        if (this.lablesModalType === 'add') {
+          await batchSetTagsReq({
+            ids: this.selectedTableRowKeys.join(','),
+            tagids: this.groupTagsSelectList.length ? this.groupTagsSelectList.map(it => it.id).join(',') : ''
+          })
+        } else if (this.lablesModalType === 'remove') {
+          await batchRemoveTagsReq({
+            ids: this.selectedTableRowKeys.join(','),
+            tagids: this.groupTagsSelectList.length ? this.groupTagsSelectList.map(it => it.id).join(',') : ''
+          })
+        }
+        this.getTableList()
+        this.$message.success('设置成功')
+      }
+      this.selectedTableRowKeys = []
+      this.groupTagsSelectList = []
+      this.groupTagsModalShow = false
     }
   }
 }

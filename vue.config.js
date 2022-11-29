@@ -131,7 +131,8 @@ const vueConfig = {
     proxy: {
       '/api': {
         // target: 'https://apijavascrm.yifeijiankang.com/', // 测试
-        target: 'https://devjavascrm.yifeijiankang.com/', // 开发
+        // target: 'https://devjavascrm.yifeijiankang.com/', // 开发
+        target: 'http://6cxe69.natappfree.cc/', // 开发
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.253:6007/',
         // target: 'http://124.70.77.92:6007/',
