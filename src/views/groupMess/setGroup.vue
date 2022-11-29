@@ -339,8 +339,8 @@ export default {
       workRoomShiftLoad(obj).then((res) => {
         console.log(res)
         this.input.data.name = res.data.name
-        this.input.data.timeTab = res.data.occur == '2099-12-31 23:59' ? '0' : '1'
-        this.input.data.date = res.data.occur == '2099-12-31 23:59' ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
+        this.input.data.timeTab = res.data.once ? '0' : '1'
+        this.input.data.date = res.data.once ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
         this.mumbersArr = res.data.owner.split(',')
         this.getNumber()
         this.input.data.plain = res.data.plain
