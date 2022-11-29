@@ -174,7 +174,7 @@ export const chartDefaultOptions = {
   },
   series: [
     {
-      name: '朋友圈发表量',
+      name: '新增成员',
       type: 'line',
       lineStyle: {
         color: 'rgb(43 111 253)'
@@ -195,4 +195,8 @@ export const returnChartData = (data) => {
     xData.unshift(item.num)
   }
   return { xName, xData }
+}
+
+export const generateMediaJSON = (ls) => {
+
 }
