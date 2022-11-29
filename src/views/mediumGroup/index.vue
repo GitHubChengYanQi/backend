@@ -915,7 +915,7 @@
                     :btnType="false"
                     :file-type="1"></upload>
                 </div>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-item>
             </a-form-model>
             <template slot="footer">

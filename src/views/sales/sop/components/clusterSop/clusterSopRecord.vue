@@ -27,7 +27,7 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <el-row :gutter="4">
+          <a-row :gutter="4">
             <a-col :span="8">
               <a-form-item label="任务状态:" :labelCol="{ span: 4}" :wrapper-col="{span: 19, offset: 1}">
                 <a-select
@@ -46,10 +46,12 @@
                   type="primary"
                   style="width: 54px;height: 34px;margin: 0 10px;"
                   @click="goSearch"
+                  v-permission="'/sopCluster/getExecutionLog@get'"
                 >查询</a-button>
                 <a-button
                   style="width: 54px;height: 34px;margin-right: 10px;"
                   @click="goReset"
+                  v-permission="'/sopCluster/getExecutionLog@get'"
                 >重置</a-button>
                 <a-button
                   type="primary"
@@ -58,7 +60,7 @@
                 >导出</a-button>
               </div>
             </a-col>
-          </el-row>
+          </a-row>
           <!-- <a-form-item label="任务状态:">
             <a-select
               placeholder="请选择"
@@ -98,7 +100,7 @@
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
-              <a-button type="link" @click="deleteItem(record.id)">删除</a-button>
+              <a-button type="link" @click="deleteItem(record.id)" v-permission="'/sopCluster/deleteExecutionLog@delete'">删除</a-button>
             </div>
           </template>
         </div>
@@ -155,8 +157,8 @@
 </template>
 
 <script>
-import { getTempExecuteSopList, deleteExecuteRecordSopMethod } from '@/api/cluster'
-// import { getExecuteRecordSopListMethod, deleteExecuteRecordSopMethod } from '@/api/cluster'
+// import { getTempExecuteSopList, deleteExecuteRecordSopMethod } from '@/api/cluster'
+import { getExecuteRecordSopListMethod, deleteExecuteRecordSopMethod } from '@/api/cluster'
 export default {
   name: 'ClusterSopExecute',
   data () {
@@ -177,6 +179,12 @@ export default {
           width: 150
         },
         {
+          title: '群主',
+          dataIndex: 'clusterOwnerName',
+          align: 'center',
+          width: 150
+        },
+        {
           title: 'SOP名称',
           dataIndex: 'sopName',
           align: 'center',
@@ -185,6 +193,12 @@ export default {
         {
           title: '创建时间',
           dataIndex: 'createdAt',
+          align: 'center',
+          width: 200
+        },
+        {
+          title: '任务状态',
+          dataIndex: 'executionState',
           align: 'center',
           width: 200
         },
@@ -209,6 +223,7 @@ export default {
     }
   },
   created () {
+    this.$set(this.searchInfo, 'employeeIds', [])
     this.getTableData()
   },
   mounted () {
@@ -262,45 +277,53 @@ export default {
     // 获取数据
     async getTableData () {
       // 临时注释掉
-      // this.tableLoading = true
-      // const params = {
-      //   sopName: this.searchInfo.sopName,
-      //   clusterName: this.searchInfo.clusterName,
-      //   idsStr: this.searchInfo.employeeIds.join(','),
-      //   executionState: this.searchInfo.executionState,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // console.log(params, '查询数据提交接口的对象')
-      // await getExecuteRecordSopListMethod(params).then(response => {
-      //   this.tableLoading = false
-      //   console.log(response, '获取字典列表数据')
-      //   this.tableData = response.data.records
-      //   this.$set(this.pagination, 'total', Number(response.data.total))
-      //   this.$set(this.pagination, 'current', Number(response.data.current))
-      //   if (this.tableData.length === 0) {
-      //     // 列表中没有数据
-      //     if (this.pagination.total !== 0) {
-      //       // 总数据有,但当前页没有
-      //       // 重新将页码换成1
-      //       this.$set(this.pagination, 'current', 1)
-      //       this.getTableData()
-      //     } else {
-      //       // 是真没有数据
-      //     }
-      //   }
-      // }).catch(() => {
-      //   this.tableLoading = false
-      // })
+      this.tableLoading = true
+      const params = {
+        idsStr: this.searchInfo.employeeIds.join(','),
+        sopName: this.searchInfo.sopName,
+        clusterName: this.searchInfo.clusterName,
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize
+      }
+      console.log(params, '查询数据提交接口的对象')
+      await getExecuteRecordSopListMethod(params).then(response => {
+        this.tableLoading = false
+        console.log(response, '执行记录SOP')
+        this.tableData = response.data.records
+        // 设置默认选中的数据
+        this.setDefaultSelect()
+        this.$set(this.pagination, 'total', Number(response.data.total))
+        this.$set(this.pagination, 'current', Number(response.data.current))
+        if (this.tableData.length === 0) {
+          // 列表中没有数据
+          if (this.pagination.total !== 0) {
+            // 总数据有,但当前页没有
+            // 重新将页码换成1
+            this.$set(this.pagination, 'current', 1)
+            this.getTableData()
+          } else {
+            // 是真没有数据
+          }
+        }
+      }).catch(() => {
+        this.tableLoading = false
+      })
       // 临时接收假数据
-      this.tableData = getTempExecuteSopList()
-      this.sendArray = this.tableData[0].listTaskInfo
-      const tempIdArray = []
-      tempIdArray.push(this.tableData[0].id)
-      this.selectedList = Object.assign([], tempIdArray)
+      // this.tableData = getTempExecuteSopList()
+      // this.sendArray = this.tableData[0].listTaskInfo
+      // const tempIdArray = []
+      // tempIdArray.push(this.tableData[0].id)
+      // this.selectedList = Object.assign([], tempIdArray)
+    },
+    setDefaultSelect () {
+      if (this.selectedList.length === 0) {
+        this.selectedList.push(this.tableData[0].id)
+        this.sendArray = Object.assign([], this.tableData[0].listTaskInfo)
+      }
     },
     // 群SOP模板切换页码
     handleTableChange ({ current, pageSize }) {
+      this.selectedList = []
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
@@ -316,11 +339,14 @@ export default {
       // 重新将页码换成1
       this.$set(this.pagination, 'current', 1)
       // 清空搜索对象
-      this.searchInfo = {}
+      this.searchInfo = {
+        employeeIds: []
+      }
       this.getTableData()
     },
-    // 删除执行中的SOP
+    // 删除执行记录的SOP
     deleteItem (id) {
+      const that = this
       const params = { id }
       this.$confirm({
         title: '确定删除所选内容?',
@@ -333,6 +359,11 @@ export default {
             console.log(response, '删除数据')
             if (response.code === 200) {
               this.$message.success('删除成功')
+              const tempIndex = that.selectedList.findIndex(item => item === id)
+              if (tempIndex !== -1) {
+                // 删除的为选中的任务
+                this.selectedList = []
+              }
               // this.pageIndex = 1
               // this.sopName = ''
               this.getTableData()

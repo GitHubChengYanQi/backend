@@ -504,17 +504,17 @@ export const routeList = {
   },
   '/sop/addClusterSop': {
     path: '/sop/addClusterSop',
-    name: '新增群SOP',
+    name: '新增群SOP模板',
     component: () => import('@/views/sales/sop/addClusterSop'),
     hidden: true,
-    meta: { title: '新增群SOP' }
+    meta: { title: '新增群SOP模板' }
   },
   '/sop/editClusterSop': {
     path: '/sop/editClusterSop',
-    name: '修改群SOP',
+    name: '修改群SOP模板',
     component: () => import('@/views/sales/sop/addClusterSop'),
     hidden: true,
-    meta: { title: '修改群SOP' }
+    meta: { title: '修改群SOP模板' }
   },
   '/sop/clusterCalendar': {
     path: '/sop/clusterCalendar',
@@ -552,14 +552,14 @@ export const routeList = {
   },
   '/sales/activityAdd': {
     path: '/sales/activityAdd',
-    name: 'generalAdd',
+    name: 'activityAdd',
     component: () => import('@/views/sales/sop/components/activityAdd'),
     hidden: true,
     meta: { title: '新增群发活动SOP' }
   },
   '/sales/activityEdit': {
     path: '/sales/activityEdit',
-    name: 'generalEdit',
+    name: 'activityEdit',
     component: () => import('@/views/sales/sop/components/activityAdd'),
     hidden: true,
     meta: { title: '修改群发活动SOP' }

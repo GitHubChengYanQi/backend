@@ -12,8 +12,8 @@
             <span class="len">{{ addInfo.sopName && addInfo.sopName.length ? addInfo.sopName.length :'0' }}/18</span>
           </div>
         </div>
-        <div class="execution" v-if="pageTypeId === -1" @click="sendSop()">保存</div>
-        <div class="execution" v-else @click="sendSop()">保存</div>
+        <div class="execution" v-permission="'/sopClusterTemplate/add@post'" v-if="(pageType === 'add') || (pageType === 'copy')" @click="sendSop()">保存</div>
+        <div class="execution" v-permission="'/sopClusterTemplate/update@post'" v-else @click="sendSop()">保存</div>
       </div>
       <div class="sendSOPInfoContainer">
         <div class="sendSOPList" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length">
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-// import { addSopTemplateMethod, getSopTemplateDetailMethod, editSopTemplateMethod } from '@/api/cluster'
+import { addSopTemplateMethod, getSopTemplateDetailMethod, editSopTemplateMethod } from '@/api/cluster'
 import SendContent from './components/sendContent.vue'
 export default {
   name: 'AddClusterSop',
@@ -196,21 +196,20 @@ export default {
     async getDetail (id) {
       console.log(id, 'id')
       // this.currentTimeId = this.addInfo.listTaskInfo[0].id
-      this.selectSopItemIdx = this.addInfo.listTaskInfo[0].id
-      this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
-      // this.loadingStatus = true
-      // const params = { id }
-      // await getSopTemplateDetailMethod(params).then(response => {
-      //   this.loadingStatus = false
-      //   console.log(response)
-      //   this.addInfo = response.data
-      //   this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
-      //   this.currentTimeId = this.addInfo.listTaskInfo[0].id
-      //   this.selectSopItemIdx = this.currentTimeId
-      // }).catch(error => {
-      //   console.log(error)
-      //   this.loadingStatus = false
-      // })
+      // this.selectSopItemIdx = this.addInfo.listTaskInfo[0].id
+      // this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
+      this.loadingStatus = true
+      const params = { id }
+      await getSopTemplateDetailMethod(params).then(response => {
+        this.loadingStatus = false
+        console.log(response)
+        this.addInfo = response.data
+        this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
+        this.selectSopItemIdx = this.addInfo.listTaskInfo[0].id
+      }).catch(error => {
+        console.log(error)
+        this.loadingStatus = false
+      })
       // this.loadingStatus = false
     },
     // 返回时间列表字符串
@@ -239,10 +238,12 @@ export default {
         return
       }
       this.isSopEdit = true
+      const tempMaxValue = Math.max.apply(Math, this.addInfo.listTaskInfo.map(item => Number(item.sendDayNum)))
       const tempInfo = {
         sort: (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length > 0) ? this.addInfo.listTaskInfo.length + 1 : '1',
         tempId: new Date().getTime(),
         sendTime: '10:00',
+        sendDayNum: tempMaxValue + 1,
         sendContentList: []
       }
       this.addInfo.listTaskInfo.push(tempInfo)
@@ -316,10 +317,6 @@ export default {
         this.$message.error('请输入SOP名称！')
         return
       }
-      if (!(this.addInfo.empIds && this.addInfo.empIds.length)) {
-        this.$message.error('至少选择一名执行员工！')
-        return
-      }
       if (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length != 0) {
         for (const singleTimeInfo of this.addInfo.listTaskInfo) {
           if (singleTimeInfo.sendContentList.length === 0) {
@@ -331,51 +328,48 @@ export default {
         this.$message.error('请选择时间点')
         return
       }
-      // console.log(this.employeeIds, this.addInfo)
-      this.$set(this.addInfo, 'empIds', this.employeeIds.join(','))
       // debugger
       // console.log(this.addInfo, 'this.addInfo')
       this.loadingStatus = true
-      if (this.pageTypeId === -1) {
+      if (this.pageType === 'add' || this.pageType === 'copy') {
         console.log('新增操作', this.addInfo)
         this.newDataMethod(this.addInfo)
       } else {
         console.log('修改操作', this.addInfo)
         this.updataMethod(this.addInfo)
-        // this.getGeneralPersonData('edit')
       }
     },
     // 新增操作
     newDataMethod (info) {
       console.log(info, '新增操作')
-      // addSopTemplateMethod(info).then(response => {
-      //   this.loadingStatus = false
-      //   console.log(response, '新增操作')
-      //   if (response.code === 200) {
-      //     this.isSopEdit = false
-      //     this.$message.success('新增成功')
-      //     this.$router.go(-1)
-      //   }
-      // }).catch(error => {
-      //   console.log(error)
-      //   this.loadingStatus = false
-      // })
+      addSopTemplateMethod(info).then(response => {
+        this.loadingStatus = false
+        console.log(response, '新增操作')
+        if (response.code === 200) {
+          this.isSopEdit = false
+          this.$message.success('新增成功')
+          this.$router.go(-1)
+        }
+      }).catch(error => {
+        console.log(error)
+        this.loadingStatus = false
+      })
     },
     // 修改操作
     updataMethod (info) {
       console.log(info, '修改操作')
-      // editSopTemplateMethod(info).then(response => {
-      //   this.loadingStatus = false
-      //   console.log(response, '修改操作')
-      //   if (response.code === 200) {
-      //     this.isSopEdit = false
-      //     this.$message.success('修改成功')
-      //     this.$router.go(-1)
-      //   }
-      // }).catch(error => {
-      //   console.log(error)
-      //   this.loadingStatus = false
-      // })
+      editSopTemplateMethod(info).then(response => {
+        this.loadingStatus = false
+        console.log(response, '修改操作')
+        if (response.code === 200) {
+          this.isSopEdit = false
+          this.$message.success('修改成功')
+          this.$router.go(-1)
+        }
+      }).catch(error => {
+        console.log(error)
+        this.loadingStatus = false
+      })
     }
   }
 }
