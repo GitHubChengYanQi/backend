@@ -25,7 +25,7 @@ export function workRoomShiftRoom (data) {
   })
 }
 
-// 查询客户群数
+// 列表
 export function workRoomShiftFind (data) {
   return request({
     url: 'work_room_shift/find',
