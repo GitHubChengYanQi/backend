@@ -227,7 +227,7 @@ export const getMediaData = (reqType, data) => {
 export const trasnfromOptions = (list) => {
   const value = []
   const newL = list.map(it => {
-    if (!value && it.checked === '1') {
+    if (it.checked === '1') {
       value.push(it.id)
     }
     return {

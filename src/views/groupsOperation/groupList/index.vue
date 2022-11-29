@@ -77,7 +77,7 @@
         <div class="lef">
           <span class="total">共{{ pagination.total }}个群聊</span>
           <span class="select">已选择{{ selectedTableRowKeys.length }}个群聊</span>
-          <span class="refresh">更新数据</span>
+          <span class="refresh" @click="getTableList()">更新数据</span>
         </div>
         <div class="rig">
           <span class="btn" @click="getTableList(true)">导出</span>
@@ -406,15 +406,17 @@ export default {
       this.groupItemSettingModal.visible = false
       this.groupItemSettingModal.dateSelect = []
       this.groupItemSettingModal.sopSelect = []
+      this.groupItemSettingModal.selectId = ''
     },
     async handleOk () {
       console.log(this.groupItemSettingModal.dateSelect, this.groupItemSettingModal.sopSelect)
       await saveListItemSettingInfoReq({
         id: this.groupItemSettingModal.selectId,
-        clusterTemplateIds: this.groupItemSettingModal.dateSelect,
-        calendarTemplateIds: this.groupItemSettingModal.sopSelect
+        clusterTemplateIds: this.groupItemSettingModal.sopSelect,
+        calendarTemplateIds: this.groupItemSettingModal.dateSelect
       })
       this.$message.success('保存成功！')
+      this.handleCancel()
     },
     async openSettingModel (id) {
       this.groupItemSettingModal.visible = true
@@ -422,6 +424,7 @@ export default {
       const res = await getListItemSettingInfoReq({ id })
       const { clusterCalendarList = [], clusterTemplateList = [] } = res.data
       const calendarObj = trasnfromOptions(clusterCalendarList)
+      console.log(calendarObj, 'calendarObj')
       this.groupItemSettingModal.dateOptions = calendarObj.list
       this.groupItemSettingModal.dateSelect = calendarObj.value
       const sopObj = trasnfromOptions(clusterTemplateList)
@@ -439,8 +442,6 @@ export default {
     },
     // 标签弹窗确认
     async handleAddGroupTagsOk () {
-      console.log('handleAddGroupTagsOk')
-      console.log(this.groupTagsSelectList, 'this.groupTagsSelectList')
       if (this.lablesModalType === 'searchObj.labels') {
         this.searchObj.labels = this.groupTagsSelectList
       } else {
