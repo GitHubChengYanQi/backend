@@ -124,6 +124,14 @@ export function setBreadcrumb (path, data) {
     18: {
       path: ['/groupMess/setGroup', '/groupMess/taskInfo'],
       returnPath: '/groupMess/index'
+    },
+    19: {
+      path: ['/groupsOperation/groupList/groupItemDetail'],
+      returnPath: '/groupsOperation/groupList/index'
+    },
+    20: {
+      path: ['/groupsOperation/joinGroupSaying/add', '/groupsOperation/joinGroupSaying/edit'],
+      returnPath: '/groupsOperation/joinGroupSaying/index'
     }
   }
 
