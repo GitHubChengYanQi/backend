@@ -656,6 +656,13 @@ export default {
       this.isSopEditStatus = true
       this.$emit('update:isSopEdit', this.isSopEditStatus)
       this.contentLibraryModalShow = false
+      const textArr = this.sendContentArray.filter(item => {
+        return item.type == 1
+      })
+      this.$emit('getText', textArr)
+      this.sendContentArray = this.sendContentArray.filter(item => {
+        return item.type != 1
+      })
       this.$emit('update:contentArray', this.sendContentArray)
     },
     // 移动某一个item

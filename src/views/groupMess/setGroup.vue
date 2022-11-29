@@ -54,7 +54,7 @@
                     type="button"
                     name="+ 添加"
                     v-model="mumbersArr"
-                    @getRows="changeAssigneeIds"
+                    @getVal="changeAssigneeIds"
                   />
                 </span></div>
                 <div class="hint">预计送达客户群数：{{ total }}个 <span
@@ -99,6 +99,7 @@
                 <div class="sendContent_box">
                   <SendContent
                     :contentArray.sync="contentArray"
+                    @getText="setText"
                     :isDisableEdit="false"
                   />
                 </div>
@@ -272,6 +273,36 @@ export default {
   },
   methods: {
     moment,
+    setText (e) {
+      console.log(e)
+      if (e.length == 0) return
+      if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+        e.map(item => {
+          if (item.textData.length > 1000) {
+            this.$message.warn('原文字长度大于1000,无法添加')
+          } else {
+            const text = this.input.data.plain + item.textData
+            this.input.data.plain = text.slice(0, 1000)
+            console.log(this.input.data.plain)
+            this.previewArr[0].textData = this.input.data.plain
+          }
+        })
+      } else {
+        e.map(item => {
+          if (item.textData.length > 1000) {
+            this.$message.warn('原文字长度大于1000,无法添加')
+          } else {
+            const text = this.input.data.plain + item.textData
+            this.input.data.plain = text.slice(0, 1000)
+          }
+        })
+        this.previewArr.unshift({
+          type: 1,
+          textData: this.input.data.plain,
+          isText: true
+        })
+      }
+    },
     getNumber () {
       if (this.mumbersArr.length == 0) return
       const obj = {
@@ -309,8 +340,9 @@ export default {
         console.log(res)
         this.input.data.name = res.data.name
         this.input.data.timeTab = res.data.occur == '2099-12-31 23:59' ? '0' : '1'
-        this.input.data.date = moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
+        this.input.data.date = res.data.occur == '2099-12-31 23:59' ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
         this.mumbersArr = res.data.owner.split(',')
+        this.getNumber()
         this.input.data.plain = res.data.plain
         this.previewArr.unshift({
           type: 1,
@@ -332,6 +364,9 @@ export default {
           })
         }
       } else {
+        if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+          this.previewArr = this.previewArr.slice(1)
+        }
       }
     },
     returnErrorText (url) {
@@ -344,13 +379,11 @@ export default {
       return current && moment(current).valueOf() < moment().valueOf()
     },
     changeAssigneeIds (e) {
-      const arr = e.map((item) => {
-        const obj = {}
-        obj.key = item.key
-        obj.title = item.title
-        return obj
-      })
-      console.log(arr)
+      this.mumbersArr = e
+      if (e.length == 0) {
+        this.total = 0
+      }
+      this.getNumber()
     },
     insertFn (e) {
       this.input.data.plain = this.input.data.plain + e
