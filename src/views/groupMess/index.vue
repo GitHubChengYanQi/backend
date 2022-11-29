@@ -32,6 +32,7 @@
             <a-button
               type="primary"
               class="button"
+              v-permission="'/groupMess/index@search'"
               @click="getSearch"
             >查询</a-button>
             <a-button
@@ -41,6 +42,7 @@
             <a-button
               type="primary"
               class="goPage"
+              v-permission="'/groupMess/index@add'"
               @click="goPage(0)"
             >新建群发</a-button>
           </div>
@@ -62,18 +64,22 @@
               <template>
                 <a-button
                   type="link"
+                  v-permission="'/groupMess/index@info'"
                   @click="goPage(3,record)"
                 >详情</a-button>
                 <a-button
                   type="link"
+                  v-permission="'/groupMess/index@edit'"
                   @click="goPage(1,record)"
                 >编辑</a-button>
                 <a-button
                   type="link"
+                  v-permission="'/groupMess/index@copy'"
                   @click="goPage(2,record)"
                 >复制</a-button>
                 <a-button
                   type="link"
+                  v-permission="'/groupMess/index@delete'"
                   @click="remove(record)"
                 >删除</a-button>
               </template>
