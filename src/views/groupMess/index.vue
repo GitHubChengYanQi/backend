@@ -42,7 +42,7 @@
               type="primary"
               class="goPage"
               @click="goPage(0)"
-            >新建群聊</a-button>
+            >新建群发</a-button>
           </div>
         </div>
         <div class="groupMess_table_box">

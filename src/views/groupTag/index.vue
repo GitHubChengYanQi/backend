@@ -92,8 +92,9 @@
         <div class="groupTag_header_box">
           <div
             class="title"
-            :style="index + 1 != titleData.length ? {color:'#ccc'}:{}"
+            :style="index + 1 != titleData.length ? {}:{color:'#000'}"
             v-for="(item,index) in titleData"
+            @click="getGroups([item.id.toString()])"
             :key="index"
           >
             <span class="icon">
@@ -128,6 +129,8 @@
             <a-input
               v-model="add.addInput"
               style="height:24px;"
+              :maxLength="10"
+              @keyup.enter.native="searchAllCompany"
               placeholder="请输入"
             ></a-input>
           </span>
@@ -156,9 +159,9 @@
         <span class="model_input_title"> <span class="model_input_icon">* </span> 标签组名称：</span>
         <a-input
           v-model="modelData.unitName"
-          :maxLength="20"
+          :maxLength="15"
         ></a-input>
-        <span class="hint">{{ modelData.unitName.length + '/20' }}</span>
+        <span class="hint">{{ modelData.unitName.length + '/15' }}</span>
       </div>
     </a-modal>
   </div>
@@ -207,6 +210,19 @@ export default {
     document.removeEventListener('click', this.setselectdiv)
   },
   methods: {
+    searchAllCompany (e) {
+      if (this.selectKey.length > 0 && this.add.addInput.length > 0) {
+        const obj = {
+          itemName: this.add.addInput,
+          parentId: this.selectKey[0]
+        }
+        workRoomLabelSave(obj).then((res) => {
+          this.getTag()
+        })
+      }
+      this.add.addState = true
+      this.add.addInput = ''
+    },
     getTree (e) {
       const obj = {}
       workRoomLabelTree(obj).then((res) => {
@@ -354,8 +370,8 @@ export default {
     },
     getGroups (id) {
       this.selectKey = id
-      if (this.selectKey[0] == '0' || this.selectKey.length == 0) return
-      this.titleData = []
+      if (this.selectKey.length == 0) return
+      // this.titleData = []
       this.getTag()
     },
     getTag () {
@@ -446,10 +462,15 @@ export default {
         align-items: center;
         border-bottom: 1px solid #ccc;
         .title {
+          cursor: pointer;
           display: flex;
           align-items: center;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.8980392156862745);
+          color: #ccc;
+
+          &:hover{
+            color: rgba(0, 82,217);
+          }
 
           .icon {
             width: 14px;
