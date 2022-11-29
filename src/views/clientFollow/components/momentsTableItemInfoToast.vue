@@ -3,7 +3,7 @@
     <a-modal v-model="visible" :footer="null" :width="800" @cancel="handleCancel">
       <div class="topBar">
         <span class="label">任务状态：</span>
-        <a-select ref="select" v-model="status" style="width: 350px;" placeholder="状态" @change="getTableList()">
+        <a-select ref="select" v-model="status" style="width: 350px;" placeholder="状态" @change="() => {this.pagination.current = 1;this.getTableList()}">
           <a-select-option value="0">全部</a-select-option>
           <a-select-option value="1">未完成</a-select-option>
           <a-select-option value="2">已完成</a-select-option>

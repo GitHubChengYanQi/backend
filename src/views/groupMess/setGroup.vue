@@ -38,8 +38,8 @@
                   <a-date-picker
                     :disabledDate="disabledDate"
                     show-time
+                    v-model="input.data.date"
                     placeholder="请选择日期时间"
-                    @change="onChange"
                     v-if="input.data[item.key] == 1"
                   />
                 </a-radio-group>
@@ -57,7 +57,10 @@
                     @getVal="changeAssigneeIds"
                   />
                 </span></div>
-                <div class="hint">预计送达客户群数：{{ 0 }}个 <span class="btn">刷新</span></div>
+                <div class="hint">预计送达客户群数：{{ total }}个 <span
+                  class="btn"
+                  @click="getNumber"
+                >刷新</span></div>
               </div>
               <!-- 内容 -->
               <div
@@ -68,7 +71,8 @@
                 <div class="textear_box">
                   <a-textarea
                     class="textear"
-                    v-model="input.data.textear"
+                    v-model="input.data.plain"
+                    @change="setPlain"
                     :maxLength="1000"
                     placeholder="请输入"
                   ></a-textarea>
@@ -89,12 +93,13 @@
                         :src="require('@/assets/expression.svg')"
                         alt=""
                       > -->
-                    </a-popover><span class="txt">{{ input.data.textear.length + '/1000' }}</span>
+                    </a-popover><span class="txt">{{ input.data.plain.length + '/1000' }}</span>
                   </div>
                 </div>
                 <div class="sendContent_box">
                   <SendContent
                     :contentArray.sync="contentArray"
+                    @getText="setText"
                     :isDisableEdit="false"
                   />
                 </div>
@@ -120,78 +125,94 @@
             <div class="content_box">
               <div
                 class="box"
-                v-for="(item,index) in contentArray"
+                v-for="(item,index) in previewArr"
                 :key="index"
               >
-                <div
-                  class="image"
-                  v-if="item.type === 2"
-                >
-                  <!-- style="max-width:100%;max-height:300px" -->
+                <div class="user">
                   <img
-                    class="img"
-                    :src="item.photoUrl"
-                    alt
-                  />
+                    src="./images/user.png"
+                    alt=""
+                  >
                 </div>
-                <div
-                  class="video"
-                  v-if="item.type === 3"
-                >
-                  <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
+                <div class="content">
                   <div
-                    class="poster"
-                    v-if="item.showPoster"
-                  >{{ returnErrorText(item.videoUrl) }}</div>
-                  <video
-                    class="poster"
-                    :src="item.videoUrl"
-                    @error="videoLoadErr(index)"
-                    alt
-                  />
-                </div>
-                <div
-                  class="link"
-                  v-if="item.type === 4"
-                >
-                  <div class="lef">
-                    <span class="til">{{ item.linkTitle }}</span>
-                    <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                    <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                    class="text"
+                    v-if="item.type === 1"
+                  >
+                    <!-- style="max-width:100%;max-height:300px" -->
+                    {{ item.textData }}
                   </div>
-                  <img
-                    :src="item.linkPhoto"
-                    alt
+                  <div
                     class="image"
-                  />
-                </div>
-                <div
-                  class="embed"
-                  v-else-if="item.type === 5"
-                >
-                  <div class="line">
+                    v-if="item.type === 2"
+                  >
+                    <!-- style="max-width:100%;max-height:300px" -->
                     <img
-                      src="./images/miniProgramIcon.svg"
+                      class="img"
+                      :src="item.photoUrl"
                       alt
-                      class="icon"
                     />
-                    <span class="til">{{ '小程序标题' }}</span>
                   </div>
-                  <div class="line desc">{{ item.appShow }}</div>
-                  <img
-                    :src="item.appPhoto"
-                    alt
-                    class="image"
-                  />
-                  <div class="line">
-                    <img
-                      src="./images/miniProgramIcon.svg"
+                  <div
+                    class="video"
+                    v-if="item.type === 3"
+                  >
+                    <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
+                    <div
+                      class="poster"
+                      v-if="item.showPoster"
+                    >{{ returnErrorText(item.videoUrl) }}</div>
+                    <video
+                      class="poster"
+                      :src="item.videoUrl"
+                      @error="videoLoadErr(index)"
                       alt
-                      class="icon"
                     />
-                    <span class="say">小程序</span>
+                  </div>
+                  <div
+                    class="link"
+                    v-if="item.type === 4"
+                  >
+                    <div class="lef">
+                      <span class="til">{{ item.linkTitle }}</span>
+                      <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span>
+                      <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
+                    </div>
+                    <img
+                      :src="item.linkPhoto"
+                      alt
+                      class="image"
+                    />
+                  </div>
+                  <div
+                    class="embed"
+                    v-else-if="item.type === 5"
+                  >
+                    <div class="line">
+                      <img
+                        src="./images/miniProgramIcon.svg"
+                        alt
+                        class="icon"
+                      />
+                      <span class="til">{{ '小程序标题' }}</span>
+                    </div>
+                    <div class="line desc">{{ item.appShow }}</div>
+                    <img
+                      :src="item.appPhoto"
+                      alt
+                      class="image"
+                    />
+                    <div class="line">
+                      <img
+                        src="./images/miniProgramIcon.svg"
+                        alt
+                        class="icon"
+                      />
+                      <span class="say">小程序</span>
+                    </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -205,6 +226,7 @@
 import moment from 'moment'
 import EmojiLIst from './emoji.json'
 import SendContent from './components/sendContent.vue'
+import { workRoomShiftSave, workRoomShiftRoom, workRoomShiftLoad } from '@/api/groupMess.js'
 
 export default {
   components: {
@@ -215,46 +237,175 @@ export default {
       EmojiLIst,
       input: {
         inputArr: [
-          { title: '任务名称', type: 'input', key: 'taskName' },
+          { title: '任务名称', type: 'input', key: 'name' },
           { title: '选择群聊', type: 'selectBox' },
           { title: '发送内容', type: 'sendBox' },
           { title: '群发时间', type: 'radio', key: 'timeTab' }
         ],
         data: {
-          taskName: '',
+          name: '',
           timeTab: '0',
-          date: '',
-          textear: ''
+          date: null,
+          plain: ''
         }
       },
       mumbersArr: [],
-      contentArray: []
+      contentArray: [],
+      previewArr: [],
+      total: 0,
+      tableId: -1,
+      type: 0
     }
   },
-  created () {},
+  watch: {
+    contentArray: {
+      handler (val) {
+        if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+          this.previewArr = [this.previewArr[0], ...val]
+        } else {
+          this.previewArr = val
+        }
+      }
+    }
+  },
+  created () {
+    this.getUrl()
+  },
   methods: {
     moment,
+    setText (e) {
+      console.log(e)
+      if (e.length == 0) return
+      if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+        e.map(item => {
+          if (item.textData.length > 1000) {
+            this.$message.warn('原文字长度大于1000,无法添加')
+          } else {
+            const text = this.input.data.plain + item.textData
+            this.input.data.plain = text.slice(0, 1000)
+            console.log(this.input.data.plain)
+            this.previewArr[0].textData = this.input.data.plain
+          }
+        })
+      } else {
+        e.map(item => {
+          if (item.textData.length > 1000) {
+            this.$message.warn('原文字长度大于1000,无法添加')
+          } else {
+            const text = this.input.data.plain + item.textData
+            this.input.data.plain = text.slice(0, 1000)
+          }
+        })
+        this.previewArr.unshift({
+          type: 1,
+          textData: this.input.data.plain,
+          isText: true
+        })
+      }
+    },
+    getNumber () {
+      if (this.mumbersArr.length == 0) return
+      const obj = {
+        owner: this.mumbersArr.join(',')
+      }
+      workRoomShiftRoom(obj).then((res) => {
+        console.log(res)
+        this.total = res.data.total
+      })
+    },
+    getUrl () {
+      const object = {}
+      // 1.获取？后面的所有内容包括问号
+      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+
+      // 2.截取？后面的字符
+      const urlData = url.substr(1)
+      // name=嘻嘻&hobby=追剧
+      if (urlData.length === 0) return
+      const strs = urlData.split('&')
+      for (let i = 0; i < strs.length; i++) {
+        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      }
+      if (!object.hasOwnProperty('id')) return
+      this.tableId = object.id
+      this.type = object.type
+      this.getInfo()
+    },
+    getInfo () {
+      const obj = {
+        id: this.tableId
+      }
+      console.log(obj)
+      workRoomShiftLoad(obj).then((res) => {
+        console.log(res)
+        this.input.data.name = res.data.name
+        this.input.data.timeTab = res.data.occur == '2099-12-31 23:59' ? '0' : '1'
+        this.input.data.date = res.data.occur == '2099-12-31 23:59' ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
+        this.mumbersArr = res.data.owner.split(',')
+        this.getNumber()
+        this.input.data.plain = res.data.plain
+        this.previewArr.unshift({
+          type: 1,
+          textData: res.data.plain,
+          isText: true
+        })
+        this.contentArray = res.data.stuff
+      })
+    },
+    setPlain (e) {
+      if (e.target.value.length > 0) {
+        if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+          this.previewArr[0].textData = e.target.value
+        } else {
+          this.previewArr.unshift({
+            type: 1,
+            textData: e.target.value,
+            isText: true
+          })
+        }
+      } else {
+        if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+          this.previewArr = this.previewArr.slice(1)
+        }
+      }
+    },
     returnErrorText (url) {
       return '暂不支持显示 .avi 格式的视频'
     },
     videoLoadErr (index) {
       this.contentArray[index].showPoster = true
-      this.$emit('update:contentArray', this.contentArray)
-    },
-    onChange (value, dateString) {
-      this.input.data.date = dateString
     },
     disabledDate (current) {
       return current && moment(current).valueOf() < moment().valueOf()
     },
     changeAssigneeIds (e) {
-      console.log(e)
+      this.mumbersArr = e
+      if (e.length == 0) {
+        this.total = 0
+      }
+      this.getNumber()
     },
     insertFn (e) {
-      this.input.data.textear = this.input.data.textear + e
+      this.input.data.plain = this.input.data.plain + e
     },
     setMess () {
-      console.log(this.contentArray)
+      const { name, plain, timeTab, date } = this.input.data
+      const owner = this.mumbersArr.join(',')
+      const obj = {
+        name,
+        owner,
+        plain,
+        stuff: this.contentArray,
+        occur: timeTab == 0 ? '2099-12-31 23:59' : moment(date).format('YYYY-MM-DD HH:mm:ss')
+      }
+      if (this.tableId != -1 && this.type == 1) {
+        obj.id = this.tableId
+      }
+      console.log(obj)
+      workRoomShiftSave(obj).then((res) => {
+        console.log(res)
+        this.$router.push('/groupMess/index')
+      })
     }
   }
 }
@@ -400,7 +551,7 @@ export default {
           position: relative;
           margin-top: 20px;
           .preview_img {
-            width: 291px;
+            width: 350px;
             height: auto;
           }
           .content_box {
@@ -408,7 +559,8 @@ export default {
             top: 71px;
             left: 0;
             width: 100%;
-            height: 489px;
+            padding-top: 10px;
+            height: 600px;
             overflow: auto;
             // background-color: pink;
             .box {
@@ -416,97 +568,108 @@ export default {
               min-height: 50px;
               border-radius: 10px;
               margin-bottom: 20px;
-            }
-            .image {
-              max-width: 200px;
-              min-height: 50px;
-              .img {
-                background-color: #fff;
-                width: auto;
-                height: auto;
-                max-width: 100%;
-                max-height: 100%;
-              }
-            }
-            .video {
-              max-width: 200px;
-              min-height: 100px;
-              position: relative;
-              .poster {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                background: #fff;
-                width: 100%;
-                height: auto;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-            }
-            .link {
-              width: 250px;
-              height: 80px;
-              border: 1px solid #cdcdcd;
-              background-color: #fff;
-              border-radius: 5px;
-              flex: none;
-              padding: 10px;
               display: flex;
-              .lef {
-                width: 160px;
-                margin-right: 10px;
-                font-size: 13px;
-                .til {
-                  width: 100%;
-                  color: #4074f6;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  display: inline-block;
+
+              .content {
+                position: relative;
+                .video {
+                  max-width: 200px;
+                  min-height: 100px;
+                  .poster {
+                    background: #fff;
+                    width: 100%;
+                    height: auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  }
                 }
-                .desc {
-                  width: 100%;
-                  display: -webkit-box;
-                  -webkit-box-orient: vertical;
-                  -webkit-line-clamp: 2;
-                  overflow: hidden;
+                .link {
+                  width: 250px;
+                  height: 80px;
+                  border: 1px solid #cdcdcd;
+                  background-color: #fff;
+                  border-radius: 5px;
+                  flex: none;
+                  padding: 10px;
+                  display: flex;
+                  .lef {
+                    width: 160px;
+                    margin-right: 10px;
+                    font-size: 13px;
+                    .til {
+                      width: 100%;
+                      color: #4074f6;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      display: inline-block;
+                    }
+                    .desc {
+                      width: 100%;
+                      white-space: nowrap;
+                      display: -webkit-box;
+                      -webkit-box-orient: vertical;
+                      -webkit-line-clamp: 2;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                  }
+                  .image {
+                    flex: 1;
+                    height: 100%;
+                    max-width: 58px;
+                  }
                 }
-              }
-              .image {
-                flex: 1;
-                height: 100%;
-                max-width: 58px;
-              }
-            }
-            .embed {
-              background-color: #fff;
-              width: 230px;
-              border: 1px solid #cdcdcd;
-              flex: none;
-              display: flex;
-              flex-direction: column;
-              padding: 8px 10px;
-              .line {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                .icon {
-                  width: 17px;
-                  height: 17px;
+                .embed {
+                  background-color: #fff;
+                  width: 230px;
+                  border: 1px solid #cdcdcd;
+                  flex: none;
+                  display: flex;
+                  flex-direction: column;
+                  padding: 8px 10px;
+                  .line {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    .icon {
+                      width: 17px;
+                      height: 17px;
+                    }
+                    .til {
+                      color: #4074f6;
+                    }
+                  }
+                  .desc {
+                    font-size: 13px;
+                    margin-top: 3px;
+                  }
+                  .image {
+                    height: 180px;
+                    margin: 3px 0;
+                  }
                 }
-                .til {
-                  color: #4074f6;
+                .image {
+                  max-width: 200px;
+                  min-height: 50px;
+                  .img {
+                    background-color: #fff;
+                    width: auto;
+                    height: auto;
+                    max-width: 100%;
+                    max-height: 100%;
+                  }
                 }
-              }
-              .desc {
-                font-size: 13px;
-                margin-top: 3px;
-              }
-              .image {
-                height: 180px;
-                margin: 3px 0;
+                .text {
+                  background-color: #fff;
+                  border-radius: 10px;
+                  padding: 10px;
+                  width: 200px;
+                  word-wrap: break-word;
+                  table-layout: fixed;
+                  word-break: break-all;
+                }
               }
             }
           }

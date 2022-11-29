@@ -85,7 +85,10 @@
       </a-tree>
     </div>
     <div class="groupTag_right_box">
-      <div class="groupTag_content_box" v-if="selectKey.length > 0 && selectKey[0] != '0'">
+      <div
+        class="groupTag_content_box"
+        v-if="selectKey.length > 0 && selectKey[0] != '0'"
+      >
         <div class="groupTag_header_box">
           <div
             class="title"
@@ -100,7 +103,7 @@
                 alt=""
               >
             </span>
-            {{ item }}
+            {{ item.unitName }}
             <span
               class="division"
               v-if="index + 1 < titleData.length"
@@ -180,7 +183,7 @@ export default {
       searchValue: '',
       groupData: [],
       selectKey: [],
-      titleData: ['客户群标签', '二级分类', '三级分类'],
+      titleData: [],
       add: {
         addState: true,
         addInput: ''
@@ -204,12 +207,16 @@ export default {
     document.removeEventListener('click', this.setselectdiv)
   },
   methods: {
-    getTree () {
+    getTree (e) {
       const obj = {}
       workRoomLabelTree(obj).then((res) => {
         console.log(res)
         this.groupData = [res.data.root]
-        this.expandedKeys = [res.data.root.key]
+        const path = e.map((item) => {
+          return item.id.toString()
+        })
+        this.expandedKeys = e.length > 0 ? [...path] : ['0']
+        console.log(this.expandedKeys)
       })
     },
     setName () {
@@ -225,16 +232,18 @@ export default {
       console.log(obj)
       workRoomLabelSave(obj).then((res) => {
         console.log(res)
-        this.getTree()
+        this.getTree(this.titleData)
         this.modelData.state = false
       })
     },
-    moveGroup (id) {
+    moveGroup (id, step) {
       const obj = {
-        id
+        id,
+        step
       }
-      workRoomLabelMove(obj).then(res => {
+      workRoomLabelMove(obj).then((res) => {
         console.log(res)
+        this.getTree()
       })
     },
     delGrop (id) {
@@ -262,13 +271,14 @@ export default {
             const obj = {
               id: item.key
             }
-            workRoomLabelDrop(obj).then(res => {
+            workRoomLabelDrop(obj).then((res) => {
               this.getTree()
             })
           },
           onCancel () {}
         })
       } else {
+        this.moveGroup(item.key, e == 3 ? 1 : -1)
       }
     },
     onSearch () {
@@ -345,6 +355,7 @@ export default {
     getGroups (id) {
       this.selectKey = id
       if (this.selectKey[0] == '0' || this.selectKey.length == 0) return
+      this.titleData = []
       this.getTag()
     },
     getTag () {
@@ -354,6 +365,7 @@ export default {
       console.log(obj)
       workRoomLabelLoad(obj).then((res) => {
         console.log(res)
+        this.titleData = res.data.path
         this.tabArr = res.data.datas
       })
     },
@@ -361,7 +373,7 @@ export default {
       const obj = {
         id: e
       }
-      workRoomLabelDrop(obj).then(res => {
+      workRoomLabelDrop(obj).then((res) => {
         this.getTag()
       })
     },

@@ -8,8 +8,8 @@
             日历模板名称
           </span>
           <div class="input">
-            <a-input v-model="addCommonInfo.sopName" placeholder="请输入日历模板名称" @change="changeSopName"/>
-            <span class="len">{{ addCommonInfo.sopName && addCommonInfo.sopName.length ? addCommonInfo.sopName.length :'0' }}/18</span>
+            <a-input v-model="addInfo.sopName" placeholder="请输入日历模板名称" @change="changeSopName"/>
+            <span class="len">{{ addInfo.sopName && addInfo.sopName.length ? addInfo.sopName.length :'0' }}/18</span>
           </div>
         </div>
         <div class="timeLine">
@@ -20,9 +20,9 @@
           <div class="timeWrapper">
             <a-calendar @select.self="chooseDateMethod" valueFormat="YYYY-MM-DD" v-if="currentShowTabId === 0">
               <ul slot="dateCellRender" slot-scope="value" class="events">
-                <li v-for="item in getCalendarTaskData(value)" :key="item.tempId ? item.tempId : item.id" class="singleDiv" @click.stop="chooseTimeContent(item)">
+                <li v-for="item in getCalendarTaskData(value)" :key="item.id" class="singleDiv" @click.stop="chooseTimeContent(item)">
                   <div class="singleContentTaskDiv">{{ returnCalendarTask(item) }}</div>
-                  <span class="delDiv" @click.stop="deleteCalendarTask(item)" v-if="getCalendarTaskData(value).length > 1">X</span>
+                  <span class="delDiv">X</span>
                 </li>
               </ul>
             </a-calendar>
@@ -59,7 +59,7 @@
                       dropdownClassName="addSop_Page_Container_selectSopItemDateBox"
                       :allowClear="false"
                       :showToday="false"
-                      v-model="addInfo.sendTime"
+                      v-model="sendTime"
                       valueFormat="YYYY-MM-DD HH:mm"
                       format="YYYY-MM-DD HH:mm"
                       show-time
@@ -69,7 +69,7 @@
                   </div>
                   <div class="singleSendContentItem">
                     <div class="singleSendContentTitle">内容标题:</div>
-                    <a-input v-model="addInfo.sendTitle" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
+                    <a-input v-model="addInfo.title" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
                   </div>
                 </div>
                 <SendContent
@@ -83,8 +83,8 @@
             </div>
           </div>
         </div>
-        <div class="execution" v-if="pageTypeId === -1" @click="sendSop()" v-permission="'/sopClusterCalendarTemplate/add@post'">保存</div>
-        <div class="execution" v-else @click="sendSop()" v-permission="'/sopClusterCalendarTemplate/update@post'">保存</div>
+        <div class="execution" v-if="pageTypeId === -1" @click="sendSop()">保存</div>
+        <div class="execution" v-else @click="sendSop()">保存</div>
       </div>
     </a-spin>
     <a-modal
@@ -110,7 +110,7 @@
           />
         </a-form-item>
         <a-form-item label="内容标题" :labelCol="{span: 2}" :wrapperCol="{span: 21}">
-          <a-input v-model="addCalendarContentInfo.sendTitle" placeholder="请输入标题,标题不发给客户"/>
+          <a-input v-model="addCalendarContentInfo.sendTitle" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
         </a-form-item>
       </a-form>
       <SendContent
@@ -133,7 +133,7 @@ import 'moment/locale/zh-cn'
 import { Calendar } from 'ant-design-vue'
 import SendContent from './components/sendContent.vue'
 import TimeContent from './components/timeContent.vue'
-import { addCalendarTemplateMethod, getCalendarTemplateDetailMethod, editCalendarTemplateMethod } from '@/api/cluster'
+// import { addCalendarTemplateMethod, getCalendarTemplateDetailMethod, editCalendarTemplateMethod } from '@/api/cluster'
 moment.locale('zh-cn')
 export default {
   name: 'AddClusterCalendar',
@@ -144,13 +144,11 @@ export default {
   },
   data () {
     return {
-      addCommonInfo: {}, // 公共的提交对象
-      addCalendarInfo: {}, // 日历模式下新增的提交对象
       addCalendarContentInfo: {}, // 日历模式下添加内容对象
       contentCalendarArray: [], // 日历模式下弹框发送内容数组
       isCalendarEdit: false, // 判断日历模式下是否被编辑
-      selectCalendarItemIdx: '', // 日历模式选中的时间id
-      selectCalendarItemIndex: '', // 日历模式时间标签选择下标
+      selectCalendarItemIdx: '', // 列表模式选中的时间id
+      selectCalendarItemIndex: '', // 列表模式时间标签选择下标
       sendTime: '',
       // 日历模式下发送内容弹框
       sendContentModalShow: false,
@@ -181,23 +179,15 @@ export default {
   },
   created () {
     this.pageTypeId = Number(this.$route.query.id)
+    // 默认展示日历视图
+    this.currentShowTabId = 0
     this.initMethod()
   },
   watch: {
     currentShowTabId (e) {
-      console.log('切换显示日历模式/列表模式', e)
-      // if (e === 0) {
-      //   this.addCommonInfo = Object.assign({}, this.addCalendarInfo)
-      // } else {
-      //   this.addCommonInfo = Object.assign({}, this.addInfo)
-      // }
-      // if (e === 0) {
-      //   this.addCalendarInfo = Object.assign({}, this.addCommonInfo)
-      // } else {
-      //   this.addInfo = Object.assign({}, this.addCommonInfo)
-      // }
+      console.log('监听获取数据', e)
     },
-    'addCommonInfo.sopName' (e) {
+    'addInfo.sopName' (e) {
       if (e && e.length > 18) {
         this.addInfo.sopName = e.slice(0, 18)
       }
@@ -205,21 +195,25 @@ export default {
     contentArray () {
       console.log(this.contentArray, '监听contentArray改变')
       console.log(this.addInfo.listTaskInfo, 'this.addInfo.listTaskInfo')
+      // const tempIndex = this.addInfo.listTaskInfo.findIndex(item => (item.tempId ? (item.tempId === this.currentTimeId) : (item.id === this.currentTimeId)))
       const tempIndex = this.addInfo.listTaskInfo.findIndex(item => (item.tempId ? (item.tempId === this.selectSopItemIdx) : (item.id === this.selectSopItemIdx)))
       console.log(tempIndex, 'tempIndex')
       if (tempIndex !== -1) {
         this.$set(this.addInfo.listTaskInfo[tempIndex], 'sendContentList', this.contentArray)
       }
       this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
+      // this.$set(this.addInfo.listTaskInfo[tempIndex], 'sendContentList', this.contentArray)
     },
     contentCalendarArray () {
-      console.log(this.contentCalendarArray, '监听contentCalendarArray改变')
-      // const tempIndex = this.addCalendarInfo.listTaskInfo.findIndex(item => (item.tempId ? (item.tempId === this.selectCalendarItemIdx) : (item.id === this.selectCalendarItemIdx)))
-      // console.log(tempIndex, 'tempIndex')
-      // if (tempIndex !== -1) {
-      //   this.$set(this.addCalendarInfo.listTaskInfo[tempIndex], 'sendContentList', this.contentCalendarArray)
-      // }
-      this.$set(this.addCalendarContentInfo, 'sendContentList', this.contentCalendarArray)
+      console.log(this.contentCalendarArray, '监听contentArray改变')
+      // const tempIndex = this.addInfo.listTaskInfo.findIndex(item => (item.tempId ? (item.tempId === this.currentTimeId) : (item.id === this.currentTimeId)))
+      const tempIndex = this.addCalendarInfo.listTaskInfo.findIndex(item => (item.tempId ? (item.tempId === this.selectCalendarItemIdx) : (item.id === this.selectCalendarItemIdx)))
+      console.log(tempIndex, 'tempIndex')
+      if (tempIndex !== -1) {
+        this.$set(this.addCalendarInfo.listTaskInfo[tempIndex], 'sendContentList', this.contentCalendarArray)
+      }
+      this.$set(this.addCalendarInfo, 'listTaskInfo', this.addCalendarInfo.listTaskInfo)
+      // this.$set(this.addInfo.listTaskInfo[tempIndex], 'sendContentList', this.contentArray)
     }
   },
   beforeRouteLeave (_, __, next) {
@@ -239,8 +233,6 @@ export default {
     // 初始化方法
     async initMethod () {
       this.selectSopItemIndex = 0
-      // 默认展示日历视图
-      this.currentShowTabId = 0
       if (this.pageTypeId === -1) {
         // 新增
         this.setDefaultTime()
@@ -253,53 +245,36 @@ export default {
     setDefaultTime () {
       const tempTaskList = []
       const tempInfo = {
+        sort: (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length > 0) ? this.addInfo.listTaskInfo.length + 1 : '1',
         tempId: new Date().getTime(),
         sendTime: moment().add(3, 'm').format('YYYY-MM-DD HH:mm'),
         sendTitle: '',
         sendContentList: []
       }
       tempTaskList.push(tempInfo)
-      if (this.currentShowTabId === 0) {
-        // 日历模式下,将数据赋值
-        // this.selectCalendarItemIdx = tempInfo.tempId
-        this.$set(this.addCalendarInfo, 'listTaskInfo', tempTaskList)
-      } else {
-        // 列表模式下,将数据赋值
-        this.selectSopItemIdx = tempInfo.tempId
-        this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
-      }
-      // const tempTaskList = []
-      // const tempInfo = {
-      //   sort: (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length > 0) ? this.addInfo.listTaskInfo.length + 1 : '1',
-      //   tempId: new Date().getTime(),
-      //   sendTime: moment().add(3, 'm').format('YYYY-MM-DD HH:mm'),
-      //   sendTitle: '',
-      //   sendContentList: []
-      // }
-      // tempTaskList.push(tempInfo)
-      // this.selectSopItemIdx = tempInfo.tempId
-      // this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
+      // this.currentTimeId = tempInfo.tempId
+      this.selectSopItemIdx = tempInfo.tempId
+      this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
     },
     // 获取详情
     async getDetail (id) {
       console.log(id, 'id')
-      const params = { id }
-      await getCalendarTemplateDetailMethod(params).then(response => {
-        this.loadingStatus = false
-        console.log(response)
-        if (this.currentShowTabId === 0) {
-          this.addCalendarInfo = response.data
-          // this.contentCalendarArray = this.addCalendarInfo.listTaskInfo[this.selectCalendarItemIndex].sendContentList
-          // this.selectCalendarItemIdx = this.addCalendarInfo.listTaskInfo[0].id
-        } else {
-          this.addInfo = response.data
-          this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
-          this.selectSopItemIdx = this.addInfo.listTaskInfo[0].id
-        }
-      }).catch(error => {
-        console.log(error)
-        this.loadingStatus = false
-      })
+      // this.currentTimeId = this.addInfo.listTaskInfo[0].id
+      this.selectSopItemIdx = this.addInfo.listTaskInfo[0].id
+      this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
+      // this.loadingStatus = true
+      // const params = { id }
+      // await getCalendarTemplateDetailMethod(params).then(response => {
+      //   this.loadingStatus = false
+      //   console.log(response)
+      //   this.addInfo = response.data
+      //   this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
+      //   this.selectSopItemIdx = this.addInfo.listTaskInfo[0].id
+      // }).catch(error => {
+      //   console.log(error)
+      //   this.loadingStatus = false
+      // })
+      // this.loadingStatus = false
     },
     // 获取日历模式下任务列表
     getCalendarTaskData (value) {
@@ -311,12 +286,12 @@ export default {
       // const tempTaskTimeList = this.addInfo.listTaskInfo.map(item => moment(item.sendTime).format('YYYY-MM-DD'))
 
       // 得到单条信息在时间点数组中的位置
-      const tempTaskIndex = this.addCalendarInfo.listTaskInfo.findIndex(item => moment(item.sendTime).format('YYYY-MM-DD') === currentValue)
+      const tempTaskIndex = this.addInfo.listTaskInfo.findIndex(item => moment(item.sendTime).format('YYYY-MM-DD') === currentValue)
       if (tempTaskIndex !== -1) {
-        // console.log(tempTaskIndex, '下标')
-        // console.log(this.addCalendarInfo.listTaskInfo[tempTaskIndex], 'this.addCalendarInfo.listTaskInfo')
+        console.log(tempTaskIndex, '下标')
+        console.log(this.addInfo.listTaskInfo[tempTaskIndex], 'this.addInfo.listTaskInfo')
         // 存在,就显示当前位置的发送内容
-        listData.push(this.addCalendarInfo.listTaskInfo[tempTaskIndex])
+        listData.push(this.addInfo.listTaskInfo[tempTaskIndex])
         // console.log(listData, 'listData')
       } else {
         // 不存在,就显示空数组
@@ -331,125 +306,9 @@ export default {
       this.addCalendarContentInfo = {}
       this.contentCalendarArray = []
     },
-    // 日历模式下删除任务
-    deleteCalendarTask (info) {
-      const that = this
-      const nowCalendarList = Object.assign([], this.addCalendarInfo.listTaskInfo)
-      this.$confirm({
-        title: '确定删除此任务?',
-        // content: 'Some descriptions',
-        okText: '确认删除',
-        okType: 'danger',
-        cancelText: '取消',
-        onOk: async () => {
-          let tempCalendarIndex = ''
-          if (info.tempId) {
-            tempCalendarIndex = nowCalendarList.findIndex(item => info.tempId === (item.tempId ? item.tempId : item.id))
-          } else {
-            tempCalendarIndex = nowCalendarList.findIndex(item => info.id === (item.tempId ? item.tempId : item.id))
-          }
-          nowCalendarList.splice(tempCalendarIndex, 1)
-          that.$set(this.addCalendarInfo, 'listTaskInfo', nowCalendarList)
-          that.addInfo = Object.assign({}, that.addCalendarInfo)
-          // this.isSopEdit = true
-          // // 当前选中的内容
-          // const selectItem = nowSopList[this.selectSopItemIndex]
-          // let selectId = ''
-          // if (selectItem.tempId) {
-          //   // 当前选中内容有tempId
-          //   selectId = nowSopList[this.selectSopItemIndex].tempId
-          // } else {
-          //   // 当前选中的id
-          //   selectId = nowSopList[this.selectSopItemIndex].id
-          // }
-
-          // nowSopList.splice(index, 1)
-          // this.$message.success('删除成功')
-          // // console.log(this.selectSopItemIdx, index, '比较')
-          // // 删除的为后加的元素
-          // if (info.tempId) {
-          //   // 删除的为选中的元素
-          //   if (that.selectSopItemIdx === info.tempId) {
-          //     // 取第一个元素的id
-          //     that.selectSopItemIdx = nowSopList[0].tempId ? nowSopList[0].tempId : nowSopList[0].id
-          //     that.selectSopItemIndex = 0
-          //   } else {
-          //     // console.log(selectId, nowSopList)
-          //     // 删除的元素为非选中的元素
-          //     // const selectIndex = nowSopList.findIndex(item => {
-          //     //   if (item.tempId) {
-          //     //     item.tempId = selectId
-          //     //   } else {
-          //     //     item.id = selectId
-          //     //   }
-          //     //   return item
-          //     // })
-          //     const selectIndex = nowSopList.findIndex(item => (item.tempId ? item.tempId === selectId : item.id === selectId))
-          //     console.log('删除后加的元素')
-          //     // debugger
-          //     that.selectSopItemIndex = selectIndex
-          //     that.selectSopItemIdx = nowSopList[selectIndex].tempId ? nowSopList[selectIndex].tempId : nowSopList[selectIndex].id
-          //   }
-          // } else {
-          //   // 删除之前的元素
-          //   // 删除的为选中的元素
-          //   if (that.selectSopItemIdx === info.id) {
-          //     // 取第一个元素的id
-          //     that.selectSopItemIdx = nowSopList[0].tempId ? nowSopList[0].tempId : nowSopList[0].id
-          //     that.selectSopItemIndex = 0
-          //   } else {
-          //     // console.log(selectId, nowSopList)
-          //     // 删除的元素为非选中的元素
-          //     // const selectIndex = nowSopList.findIndex(item => {
-          //     //   if (item.tempId) {
-          //     //     item.tempId = selectId
-          //     //   } else {
-          //     //     item.id = selectId
-          //     //   }
-          //     //   return item
-          //     //   // item.id === selectId
-          //     // })
-          //     const selectIndex = nowSopList.findIndex(item => (item.tempId ? item.tempId === selectId : item.id === selectId))
-          //     console.log('删除之前的元素')
-          //     // debugger
-          //     that.selectSopItemIndex = selectIndex
-          //     that.selectSopItemIdx = nowSopList[selectIndex].tempId ? nowSopList[selectIndex].tempId : nowSopList[selectIndex].id
-          //   }
-          // }
-          // // this.sopList = nowSopList
-          // this.$set(this.addInfo, 'listTaskInfo', nowSopList)
-          // this.addCalendarInfo = Objec.assign({}, this.addInfo)
-        }
-      })
-    },
     // 提交日历模式添加内容
     confirmCalendarSendSure () {
       console.log(this.addCalendarContentInfo, 'this.addCalendarContentInfo')
-      let tempIndex = ''
-      if (!this.addCalendarContentInfo.sendTitle) {
-        this.$message.error('请输入内容标题！')
-        return
-      }
-      if ((!this.addCalendarContentInfo.sendContentList) || (this.addCalendarContentInfo.sendContentList.length === 0)) {
-        this.$message.error('请设置发送内容！')
-        return
-      }
-      if (this.addCalendarContentInfo.tempId) {
-        // 有tempId,表示为新增的元素提交
-        tempIndex = this.addCalendarInfo.listTaskInfo.findIndex(item => this.addCalendarContentInfo.tempId === (item.tempId ? item.tempId : item.id))
-      } else {
-        // 没有tempId,表示为之前的元素提交
-        tempIndex = this.addCalendarInfo.listTaskInfo.findIndex(item => this.addCalendarContentInfo.id === (item.tempId ? item.tempId : item.id))
-      }
-      // let tempIndex = this.addCalendarInfo.listTaskInfo.findIndex(item => item.id === )
-      // console.log(this.chooseOldCalendarInfo, 'this.chooseOldCalendarInfo')
-      // let tempIndex = this.addCalendarInfo.listTaskInfo.findIndex(item => item.sendTime === this.chooseOldCalendarInfo.sendTime)
-      // this.addCalendarInfo.listTaskInfo.push(this.addCalendarContentInfo)
-      // this.$set(this.addCalendarInfo, 'listTaskInfo', this.addCalendarInfo.listTaskInfo)
-      this.addCalendarInfo.listTaskInfo.splice(tempIndex, 1, this.addCalendarContentInfo)
-      this.$set(this.addCalendarInfo, 'listTaskInfo', this.addCalendarInfo.listTaskInfo)
-      this.addInfo = Object.assign({}, this.addCalendarInfo)
-      this.sendContentModalShow = false
     },
     sendDateChange (val) {
       console.log(val, '更新时间')
@@ -457,19 +316,17 @@ export default {
     sendCalendarDateChange () {},
     // 返回日历模式中的task
     returnCalendarTask (info) {
-      console.log(info, 'info')
+      // console.log(info, 'info')
       return moment(info.sendTime).format('HH:mm') + ' ' + info.sendTitle
     },
     // 日历模式选择日期
     chooseDateMethod (e) {
       console.log(e, '选择日期')
-      this.addCalendarContentInfo = {}
       this.sendContentModalShow = true
       const chooseCurrentDate = moment(e).format('YYYY-MM-DD')
       const tempCurrentTime = moment().format('HH:mm')
       const tempCurrentDate = chooseCurrentDate + ' ' + tempCurrentTime
       this.$set(this.addCalendarContentInfo, 'sendTime', moment(tempCurrentDate).format('YYYY-MM-DD HH:mm'))
-      this.$set(this.addCalendarContentInfo, 'sendContentList', [])
     },
     // 日历模式选择日期中的任务
     chooseTimeContent (info) {
@@ -481,10 +338,6 @@ export default {
     // 切换日历视图/列表视图tab
     changeTabMethod (info) {
       this.currentShowTabId = info.id
-      if (info.id === 1) {
-        this.contentArray = this.addInfo.listTaskInfo[this.selectSopItemIndex].sendContentList
-        this.selectSopItemIdx = this.addInfo.listTaskInfo[0].tempId ? this.addInfo.listTaskInfo[0].tempId : this.addInfo.listTaskInfo[0].id
-      }
     },
     // 监听用户输入框输入
     changeSopName () {
@@ -530,9 +383,17 @@ export default {
         sendTime: (previoutTimeFormat === currentTimeFormat) ? moment(previousTime).add(1, 'm').format('YYYY-MM-DD HH:mm') : moment(currentTimeFormat).add(3, 'm').format('YYYY-MM-DD HH:mm'),
         sendContentList: []
       }
+      // this.isSopEdit = true
+      // const tempInfo = {
+      //   sort: (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length > 0) ? this.addInfo.listTaskInfo.length + 1 : '1',
+      //   tempId: new Date().getTime(),
+      //   sendDayNum: '', // 默认传空
+      //   sendTime: '', // 默认传空
+      //   sendTitle: '',
+      //   sendContentList: []
+      // }
       this.addInfo.listTaskInfo.push(tempAddInfo)
       this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
-      this.addCalendarInfo = Object.assign({}, this.addInfo)
       console.log(this.addInfo, '新增时间点后的对象')
       this.chooseSopItem(tempAddInfo, this.addInfo.listTaskInfo.length - 1)
     },
@@ -615,26 +476,40 @@ export default {
           }
           // this.sopList = nowSopList
           this.$set(this.addInfo, 'listTaskInfo', nowSopList)
-          this.addCalendarInfo = Object.assign({}, this.addInfo)
         }
       })
     },
+    // 单击选择所选内容
+    chooseDateRadioClick (value) {
+      console.log(value, 'value')
+      if (this.addInfo.listTaskInfo[this.selectSopItemIndex].sendType === Number(value)) {
+        // 状态没变,无需触发
+      } else {
+        if (value === 2) {
+          // 选中为第几天
+          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendDayNum = 1
+          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendTime = '10:00'
+        } else {
+          // 选中为第几天
+          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendHour = 0
+          this.addInfo.listTaskInfo[this.selectSopItemIndex].sendMinute = 10
+        }
+      }
+      this.addInfo.listTaskInfo[this.selectSopItemIndex].sendType = Number(value)
+      this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
+    },
     // 开始执行
     sendSop () {
-      let tempCommonInfo = {}
-      if (this.currentShowTabId === 0) {
-        // 为日历模式
-        tempCommonInfo = Object.assign({}, this.addCalendarInfo)
-      } else {
-        tempCommonInfo = Object.assign({}, this.addInfo)
-      }
-      this.$set(tempCommonInfo, 'sopName', this.addCommonInfo.sopName)
-      if (!(tempCommonInfo.sopName && tempCommonInfo.sopName.trim())) {
+      if (!(this.addInfo.sopName && this.addInfo.sopName.trim())) {
         this.$message.error('请输入SOP名称！')
         return
       }
-      if (tempCommonInfo.listTaskInfo && tempCommonInfo.listTaskInfo.length != 0) {
-        for (const singleTimeInfo of tempCommonInfo.listTaskInfo) {
+      if (!(this.addInfo.empIds && this.addInfo.empIds.length)) {
+        this.$message.error('至少选择一名执行员工！')
+        return
+      }
+      if (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length != 0) {
+        for (const singleTimeInfo of this.addInfo.listTaskInfo) {
           if (singleTimeInfo.sendContentList.length === 0) {
             this.$message.error('每项任务都至少添加一项发送内容才可以执行！')
             return
@@ -644,49 +519,51 @@ export default {
         this.$message.error('请选择时间点')
         return
       }
+      // console.log(this.employeeIds, this.addInfo)
+      this.$set(this.addInfo, 'empIds', this.employeeIds.join(','))
       // debugger
       // console.log(this.addInfo, 'this.addInfo')
       this.loadingStatus = true
       if (this.pageTypeId === -1) {
-        console.log('新增操作', tempCommonInfo)
-        this.newDataMethod(tempCommonInfo)
+        console.log('新增操作', this.addInfo)
+        this.newDataMethod(this.addInfo)
       } else {
-        console.log('修改操作', tempCommonInfo)
-        this.updataMethod(tempCommonInfo)
+        console.log('修改操作', this.addInfo)
+        this.updataMethod(this.addInfo)
         // this.getGeneralPersonData('edit')
       }
     },
     // 新增操作
     newDataMethod (info) {
       console.log(info, '新增操作')
-      addCalendarTemplateMethod(info).then(response => {
-        this.loadingStatus = false
-        console.log(response, '新增操作')
-        if (response.code === 200) {
-          this.isSopEdit = false
-          this.$message.success('新增成功')
-          this.$router.go(-1)
-        }
-      }).catch(error => {
-        console.log(error)
-        this.loadingStatus = false
-      })
+      // addFriendSop(info).then(response => {
+      //   this.loadingStatus = false
+      //   console.log(response, '新增操作')
+      //   if (response.code === 200) {
+      //     this.isSopEdit = false
+      //     this.$message.success('新增成功')
+      //     this.$router.go(-1)
+      //   }
+      // }).catch(error => {
+      //   console.log(error)
+      //   this.loadingStatus = false
+      // })
     },
     // 修改操作
     updataMethod (info) {
       console.log(info, '修改操作')
-      editCalendarTemplateMethod(info).then(response => {
-        this.loadingStatus = false
-        console.log(response, '修改操作')
-        if (response.code === 200) {
-          this.isSopEdit = false
-          this.$message.success('修改成功')
-          this.$router.go(-1)
-        }
-      }).catch(error => {
-        console.log(error)
-        this.loadingStatus = false
-      })
+      // editFriendSop(info).then(response => {
+      //   this.loadingStatus = false
+      //   console.log(response, '修改操作')
+      //   if (response.code === 200) {
+      //     this.isSopEdit = false
+      //     this.$message.success('修改成功')
+      //     this.$router.go(-1)
+      //   }
+      // }).catch(error => {
+      //   console.log(error)
+      //   this.loadingStatus = false
+      // })
     }
   }
 }

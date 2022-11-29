@@ -67,8 +67,8 @@
             >
               <div class="lef">
                 <span class="til">{{ item.linkTitle }}</span>
-                <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span>
+                <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
               </div>
               <img
                 :src="item.linkPhoto"
@@ -656,6 +656,13 @@ export default {
       this.isSopEditStatus = true
       this.$emit('update:isSopEdit', this.isSopEditStatus)
       this.contentLibraryModalShow = false
+      const textArr = this.sendContentArray.filter(item => {
+        return item.type == 1
+      })
+      this.$emit('getText', textArr)
+      this.sendContentArray = this.sendContentArray.filter(item => {
+        return item.type != 1
+      })
       this.$emit('update:contentArray', this.sendContentArray)
     },
     // 移动某一个item
@@ -1027,6 +1034,7 @@ export default {
               display: inline-block;
             }
             .desc {
+              white-space: nowrap;
               width: 100%;
               display: -webkit-box;
               -webkit-box-orient: vertical;

@@ -1,144 +1,78 @@
 <template>
   <div id="cluster_template_container" ref="cluster_template_container">
-    <button @click="addGroupChat()">添加群聊</button>
+    <!-- <button @click="addGroupChat()">临时测试添加群聊</button> -->
     <div class="searchLine">
       <div class="searchBox">
         <div class="item">
           <span>SOP名称:</span>
-          <a-input placeholder="请输入SOP名称" v-model="searchValue" class="inputClass" />
+          <a-input placeholder="请输入SOP名称" v-model="searchInfo.sopName" class="inputClass" />
           <!-- style="width: 200px; height: 35px" -->
         </div>
         <div class="item">
           <span>创建人:</span>
+          <!-- v-if="treeData" :record="treeData" -->
           <selectPersonnel
-            v-if="treeData"
-            :record="treeData"
             class="selectPersonnelCom"
-            name="选择成员"
-            v-model="employeeIds"
-            @getVal="employeeIdsChange"
+            name="请选择创建者"
+            :changeId="true"
+            :num="1"
+            v-model="searchInfo.employeeIds"
           />
         </div>
         <a-button
           type="primary"
           style="width: 54px;height: 34px;margin: 0 10px;"
           @click="goSearch"
+          permission="'/sopClusterTemplate/index@get'"
         >查询</a-button>
         <a-button
           style="width: 54px;height: 34px;margin-right: 10px;"
           @click="goReset"
+          v-permission="'/sopClusterTemplate/index@get'"
         >重置</a-button>
       </div>
       <div class="handlesBox">
-        <div class="btn" @click="goAdd">创建SOP模板</div>
+        <div class="btn" @click="goAdd" v-permission="'/sopClusterTemplate/add@post'">创建群SOP模板</div>
       </div>
     </div>
     <a-table
       :loading="tableLoading"
-      class="tableBox"
       :row-key="record => record.id"
       :data-source="tableData"
       :columns="tableColumns"
       :pagination="pagination"
+      class="tableBox"
       :scroll="{ x: 1500}"
-      @change="getChangeList">
+      @change="handleTableChange">
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
-            <a-button type="link" @click="addGroupChat(record)">添加群聊</a-button>
-            <a-button type="link" @click="editItem(record)">编辑</a-button>
-            <a-button type="link" @click="copyItem(record)">复制</a-button>
-            <a-button type="link" @click="deleteItem(record.id)">删除</a-button>
+            <a-button type="link" @click="addGroupChat(record)" v-permission="'/sopClusterTemplate/sopBindCluster@post'">添加群聊</a-button>
+            <a-button type="link" @click="editItem(record)" v-permission="'/sopClusterTemplate/update@post'">编辑</a-button>
+            <a-button type="link" @click="copyItem(record)" v-permission="'/sopClusterTemplate/add@post'">复制</a-button>
+            <a-button type="link" @click="deleteItem(record.id)" v-permission="'/sopClusterTemplate/delete@delete'">删除</a-button>
           </div>
         </template>
       </div>
     </a-table>
-    <a-modal
-      title="添加群聊"
-      :maskClosable="false"
-      :width="1400"
-      :visible="addGroupChatShowStatus"
-      class="addGroupChatClass"
-      @cancel="closeGroupChat()"
-      :getContainer="() => $refs['cluster_template_container']"
-    >
-      <span>选择执行群(SOP话术将推送给群主,由群主发送到所选择的群)</span>
-      <div class="filter-input-row flex-between">
-        <div class="item">
-          <div class="title">群主：</div>
-          <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.personName"/>
-        </div>
-        <div class="item">
-          <div class="title">群名称：</div>
-          <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.personName"/>
-        </div>
-        <div class="item">
-          <div class="title">标签：</div>
-          <a-select
-            placeholder="请选择"
-            v-model="groupChatSearchInfo.tagType"
-            style="width: 200px"
-          >
-            <a-select-option :value="tagsTypeItem.id" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
-          </a-select>
-          <SelectTagInput v-model="groupChatSearchInfo.tags" :screentags="true" :changeId="true" ref="SelectTagInput" />
-        </div>
-        <div class="item">
-          <div class="title">群创建日期：</div>
-          <a-range-picker
-            style="width: 265px"
-            v-model="groupChatSearchInfo.time"
-            format="YYYY-MM-DD"
-            :placeholder="['开始日期', '结束日期']"
-          />
-        </div>
-        <div class="item">
-          <a-button type="primary" @click="confirmGroupChat()">查询</a-button>
-          <a-button @click="confirmGroupChat()">重置</a-button>
-        </div>
-
-      </div>
-      <a-table
-        :row-key="record => record.id"
-        :loading="groupChatLoading"
-        :columns="groupChatColumns"
-        :data-source="groupChatDataList"
-        :pagination="groupChatPagination"
-        :pageSizeOptions="['10', '20', '30', '50']"
-        :row-selection="{ selectedRowKeys: groupChatSelectedRowKeys, onChange: onGroupChatSelectChange }"
-        :scroll="{ x: 1500 }"
-        @change="groupChatHandleTableChange"
-      ></a-table>
-      <template slot="footer">
-        <a-button
-          @click="closeGroupChat()"
-        >取消</a-button>
-        <a-button type="primary" @click="confirmGroupChat()">确定</a-button>
-      </template>
-    </a-modal>
+    <GroupChatList :showStatus.sync="addGroupChatShowStatus" :typeInfo="bindGroupChatInfo" @submitGroupChat="submitGroupChatMethod"/>
   </div>
 </template>
 
 <script>
-import { departmentEmp } from '@/api/common.js'
+import { getSopTemplateListMethod, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
+// import { getTempSopList, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
+import GroupChatList from '../groupChat.vue'
 export default {
   name: 'ClusterSopTemplate',
+  components: {
+    GroupChatList
+  },
   data () {
     return {
-      groupChatSelectedRowKeys: [],
-      groupChatSearchInfo: {}, // 群聊查询对象
-      // 添加群聊弹框显示状态
-      addGroupChatShowStatus: false,
-      tagsTypeList: [
-        {
-          id: 0,
-          name: '同时满足'
-        },
-        {
-          id: 1,
-          name: '至少满足一项'
-        }
-      ],
+      bindGroupChatInfo: {}, // 群SOP模板绑定群聊对象
+      selectArrayString: '',
+      searchInfo: {}, // 查询列表对象
       // 表格加载效果
       tableLoading: false,
       // 表格数据
@@ -154,13 +88,7 @@ export default {
           title: 'SOP名称',
           dataIndex: 'sopName',
           align: 'center',
-          width: 150
-        },
-        {
-          title: '创建人',
-          dataIndex: 'createdByName',
-          align: 'center',
-          width: 150
+          width: 200
         },
         {
           title: '创建时间',
@@ -169,64 +97,22 @@ export default {
           width: 200
         },
         {
+          title: '创建人',
+          dataIndex: 'createdByName',
+          align: 'center',
+          width: 200
+        },
+        {
           title: '操作',
           align: 'center',
-          width: 200,
+          width: 250,
           fixed: 'right',
           scopedSlots: { customRender: 'options' },
           all: true
         }
       ],
-      groupChatLoading: false, // 添加群聊弹框列表加载
-      groupChatDataList: [],
-      groupChatColumns: [
-        {
-          title: '群名称',
-          dataIndex: 'groupName',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '群主',
-          dataIndex: 'personName',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'createDate',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '群标签',
-          dataIndex: 'tags',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '执行中的SOP',
-          dataIndex: 'openingSop',
-          align: 'center',
-          width: 150
-        },
-        {
-          title: '执行中的群日历',
-          dataIndex: 'openingCalendar',
-          align: 'center',
-          width: 150
-        }
-      ],
-      // 群聊弹框分页信息
-      groupChatPagination: {
-        total: 0,
-        current: 1,
-        pageSize: 10,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        pageSizeOptions: ['10', '20', '30', '50']
-      },
-      // 分页对象
+      addGroupChatShowStatus: false,
+      // 模板页面分页对象
       pagination: {
         total: 0,
         current: 1,
@@ -238,64 +124,150 @@ export default {
     }
   },
   created () {
-    this.departmentEmp()
+    // 获取缓存中的页码
+    const tempPage = sessionStorage.getItem('sopTemplatePage')
+    this.$set(this.searchInfo, 'employeeIds', [])
+    if (tempPage) {
+      this.$set(this.pagination, 'current', Number(tempPage))
+    } else {
+      this.$set(this.pagination, 'current', 1)
+    }
+    this.getTableData()
   },
   methods: {
-    // 群聊列表切换选中状态
-    onGroupChatSelectChange () {},
-    // 群聊列表分页信息
-    groupChatHandleTableChange () {},
-    onSelectChange () {},
-    // 关闭添加群聊弹框
-    closeGroupChat () {
-      this.addGroupChatShowStatus = false
-    },
-    // 提交添加群聊
-    confirmGroupChat () {
-      console.log('提交添加群聊')
-    },
-    // 拉取部门数据
-    departmentEmp () {
-      departmentEmp().then(res => {
-        this.treeData = res.data
-      }).catch(error => {
-        console.log(error)
+    // 获取数据
+    async getTableData () {
+      this.tableLoading = true
+      const params = {
+        sopName: this.searchInfo.sopName,
+        idsStr: this.searchInfo.employeeIds.join(','),
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize
+      }
+      console.log(params, '查询数据提交接口的对象')
+      await getSopTemplateListMethod(params).then(response => {
+        this.tableLoading = false
+        console.log(response, '获取群SOP模板信息')
+        this.tableData = response.data.list
+        this.$set(this.pagination, 'total', Number(response.data.page.total))
+        if (this.tableData.length === 0) {
+          // 列表中没有数据
+          if (this.pagination.total !== 0) {
+            // 总数据有,但当前页没有
+            // 重新将页码换成1
+            this.$set(this.pagination, 'current', 1)
+            this.getTableData()
+          } else {
+            // 是真没有数据
+          }
+        }
+      }).catch(() => {
+        this.tableLoading = false
       })
+      // 临时接收假数据
+      // this.tableData = getTempSopList()
     },
-    // 切换员工选择
-    employeeIdsChange (e) {
-      console.log(e)
-    },
-    // 切换列表,翻页
-    getChangeList () {
-
+    // 群SOP模板切换页码
+    handleTableChange ({ current, pageSize }) {
+      this.pagination.current = current
+      this.pagination.pageSize = pageSize
+      this.getTableData()
     },
     // 搜索
-    goSearch () {},
+    goSearch () {
+      // 重新将页码换成1
+      this.$set(this.pagination, 'current', 1)
+      this.getTableData()
+    },
     // 重置
-    goReset () {},
-    // 创建sop模板
-    goAdd () {
-      this.$router.push({
-        path: '/sop/addClusterSop',
-        query: {
-          id: -1
+    goReset () {
+      // 重新将页码换成1
+      this.$set(this.pagination, 'current', 1)
+      this.searchInfo = {}
+      this.$set(this.searchInfo, 'employeeIds', [])
+      this.getTableData()
+    },
+    // 添加群聊
+    addGroupChat (info) {
+      this.addGroupChatShowStatus = true
+      this.$set(this.bindGroupChatInfo, 'soptype', 'Cluster')
+      this.$set(this.bindGroupChatInfo, 'id', info.id)
+      // this.groupChatSearchInfo.tagType = 0
+    },
+    // 绑定群聊回调
+    submitGroupChatMethod (arrayText) {
+      console.log(arrayText, '提交的绑定群聊')
+      this.tableLoading = true
+      this.$set(this.bindGroupChatInfo, 'clusterIds', JSON.parse(arrayText))
+      bindSopTemplateMethod(this.bindGroupChatInfo).then(response => {
+        console.log(response, '绑定群聊返回状态')
+        if (response.code === 200) {
+          this.$message.success('绑定成功')
+          this.getTableData()
         }
       })
     },
-    // 添加群聊
-    addGroupChat () {
-      this.addGroupChatShowStatus = true
-      this.groupChatSearchInfo.tagType = 0
+    // 创建sop模板
+    goAdd () {
+      // 将页码缓存移除
+      sessionStorage.removeItem('sopTemplatePage')
+      this.$router.push({
+        path: '/sop/addClusterSop',
+        query: {
+          id: -1,
+          type: 'add'
+        }
+      })
     },
-    // 复制
-    copyItem () {},
-    // 删除sop
-    deleteItem () {
-
+    // 复制群SOP模板
+    copyItem (info) {
+      // 将页码缓存移除
+      sessionStorage.removeItem('sopTemplatePage')
+      this.$router.push({
+        path: '/sop/addClusterSop',
+        query: {
+          id: info.id,
+          type: 'copy'
+        }
+      })
     },
-    // 编辑sop
-    editItem () {}
+    // 删除群SOP模板
+    deleteItem (id) {
+      const that = this
+      const params = { id }
+      this.$confirm({
+        title: '确定删除所选内容?',
+        // content: 'Some descriptions',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          that.tableLoading = true
+          deleteSopTemplateMethod(params).then(response => {
+            console.log(response, '删除数据')
+            if (response.code === 200) {
+              this.$message.success('删除成功')
+              // this.pageIndex = 1
+              // this.sopName = ''
+              this.tableLoading = false
+              this.getTableData()
+            }
+          })
+        }
+      })
+    },
+    // 编辑群sop模板
+    editItem (info) {
+      // 将当前的页码存入缓存中
+      sessionStorage.setItem('sopTemplatePage', this.pagination.current)
+      this.$router.push({
+        path: '/sop/editClusterSop',
+        query: {
+          id: info.id,
+          type: 'edit'
+        }
+      })
+    }
   }
 }
 </script>
@@ -344,18 +316,7 @@ export default {
       }
     }
   }
-  .filter-input-row {
-    .item {
-      display: flex;
-      align-items: center;
-      .title {
-        flex-shrink: 0;
-        text-align: left;
-        width: auto;
-      }
-    }
-    .ant-btn:nth-last-child(1) {
-      margin-left: 4px;
-    }
-  }
+.tableBox {
+  background-color: white;
+}
 </style>

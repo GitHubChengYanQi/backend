@@ -7,9 +7,11 @@
           <a-select-option value="2">创建时间</a-select-option>
         </a-select>
         <a-range-picker
+          dropdownClassName="momentsOperation-component_Container_rangePickerDropdown"
           v-model="searchObj.date"
           :show-time="{ format: 'HH:mm' }"
           format="YYYY-MM-DD HH:mm"
+          :ranges="searchDateItemRanges"
           @change="searchDateChange" />
       </div>
       <div class="searchItem">
@@ -86,9 +88,13 @@
 </template>
 
 <script>
+import moment from 'moment'
 import { getMomentsListReq, deleteMomentsItemReq, momentsListExportReq } from '@/api/momentsOperation'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 import MomentsTableItemInfoToast from './momentsTableItemInfoToast.vue'
+
+const dayNum = 1000 * 60 * 60 * 24
+const maxDayNum = dayNum * 365 // 最大搜索天数不超过一年
 export default {
   name: 'MomentsTable',
   components: {
@@ -101,6 +107,14 @@ export default {
         date: [],
         content: '',
         status: undefined
+      },
+      searchDateItemRanges: {
+        '今天': [moment().startOf('day'), moment().endOf('day')],
+        '昨天': [moment().add(-1, 'days').startOf('day'), moment().add(-1, 'days').endOf('day')],
+        '最近七天': [moment().add(-6, 'days').startOf('day'), moment().endOf('day')],
+        '最近一个月': [moment().add(-1, 'months'), moment()],
+        '最近三个月': [moment().add(-3, 'months'), moment()],
+        '最近一年': [moment().add(-1, 'years'), moment()]
       },
       tableSortStr: '',
       tableColunms: [
@@ -196,6 +210,14 @@ export default {
   methods: {
     async getTableList (expstatus) {
       const { date, status = '', ...args } = this.searchObj
+      if (date.length === 2) {
+        const [starttime, endtime] = date
+        const targetNum = new Date(endtime).valueOf() - new Date(starttime).valueOf()
+        if (targetNum > maxDayNum) {
+          this.$message.warn('日期区间最多选择一年!')
+          return
+        }
+      }
       const { current, pageSize } = this.pagination
       const obj = {
         ...args,
@@ -266,6 +288,11 @@ export default {
     .ant-table {
       background-color: #fff;
     }
+  }
+}
+.momentsOperation-component_Container_rangePickerDropdown{
+  .ant-calendar-footer {
+    padding: 0 6px;
   }
 }
 </style>
