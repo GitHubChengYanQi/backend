@@ -57,6 +57,7 @@
                   type="primary"
                   style="width: 54px;height: 34px;margin: 0 10px;"
                   @click="goExportData"
+                  v-permission="'/sopCluster/getExecutionLogExcel@get'"
                 >导出</a-button>
               </div>
             </a-col>
@@ -158,7 +159,8 @@
 
 <script>
 // import { getTempExecuteSopList, deleteExecuteRecordSopMethod } from '@/api/cluster'
-import { getExecuteRecordSopListMethod, deleteExecuteRecordSopMethod } from '@/api/cluster'
+import { getExecuteRecordSopListMethod, deleteExecuteRecordSopMethod, exportClusterSopMethod, getDictData } from '@/api/cluster'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
 export default {
   name: 'ClusterSopExecute',
   data () {
@@ -224,7 +226,7 @@ export default {
   },
   created () {
     this.$set(this.searchInfo, 'employeeIds', [])
-    this.getTableData()
+    this.getTaskStatusList()
   },
   mounted () {
 
@@ -232,25 +234,19 @@ export default {
 
   methods: {
     // 获取任务状态列表
-    getTaskStatusList () {
-      this.taskStatusList = [
-        {
-          code: '0',
-          name: '未完成'
-        },
-        {
-          code: '1',
-          name: '已完成'
-        },
-        {
-          code: '2',
-          name: '已删除'
-        }
-      ]
+    async getTaskStatusList () {
+      const params = { dictType: 'execution_state' }
+      await getDictData(params).then(response => {
+        this.taskStatusList = response.data
+      })
+      this.getTableData()
     },
     // 导出数据
     goExportData () {
       console.log('导出数据')
+      exportClusterSopMethod(this.searchInfo).then(response => {
+        callDownLoadByBlob(response)
+      })
     },
     // 选择任务状态
     changeTaskStatus (value) {
@@ -288,12 +284,11 @@ export default {
       console.log(params, '查询数据提交接口的对象')
       await getExecuteRecordSopListMethod(params).then(response => {
         this.tableLoading = false
-        console.log(response, '执行记录SOP')
-        this.tableData = response.data.records
+        console.log(response, '获取字典列表数据')
+        this.tableData = response.data.list
         // 设置默认选中的数据
         this.setDefaultSelect()
-        this.$set(this.pagination, 'total', Number(response.data.total))
-        this.$set(this.pagination, 'current', Number(response.data.current))
+        this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
           // 列表中没有数据
           if (this.pagination.total !== 0) {

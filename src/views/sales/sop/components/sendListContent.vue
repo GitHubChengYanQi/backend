@@ -244,7 +244,7 @@ import { handleBtnArr, isUrl } from '../sopUtils'
 // import { userSopTaskItemSettingReq } from '@/api/salesManagement'
 import { upLoad } from '@/api/common'
 export default {
-  name: 'SendContent',
+  name: 'SendListContent',
   data () {
     return {
       isSopEditStatus: false,
@@ -335,12 +335,9 @@ export default {
         this.contentMiniObj.appShow = e.slice(0, 170)
       }
     },
-    contentArray: {
-      deep: true,
-      handler (newValue) {
-        console.log(newValue, '列表模式子组件contentArray数组')
-        this.sendContentArray = Object.assign([], newValue)
-      }
+    contentArray () {
+      console.log(this.contentArray, '列表模式子组件contentArray数组')
+      this.sendContentArray = Object.assign([], this.contentArray)
     }
   },
   methods: {
@@ -410,7 +407,7 @@ export default {
       }
       this.isSopEditStatus = true
       this.$emit('update:isSopEdit', this.isSopEditStatus)
-      this.$emit('update:contentArray', this.sendContentArray)
+      this.$emit('changeData', this.sendContentArray)
       this.submitType = ''
       // 清空输入框内容,关闭弹框
       this.closeContentTextModal()
@@ -439,7 +436,7 @@ export default {
     // 视频错误时显示
     videoLoadErr (index) {
       this.sendContentArray[index].showPoster = true
-      this.$emit('update:contentArray', this.sendContentArray)
+      this.$emit('changeData', this.sendContentArray)
     },
     // 关闭弹框
     closeContentModal () {
@@ -471,7 +468,7 @@ export default {
       this.contentLinkModalShow = false
       this.submitType = ''
       this.uploadPhotoType = ''
-      this.$emit('update:contentArray', this.sendContentArray)
+      this.$emit('changeData', this.sendContentArray)
       this.contentLinkObj = {}
     },
     // 关闭链接弹框
@@ -503,7 +500,7 @@ export default {
       this.contentMiniModalShow = false
       this.submitType = ''
       this.uploadPhotoType = ''
-      this.$emit('update:contentArray', this.sendContentArray)
+      this.$emit('changeData', this.sendContentArray)
       this.contentMiniObj = {}
     },
     // 关闭小程序弹框
@@ -589,7 +586,7 @@ export default {
       this.isSopEditStatus = true
       this.$emit('update:isSopEdit', this.isSopEditStatus)
       this.contentLibraryModalShow = false
-      this.$emit('update:contentArray', this.sendContentArray)
+      this.$emit('changeData', this.sendContentArray)
     },
     // 移动某一个item
     async handleMoveClick (index, type) {
@@ -612,7 +609,7 @@ export default {
       this.isSopEditStatus = true
       this.$emit('update:isSopEdit', this.isSopEditStatus)
       this.sendContentArray = Object.assign([], nowArray)
-      this.$emit('update:contentArray', this.sendContentArray)
+      this.$emit('changeData', this.sendContentArray)
     },
     // 编辑单个item
     handleEditClick (info, index) {
@@ -661,7 +658,7 @@ export default {
           nowD.splice(index, 1)
           this.$message.success('删除成功')
           that.sendContentArray = Object.assign([], nowD)
-          that.$emit('update:contentArray', this.sendContentArray)
+          that.$emit('changeData', this.sendContentArray)
           this.isSopEditStatus = true
           this.$emit('update:isSopEdit', this.isSopEditStatus)
         }
@@ -710,7 +707,7 @@ export default {
         }
         this.isSopEditStatus = true
         this.$emit('update:isSopEdit', this.isSopEditStatus)
-        this.$emit('update:contentArray', this.sendContentArray)
+        this.$emit('changeData', this.sendContentArray)
         this.submitType = ''
         this.$refs.uploadPhotoRef.value = ''
       } else {
@@ -742,7 +739,7 @@ export default {
         }
         this.isSopEditStatus = true
         this.$emit('update:isSopEdit', this.isSopEditStatus)
-        this.$emit('update:contentArray', this.sendContentArray)
+        this.$emit('changeData', this.sendContentArray)
         this.$refs.uploadVideoRef.value = ''
       } else {
         console.log(e)

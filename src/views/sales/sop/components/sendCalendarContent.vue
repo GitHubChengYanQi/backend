@@ -244,7 +244,7 @@ import { handleBtnArr, isUrl } from '../sopUtils'
 // import { userSopTaskItemSettingReq } from '@/api/salesManagement'
 import { upLoad } from '@/api/common'
 export default {
-  name: 'SendContent',
+  name: 'SendCalendarContent',
   data () {
     return {
       isSopEditStatus: false,
@@ -335,12 +335,9 @@ export default {
         this.contentMiniObj.appShow = e.slice(0, 170)
       }
     },
-    contentArray: {
-      deep: true,
-      handler (newValue) {
-        console.log(newValue, '列表模式子组件contentArray数组')
-        this.sendContentArray = Object.assign([], newValue)
-      }
+    contentArray () {
+      console.log(this.contentArray, '日历模式子组件contentArray数组')
+      this.sendContentArray = Object.assign([], this.contentArray)
     }
   },
   methods: {
