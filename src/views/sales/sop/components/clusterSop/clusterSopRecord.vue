@@ -96,7 +96,9 @@
         :columns="tableColumns"
         :pagination="pagination"
         :scroll="{ x: 1500}"
-        :row-selection="{ selectedRowKeys: selectedList, onSelect: chooseSelection, type: 'radio' }"
+        :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
+        :customRow="rowClick"
+        :rowClassName="setRowClassName"
         @change="handleTableChange">
         <div slot="options" slot-scope="text, record">
           <template>
@@ -165,6 +167,7 @@ export default {
   name: 'ClusterSopExecute',
   data () {
     return {
+      currentRow: {},
       selectedList: [],
       // 任务状态列表
       taskStatusList: [],
@@ -233,6 +236,23 @@ export default {
   },
 
   methods: {
+    setRowClassName (record) {
+      return record.id === this.currentRow.id ? 'clickRowStyle' : 'rowColor'// 赋予点击行样式
+    },
+    rowClick: function (record, index) {
+      // console.log(record, index)
+      // let tempInfo = {}
+      // tempInfo = Object.assign({}, record)
+      return {
+        on: {
+          click: () => {
+            console.log('点击了我', record)
+            this.sendArray = Object.assign([], record.listTaskInfo)
+            this.currentRow = record
+          }
+        }
+      }
+    },
     // 获取任务状态列表
     async getTaskStatusList () {
       const params = { dictType: 'execution_state' }
@@ -244,7 +264,15 @@ export default {
     // 导出数据
     goExportData () {
       console.log('导出数据')
-      exportClusterSopMethod(this.searchInfo).then(response => {
+      const params = {
+        idsStr: this.searchInfo.employeeIds.join(','),
+        sopName: this.searchInfo.sopName,
+        clusterName: this.searchInfo.clusterName,
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize,
+        sopIdsStr: this.selectedList.join(',')
+      }
+      exportClusterSopMethod(params).then(response => {
         callDownLoadByBlob(response)
       })
     },
@@ -263,12 +291,13 @@ export default {
       return '图片地址错误,暂不显示'
     },
     // 单击某一行的回调
-    chooseSelection (record) {
-      console.log(record, '单击某一行的回调')
-      this.sendArray = record.listTaskInfo
-      const tempIdArray = []
-      tempIdArray.push(record.id)
-      this.selectedList = Object.assign([], tempIdArray)
+    onSelectionnChange (selectedRowKeys) {
+      // console.log(record, '单击某一行的回调')
+      // this.sendArray = record.listTaskInfo
+      // const tempIdArray = []
+      // tempIdArray.push(record.id)
+      // this.selectedList = Object.assign([], tempIdArray)
+      this.selectedList = selectedRowKeys
     },
     // 获取数据
     async getTableData () {
@@ -312,7 +341,8 @@ export default {
     },
     setDefaultSelect () {
       if (this.selectedList.length === 0) {
-        this.selectedList.push(this.tableData[0].id)
+        // this.selectedList.push(this.tableData[0].id)
+        this.currentRow = Object.assign({}, this.tableData[0])
         this.sendArray = Object.assign([], this.tableData[0].listTaskInfo)
       }
     },

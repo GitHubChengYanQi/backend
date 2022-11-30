@@ -36,14 +36,16 @@
           <div class="tabWrapperDiv">
             <div class="singleTabDiv" @click="changeTabMethod(item)" :class="currentShowTabId === item.id ? 'activeTabDiv' : ''" v-for="item in showTabList" :key="item.id">{{ item.name }}</div>
           </div>
-          <a-calendar @select.self="chooseDateMethod" valueFormat="YYYY-MM-DD" v-if="currentShowTabId === 0">
-            <ul slot="dateCellRender" slot-scope="value" class="events">
-              <li v-for="item in getCalendarTaskData(value)" :key="item.tempId ? item.tempId : item.id" class="singleDiv" @click.stop="chooseTimeContent(item)">
-                <div class="singleContentTaskDiv">{{ returnCalendarTask(item) }}</div>
-                <span class="delDiv" @click.stop="deleteCalendarTask(item)" v-if="getCalendarTaskData(value).length > 1">X</span>
-              </li>
-            </ul>
-          </a-calendar>
+          <div class="calendarDivWrapper">
+            <a-calendar @select.self="chooseDateMethod" valueFormat="YYYY-MM-DD" v-if="currentShowTabId === 0">
+              <ul slot="dateCellRender" slot-scope="value" class="events">
+                <li v-for="item in getCalendarTaskData(value)" :key="item.tempId ? item.tempId : item.id" class="singleDiv" @click.stop="chooseTimeContent(item)">
+                  <div class="singleContentTaskDiv">{{ returnCalendarTask(item) }}</div>
+                  <span class="delDiv" @click.stop="deleteCalendarTask(item)" v-if="getCalendarTaskData(value).length > 1">X</span>
+                </li>
+              </ul>
+            </a-calendar>
+          </div>
           <div class="chooseSendDate" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length && currentShowTabId === 1">
             <div class="singleSendContentItem">
               <div class="singleSendContentTitle">发送时间:</div>
@@ -78,12 +80,12 @@
       :width="1000"
       :visible="sendCalendarContentModalShow"
       class="sendContentModal"
-      @cancel="closeSendContentModal()"
+      @cancel="closeCalendarSendContentModal()"
       :getContainer="() => $refs['addSop_Page_Container']"
     >
       <div>
         <a-form layout="horizontal">
-          <a-form-item label="发送时间" :labelCol="{span: 4}" :wrapperCol="{span: 14}">
+          <a-form-item label="发送时间" :labelCol="{span: 2}" :wrapperCol="{span: 14}">
             <a-date-picker
               dropdownClassName="addSop_Page_Container_selectSopItemDateBox"
               :allowClear="false"
@@ -96,7 +98,7 @@
               @change="sendDateChange"
             />
           </a-form-item>
-          <a-form-item label="内容标题" :labelCol="{span: 4}" :wrapperCol="{span: 20}">
+          <a-form-item label="内容标题" :labelCol="{span: 2}" :wrapperCol="{span: 20}">
             <a-input v-model="addCalendarContentInfo.sendTitle" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
           </a-form-item>
         </a-form>
@@ -519,6 +521,28 @@ export default {
     }
   },
   methods: {
+    // 日历模式下删除任务
+    deleteCalendarTask (info) {
+      const that = this
+      const nowCalendarList = Object.assign([], this.addInfo.listTaskInfo)
+      this.$confirm({
+        title: '确定删除此任务?',
+        // content: 'Some descriptions',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          let tempCalendarIndex = ''
+          if (info.tempId) {
+            tempCalendarIndex = nowCalendarList.findIndex(item => info.tempId === (item.tempId ? item.tempId : item.id))
+          } else {
+            tempCalendarIndex = nowCalendarList.findIndex(item => info.id === (item.tempId ? item.tempId : item.id))
+          }
+          nowCalendarList.splice(tempCalendarIndex, 1)
+          that.$set(this.addInfo, 'listTaskInfo', nowCalendarList)
+        }
+      })
+    },
     // 日历模式视频显示错误提示
     returnCalendarErrorText (url) {
       return '暂不支持显示 .avi 格式的视频'
@@ -896,6 +920,8 @@ export default {
     // 日历模式关闭设置发送内容弹框
     closeCalendarSendContentModal () {
       this.sendCalendarContentModalShow = false
+      this.addCalendarContentInfo = {}
+      this.sendCalendarContentArray = []
     },
     // 日历模式添加发送内容点击确定
     confirmCalendarSendSure () {
@@ -921,13 +947,17 @@ export default {
         // 没有tempId,表示为之前的元素提交
         tempIndex = this.addInfo.listTaskInfo.findIndex(item => this.addCalendarContentInfo.id === (item.tempId ? item.tempId : item.id))
       }
-      this.addInfo.listTaskInfo.splice(tempIndex, 1, this.addCalendarContentInfo)
+      if (tempIndex !== -1) {
+        this.addInfo.listTaskInfo.splice(tempIndex, 1, this.addCalendarContentInfo)
+      } else {
+        this.addInfo.listTaskInfo.push(this.addCalendarContentInfo)
+      }
+      this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
       this.contentArray = this.addInfo.listTaskInfo[0].sendContentList
       this.sendCalendarContentModalShow = false
       // this.selectSopItemIdx = this.addInfo.listTaskInfo[0].tempId ? this.addInfo.listTaskInfo[0].tempId : this.addInfo.listTaskInfo[0].id
       // this.contentListArray = Object.assign([], this.addInfo.listTaskInfo[0].sendContentList)
     },
-
     // 日历模式选择日期中的任务
     chooseTimeContent (info) {
       console.log(info, '点击日期中的任务')
@@ -939,22 +969,25 @@ export default {
     // 获取日历模式下任务列表
     getCalendarTaskData (value) {
       let listData = []
-      // console.log(this.addInfo.listTaskInfo, '日历模式获取任务列表')
-      if (this.addInfo && this.addInfo.listTaskInfo) {
+      if (this.addInfo && this.addInfo.listTaskInfo && (this.addInfo.listTaskInfo.length !== 0)) {
         // 格式化单条日期
         const currentValue = moment(value).format('YYYY-MM-DD')
-        // 得到当前模板中的时间点数组
-        // const tempTaskTimeList = this.addInfo.listTaskInfo.map(item => moment(item.sendTime).format('YYYY-MM-DD'))
-        // 得到单条信息在时间点数组中的位置
-        const tempTaskIndex = this.addInfo.listTaskInfo.findIndex(item => moment(item.sendTime).format('YYYY-MM-DD') === currentValue)
-        if (tempTaskIndex !== -1) {
-          // console.log(tempTaskIndex, '下标')
-          // console.log(this.addCalendarInfo.listTaskInfo[tempTaskIndex], 'this.addCalendarInfo.listTaskInfo')
-          // 存在,就显示当前位置的发送内容
-          listData.push(this.addInfo.listTaskInfo[tempTaskIndex])
-          // console.log(listData, 'listData')
+        console.log(currentValue)
+        // // 得到单条信息在时间点数组中的位置
+        const tempList = this.addInfo.listTaskInfo.filter(item => moment(item.sendTime).isSame(currentValue, 'day') === true)
+        // const tempTaskIndex = this.addInfo.listTaskInfo.findIndex(item => moment(item.sendTime).isSame(currentValue, 'day') === true)
+        // // console.log(this.addInfo.listTaskInfo, currentValue, tempTaskIndex, '下标')
+        // if (tempTaskIndex !== -1) {
+        //   // 存在,就显示当前位置的发送内容
+        //   listData.push(this.addInfo.listTaskInfo[tempTaskIndex])
+        // } else {
+        //   // 不存在,就显示空数组
+        //   listData = []
+        // }
+        if (tempList.length !== 0) {
+          console.log(tempList, 'tempList')
+          listData = Object.assign([], tempList)
         } else {
-          // 不存在,就显示空数组
           listData = []
         }
       } else {
@@ -965,7 +998,7 @@ export default {
     },
     // 返回日历模式中的task
     returnCalendarTask (info) {
-      console.log(info, 'info')
+      // console.log(info, 'info')
       return moment(info.sendTime).format('HH:mm') + ' ' + info.sendTitle
     },
     // 切换日历视图/列表视图tab
@@ -983,6 +1016,7 @@ export default {
       const tempCurrentDate = chooseCurrentDate + ' ' + tempCurrentTime
       this.$set(this.addCalendarContentInfo, 'sendTime', moment(tempCurrentDate).format('YYYY-MM-DD HH:mm'))
       this.$set(this.addCalendarContentInfo, 'sendContentList', [])
+      this.$set(this.addCalendarContentInfo, 'tempId', new Date().getTime())
     },
     // 监听用户输入框输入
     changeSopName (value) {
@@ -1202,6 +1236,10 @@ export default {
 }
 </script>
   <style lang='less' scoped>
+  ul, li {
+    padding: 0;
+    margin: 0;
+  }
    .contentLinkModal {
         display: flex;
         justify-content: space-between;
@@ -1501,54 +1539,56 @@ export default {
             color: white;
           }
         }
-        .events {
-          width: 100%;
-          .singleDiv {
-            width: calc(100% - 8px);
-            position: relative;
-            padding: 2px 10px 2px 4px;
-            border-bottom: 1px solid #d8d8d8;
-            margin-top: 2px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            &::nth-child(1) {
-              margin-top: 0px;
-            }
-            // .singleContentTaskDiv::before {
-            //   content: '';
-            //   display: block;
-            //   width: 4px;
-            //   height: 4px;
-            //   border-radius: 4px;
-            //   background-color: black;
-            // }
-            .delDiv{
-              width: 10px;
-              height: 100%;
+        .calendarDivWrapper {
+          .events {
+            width: 100%;
+            .singleDiv {
+              width: calc(100% - 8px);
+              position: relative;
+              padding: 2px 10px 2px 4px;
+              border-bottom: 1px solid #d8d8d8;
+              margin-top: 2px;
+              font-size: 12px;
               display: flex;
               align-items: center;
-              justify-content: center;
-              visibility: hidden;
-              position: absolute;
-              right: 0;
-              top: 0;
-            }
-            &:hover {
-              background-color: white;
-              .delDiv {
-                visibility: visible;
+              &::nth-child(1) {
+                margin-top: 0px;
+              }
+              // .singleContentTaskDiv::before {
+              //   content: '';
+              //   display: block;
+              //   width: 4px;
+              //   height: 4px;
+              //   border-radius: 4px;
+              //   background-color: black;
+              // }
+              .delDiv{
+                width: 10px;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                visibility: hidden;
+                position: absolute;
+                right: 0;
+                top: 0;
+              }
+              &:hover {
+                background-color: white;
+                .delDiv {
+                  visibility: visible;
+                }
               }
             }
-          }
-          .singleDiv::before {
-            content: '';
-            display: block;
-            width: 5px;
-            height: 5px;
-            border-radius: 5px;
-            margin-right: 2px;
-            background-color: black;
+            .singleDiv::before {
+              content: '';
+              display: block;
+              width: 5px;
+              height: 5px;
+              border-radius: 5px;
+              margin-right: 2px;
+              background-color: black;
+            }
           }
         }
         .chooseSendDate {
