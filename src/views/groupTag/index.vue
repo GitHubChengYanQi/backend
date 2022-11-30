@@ -223,7 +223,7 @@ export default {
       this.add.addState = true
       this.add.addInput = ''
     },
-    getTree (e) {
+    getTree (e = []) {
       const obj = {}
       workRoomLabelTree(obj).then((res) => {
         console.log(res)

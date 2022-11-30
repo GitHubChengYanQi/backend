@@ -20,6 +20,7 @@
                 v-if="item.type == 'input'"
               >
                 <a-input
+                  :disabled="isDisableEdit"
                   style="width:100%;height:100%;padding-right:60px;"
                   placeholder="请输入"
                   :maxLength="50"
@@ -32,12 +33,14 @@
                 class="radio"
                 v-else-if="item.type == 'radio'"
               >
-                <a-radio-group v-model="input.data[item.key]">
+                <a-radio-group v-model="input.data[item.key]" :disabled="isDisableEdit">
                   <a-radio value="0">立即发送</a-radio>
                   <a-radio value="1">定时发送</a-radio>
                   <a-date-picker
+                    :disabled="isDisableEdit"
                     :disabledDate="disabledDate"
-                    show-time
+                    :show-time="{ format: 'HH:mm' }"
+                    format="YYYY-MM-DD HH:mm"
                     v-model="input.data.date"
                     placeholder="请选择日期时间"
                     v-if="input.data[item.key] == 1"
@@ -51,6 +54,7 @@
               >
                 <div class="select_title"><span class="txt">选择群主 </span><span class="btn">
                   <selectPersonnel
+                    :style="isDisableEdit ? {pointerEvents:'none'}:{}"
                     type="button"
                     name="+ 添加"
                     v-model="mumbersArr"
@@ -70,6 +74,7 @@
                 <div class="hint">群发文本</div>
                 <div class="textear_box">
                   <a-textarea
+                    :disabled="isDisableEdit"
                     class="textear"
                     v-model="input.data.plain"
                     @change="setPlain"
@@ -100,13 +105,14 @@
                   <SendContent
                     :contentArray.sync="contentArray"
                     @getText="setText"
-                    :isDisableEdit="false"
+                    :isDisableEdit="isDisableEdit"
                   />
                 </div>
               </div>
             </div>
           </div>
           <a-button
+            :disabled="isDisableEdit"
             type="primary"
             class="button"
             @click="setMess"
@@ -254,7 +260,8 @@ export default {
       previewArr: [],
       total: 0,
       tableId: -1,
-      type: 0
+      type: 0,
+      isDisableEdit: false
     }
   },
   watch: {
@@ -338,9 +345,12 @@ export default {
       console.log(obj)
       workRoomShiftLoad(obj).then((res) => {
         console.log(res)
+        if (this.type == 1 && (res.data.state == 3 || res.data.state == 2)) {
+          this.isDisableEdit = true
+        }
         this.input.data.name = res.data.name
         this.input.data.timeTab = res.data.once ? '0' : '1'
-        this.input.data.date = res.data.once ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
+        this.input.data.date = res.data.once ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm')
         this.mumbersArr = res.data.owner.split(',')
         this.getNumber()
         this.input.data.plain = res.data.plain
@@ -396,8 +406,9 @@ export default {
         owner,
         plain,
         stuff: this.contentArray,
-        occur: timeTab == 0 ? '2099-12-31 23:59' : moment(date).format('YYYY-MM-DD HH:mm:ss')
+        occur: timeTab == 0 ? '2099-12-31 23:59' : moment(date).format('YYYY-MM-DD HH:mm')
       }
+      if (timeTab != 0 && moment(date).valueOf() < moment().valueOf()) return this.$message.warn('开始时间不能小于当前时间')
       if (this.tableId != -1 && this.type == 1) {
         obj.id = this.tableId
       }
@@ -459,6 +470,7 @@ export default {
             }
             .selectBox {
               width: 100%;
+              max-width: 850px;
               box-sizing: border-box;
               padding-left: 10px;
               font-family: '微软雅黑', sans-serif;
