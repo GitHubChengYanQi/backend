@@ -30,7 +30,9 @@
         :columns="tableColumns"
         :pagination="pagination"
         :scroll="{ x: 1500}"
-        :row-selection="{ selectedRowKeys: selectedList, onSelect: chooseSelection, type: 'radio' }"
+        :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
+        :customRow="rowClick"
+        :rowClassName="setRowClassName"
         @change="handleTableChange">
         <div slot="options" slot-scope="text, record">
           <template>
@@ -97,6 +99,7 @@ export default {
   name: 'ClusterSopExecute',
   data () {
     return {
+      currentRow: {},
       selectedList: [],
       sendArray: [
       ],
@@ -150,6 +153,23 @@ export default {
   },
 
   methods: {
+    setRowClassName (record) {
+      return record.id === this.currentRow.id ? 'clickRowStyle' : 'rowColor'// 赋予点击行样式
+    },
+    rowClick: function (record, index) {
+      // console.log(record, index)
+      // let tempInfo = {}
+      // tempInfo = Object.assign({}, record)
+      return {
+        on: {
+          click: () => {
+            console.log('点击了我', record)
+            this.sendArray = Object.assign([], record.listTaskInfo)
+            this.currentRow = record
+          }
+        }
+      }
+    },
     // 返回文字信息
     returnTimeText (info) {
       return `第${info.sendDayNum}天${info.sendTimeRange}提醒发送`
@@ -161,12 +181,13 @@ export default {
       return '图片地址错误,暂不显示'
     },
     // 单击某一行的回调
-    chooseSelection (record) {
-      console.log(record, '单击某一行的回调')
-      this.sendArray = record.listTaskInfo
-      const tempIdArray = []
-      tempIdArray.push(record.id)
-      this.selectedList = Object.assign([], tempIdArray)
+    onSelectionnChange (selectedRowKeys) {
+      // console.log(record, '单击某一行的回调')
+      // this.sendArray = record.listTaskInfo
+      // const tempIdArray = []
+      // tempIdArray.push(record.id)
+      // this.selectedList = Object.assign([], tempIdArray)
+      this.selectedList = selectedRowKeys
     },
     // 获取数据
     async getTableData () {
@@ -209,7 +230,7 @@ export default {
     },
     setDefaultSelect () {
       if (this.selectedList.length === 0) {
-        this.selectedList.push(this.tableData[0].id)
+        this.currentRow = Object.assign({}, this.tableData[0])
         this.sendArray = Object.assign([], this.tableData[0].listTaskInfo)
       }
     },
@@ -299,6 +320,9 @@ export default {
       padding: 20px;
       .leftContainerTop {
         margin-bottom: 10px;
+      }
+      /deep/.ant-table-tbody .clickRowStyle {
+        background-color: #cdd9e4 !important;
       }
     }
     .rightContainer {
