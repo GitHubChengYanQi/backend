@@ -54,7 +54,7 @@
         </template>
       </div>
     </a-table>
-    <GroupChatList :showStatus.sync="addGroupChatShowStatus" :typeInfo="bindGroupChatInfo" @submitGroupChat="submitGroupChatMethod"/>
+    <GroupChatList :showStatus.sync="addGroupChatShowStatus" :permissionText="'/sopClusterTemplate/getClusterList@post'" :typeInfo="bindGroupChatInfo" @submitGroupChat="submitGroupChatMethod"/>
   </div>
 </template>
 
@@ -147,9 +147,9 @@ export default {
       // console.log(params, '查询数据提交接口的对象')
       await getCalendarTemplateListMethod(params).then(response => {
         this.tableLoading = false
-        console.log(response, '获取群日历模板数据')
-        this.tableData = response.data.records
-        this.$set(this.pagination, 'total', Number(response.data.total))
+        console.log(response, '获取群日历模板信息')
+        this.tableData = response.data.list
+        this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
           // 列表中没有数据
           if (this.pagination.total !== 0) {
@@ -190,7 +190,7 @@ export default {
     // 添加群聊
     addGroupChat (info) {
       this.addGroupChatShowStatus = true
-      this.$set(this.bindGroupChatInfo, 'soptype', 'Cluster')
+      this.$set(this.bindGroupChatInfo, 'soptype', 'ClusterCalendar')
       this.$set(this.bindGroupChatInfo, 'id', info.id)
       // this.groupChatSearchInfo.tagType = 0
     },

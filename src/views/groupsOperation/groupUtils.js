@@ -195,7 +195,7 @@ export const getMediaData = (reqType, data) => {
     }
     return JSON.stringify({ type: t, files, ...link })
   } else if (reqType === 'from') {
-    const startLen = 43 // 域名长度
+    // const startLen = 43 // 域名长度
     const { type, files, ...link } = data
     let mediaType, mediaData
     if (type === 1) {
@@ -236,4 +236,61 @@ export const trasnfromOptions = (list) => {
     }
   })
   return { list: newL, value }
+}
+
+// 转换素材库内选中的值
+export const transformLibraryData = (item) => {
+  let generateObj = {}
+  if (item.type_id === 1) {
+    // 文本
+    generateObj = {
+      type: 'text',
+      data: item.content.content
+    }
+  } else if (item.type_id === 2) {
+    generateObj = {
+      type: 'image',
+      data: {
+        imgUrl: item.content.imageFullPath,
+        mediaName: item.content.imageName,
+        path: item.content.imagePath
+      }
+    }
+  } else if (item.type_id === 5) {
+    generateObj = {
+      type: 'video',
+      data: {
+        videoUrl: item.content.videoFullPath,
+        mediaName: item.content.videoName
+        // path
+      }
+    }
+  } else if (item.type_id === 3) {
+    generateObj = {
+      type: 'link',
+      data: {
+        desc: item.content.description,
+        pic: {
+          url: item.content.imageFullPath,
+          path: item.content.imagePath
+        },
+        title: item.content.maintitle,
+        url: item.content.imageLink
+      }
+    }
+  } else if (item.type_id === 6) {
+    generateObj = {
+      type: 'embed',
+      data: {
+        desc: item.content.title,
+        appid: item.content.appid,
+        path: item.content.page,
+        pic: {
+          url: item.content.imageFullPath,
+          path: item.content.imagePath
+        }
+      }
+    }
+  }
+  return generateObj
 }
