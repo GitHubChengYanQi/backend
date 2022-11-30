@@ -139,7 +139,6 @@
                 class="video"
                 v-if="item.type === 3"
               >
-                <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
                 <div
                   class="poster"
                   v-if="item.showPoster"
@@ -329,6 +328,7 @@ export default {
     videoLoadErr (index) {
       console.log(index)
       this.contentArray[index].showPoster = true
+      this.$forceUpdate()
     },
     getUrl () {
       const object = {}
@@ -357,13 +357,13 @@ export default {
       workRoomShiftLoad(obj).then((res) => {
         console.log(res)
         const { data } = res
-        this.contentArray = [
+        this.contentArray = data.plain.length > 0 ? [
           {
             type: 1,
             textData: data.plain
           },
           ...data.stuff
-        ]
+        ] : data.stuff
         this.info.data.content = this.contentArray.map((item) => {
           return item.type
         })
