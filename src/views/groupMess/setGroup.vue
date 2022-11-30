@@ -409,7 +409,7 @@ export default {
         owner,
         plain,
         stuff: this.contentArray,
-        occur: timeTab == 0 ? '2099-12-31 23:59' : moment(date).format('YYYY-MM-DD HH:mm:ss')
+        occur: timeTab == 0 ? '2099-12-31 23:59:59' : moment(date).format('YYYY-MM-DD HH:mm:ss')
       }
       if (timeTab != 0 && moment(date).valueOf() < moment().valueOf()) return this.$message.warn('开始时间不能小于当前时间')
       if (this.tableId != -1 && this.type == 1) {
