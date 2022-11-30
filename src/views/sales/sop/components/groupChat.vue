@@ -267,6 +267,7 @@ export default {
       getGroupChatListMethod(params).then(response => {
         console.log(response, '获取群聊列表')
         this.groupChatDataList = response.data.list
+        this.$set(this.groupChatPagination, 'total', Number(response.data.page.total))
         this.modalLoadingStatus = false
       }).catch(() => {
         this.modalLoadingStatus = false
@@ -293,13 +294,12 @@ export default {
     groupChatHandleTableChange ({ current, pageSize }) {
       this.groupChatPagination.current = current
       this.groupChatPagination.pageSize = pageSize
-      this.getTableData()
+      this.getDataList()
     },
     onSelectChange () {},
     // 搜索群聊
     searchGroupChatMethod () {
       console.log(this.groupChatSearchInfo, 'this.groupChatSearchInfo')
-      debugger
       this.$set(this.groupChatSearchInfo, 'workRoomOwnerId', this.groupChatSearchInfo.employeeIds.length !== 0 ? this.groupChatSearchInfo.employeeIds.join(',') : '')
       const tempTimeArray = this.groupChatSearchInfo.time
       if (tempTimeArray && tempTimeArray.length === 2) {

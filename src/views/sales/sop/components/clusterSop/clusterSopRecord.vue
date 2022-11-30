@@ -464,6 +464,118 @@ export default {
               border-radius: 4px;
               width: calc(100% - 40px);
               padding: 10px 20px;
+              .content {
+                max-width: 100%;
+                margin-left: 10px;
+              }
+              .text {
+                word-wrap: break-word;
+                padding: 5px 0;
+              }
+              .image,
+              .video {
+                img,
+                video {
+                  max-height: 300px;
+                  max-width: 100%;
+                }
+              }
+              .video {
+                position: relative;
+                .poster {
+                  position: absolute;
+                  left: 50%;
+                  top: 50%;
+                  transform: translate(-50%, -50%);
+                  background: rgba(0, 0, 0, 0.1);
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+              }
+              .link {
+                max-width: 250px;
+                height: 80px;
+                border: 1px solid #cdcdcd;
+                border-radius: 5px;
+                flex: none;
+                padding: 10px;
+                display: flex;
+                .lef {
+                  width: 160px;
+                  margin-right: 10px;
+                  font-size: 13px;
+                  .til {
+                    width: 100%;
+                    color: #4074f6;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    display: inline-block;
+                  }
+                  .desc {
+                    width: 100%;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                    overflow: hidden;
+                  }
+                }
+                .image {
+                  flex: 1;
+                  height: 100%;
+                  max-width: 58px;
+                }
+              }
+              .embed {
+                max-width: 230px;
+                border: 1px solid #cdcdcd;
+                flex: none;
+                display: flex;
+                flex-direction: column;
+                padding: 8px 10px;
+                .line {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  .icon {
+                    width: 17px;
+                    height: 17px;
+                  }
+                  .til {
+                    color: #4074f6;
+                  }
+                }
+                .desc {
+                  font-size: 13px;
+                  margin-top: 3px;
+                }
+                .image {
+                  height: 180px;
+                  margin: 3px 0;
+                }
+              }
+              .handlesBox {
+                display: none;
+                // display: flex;
+                margin: auto;
+                margin-right: 30px;
+                .icon {
+                  width: 30px;
+                  height: 30px;
+                  margin-left: 10px;
+                  cursor: pointer;
+                }
+                .move {
+                  width: 35px;
+                  height: 35px;
+                }
+                .disabled {
+                  cursor: no-drop;
+                }
+              }
             }
           }
         }
