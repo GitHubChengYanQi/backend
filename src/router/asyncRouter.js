@@ -867,5 +867,11 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/groupMess/taskInfo'),
     meta: { title: '任务详情' }
+  },
+  '/interactionRadar/index': {
+    path: '/interactionRadar/index',
+    name: '互动雷达',
+    component: () => import('@/views/interactionRadar/index'),
+    meta: { title: '互动雷达' }
   }
 }

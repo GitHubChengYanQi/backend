@@ -139,12 +139,12 @@
                 class="video"
                 v-if="item.type === 3"
               >
-                <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
                 <div
                   class="poster"
                   v-if="item.showPoster"
                 >{{ returnErrorText(item.videoUrl) }}</div>
                 <video
+                  v-else
                   class="poster"
                   :src="item.videoUrl"
                   @error="videoLoadErr(index)"
@@ -322,10 +322,13 @@ export default {
     this.getUrl()
   },
   methods: {
+    returnErrorText (url) {
+      return '暂不支持显示 .avi 格式的视频'
+    },
     videoLoadErr (index) {
       console.log(index)
       this.contentArray[index].showPoster = true
-      this.$emit('update:contentArray', this.contentArray)
+      this.$forceUpdate()
     },
     getUrl () {
       const object = {}
@@ -354,13 +357,13 @@ export default {
       workRoomShiftLoad(obj).then((res) => {
         console.log(res)
         const { data } = res
-        this.contentArray = [
+        this.contentArray = data.plain.length > 0 ? [
           {
             type: 1,
             textData: data.plain
           },
           ...data.stuff
-        ]
+        ] : data.stuff
         this.info.data.content = this.contentArray.map((item) => {
           return item.type
         })
@@ -568,6 +571,8 @@ export default {
               .poster {
                 background: #fff;
                 width: 100%;
+                min-width: 200px;
+                min-height: 100px;
                 height: auto;
                 display: flex;
                 align-items: center;

@@ -56,6 +56,7 @@
                 v-if="item.showPoster"
               >{{ returnErrorText(item.videoUrl) }}</div>
               <video
+                v-else
                 :src="item.videoUrl"
                 @error="videoLoadErr(index)"
                 alt
@@ -1000,7 +1001,10 @@ export default {
         }
         .video {
           position: relative;
+          min-width: 300px;
+          min-height: 150px;
           .poster {
+            white-space: nowrap;
             position: absolute;
             left: 50%;
             top: 50%;
