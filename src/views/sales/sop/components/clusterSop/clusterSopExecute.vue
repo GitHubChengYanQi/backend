@@ -182,11 +182,10 @@ export default {
       await getExecutingSopListMethod(params).then(response => {
         this.tableLoading = false
         console.log(response, '获取字典列表数据')
-        this.tableData = response.data.records
+        this.tableData = response.data.list
         // 设置默认选中的数据
         this.setDefaultSelect()
-        this.$set(this.pagination, 'total', Number(response.data.total))
-        this.$set(this.pagination, 'current', Number(response.data.current))
+        this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
           // 列表中没有数据
           if (this.pagination.total !== 0) {

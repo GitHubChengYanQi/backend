@@ -57,6 +57,7 @@
                   type="primary"
                   style="width: 54px;height: 34px;margin: 0 10px;"
                   @click="goExportData"
+                  v-permission="'/sopCluster/getExecutionLogExcel@get'"
                 >导出</a-button>
               </div>
             </a-col>
@@ -95,7 +96,9 @@
         :columns="tableColumns"
         :pagination="pagination"
         :scroll="{ x: 1500}"
-        :row-selection="{ selectedRowKeys: selectedList, onSelect: chooseSelection, type: 'radio' }"
+        :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
+        :customRow="rowClick"
+        :rowClassName="setRowClassName"
         @change="handleTableChange">
         <div slot="options" slot-scope="text, record">
           <template>
@@ -158,11 +161,13 @@
 
 <script>
 // import { getTempExecuteSopList, deleteExecuteRecordSopMethod } from '@/api/cluster'
-import { getExecuteRecordSopListMethod, deleteExecuteRecordSopMethod } from '@/api/cluster'
+import { getExecuteRecordSopListMethod, deleteExecuteRecordSopMethod, exportClusterSopMethod, getDictData } from '@/api/cluster'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
 export default {
   name: 'ClusterSopExecute',
   data () {
     return {
+      currentRow: {},
       selectedList: [],
       // 任务状态列表
       taskStatusList: [],
@@ -224,33 +229,52 @@ export default {
   },
   created () {
     this.$set(this.searchInfo, 'employeeIds', [])
-    this.getTableData()
+    this.getTaskStatusList()
   },
   mounted () {
 
   },
 
   methods: {
-    // 获取任务状态列表
-    getTaskStatusList () {
-      this.taskStatusList = [
-        {
-          code: '0',
-          name: '未完成'
-        },
-        {
-          code: '1',
-          name: '已完成'
-        },
-        {
-          code: '2',
-          name: '已删除'
+    setRowClassName (record) {
+      return record.id === this.currentRow.id ? 'clickRowStyle' : 'rowColor'// 赋予点击行样式
+    },
+    rowClick: function (record, index) {
+      // console.log(record, index)
+      // let tempInfo = {}
+      // tempInfo = Object.assign({}, record)
+      return {
+        on: {
+          click: () => {
+            console.log('点击了我', record)
+            this.sendArray = Object.assign([], record.listTaskInfo)
+            this.currentRow = record
+          }
         }
-      ]
+      }
+    },
+    // 获取任务状态列表
+    async getTaskStatusList () {
+      const params = { dictType: 'execution_state' }
+      await getDictData(params).then(response => {
+        this.taskStatusList = response.data
+      })
+      this.getTableData()
     },
     // 导出数据
     goExportData () {
       console.log('导出数据')
+      const params = {
+        idsStr: this.searchInfo.employeeIds.join(','),
+        sopName: this.searchInfo.sopName,
+        clusterName: this.searchInfo.clusterName,
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize,
+        sopIdsStr: this.selectedList.join(',')
+      }
+      exportClusterSopMethod(params).then(response => {
+        callDownLoadByBlob(response)
+      })
     },
     // 选择任务状态
     changeTaskStatus (value) {
@@ -267,12 +291,13 @@ export default {
       return '图片地址错误,暂不显示'
     },
     // 单击某一行的回调
-    chooseSelection (record) {
-      console.log(record, '单击某一行的回调')
-      this.sendArray = record.listTaskInfo
-      const tempIdArray = []
-      tempIdArray.push(record.id)
-      this.selectedList = Object.assign([], tempIdArray)
+    onSelectionnChange (selectedRowKeys) {
+      // console.log(record, '单击某一行的回调')
+      // this.sendArray = record.listTaskInfo
+      // const tempIdArray = []
+      // tempIdArray.push(record.id)
+      // this.selectedList = Object.assign([], tempIdArray)
+      this.selectedList = selectedRowKeys
     },
     // 获取数据
     async getTableData () {
@@ -288,12 +313,11 @@ export default {
       console.log(params, '查询数据提交接口的对象')
       await getExecuteRecordSopListMethod(params).then(response => {
         this.tableLoading = false
-        console.log(response, '执行记录SOP')
-        this.tableData = response.data.records
+        console.log(response, '获取字典列表数据')
+        this.tableData = response.data.list
         // 设置默认选中的数据
         this.setDefaultSelect()
-        this.$set(this.pagination, 'total', Number(response.data.total))
-        this.$set(this.pagination, 'current', Number(response.data.current))
+        this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
           // 列表中没有数据
           if (this.pagination.total !== 0) {
@@ -317,7 +341,8 @@ export default {
     },
     setDefaultSelect () {
       if (this.selectedList.length === 0) {
-        this.selectedList.push(this.tableData[0].id)
+        // this.selectedList.push(this.tableData[0].id)
+        this.currentRow = Object.assign({}, this.tableData[0])
         this.sendArray = Object.assign([], this.tableData[0].listTaskInfo)
       }
     },
