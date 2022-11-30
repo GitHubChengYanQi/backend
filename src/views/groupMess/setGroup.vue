@@ -384,7 +384,9 @@ export default {
       return '暂不支持显示 .avi 格式的视频'
     },
     videoLoadErr (index) {
+      console.log(index, '报错')
       this.contentArray[index].showPoster = true
+      console.log(this.contentArray)
     },
     disabledDate (current) {
       return current && moment(current).valueOf() < moment().valueOf()

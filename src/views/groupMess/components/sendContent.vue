@@ -58,7 +58,7 @@
               <video
                 v-else
                 :src="item.videoUrl"
-                @error.prevent="videoLoadErr(index)"
+                @error="videoLoadErr(index)"
                 alt
               />
             </div>

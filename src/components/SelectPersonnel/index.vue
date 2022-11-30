@@ -284,6 +284,7 @@ export default {
       }
       this.$set(this, 'keys', keys)
       this.$set(this, 'rows', rows)
+      this.$emit('getVal', this.keys)
       this.$emit('input', this.keys)
     }
   }
