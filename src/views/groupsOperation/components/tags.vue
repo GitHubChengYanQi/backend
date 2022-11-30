@@ -24,22 +24,6 @@
     </div>
     <div class="groupTag_right_box">
       <div class="groupTag_content_box" v-if="selectKey.length > 0 && selectKey[0] != '0'">
-        <div class="groupTag_header_box">
-          <div
-            class="title"
-            :style="index + 1 != titleData.length ? { color: '#ccc' } : {}"
-            v-for="(item, index) in titleData"
-            :key="index">
-            <span class="icon">
-              <img
-                class="img"
-                :src="index == 0 ? require('@/assets/branch_start.svg') : require('@/assets/branch_icon.svg')"
-                alt="">
-            </span>
-            {{ item.unitName }}
-            <span class="division" v-if="index + 1 < titleData.length">></span>
-          </div>
-        </div>
         <div class="groupTag_content">
           <span
             v-for="(item, index) in tabArr"
