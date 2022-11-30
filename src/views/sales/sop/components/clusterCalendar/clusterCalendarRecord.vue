@@ -98,6 +98,7 @@
         :scroll="{ x: 1500}"
         :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
         :customRow="rowClick"
+        :rowClassName="setRowClassName"
         @change="handleTableChange">
         <div slot="options" slot-scope="text, record">
           <template>
@@ -432,6 +433,9 @@ export default {
       padding: 20px;
       .leftContainerTop {
         margin-bottom: 10px;
+      }
+      /deep/.ant-table-tbody .clickRowStyle {
+        background-color: #cdd9e4 !important;
       }
     }
     .rightContainer {

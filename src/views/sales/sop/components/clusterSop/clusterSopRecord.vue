@@ -435,6 +435,9 @@ export default {
       .leftContainerTop {
         margin-bottom: 10px;
       }
+      /deep/.ant-table-tbody .clickRowStyle {
+        background-color: #cdd9e4 !important;
+      }
     }
     .rightContainer {
       width: calc(450px - 40px);
