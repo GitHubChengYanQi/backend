@@ -16,7 +16,14 @@
                   <span class="item" @click="insertContent('用户昵称')">用户昵称</span>
                 </div>
               </div>
-              <div id="messageInput" class="messageInput" contenteditable @click="getRange" @keyup="sendMessage" />
+              <div
+                id="messageInput"
+                class="messageInput"
+                contenteditable
+                @click="getRange"
+                @keyup="e => sendMessage(e, false)"
+              />
+              <span class="numCount">{{ msgContent.length }} / 1000</span>
             </div>
           </div>
         </div>
@@ -39,7 +46,7 @@
               <div class="noData" v-if="!mediaList.type">
                 点击上方,添加发送内容
               </div>
-              <div class="contentItem" >
+              <div class="contentItem" v-if="mediaList.type">
                 <!-- <div class="idx"></div> -->
                 <div :class="`content ${mediaList.type}`" v-if="mediaList.type === 'image'">
                   <img :src="mediaList.content.imgUrl" alt />
@@ -140,7 +147,7 @@
         </div>
       </div>
     </div>
-    <input type="file" accept="image/png,image/jpg" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
+    <input type="file" accept="image/*" ref="uploadPhoto" @change="uploadPhoto" class="uploadFileInp" />
 
     <a-modal
       title="新增链接"
@@ -321,6 +328,10 @@ export default {
       } else {
         this.isEdit = true
       }
+      if (e.length > 1000) {
+        this.msgContent = e.slice(0, 1000)
+        this.transfromHTMLMsg(e.slice(0, 1000))
+      }
     },
     'modalLinkObj.title' (e) {
       if (e.length > 200) {
@@ -441,7 +452,7 @@ export default {
           this.endInsert(dom)
         }
         this.range = null
-        this.sendMessage()
+        this.sendMessage(null, true)
       })
     },
     endInsert (val) {
@@ -453,7 +464,7 @@ export default {
         this.range = this.savePosition()
       })
     },
-    sendMessage (e) {
+    sendMessage (e, isInsert) {
       const target = document.querySelector('#messageInput')
       let str = ((e && e.target) || target).innerHTML.replace(/<[^>]*>/g, '')
       str = str.replace(/&nbsp;/g, ' ')
@@ -461,7 +472,10 @@ export default {
       str = str.replace(/&lt;/g, '<')
       str = str.replace(/&gt;/g, '>')
       this.msgContent = str
-      this.getRange()
+      if (!isInsert) {
+        // 每次键入内容更新光标位置
+        this.getRange()
+      }
     },
     // 发送内容集合
     // 选择单个发送类型

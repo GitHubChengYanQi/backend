@@ -18,7 +18,7 @@
     <div class="tableBox">
       <a-table :columns="tableColunms" :data-source="tableData" :pagination="pagination" @change="handleTableChange">
         <div slot="content" slot-scope="text">
-          <div class="txt">
+          <div class="joinGroupTxt">
             {{ text }}
           </div>
         </div>
@@ -52,7 +52,8 @@ export default {
         {
           title: '入群欢迎语',
           width: '40%',
-          dataIndex: 'content'
+          dataIndex: 'content',
+          scopedSlots: { customRender: 'content' }
         },
         {
           title: '创建人',
@@ -76,7 +77,7 @@ export default {
         }
       ],
       tableData: [],
-      tableSortStr: '',
+      tableSortStr: 'CreateAtDesc',
       pagination: {
         total: 0,
         current: 1,
