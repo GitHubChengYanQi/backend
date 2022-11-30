@@ -55,7 +55,7 @@
         </template>
       </div>
     </a-table>
-    <GroupChatList :showStatus.sync="addGroupChatShowStatus" :typeInfo="bindGroupChatInfo" @submitGroupChat="submitGroupChatMethod"/>
+    <GroupChatList :showStatus.sync="addGroupChatShowStatus" :permissionText="'/sopClusterTemplate/getClusterList@post'" :typeInfo="bindGroupChatInfo" @submitGroupChat="submitGroupChatMethod"/>
   </div>
 </template>
 

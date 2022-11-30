@@ -7,11 +7,6 @@
             <span style="color: red;font-weight: 500;">*</span>发送内容
           </span>
           <div class="handleBox">
-            <!--:class="(
-                  (item.type === 'text' && sopList[selectSopItemIdx].content.some(it => it.type === 'text')) ||
-                  sopList[selectSopItemIdx].content.length === 10) ?
-                  'handleBtn disabled' :
-                  'handleBtn'"  -->
             <div
               v-for="(item, index) in handleBtnArr"
               :class="((sendContentArray.length === 10 || (sendContentArray.findIndex(it => (it.type === 1 && item.type === 'text')) != -1)) || isDisableEdit === true)?
@@ -36,11 +31,9 @@
             <div class="idx">{{ index + 1 }}</div>
             <div :class="`content ${item.type === 1 ? 'text' : ''}`" v-if="item.type === 1">{{ item.textData }}</div>
             <div :class="`content ${item.type === 2 ? 'image': ''}`" v-else-if="item.type === 2">
-              <!-- style="max-width:100%;max-height:300px" -->
               <img :src="item.photoUrl" alt />
             </div>
             <div :class="`content ${item.type === 3 ? 'video' : ''}`" v-else-if="item.type === 3">
-              <!-- v-if="sopList[selectSopItemIdx].content[index].showPoster" -->
               <div class="poster" v-if="item.showPoster">{{ returnErrorText(item.videoUrl) }}</div>
               <video :src="item.videoUrl" @error="videoLoadErr(index)" alt />
             </div>
@@ -64,7 +57,6 @@
                 <span class="say">小程序</span>
               </div>
             </div>
-            <!-- v-if="sopList[selectSopItemIdx].isEdit" -->
             <div class="handlesBox" v-if="sendContentArray && sendContentArray[selectSopItemIdx] && isDisableEdit === false">
               <img
                 src="../images/move.svg"
@@ -72,7 +64,6 @@
                 :class="index === 0 ? 'icon move disabled' : 'icon move'"
                 @click="handleMoveClick(index, 'up')"
               />
-              <!-- (sendContentArray[selectSopItemIdx].content.length - 1) === index ? 'icon move disabled' : 'icon move' -->
               <img
                 src="../images/move.svg"
                 style="transform: rotate(180deg)"
@@ -107,18 +98,18 @@
       @change="uploadVideo"
       class="uploadFileInp"
     />
-    <!-- :getContainer="() => $refs['addSop_Page_Container']" -->
     <a-modal
       title="添加文本"
       :maskClosable="false"
       :width="600"
       :visible="contentTextModalShow"
-      class="contentTextModal"
       @cancel="closeContentTextModal()"
       :getContainer="() => $refs['send_content_container']"
     >
-      <a-textarea v-model="contentText" autoSize placeholder="请输入内容" />
-      <span class="len">{{ contentText.length ? contentText.length : '0' }}/1000</span>
+      <div class="contentTextModal">
+        <a-textarea v-model="contentText" autoSize placeholder="请输入内容" />
+        <span class="len">{{ contentText.length ? contentText.length : '0' }}/1000</span>
+      </div>
       <template slot="footer">
         <a-button @click="closeContentTextModal()">取消</a-button>
         <a-button type="primary" @click="confirmContentText">确定</a-button>
@@ -129,37 +120,38 @@
       :maskClosable="false"
       :width="600"
       :visible="contentLinkModalShow"
-      class="contentLinkModal"
       @cancel="closeLinkModal()"
       :getContainer="() => $refs['send_content_container']"
     >
-      <div class="formBox">
-        <div class="line">
-          <a-input v-model="contentLinkObj.linkTitle" placeholder="请输入链接标题（必填）" />
-          <span class="len">{{ (contentLinkObj.linkTitle && contentLinkObj.linkTitle.length) ? contentLinkObj.linkTitle.length : '0' }}/200</span>
+      <div class="contentLinkModal">
+        <div class="formBox">
+          <div class="line">
+            <a-input v-model="contentLinkObj.linkTitle" placeholder="请输入链接标题（必填）" />
+            <span class="len">{{ (contentLinkObj.linkTitle && contentLinkObj.linkTitle.length) ? contentLinkObj.linkTitle.length : '0' }}/200</span>
+          </div>
+          <div class="line">
+            <a-input v-model="contentLinkObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
+            <span class="len">{{ (contentLinkObj.linkUrl && contentLinkObj.linkUrl.length) ? contentLinkObj.linkUrl.length : '0' }}/500</span>
+          </div>
+          <div class="line textarea">
+            <a-textarea v-model="contentLinkObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
+            <span class="len">{{ (contentLinkObj.linkShow && contentLinkObj.linkShow.length) ? contentLinkObj.linkShow.length : '0' }}/170</span>
+          </div>
         </div>
-        <div class="line">
-          <a-input v-model="contentLinkObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
-          <span class="len">{{ (contentLinkObj.linkUrl && contentLinkObj.linkUrl.length) ? contentLinkObj.linkUrl.length : '0' }}/500</span>
+        <div class="pic">
+          <div
+            class="addPic image"
+            v-if="!contentLinkObj.linkPhoto"
+            @click="openSelectPhoto('addLinkPhoto')"
+          >+</div>
+          <img
+            class="image"
+            v-else
+            :src="contentLinkObj.linkPhoto"
+            @click="openSelectPhoto('addLinkPhoto')"
+          />
+          <span class="tip">图片限制在2MB以内</span>
         </div>
-        <div class="line textarea">
-          <a-textarea v-model="contentLinkObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
-          <span class="len">{{ (contentLinkObj.linkShow && contentLinkObj.linkShow.length) ? contentLinkObj.linkShow.length : '0' }}/170</span>
-        </div>
-      </div>
-      <div class="pic">
-        <div
-          class="addPic image"
-          v-if="!contentLinkObj.linkPhoto"
-          @click="openSelectPhoto('addLinkPhoto')"
-        >+</div>
-        <img
-          class="image"
-          v-else
-          :src="contentLinkObj.linkPhoto"
-          @click="openSelectPhoto('addLinkPhoto')"
-        />
-        <span class="tip">图片限制在2MB以内</span>
       </div>
       <template slot="footer">
         <a-button
@@ -173,59 +165,60 @@
       :maskClosable="false"
       :width="600"
       :visible="contentMiniModalShow"
-      class="contentLinkModal"
       @cancel="closeMiniModal()"
       :getContainer="() => $refs['send_content_container']"
     >
       <p class="tip top">
         请填写企业微信后台绑定的小程序，否则会造成发送失败
         <!-- <a
-          class="click"
-          href="https://www.yuque.com/docs/share/9def95f9-bce5-4c66-b800-9f3cbef4fe50"
-          target="_blank"
-        >查看如何绑定</a> -->
+            class="click"
+            href="https://www.yuque.com/docs/share/9def95f9-bce5-4c66-b800-9f3cbef4fe50"
+            target="_blank"
+          >查看如何绑定</a> -->
       </p>
-      <div class="formBox">
-        <div class="line">
-          <a-input v-model="contentMiniObj.appId" placeholder="输入小程序APPID（必填）" />
-          <span class="len">{{ contentMiniObj.appId && contentMiniObj.appId.length ? contentMiniObj.appId.length :'0' }}/200</span>
-          <p class="tip">
-            <!-- <a
-              class="click"
-              href="https://www.yuque.com/docs/share/6b55b4d7-7e59-4a0a-bdd6-fb4dd0d2f2e5"
-              target="_blank"
-            >如何获取APPID</a> -->
-          </p>
+      <div class="contentLinkModal">
+        <div class="formBox">
+          <div class="line">
+            <a-input v-model="contentMiniObj.appId" placeholder="输入小程序APPID（必填）" />
+            <span class="len">{{ contentMiniObj.appId && contentMiniObj.appId.length ? contentMiniObj.appId.length :'0' }}/200</span>
+            <p class="tip">
+              <!-- <a
+                class="click"
+                href="https://www.yuque.com/docs/share/6b55b4d7-7e59-4a0a-bdd6-fb4dd0d2f2e5"
+                target="_blank"
+              >如何获取APPID</a> -->
+            </p>
+          </div>
+          <div class="line">
+            <a-input v-model="contentMiniObj.appUrl" placeholder="输入小程序页面路径（必填）" />
+            <span class="len">{{ contentMiniObj.appUrl && contentMiniObj.appUrl ? contentMiniObj.appUrl.length :'0' }}/500</span>
+            <p class="tip">
+              <!-- <a
+                class="click"
+                href="https://www.yuque.com/docs/share/dd225b88-7778-463e-82a2-37bff08e1119"
+                target="_blank"
+              >如何获取小程序路径</a> -->
+            </p>
+          </div>
+          <div class="line textarea">
+            <a-textarea v-model="contentMiniObj.appShow" autoSize placeholder="输入小程序的描述（必填）" />
+            <span class="len">{{ contentMiniObj.appShow && contentMiniObj.appShow.length ? contentMiniObj.appShow.length :'0' }}/170</span>
+          </div>
         </div>
-        <div class="line">
-          <a-input v-model="contentMiniObj.appUrl" placeholder="输入小程序页面路径（必填）" />
-          <span class="len">{{ contentMiniObj.appUrl && contentMiniObj.appUrl ? contentMiniObj.appUrl.length :'0' }}/500</span>
-          <p class="tip">
-            <!-- <a
-              class="click"
-              href="https://www.yuque.com/docs/share/dd225b88-7778-463e-82a2-37bff08e1119"
-              target="_blank"
-            >如何获取小程序路径</a> -->
-          </p>
+        <div class="pic">
+          <div
+            class="addPic image"
+            v-if="!contentMiniObj.appPhoto"
+            @click="openSelectPhoto('addMiniPhoto')"
+          >+</div>
+          <img
+            class="image"
+            v-else
+            :src="contentMiniObj.appPhoto"
+            @click="openSelectPhoto('addMiniPhoto')"
+          />
+          <span class="photoTip">图片限制在2MB以内</span>
         </div>
-        <div class="line textarea">
-          <a-textarea v-model="contentMiniObj.appShow" autoSize placeholder="输入小程序的描述（必填）" />
-          <span class="len">{{ contentMiniObj.appShow && contentMiniObj.appShow.length ? contentMiniObj.appShow.length :'0' }}/170</span>
-        </div>
-      </div>
-      <div class="pic">
-        <div
-          class="addPic image"
-          v-if="!contentMiniObj.appPhoto"
-          @click="openSelectPhoto('addMiniPhoto')"
-        >+</div>
-        <img
-          class="image"
-          v-else
-          :src="contentMiniObj.appPhoto"
-          @click="openSelectPhoto('addMiniPhoto')"
-        />
-        <span class="photoTip">图片限制在2MB以内</span>
       </div>
       <template slot="footer">
         <a-button
@@ -256,7 +249,6 @@ export default {
       isSopEditStatus: false,
       chooseEditIndex: '', // 当前选择编辑的下标
       submitType: '', // 提交状态,新增与修改
-      sopList: [],
       selectSopItemIdx: 0,
       sendContentArray: [],
       // 链接/小程序上传类型
@@ -442,9 +434,6 @@ export default {
     },
     // 视频错误时显示
     videoLoadErr (index) {
-      // const nowD = deepClonev2(this.sopList)
-      // nowD[this.selectSopItemIdx].content[index].showPoster = true
-      // this.sopList = nowD
       this.sendContentArray[index].showPoster = true
       this.$emit('update:contentArray', this.sendContentArray)
     },
@@ -758,10 +747,9 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 #send_content_container {
   .contentLinkModal {
-    .ant-modal-body {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -836,106 +824,23 @@ export default {
           height: 1px;
         }
       }
-    }
   }
   .contentTextModal {
-    .ant-modal-body {
-      padding-top: 0;
-      .ant-input {
-        min-height: 100px;
-      }
-      .len {
-        display: block;
-        text-align: end;
-      }
+    padding-top: 0;
+    .ant-input {
+      min-height: 100px;
+    }
+    .len {
+      display: block;
+      text-align: end;
     }
   }
-
 }
 .sendSOPInfoContainer {
   width: 100%;
   margin-top: 10px;
   display: flex;
-  .sendSOPList {
-    border-radius: 5px;
-    padding: 20px;
-    width: 300px;
-    height: 460px;
-    background-color: #fff;
-    overflow-y: auto;
-    .sopItem {
-      height: 35px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      text-indent: 15px;
-      cursor: pointer;
-      border-radius: 5px;
-      position: relative;
-      .del {
-        display: none;
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        align-items: center;
-        justify-content: center;
-        transform: translate(0, -50%);
-      }
-    }
-    .sopItem:hover {
-      .del {
-        display: flex;
-      }
-    }
-    .active {
-      background: #eef2fc;
-      color: #4074f6;
-    }
-    .addSop {
-      margin-bottom: 20px;
-      width: 100%;
-      height: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      border: 1px dashed #8a8a8a;
-      cursor: pointer;
-    }
-  }
-  .sendItemContent {
-    margin-left: 10px;
-    flex: 1;
-    height: 100%;
-    .chooseSendDate {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      .til {
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-      .chooseDateBox1 {
-        .chooseDateBoxRadio {
-          display: flex;
-          flex-direction: column;
-          .line-wrapper {
-            margin-bottom: 10px;
-            .ant-time-picker {
-              width: 120px;
-            }
-          }
-        }
-      }
-      .chooseDateBox2 {
-        display: flex;
-        align-items: center;
-      }
-    }
-    .sendContent {
+  .sendContent {
       margin-top: 10px;
       background-color: #fff;
       padding: 20px;
@@ -1115,9 +1020,7 @@ export default {
         }
       }
     }
-  }
 }
-
 .uploadFileInp {
   position: fixed;
   left: -100000px;

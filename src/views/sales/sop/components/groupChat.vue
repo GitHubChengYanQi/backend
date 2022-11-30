@@ -19,6 +19,7 @@
               name="请选择创建者"
               :changeId="true"
               :num="1"
+              style="width: 200px"
               v-model="groupChatSearchInfo.employeeIds"
             />
           </div>
@@ -30,10 +31,10 @@
             <div class="title">标签：</div>
             <a-select
               placeholder="请选择"
-              v-model="groupChatSearchInfo.tagType"
+              v-model="groupChatSearchInfo.tagMatchType"
               style="width: 200px"
             >
-              <a-select-option :value="tagsTypeItem.id" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
+              <a-select-option :value="tagsTypeItem.value" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
             </a-select>
             <SelectTagInput v-model="groupChatSearchInfo.tagsList" :screentags="true" :changeId="true" ref="SelectTagInput" />
           </div>
@@ -59,14 +60,51 @@
           :row-selection="{ selectedRowKeys: groupChatSelectedRowKeys, onChange: onGroupChatSelectChange, getCheckboxProps: getCheckboxProps }"
           :scroll="{ x: 1500 }"
           @change="groupChatHandleTableChange"
-        ></a-table>
+        >
+          <div slot="tagListStr" slot-scope="text">
+            <a-popover title="群标签">
+              <template slot="content">
+                <div class="labelBox">
+                  {{ text }}
+                </div>
+              </template>
+              <a-tag type="button">
+                查看
+              </a-tag>
+            </a-popover>
+          </div>
+          <div slot="sopNameListStr" slot-scope="text">
+            <a-popover title="执行中的SOP">
+              <template slot="content">
+                <div class="labelBox">
+                  {{ text }}
+                </div>
+              </template>
+              <a-tag type="button">
+                查看
+              </a-tag>
+            </a-popover>
+          </div>
+          <div slot="calendarNameListStr" slot-scope="text">
+            <a-popover title="执行中的群日历">
+              <template slot="content">
+                <div class="labelBox">
+                  {{ text }}
+                </div>
+              </template>
+              <a-tag type="button">
+                查看
+              </a-tag>
+            </a-popover>
+          </div>
+        </a-table>
       </a-spin>
       <template slot="footer">
         <a-button
           :disabled="modalLoadingStatus"
           @click="closeGroupChat()"
         >取消</a-button>
-        <a-button type="primary" :disabled="modalLoadingStatus" @click="confirmGroupChat" v-permission="'/sopClusterTemplate/sopBindCluster@post'">确定</a-button>
+        <a-button type="primary" :disabled="modalLoadingStatus" @click="confirmGroupChat" v-permission="permissionText">确定</a-button>
       </template>
     </a-modal>
   </div>
@@ -86,12 +124,14 @@ export default {
       addGroupChatShowStatus: false,
       tagsTypeList: [
         {
-          id: 0,
-          name: '同时满足'
+          id: 1,
+          value: 1,
+          name: '至少满足一项'
         },
         {
-          id: 1,
-          name: '至少满足一项'
+          id: 2,
+          value: 2,
+          name: '同时满足'
         }
       ],
       groupChatDataList: [],
@@ -118,19 +158,22 @@ export default {
           title: '群标签',
           dataIndex: 'tagListStr',
           align: 'center',
-          width: 150
+          width: 150,
+          scopedSlots: { customRender: 'tagListStr' }
         },
         {
           title: '执行中的SOP',
           dataIndex: 'sopNameListStr',
           align: 'center',
-          width: 150
+          width: 150,
+          scopedSlots: { customRender: 'sopNameListStr' }
         },
         {
           title: '执行中的群日历',
           dataIndex: 'calendarNameListStr',
           align: 'center',
-          width: 150
+          width: 150,
+          scopedSlots: { customRender: 'calendarNameListStr' }
         }
       ],
       // 群聊弹框分页信息
@@ -145,6 +188,10 @@ export default {
     }
   },
   props: {
+    permissionText: {
+      type: String,
+      default: ''
+    },
     showStatus: {
       type: Boolean,
       default: false
@@ -173,6 +220,7 @@ export default {
         this.$set(this.groupChatSearchInfo, 'tagsList', [])
         this.$set(this.groupChatSearchInfo, 'templateId', this.typeInfo.id)
         this.$set(this.groupChatSearchInfo, 'soptype', this.typeInfo.soptype)
+        this.$set(this.groupChatSearchInfo, 'tagMatchType', this.tagsTypeList[0].value)
         this.getDataList()
       }
     }
@@ -215,9 +263,12 @@ export default {
         page: this.groupChatPagination.current,
         perPage: this.groupChatPagination.pageSize
       }
+      this.modalLoadingStatus = true
       getGroupChatListMethod(params).then(response => {
         console.log(response, '获取群聊列表')
         this.groupChatDataList = response.data.list
+        this.modalLoadingStatus = false
+      }).catch(() => {
         this.modalLoadingStatus = false
       })
     },
@@ -247,9 +298,11 @@ export default {
     onSelectChange () {},
     // 搜索群聊
     searchGroupChatMethod () {
+      console.log(this.groupChatSearchInfo, 'this.groupChatSearchInfo')
+      debugger
       this.$set(this.groupChatSearchInfo, 'workRoomOwnerId', this.groupChatSearchInfo.employeeIds.length !== 0 ? this.groupChatSearchInfo.employeeIds.join(',') : '')
       const tempTimeArray = this.groupChatSearchInfo.time
-      if (tempTimeArray.length !== 0) {
+      if (tempTimeArray && tempTimeArray.length === 2) {
         this.$set(this.groupChatSearchInfo, 'startTime', moment(tempTimeArray[0]).format('YYYY-MM-DD'))
         this.$set(this.groupChatSearchInfo, 'endTime', moment(tempTimeArray[1]).format('YYYY-MM-DD'))
       } else {
@@ -277,7 +330,7 @@ export default {
       this.addGroupChatShowStatus = false
       this.$emit('update:showStatus', this.addGroupChatShowStatus)
       // debugger
-      this.$emit('submitGroupChat', this.groupChatSelectedRowKeys.join(','))
+      this.$emit('submitGroupChat', JSON.stringify(this.groupChatSelectedRowKeys))
     }
   }
 }
