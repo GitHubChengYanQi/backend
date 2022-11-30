@@ -170,6 +170,7 @@
                     >{{ returnErrorText(item.videoUrl) }}</div>
                     <video
                       class="poster"
+                      v-else
                       :src="item.videoUrl"
                       @error="videoLoadErr(index)"
                       alt
@@ -590,6 +591,8 @@ export default {
                   .poster {
                     background: #fff;
                     width: 100%;
+                    min-width: 200px;
+                    min-height: 100px;
                     height: auto;
                     display: flex;
                     align-items: center;
