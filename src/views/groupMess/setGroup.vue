@@ -39,8 +39,8 @@
                   <a-date-picker
                     :disabled="isDisableEdit"
                     :disabledDate="disabledDate"
-                    :show-time="{ format: 'HH:mm' }"
-                    format="YYYY-MM-DD HH:mm"
+                    :show-time="{ format: 'HH:mm:ss' }"
+                    format="YYYY-MM-DD HH:mm:ss"
                     v-model="input.data.date"
                     placeholder="请选择日期时间"
                     v-if="input.data[item.key] == 1"
@@ -351,7 +351,7 @@ export default {
         }
         this.input.data.name = res.data.name
         this.input.data.timeTab = res.data.once ? '0' : '1'
-        this.input.data.date = res.data.once ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm')
+        this.input.data.date = res.data.once ? '' : moment(res.data.occur, 'YYYY-MM-DD HH:mm:ss')
         this.mumbersArr = res.data.owner.split(',')
         this.getNumber()
         this.input.data.plain = res.data.plain
@@ -384,7 +384,9 @@ export default {
       return '暂不支持显示 .avi 格式的视频'
     },
     videoLoadErr (index) {
+      console.log(index, '报错')
       this.contentArray[index].showPoster = true
+      console.log(this.contentArray)
     },
     disabledDate (current) {
       return current && moment(current).valueOf() < moment().valueOf()
@@ -407,7 +409,7 @@ export default {
         owner,
         plain,
         stuff: this.contentArray,
-        occur: timeTab == 0 ? '2099-12-31 23:59' : moment(date).format('YYYY-MM-DD HH:mm')
+        occur: timeTab == 0 ? '2099-12-31 23:59:59' : moment(date).format('YYYY-MM-DD HH:mm:ss')
       }
       if (timeTab != 0 && moment(date).valueOf() < moment().valueOf()) return this.$message.warn('开始时间不能小于当前时间')
       if (this.tableId != -1 && this.type == 1) {
