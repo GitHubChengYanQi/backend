@@ -165,14 +165,14 @@ export default {
     async getChartData () {
       const id = this.$route.query.id
       const [starttime, endtime] = this.echartDate
-      let timeType = '1'
+      // let timeType = '1'
       const targetNum = new Date(endtime).valueOf() - new Date(starttime).valueOf()
       if (targetNum > maxDayNum) {
         this.$message.warn('日期区间最多选择一年!')
         return
       }
       if (targetNum < dayNum) {
-        timeType = '2'
+        // timeType = '2'
       }
       const obj = {
         roomid: id,

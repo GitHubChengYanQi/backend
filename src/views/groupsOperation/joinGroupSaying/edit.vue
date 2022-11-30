@@ -257,8 +257,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { upLoad } from '@/api/common'
-import { transformLibraryData } from '@/views/salesManagement/sopUtils'
-import { defaultLinkObj, defaultLibraryObj, isUrl, defaultMiniObj, getMediaData } from '../groupUtils'
+import { defaultLinkObj, defaultLibraryObj, isUrl, defaultMiniObj, getMediaData, transformLibraryData } from '../groupUtils'
 import { addJoinSayItemReq, getJoinSayItemInfoReq, setJoinSayItemInfoReq } from '@/api/groupsOperation'
 
 export default {
