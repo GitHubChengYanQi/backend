@@ -38,8 +38,8 @@
             :ranges="searchDateItemRanges"
             :disabled-date="e => disabledBeforeDate(e, 'date', true)"
             :disabled-time="e => disabledBeforeDate(e, 'time', true)"
-            :allowClear="false"
-            @change="(_, values) => { this.echartDate = values }"
+            :allowClear="true"
+            @change="handleRangePicker"
             @ok="handleSearch" />
         </div>
       </div>
@@ -217,6 +217,13 @@ export default {
       const { data } = await getItemChartdaysReq(obj)
       this.tableData = data.datas
       this.pagination.total = data.total
+    },
+    handleRangePicker (_, values) {
+      this.echartDate = values
+      if (!values[0] && !values[1]) {
+      // 清空
+        this.handleSearch()
+      }
     }
   }
 }

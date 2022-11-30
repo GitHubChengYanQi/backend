@@ -32,7 +32,7 @@
         >重置</a-button>
       </div>
       <div class="handlesBox">
-        <div class="btn" @click="goAdd" v-permission="'/sopClusterCalendarTemplate/add@post'">创建SOP模板</div>
+        <div class="btn" @click="goAdd" v-permission="'/sopClusterCalendarTemplate/add@post'">创建群日历</div>
       </div>
     </div>
     <a-table
