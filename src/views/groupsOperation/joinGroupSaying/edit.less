@@ -51,6 +51,7 @@
           max-width: 80%;
           display: flex;
           flex-direction: column;
+          position: relative;
           .handleKeysBar {
             height: 40px;
             padding: 5px 10px 5px;
@@ -73,6 +74,7 @@
           }
           .messageInput {
             width: 100%;
+            max-width: 600px;
             height: 200px;
             padding: 10px;
             outline: none;
@@ -80,6 +82,11 @@
             white-space: pre-wrap;
             word-wrap: break-word;
             -webkit-user-modify: read-write-plaintext-only;
+          }
+          .numCount {
+            position: absolute;
+            bottom: -25px;
+            right: 20px;
           }
         }
         .handleBox {

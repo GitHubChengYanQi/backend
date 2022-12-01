@@ -20,7 +20,7 @@
                 v-if="item.type == 'input'"
               >
                 <a-input
-                  :disabled="isDisableEdit"
+                  :disabled="isDisableEdit && type == 1"
                   style="width:100%;height:100%;padding-right:60px;"
                   placeholder="请输入"
                   :maxLength="50"
@@ -33,11 +33,11 @@
                 class="radio"
                 v-else-if="item.type == 'radio'"
               >
-                <a-radio-group v-model="input.data[item.key]" :disabled="isDisableEdit">
+                <a-radio-group v-model="input.data[item.key]" :disabled="isDisableEdit && type == 1">
                   <a-radio value="0">立即发送</a-radio>
                   <a-radio value="1">定时发送</a-radio>
                   <a-date-picker
-                    :disabled="isDisableEdit"
+                    :disabled="isDisableEdit && type == 1"
                     :disabledDate="disabledDate"
                     :show-time="{ format: 'HH:mm:ss' }"
                     format="YYYY-MM-DD HH:mm:ss"
@@ -54,7 +54,7 @@
               >
                 <div class="select_title"><span class="txt">选择群主 </span><span class="btn">
                   <selectPersonnel
-                    :style="isDisableEdit ? {pointerEvents:'none'}:{}"
+                    :style="isDisableEdit && type == 1 ? {pointerEvents:'none'}:{}"
                     type="button"
                     name="+ 添加"
                     v-model="mumbersArr"
@@ -63,6 +63,7 @@
                 </span></div>
                 <div class="hint">预计送达客户群数：{{ total }}个 <span
                   class="btn"
+                  :style="isDisableEdit && type == 1 ? {pointerEvents:'none'}:{}"
                   @click="getNumber"
                 >刷新</span></div>
               </div>
@@ -74,7 +75,7 @@
                 <div class="hint">群发文本</div>
                 <div class="textear_box">
                   <a-textarea
-                    :disabled="isDisableEdit"
+                    :disabled="isDisableEdit && type == 1"
                     class="textear"
                     v-model="input.data.plain"
                     @change="setPlain"
@@ -106,13 +107,14 @@
                     :contentArray.sync="contentArray"
                     @getText="setText"
                     :isDisableEdit="isDisableEdit"
+                    :isEdit="type != 1 && state != 2 && state != 3"
                   />
                 </div>
               </div>
             </div>
           </div>
           <a-button
-            :disabled="isDisableEdit"
+            :disabled="isDisableEdit && type == 1"
             type="primary"
             class="button"
             @click="setMess"
@@ -262,12 +264,16 @@ export default {
       total: 0,
       tableId: -1,
       type: 0,
-      isDisableEdit: false
+      isDisableEdit: false,
+      state: 0
     }
   },
   watch: {
     contentArray: {
       handler (val) {
+        if (this.type != 1) {
+          this.isDisableEdit = val.length == 9
+        }
         if (this.previewArr.length > 0 && this.previewArr[0].isText) {
           this.previewArr = [this.previewArr[0], ...val]
         } else {
@@ -348,6 +354,7 @@ export default {
         console.log(res)
         if (this.type == 1 && (res.data.state == 3 || res.data.state == 2)) {
           this.isDisableEdit = true
+          this.state = res.data.state
         }
         this.input.data.name = res.data.name
         this.input.data.timeTab = res.data.once ? '0' : '1'

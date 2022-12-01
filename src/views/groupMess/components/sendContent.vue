@@ -107,7 +107,7 @@
             <!-- v-if="sopList[selectSopItemIdx].isEdit" -->
             <div
               class="handlesBox"
-              v-if="sendContentArray && sendContentArray[selectSopItemIdx] && isDisableEdit === false"
+              v-if="sendContentArray && sendContentArray[selectSopItemIdx] && (isDisableEdit == false || isEdit)"
             >
               <img
                 src="../images/move.svg"
@@ -358,6 +358,10 @@ export default {
       default: false
     },
     isSopEdit: {
+      type: Boolean,
+      default: false
+    },
+    isEdit: {
       type: Boolean,
       default: false
     },

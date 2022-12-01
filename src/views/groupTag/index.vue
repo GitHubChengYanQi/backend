@@ -3,7 +3,7 @@
     <div class="groupTag_left_box">
       <a-input-search
         v-model="searchStr"
-        @search="onSearch"
+        @change="onSearch"
         style="margin-bottom: 8px"
         placeholder="请输入分组名称"
       />
