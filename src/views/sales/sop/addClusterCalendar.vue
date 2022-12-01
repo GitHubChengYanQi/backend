@@ -496,6 +496,7 @@ export default {
       const tempInfo = this.addInfo.listTaskInfo.find(item => (item.tempId ? item.tempId === this.selectSopItemIdx : item.id === this.selectSopItemIdx))
       console.log(tempInfo, 'tempInfo切换时间回调')
       this.contentArray = Object.assign(tempInfo.sendContentList)
+      this.sendListTitle = tempInfo.sendTitle
     },
     addSop () {
       if (!this.addInfo.listTaskInfo.every(item => item.sendContentList && item.sendContentList.length > 0)) {
@@ -514,7 +515,8 @@ export default {
           sort: this.addInfo.listTaskInfo.length + 1,
           tempId: new Date().getTime(),
           sendTime: (previoutTimeFormat === currentTimeFormat) ? moment(previousTime).add(1, 'm').format('YYYY-MM-DD HH:mm') : moment(currentTimeFormat).add(3, 'm').format('YYYY-MM-DD HH:mm'),
-          sendContentList: []
+          sendContentList: [],
+          sendTitle: ''
         }
         this.addInfo.listTaskInfo.push(tempAddInfo)
         this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
@@ -526,7 +528,8 @@ export default {
           tempId: new Date().getTime(),
           sendTime: moment().add(3, 'm').format('YYYY-MM-DD HH:mm'),
           sendTitle: '',
-          sendContentList: []
+          sendContentList: [],
+          sendTitle: ''
         }
         tempTaskList.push(tempInfo)
         this.selectSopItemIdx = tempInfo.tempId
