@@ -259,6 +259,7 @@ export default {
       console.log(obj)
       workRoomShiftFind(obj).then((res) => {
         console.log(res)
+        this.table.pagination.total = res.data.total
         this.table.tableData = res.data.datas.map((item) => {
           const arr = ['executeOwner', 'nonExecutionOwner', 'deliveryGroup', 'nonDeliveryGroup']
           item.fruit.map((items, index) => {
