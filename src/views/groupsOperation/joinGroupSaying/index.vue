@@ -66,6 +66,7 @@ export default {
           width: '20%',
           align: 'center',
           sorter: true,
+          defaultSortOrder: 'descend',
           dataIndex: 'create_time'
         },
         {
