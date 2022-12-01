@@ -61,7 +61,7 @@
             class="lineChart_tab"
             @click="setLineChartTab(index)"
             v-for="(item,index) in ['流失人数','流失会员人数']"
-            :style="index == lineChart.tab ? {color:'#0CBC8B'}:{}"
+            :style="index == lineChart.tab ? {color:'#1890ff'}:{}"
             :key="index"
           ><span>{{ item }}</span>
             <div
@@ -751,7 +751,7 @@ export default {
         leftChart: {
           options: {
             center: ['50%', '50%'],
-            color: ['#64DDAB', '#C6F6E3', '#E2FFF4', '#B0EDD4'],
+            color: ['#1890ff', '#1890ffe3', '#1890ffb2', '#1890ff2a'],
             tooltip: {
               trigger: 'item',
               formatter: '{a} <br/>{b}: {c} ({d}%)'
@@ -775,7 +775,7 @@ export default {
         rightChart: {
           options: {
             center: ['50%', '50%'],
-            color: ['#64DDAB', '#C6F6E3', '#E2FFF4', '#B0EDD4'],
+            color: ['#1890ff', '#1890ffe3', '#1890ffb2', '#1890ff2a'],
             tooltip: {
               trigger: 'item',
               formatter: '{a} <br/>{b}: {c} ({d}%)'
@@ -1327,7 +1327,7 @@ export default {
     align-items: center;
     font-family: PingFang SC-Regular, PingFang SC;
     font-weight: 400;
-    color: #03b976;
+    color: #188fff;
     line-height: 24px;
     .icon {
       font-size: 10px;
@@ -1339,8 +1339,8 @@ export default {
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      color: #03b976;
-      border: 1px solid #03b976;
+      color: #1890ff;
+      border: 1px solid #188fff4c;
     }
   }
   .lossAnalysis_lineChart_box {
@@ -1370,7 +1370,7 @@ export default {
             transform: translateY(-50%);
             width: 2px;
             height: 10px;
-            background: #03b976;
+            background: #1890ff;
           }
         }
         .lineChart_search_box {
@@ -1420,7 +1420,7 @@ export default {
             margin-top: 3px;
             width: 50%;
             height: 2px;
-            background: #0cbc8b;
+            background: #1890ff;
           }
         }
       }
@@ -1478,7 +1478,7 @@ export default {
             transform: translateY(-50%);
             width: 2px;
             height: 10px;
-            background: #03b976;
+            background: #1890ff;
           }
 
           .icon {
@@ -1491,8 +1491,8 @@ export default {
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            color: #03b976;
-            border: 1px solid #03b976;
+            color: #1890ff;
+            border: 1px solid #1890ff;
           }
         }
 
@@ -1569,7 +1569,7 @@ export default {
             transform: translateY(-50%);
             width: 2px;
             height: 10px;
-            background: #03b976;
+            background: #1890ff;
           }
 
           .icon {
@@ -1582,8 +1582,8 @@ export default {
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            color: #03b976;
-            border: 1px solid #03b976;
+            color: #1890ff;
+            border: 1px solid #1890ff;
           }
         }
         .input_box {
@@ -1663,7 +1663,7 @@ export default {
           width: 25%;
           height: 4px;
           border-radius: 4px;
-          background: #03b976;
+          background: #1890ff;
         }
       }
     }
@@ -1676,7 +1676,7 @@ export default {
         align-items: center;
         font-family: PingFang SC-Regular, PingFang SC;
         font-weight: 400;
-        color: #03b976;
+        color: #1890ff;
         line-height: 24px;
       }
 
@@ -1690,8 +1690,8 @@ export default {
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        color: #03b976;
-        border: 1px solid #03b976;
+        color: #1890ff;
+        border: 1px solid #1890ff;
       }
     }
     .table_search_box {

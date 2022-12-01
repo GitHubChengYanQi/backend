@@ -1,8 +1,8 @@
 <template>
-  <div class="a_page">
-    <a-card class="a_card">
-      <div class="a_content">
-        <div class="a_catalog">
+  <div class="interactionRadar_page">
+    <a-card class="interactionRadar_card">
+      <div class="interactionRadar_content">
+        <div class="interactionRadar_catalog">
           <div class="header">
             <div class="title">
               分组名称
@@ -60,7 +60,7 @@
             </div>
           </div>
         </div>
-        <div class="a_table_box">
+        <div class="interactionRadar_table_box">
           <div class="hearder">
             <div class="search_box">
               <div
@@ -536,6 +536,9 @@ export default {
     },
     goPage (e, item = {}) {
       console.log(e, item)
+      if (e != 3) {
+        this.$router.push(`/interactionRadar/setRadar${e == 0 ? '' : '?id=' + item.id }`)
+      }
     },
     getSearch () {},
     reset () {
@@ -597,13 +600,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.a_page {
+.interactionRadar_page {
   width: 100%;
-  .a_card {
+  .interactionRadar_card {
     width: 100%;
     min-width: 870px;
 
-    .a_content {
+    .interactionRadar_content {
       min-width: 870px;
       width: 100%;
       display: flex;
@@ -613,7 +616,7 @@ export default {
       font-size: 13px;
       letter-spacing: normal;
       color: #333333;
-      .a_catalog {
+      .interactionRadar_catalog {
         flex-shrink: 0;
         width: 220px;
         height: 647px;
@@ -661,7 +664,7 @@ export default {
           }
         }
       }
-      .a_table_box {
+      .interactionRadar_table_box {
         flex-grow: 1;
         box-sizing: border-box;
         padding: 5px 10px;
