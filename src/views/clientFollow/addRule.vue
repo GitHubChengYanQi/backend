@@ -684,6 +684,203 @@
           <div class="hint">当客户匹配到了该标签后，自动创建跟客任务 <span class="btn">点击跳转</span></div>
         </div>
       </div>
+      <div
+        class="add_rule_box"
+        v-if="table == 4"
+      >
+        <div class="title">{{ tableId.length == 0 ?'新建':'编辑' }}消费属性打标签</div>
+        <div class="content">
+          <div class="input_box">
+            <div class="input">
+              <span class="input_title"><span class="necessary">*</span> 规则名称： </span>
+              <a-input
+                style="width: 400px; height: 36px"
+                placeholder="请填写规则名称，仅内部可见"
+                v-model="input"
+              ></a-input>
+            </div>
+          </div>
+          <div class="selectLable_box">
+            <span class="selectLable_title"><span class="necessary">*</span> 选择标签： </span>
+            <span
+              class="label_input"
+              @click="showBox()"
+            >
+              <span v-if="dateRule.length == 0">请选择标签</span>
+              <span
+                class="label_input_title"
+                v-for="(item,index) in dateRule"
+                :key="index"
+              >
+                {{ item.name }}
+                <span
+                  class="delete"
+                  @click.stop="setInputArr(item.id,0, index)"
+                >+</span>
+              </span>
+              <span
+                v-if="dateRule.length >0"
+                class="empty"
+                @click.stop="empty"
+              >+</span>
+            </span>
+          </div>
+          <div class="installRule_box">
+            <span class="installRule_title"><span class="necessary">*</span> 设置打标签规则： </span>
+            <span class="installRule_content">
+              <span
+                class="installRule"
+                v-for="(item,index) in ruleDate"
+                :key="index"
+              >
+                <span
+                  class="is_cascader"
+                  @click="setCascader(index)"
+                >
+                  <span
+                    class="is_placeholder"
+                    v-if="item.txt.length == 0"
+                  >请选择类型</span>
+                  <span
+                    class="is_txt"
+                    v-else
+                  >{{ item.txt }}</span>
+                  <i class="is_icon">
+                    <svg-icon
+                      :state="11"
+                      :rotate="cascaderstate == index"
+                    />
+                  </i>
+                  <div
+                    class="is_selectBox"
+                    v-if="cascaderstate == index"
+                  >
+                    <div
+                      class="is_select_listBox"
+                      v-for="(cascaderItem,cascaderIndex) in item.cascaderData"
+                      :key="cascaderIndex"
+                    >
+                      <div
+                        @click.stop="setCascaderSelect(selectItem,cascaderIndex,index,selectItem.isChildern)"
+                        v-for="(selectItem ,selectIndex) in cascaderItem"
+                        :class="item.cascaderSelect[cascaderIndex] == selectItem.id ? 'is_select is_active' : 'is_select'"
+                        :key="selectIndex"
+                      >
+                        {{ selectItem.name }}
+                        <i
+                          class="is_select_icon"
+                          v-if="selectItem.isChildern"
+                        >
+                          <svg-icon :state="12" />
+                        </i>
+                      </div>
+                    </div>
+                  </div>
+                </span>
+                <a-select
+                  v-model="ruleDate[index].select"
+                  placeholder="请选择"
+                  style="width: 100px; height:36px;margin-left:20px;"
+                >
+                  <a-select-option
+                    v-for="( items , indexs ) in relation"
+                    :value="items.value"
+                    :key="indexs"
+                  >
+                    {{ items.label }}
+                  </a-select-option>
+                </a-select>
+                <!-- 日期 -->
+                <a-date-picker
+                  v-if="item.type == 'date'"
+                  format="YYYY/MM/DD"
+                  :showToday="false"
+                  v-model="ruleDate[index].date"
+                  placeholder="请输入"
+                  style="width: 120px; height:36px;margin-left:20px;margin-bottom: 20px;"
+                />
+                <!-- 多选 -->
+                <a-select
+                  v-if="item.type == 'checkbox'"
+                  mode="tags"
+                  id="auctionTimesCode"
+                  v-model="ruleDate[index].checkbox"
+                  :maxTagCount="1"
+                  placeholder="请输入"
+                  style="min-width: 120px; min-height:36px;margin-left:20px;margin-bottom: 20px; cursor:pointer;"
+                >
+                  <a-select-option
+                    v-for="( items , indexs ) in ruleDate[index].selectData"
+                    :value="items.value"
+                    :key="indexs"
+                  >
+                    {{ items.label }}
+                  </a-select-option>
+                </a-select>
+                <!-- 单选 -->
+                <a-select
+                  v-if="item.type == 'radio' || item.type == 'select'"
+                  v-model="ruleDate[index].radio"
+                  placeholder="请输入"
+                  style="min-width: 120px; min-height:36px;margin-left:20px;margin-bottom: 20px;"
+                >
+                  <a-select-option
+                    v-for="( items , indexs ) in ruleDate[index].selectData"
+                    :value="items.value"
+                    :key="indexs"
+                  >
+                    {{ items.label }}
+                  </a-select-option>
+                </a-select>
+                <!-- 输入框 -->
+                <a-input
+                  v-if="item.type == 'input' || item.type == 'text' || item.type == 'bm' || item.type == 'range' || item.type == 'rangeDouble'"
+                  v-model="ruleDate[index].input"
+                  placeholder="请输入"
+                  style="width: 80px; height:36px;margin-left:20px;margin-bottom: 20px;"
+                />
+                <a-button
+                  :type="index > 0 ? '' : 'primary'"
+                  style="margin-left:10px;"
+                  @click="addRuleDate(index.toString())"
+                >{{ index > 0 ? '删除':'增加' }}</a-button>
+              </span>
+              <div
+                class="relation_box"
+                v-if="ruleDate.length > 1"
+              >
+                <div
+                  class="relation_select also"
+                  v-for="(relationItem ,relationIndex) in relationData "
+                  :key="relationIndex"
+                  :style="{background: relationState == relationItem.value ? '#1890ff': '',top: `calc( 50% - ${20 * (1 - relationIndex)}px)` }"
+                  @click="setRelation(relationItem.value)"
+                >{{ relationItem.label }}</div>
+              </div>
+            </span>
+          </div>
+          <div class="hint">
+            <span
+              style="white-space: break-spaces;"
+              v-if="hintState"
+            >{{ hintTxt }}</span>
+            <span v-else>当所选的数值数值为所设置内容</span>
+            时，自动为客户打上<span class="label_box">
+              <span
+                class="label"
+                v-for="(item,index) in dateRule"
+                :key="index"
+              >{{ item.name }}</span></span> 标签。
+          </div>
+        </div>
+        <div
+          class="title"
+          style="margin-top:50px"
+        >增加跟客任务<span style="color:#ccc;">（非必填）</span>：</div>
+        <div class="content">
+          <div class="hint">当客户匹配到了该标签后，自动创建跟客任务 <span class="btn">点击跳转</span></div>
+        </div>
+      </div>
       <div class="btn_box">
         <a-button
           type="primary"
