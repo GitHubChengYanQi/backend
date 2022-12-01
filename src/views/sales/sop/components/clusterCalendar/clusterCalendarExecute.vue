@@ -6,8 +6,8 @@
           <a-form-item label="群名称:">
             <a-input placeholder="请输入群名称" v-model="searchInfo.clusterName" class="inputClass" />
           </a-form-item>
-          <a-form-item label="SOP名称:">
-            <a-input placeholder="请输入SOP名称" v-model="searchInfo.sopName" class="inputClass" />
+          <a-form-item label="群日历名称:">
+            <a-input placeholder="请输入群日历名称" v-model="searchInfo.sopName" class="inputClass" />
           </a-form-item>
           <a-button
             type="primary"
@@ -29,7 +29,7 @@
         :data-source="tableData"
         :columns="tableColumns"
         :pagination="pagination"
-        :scroll="{ x: 1500}"
+        :scroll="{ x: '100%'}"
         :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
         :customRow="rowClick"
         :rowClassName="setRowClassName"
@@ -37,7 +37,7 @@
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
-              <a-button type="link" @click="deleteItem(record.id)" v-permission="'/sopClusterCalendar/delete@delete'">删除</a-button>
+              <a-button type="link" @click="deleteItem(record.id)" v-permission="'/sopClusterCalendar/delete@delete'">取消</a-button>
             </div>
           </template>
         </div>
@@ -111,25 +111,25 @@ export default {
           title: '群名称',
           dataIndex: 'clusterName',
           align: 'center',
-          width: 150
+          width: 100
         },
         {
-          title: 'SOP名称',
+          title: '群日历名称',
           dataIndex: 'sopName',
           align: 'center',
-          width: 150
+          width: 100
         },
         {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
-          width: 200
+          width: 100
         },
         {
           title: '操作',
           align: 'center',
-          width: 200,
-          fixed: 'right',
+          width: 100,
+          // fixed: 'right',
           scopedSlots: { customRender: 'options' },
           all: true
         }

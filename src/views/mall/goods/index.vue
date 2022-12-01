@@ -10,7 +10,7 @@
                 label="通用名："
                 :labelCol="{lg: {span: 7} }"
                 :wrapperCol="{lg: {span: 17} }">
-                <a-input v-model="screenData.contactName" placeholder="请输入药品通用名"></a-input>
+                <a-input v-model="screenData.commonName" placeholder="请输入药品通用名"></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="8" :md="6">
@@ -18,7 +18,7 @@
                 label="商品名称："
                 :labelCol="{lg: {span: 7} }"
                 :wrapperCol="{lg: {span: 17} }">
-                <a-input v-model="screenData.contactName" placeholder="请输入商品名称"></a-input>
+                <a-input v-model="screenData.name" placeholder="请输入商品名称"></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="8" :md="6">
@@ -26,10 +26,10 @@
                 label="商品状态："
                 :labelCol="{lg: {span: 7} }"
                 :wrapperCol="{lg: {span: 17} }">
-                <a-select>
+                <a-select v-model="screenData.effective">
                   <a-select-option value="">请选择</a-select-option>
-                  <a-select-option value="0">有效</a-select-option>
-                  <a-select-option value="1">失效</a-select-option>
+                  <a-select-option value="1">有效</a-select-option>
+                  <a-select-option value="0">失效</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -38,7 +38,7 @@
                 label="批准文号："
                 :labelCol="{lg: {span: 7} }"
                 :wrapperCol="{lg: {span: 17} }">
-                <a-input v-model="screenData.contactName" placeholder="请输入批准文号"></a-input>
+                <a-input v-model="screenData.approvalNo" placeholder="请输入批准文号"></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="8" :md="6">
@@ -46,7 +46,7 @@
                 label="ERP商品编码："
                 :labelCol="{lg: {span: 7} }"
                 :wrapperCol="{lg: {span: 17} }">
-                <a-input v-model="screenData.contactName" placeholder="请输入ERP商品编码"></a-input>
+                <a-input v-model="screenData.code" placeholder="请输入ERP商品编码"></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="8" :md="6">
@@ -54,7 +54,7 @@
                 label="条形码："
                 :labelCol="{lg: {span: 7} }"
                 :wrapperCol="{lg: {span: 17} }">
-                <a-input v-model="screenData.contactName" placeholder="请输入条形码"></a-input>
+                <a-input v-model="screenData.barCode" placeholder="请输入条形码"></a-input>
               </a-form-item>
             </a-col>
           </a-row>
@@ -72,11 +72,15 @@
               type="primary"
               @click="search">查询</a-button>
             <a-button @click="resetSearch">重置</a-button>
-            <a-button
-              type="primary"
-              :loading="loading"
+            <a-upload
+              name="file"
               v-permission="'/mall/goods@import'"
-              @click="exportFn()">导入</a-button>
+              accept=".xlsx"
+              :showUploadList="false"
+              :customRequest="importFn"
+            >
+              <a-button :loading="loading">导入</a-button>
+            </a-upload>
             <a-button
               type="primary"
               :loading="loading"
@@ -94,7 +98,7 @@
           :scroll="{ x: 1500}"
           @change="handleTableChange">
           <div
-            slot="status"
+            slot="effective"
             slot-scope="record">
             <template>
               <a-switch
@@ -133,7 +137,6 @@
         <a-form-item label="药品通用名">
           <a-select
             mode="multiple"
-            :size="size"
             placeholder="Please select"
             :default-value="['a1', 'b2']"
             style="width: 200px"
@@ -173,7 +176,7 @@
 <script>
 import moment from 'moment'
 import detail from './detail.vue'
-import { relList, userRelExport } from '@/api/actor'
+import { erpGoods, erpGoodsSync } from '@/api/mall'
 import { deepClone } from '@/utils/util'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 export default {
@@ -185,6 +188,7 @@ export default {
       showEdit: false,
       visible: false,
       loading: false,
+      confirmLoading: false,
       selectedRowKeys: [], // 选中key
       selectedRows: [], // 选中row
       screenData: {},
@@ -193,87 +197,77 @@ export default {
       columns: [
         {
           title: '平台编码',
-          dataIndex: 'contactName',
+          dataIndex: 'platformCode',
           sorter: true,
           align: 'center',
-          width: 200,
-          scopedSlots: { customRender: 'contactName' }
+          width: 200
         },
         {
           title: 'ERP商品编码',
-          dataIndex: 'maintainerName',
+          dataIndex: 'code',
           sorter: true,
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'maintainerName' }
+          width: 150
         },
         {
           title: '通用名',
-          dataIndex: 'maintainerDepartmentName',
+          dataIndex: 'commonName',
           sorter: true,
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'maintainerDepartmentName' }
+          width: 150
         },
         {
           title: '商品名称',
-          dataIndex: 'maintainerStoreName',
+          dataIndex: 'name',
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'maintainerStoreName' }
+          width: 150
         },
         {
           title: '商品规格',
-          dataIndex: 'num',
+          dataIndex: 'specifications',
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'num' }
+          width: 150
         },
         {
           title: '批准文号',
-          dataIndex: 'createdAt',
+          dataIndex: 'approvalNo',
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          width: 150
         },
         {
           title: '毛利率',
-          dataIndex: 'createdAt',
+          dataIndex: 'margin',
           sorter: true,
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          width: 150
         },
         {
           title: '失效天数',
-          dataIndex: 'createdAt',
+          dataIndex: 'invalidDyas',
           sorter: true,
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          width: 150
         },
         {
           title: '单品提成',
-          dataIndex: 'createdAt',
+          dataIndex: 'goodsCommission',
           sorter: true,
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          width: 150
         },
         {
           title: '更新时间',
           dataIndex: 'createdAt',
           sorter: true,
           align: 'center',
-          width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          width: 150
         },
         {
           title: '状态',
-          dataIndex: 'createdAt',
+          dataIndex: 'effective',
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          scopedSlots: { customRender: 'effective' }
         },
         {
           title: '操作',
@@ -349,7 +343,7 @@ export default {
       }
       params.storeIds = this.storeIds.length !== 0 ? this.storeIds.join(',') : ''
       params.maintainerIds = params.maintainerIds ? params.maintainerIds.join(',') : ''
-      relList(params).then((res) => {
+      erpGoods(params).then((res) => {
         this.loading = false
         this.tableData = res.data.records
         this.pagination.total = res.data.total
@@ -446,6 +440,12 @@ export default {
       this.visible = false
     },
     /**
+     * 导入
+     */
+    importFn (e) {
+      console.log(e)
+    },
+    /**
      * 导出
      */
     exportFn () {
@@ -460,16 +460,10 @@ export default {
         param.storeIds = this.storeIds.length !== 0 ? this.storeIds.join(',') : ''
         param.maintainerIds = this.screenData.maintainerIds ? this.screenData.maintainerIds.join(',') : ''
       }
-      userRelExport(param).then((res) => {
+      erpGoodsExport(param).then((res) => {
         this.loading = false
         callDownLoadByBlob(res, '客户协作人')
       })
-    },
-    /**
-     * 部门回调
-     */
-    getDept (e) {
-      this.storeIds = e
     }
   }
 }
