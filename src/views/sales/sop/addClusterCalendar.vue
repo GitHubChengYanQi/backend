@@ -16,20 +16,22 @@
         <div class="execution" v-permission="'/sopClusterCalendarTemplate/update@post'" v-else @click="sendSop()">保存</div>
       </div>
       <div class="sendSOPInfoContainer">
-        <div class="sendSOPList" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length && currentShowTabId === 1">
+        <div class="sendSOPList" v-if="currentShowTabId === 1">
           <div class="addSop" @click="addSop">+ 添加</div>
-          <div
-            :class="selectSopItemIndex === index ? 'sopItem active' : 'sopItem'"
-            v-for="(item, index) in addInfo.listTaskInfo"
-            :key="item.tempId ? item.tempId : item.id"
-            @click="chooseSopItem(item,index)"
-          >
-            {{ returnSopText(item) }}
-            <span
-              v-if="addInfo.listTaskInfo.length !== 1"
-              class="del"
-              @click.stop="delSopItem(index, item)"
-            >×</span>
+          <div v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length">
+            <div
+              :class="selectSopItemIndex === index ? 'sopItem active' : 'sopItem'"
+              v-for="(item, index) in addInfo.listTaskInfo"
+              :key="item.tempId ? item.tempId : item.id"
+              @click="chooseSopItem(item,index)"
+            >
+              {{ returnSopText(item) }}
+              <span
+                v-if="addInfo.listTaskInfo.length !== 1"
+                class="del"
+                @click.stop="delSopItem(index, item)"
+              >×</span>
+            </div>
           </div>
         </div>
         <div class="sendItemContent">
@@ -46,8 +48,12 @@
               </ul>
             </a-calendar>
           </div>
-          <div class="chooseSendDate" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length && currentShowTabId === 1">
-            <div class="singleSendContentItem">
+          <div class="chooseSendDate" v-if="currentShowTabId === 1">
+            <div class="chooseNoTitle">
+              <div class="noTitleDiv">发送内容</div>
+              <div class="noTitleContent">(发送时间,通过企微应用消息提醒群主和内容推送到企微侧边栏的时间)</div>
+            </div>
+            <div class="singleSendContentItem" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length">
               <div class="singleSendContentTitle">发送时间:</div>
               <a-date-picker
                 dropdownClassName="addSop_Page_Container_selectSopItemDateBox"
@@ -61,14 +67,22 @@
                 @change="sendDateChange"
               />
             </div>
-            <div class="singleSendContentItem">
+            <div class="singleSendContentItem" v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length">
               <div class="singleSendContentTitle">内容标题:</div>
-              <a-input v-model="sendListTitle" class="inputSendTitleClass" placeholder="请输入标题,标题不发给客户" @change="changeListTitleName"/>
-              <span class="len">{{ sendListTitle && sendListTitle.length ? sendListTitle.length :'0' }}/15</span>
+              <div class="inputSendTitleWrapper">
+                <a-input v-model="sendListTitle" class="inputSendTitleClass" placeholder="请输入标题,标题不发给客户" @change="changeListTitleName"/>
+                <span class="len">{{ sendListTitle && sendListTitle.length ? sendListTitle.length :'0' }}/15</span>
+              </div>
             </div>
           </div>
+          <!-- <div class="chooseNoDateSend" v-else>
+            <div class="chooseNoTitle">
+              <div class="noTitleDiv">发送内容</div>
+              <div class="noTitleContent">(发送时间,通过企微应用消息提醒群主和内容推送到企微侧边栏的时间)</div>
+            </div>
+          </div> -->
           <SendContent
-            v-if="currentShowTabId === 1"
+            v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length && currentShowTabId === 1"
             :contentArray.sync="contentArray"
             :isSopEdit.sync="isSopEdit"
             :isDisableEdit="false"/>
@@ -102,8 +116,10 @@
             </div>
             <div class="singleCalendarSendContentItem">
               <div class="singleCalendarSendContentTitle">内容标题:</div>
-              <a-input v-model="addCalendarContentInfo.sendTitle" class="inputCalendarSendTitleClass" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
-              <span class="len">{{ addCalendarContentInfo.sendTitle && addCalendarContentInfo.sendTitle.length ? addCalendarContentInfo.sendTitle.length :'0' }}/15</span>
+              <div class="inputCalendarSendTitleWrapper">
+                <a-input v-model="addCalendarContentInfo.sendTitle" class="inputCalendarSendTitleClass" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
+                <span class="len">{{ addCalendarContentInfo.sendTitle && addCalendarContentInfo.sendTitle.length ? addCalendarContentInfo.sendTitle.length :'0' }}/15</span>
+              </div>
             </div>
           </div>
         <!-- <a-form layout="horizontal">
@@ -379,8 +395,10 @@ export default {
       this.currentShowTabId = info.id
       if (this.currentShowTabId === 1) {
         this.$nextTick(() => {
-          this.sendListTitle = this.addInfo.listTaskInfo[0].sendTitle
-          this.contentArray = Object.assign(this.addInfo.listTaskInfo[0].sendContentList)
+          if (this.addInfo && this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length) {
+            this.sendListTitle = this.addInfo.listTaskInfo[0].sendTitle
+            this.contentArray = Object.assign(this.addInfo.listTaskInfo[0].sendContentList)
+          }
         })
       }
     },
@@ -428,14 +446,14 @@ export default {
     // 如果是新增,设置默认时间点
     setDefaultTime () {
       const tempTaskList = []
-      const tempInfo = {
-        tempId: new Date().getTime(),
-        sendTime: moment().add(3, 'm').format('YYYY-MM-DD HH:mm'),
-        sendTitle: '',
-        sendContentList: []
-      }
-      tempTaskList.push(tempInfo)
-      this.selectSopItemIdx = tempInfo.tempId
+      // const tempInfo = {
+      //   tempId: new Date().getTime(),
+      //   sendTime: moment().add(3, 'm').format('YYYY-MM-DD HH:mm'),
+      //   sendTitle: '',
+      //   sendContentList: []
+      // }
+      // tempTaskList.push(tempInfo)
+      // this.selectSopItemIdx = tempInfo.tempId
       this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
     },
     // 获取详情
@@ -478,6 +496,7 @@ export default {
       const tempInfo = this.addInfo.listTaskInfo.find(item => (item.tempId ? item.tempId === this.selectSopItemIdx : item.id === this.selectSopItemIdx))
       console.log(tempInfo, 'tempInfo切换时间回调')
       this.contentArray = Object.assign(tempInfo.sendContentList)
+      this.sendListTitle = tempInfo.sendTitle
     },
     addSop () {
       if (!this.addInfo.listTaskInfo.every(item => item.sendContentList && item.sendContentList.length > 0)) {
@@ -485,22 +504,39 @@ export default {
         return
       }
       this.isSopEdit = true
-      // 获取最后一条的时间
-      const previousTime = this.addInfo.listTaskInfo[this.addInfo.listTaskInfo.length - 1].sendTime
-      // 将最后一条的时间格式化
-      const previoutTimeFormat = moment(previousTime).format('YYYY-MM-DD HH:mm')
-      // 获取当前的时间
-      const currentTimeFormat = moment().format('YYYY-MM-DD HH:mm')
-      const tempAddInfo = {
-        sort: this.addInfo.listTaskInfo.length + 1,
-        tempId: new Date().getTime(),
-        sendTime: (previoutTimeFormat === currentTimeFormat) ? moment(previousTime).add(1, 'm').format('YYYY-MM-DD HH:mm') : moment(currentTimeFormat).add(3, 'm').format('YYYY-MM-DD HH:mm'),
-        sendContentList: []
+      if (this.addInfo.listTaskInfo.length !== 0) {
+        // 获取最后一条的时间
+        const previousTime = this.addInfo.listTaskInfo[this.addInfo.listTaskInfo.length - 1].sendTime
+        // 将最后一条的时间格式化
+        const previoutTimeFormat = moment(previousTime).format('YYYY-MM-DD HH:mm')
+        // 获取当前的时间
+        const currentTimeFormat = moment().format('YYYY-MM-DD HH:mm')
+        const tempAddInfo = {
+          sort: this.addInfo.listTaskInfo.length + 1,
+          tempId: new Date().getTime(),
+          sendTime: (previoutTimeFormat === currentTimeFormat) ? moment(previousTime).add(1, 'm').format('YYYY-MM-DD HH:mm') : moment(currentTimeFormat).add(3, 'm').format('YYYY-MM-DD HH:mm'),
+          sendContentList: [],
+          sendTitle: ''
+        }
+        this.addInfo.listTaskInfo.push(tempAddInfo)
+        this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
+        console.log(this.addInfo, '新增时间点后的对象')
+        this.chooseSopItem(tempAddInfo, this.addInfo.listTaskInfo.length - 1)
+      } else {
+        const tempTaskList = []
+        const tempInfo = {
+          tempId: new Date().getTime(),
+          sendTime: moment().add(3, 'm').format('YYYY-MM-DD HH:mm'),
+          sendTitle: '',
+          sendContentList: [],
+          sendTitle: ''
+        }
+        tempTaskList.push(tempInfo)
+        this.selectSopItemIdx = tempInfo.tempId
+        this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
+        this.chooseSopItem(tempInfo, this.addInfo.listTaskInfo.length - 1)
       }
-      this.addInfo.listTaskInfo.push(tempAddInfo)
-      this.$set(this.addInfo, 'listTaskInfo', this.addInfo.listTaskInfo)
-      console.log(this.addInfo, '新增时间点后的对象')
-      this.chooseSopItem(tempAddInfo, this.addInfo.listTaskInfo.length - 1)
+      
     },
     // 删除时间节点
     delSopItem (index, info) {
@@ -565,7 +601,7 @@ export default {
     // 开始执行
     sendSop () {
       if (!(this.addInfo.sopName && this.addInfo.sopName.trim())) {
-        this.$message.error('请输入SOP名称！')
+        this.$message.error('请输入规则名称！')
         return
       }
       if (this.addInfo.listTaskInfo && this.addInfo.listTaskInfo.length != 0) {
@@ -643,182 +679,30 @@ export default {
         .singleCalendarSendContentTitle {
           margin-right: 30px;
         }
-        .inputCalendarSendTitleClass {
-          width: 300px;
+        .inputCalendarSendTitleWrapper {
+          position: relative;;
+          .inputCalendarSendTitleClass {
+            width: 400px;
+          }
+          .len {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 20px;
+            position: absolute;
+            right: 4px;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+          }
         }
-        .len {
-          margin-left: 20px;
-        }
+        
       }
       .singleCalendarSendContentItem:nth-child(1) {
         margin-top: 0px;
       }
     }
   }
-   .contentLinkModal {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        position: relative;
-        .tip {
-          margin: 0;
-          .click {
-            color: #4074f6;
-            cursor: pointer;
-          }
-        }
-        .top {
-          position: absolute;
-          top: 0;
-        }
-        .formBox {
-          width: 65%;
-          .line {
-            position: relative;
-            margin-bottom: 10px;
-            .ant-input {
-              height: 35px;
-              padding-right: 60px;
-            }
-            .len {
-              position: absolute;
-              right: 5px;
-              top: 8px;
-            }
-          }
-          .textarea {
-            .ant-input {
-              min-height: 100px;
-            }
-            .len {
-              bottom: 0;
-              transform: translate(0, 100%);
-            }
-          }
-        }
-        .pic {
-          flex: 1;
-          margin-left: 20px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          .image {
-            width: 170px;
-            height: 170px;
-            border-radius: 5px;
-            overflow: hidden;
-            cursor: pointer;
-          }
-          .addPic {
-            border: 1px dashed #d1d1d1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            font-weight: 100;
-            color: #878787;
-          }
-          .photoTip {
-            margin-top: 5px;
-          }
-          .file {
-            position: fixed;
-            left: 100000px;
-            top: 100000px;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
-          }
-        }
-      // .ant-modal-body {
-      //   display: flex;
-      //   justify-content: space-between;
-      //   align-items: flex-start;
-      //   position: relative;
-      //   .tip {
-      //     margin: 0;
-      //     .click {
-      //       color: #4074f6;
-      //       cursor: pointer;
-      //     }
-      //   }
-      //   .top {
-      //     position: absolute;
-      //     top: 0;
-      //   }
-      //   .formBox {
-      //     width: 65%;
-      //     .line {
-      //       position: relative;
-      //       margin-bottom: 10px;
-      //       .ant-input {
-      //         height: 35px;
-      //         padding-right: 60px;
-      //       }
-      //       .len {
-      //         position: absolute;
-      //         right: 5px;
-      //         top: 8px;
-      //       }
-      //     }
-      //     .textarea {
-      //       .ant-input {
-      //         min-height: 100px;
-      //       }
-      //       .len {
-      //         bottom: 0;
-      //         transform: translate(0, 100%);
-      //       }
-      //     }
-      //   }
-      //   .pic {
-      //     flex: 1;
-      //     margin-left: 20px;
-      //     display: flex;
-      //     flex-direction: column;
-      //     align-items: center;
-      //     .image {
-      //       width: 170px;
-      //       height: 170px;
-      //       border-radius: 5px;
-      //       overflow: hidden;
-      //       cursor: pointer;
-      //     }
-      //     .addPic {
-      //       border: 1px dashed #d1d1d1;
-      //       display: flex;
-      //       align-items: center;
-      //       justify-content: center;
-      //       font-size: 50px;
-      //       font-weight: 100;
-      //       color: #878787;
-      //     }
-      //     .photoTip {
-      //       margin-top: 5px;
-      //     }
-      //     .file {
-      //       position: fixed;
-      //       left: 100000px;
-      //       top: 100000px;
-      //       opacity: 0;
-      //       width: 1px;
-      //       height: 1px;
-      //     }
-      //   }
-      // }
-    }
-    .contentTextModal {
-      .ant-modal-body {
-        padding-top: 0;
-        .ant-input {
-          min-height: 100px;
-        }
-        .len {
-          display: block;
-          text-align: end;
-        }
-      }
-    }
   /deep/.ant-fullcalendar-header {
     padding: 11px 16px;
     text-align: left;
@@ -876,6 +760,7 @@ export default {
       width: 100%;
       margin-top: 10px;
       display: flex;
+      min-height: 300px;
       height: 100%;
       .sendSOPList {
         border-radius: 5px;
@@ -1010,6 +895,17 @@ export default {
           background-color: #fff;
           padding: 20px;
           border-radius: 5px;
+          .chooseNoTitle {
+            display: flex;
+            align-items: flex-end;
+            .noTitleDiv {
+              font-size: 16px;
+            }
+            .noTitleContent {
+              font-size: 14px;
+              margin-left: 4px;
+            }
+          }
           .singleSendContentItem {
             width: 100%;
             display: flex;
@@ -1018,11 +914,21 @@ export default {
             .singleSendContentTitle {
               margin-right: 30px;
             }
-            .inputSendTitleClass {
-              width: 300px;
-            }
-            .len {
-              margin-left: 20px;
+            .inputSendTitleWrapper {
+              position: relative;
+              .inputSendTitleClass {
+                width: 400px;
+              }
+              .len {
+                position: absolute;
+                right: 4px;
+                bottom: 0;
+                top: 0;
+                margin: auto 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
             }
           }
           .singleSendContentItem:nth-child(1) {
@@ -1049,274 +955,22 @@ export default {
             align-items: center;
           }
         }
-
+        .chooseNoDateSend {
+          margin-top: 20px;
+          .chooseNoTitle {
+            display: flex;
+            align-items: flex-end;
+            .noTitleDiv {
+              font-size: 16px;
+            }
+            .noTitleContent {
+              font-size: 14px;
+              margin-left: 4px;
+            }
+          }
+        }
       }
 }
-.sendCalendarSOPInfoContainer {
-    width: 100%;
-    margin-top: 10px;
-    display: flex;
-    .sendSOPList {
-      border-radius: 5px;
-      padding: 20px;
-      width: 300px;
-      height: 460px;
-      background-color: #fff;
-      overflow-y: auto;
-      .sopItem {
-        height: 35px;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        text-indent: 15px;
-        cursor: pointer;
-        border-radius: 5px;
-        position: relative;
-        .del {
-          display: none;
-          width: 35px;
-          height: 35px;
-          font-size: 16px;
-          position: absolute;
-          right: 0;
-          top: 50%;
-          align-items: center;
-          justify-content: center;
-          transform: translate(0, -50%);
-        }
-      }
-      .sopItem:hover {
-        .del {
-          display: flex;
-        }
-      }
-      .active {
-        background: #eef2fc;
-        color: #4074f6;
-      }
-      .addSop {
-        margin-bottom: 20px;
-        width: 100%;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 3px;
-        border: 1px dashed #8a8a8a;
-        cursor: pointer;
-      }
-    }
-    .sendContent {
-        margin-top: 10px;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        width: 100%;
-        min-height: 350px;
-        .tilBar {
-          margin-bottom: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-bottom: 10px;
-          border-bottom: 1px solid #cdcdcd;
-          .til {
-            font-weight: 600;
-          }
-          .handleBox {
-            width: auto;
-            display: flex;
-            position: relative;
-            .handleBtn {
-              margin-left: 5px;
-              border-radius: 3px;
-              padding: 5px 15px;
-              border: 1px solid #a9a9a9;
-              cursor: pointer;
-              color: rgb(28, 28, 28);
-            }
-            .handleBtn:first-child {
-              margin-left: 0;
-            }
-            .disabled {
-              opacity: 0.5;
-              cursor: no-drop;
-            }
-          }
-        }
-        .contentBox {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          .contentItem {
-            display: flex;
-            padding: 5px;
-            width: 100%;
-            align-items: center;
-            border-radius: 5px;
-
-            .idx {
-              width: 25px;
-              height: 25px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              border-radius: 50%;
-              background: #eef2fc;
-              color: #4074f6;
-            }
-            .content {
-              max-width: 750px;
-              margin-left: 10px;
-            }
-            .text {
-              word-wrap: break-word;
-              padding: 5px 0;
-            }
-            .image,
-            .video {
-              img,
-              video {
-                max-height: 300px;
-                max-width: 100%;
-              }
-            }
-            .video {
-              position: relative;
-              .poster {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(0, 0, 0, 0.1);
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-            }
-            .link {
-              width: 250px;
-              height: 80px;
-              border: 1px solid #cdcdcd;
-              border-radius: 5px;
-              flex: none;
-              padding: 10px;
-              display: flex;
-              .lef {
-                width: 160px;
-                margin-right: 10px;
-                font-size: 13px;
-                .til {
-                  width: 100%;
-                  color: #4074f6;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  display: inline-block;
-                }
-                .desc {
-                  width: 100%;
-                  display: -webkit-box;
-                  -webkit-box-orient: vertical;
-                  -webkit-line-clamp: 2;
-                  overflow: hidden;
-                }
-              }
-              .image {
-                flex: 1;
-                height: 100%;
-                max-width: 58px;
-              }
-            }
-            .embed {
-              width: 230px;
-              border: 1px solid #cdcdcd;
-              flex: none;
-              display: flex;
-              flex-direction: column;
-              padding: 8px 10px;
-              .line {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                .icon {
-                  width: 17px;
-                  height: 17px;
-                }
-                .til {
-                  color: #4074f6;
-                }
-              }
-              .desc {
-                font-size: 13px;
-                margin-top: 3px;
-              }
-              .image {
-                height: 180px;
-                margin: 3px 0;
-              }
-            }
-            .handlesBox {
-              display: none;
-              // display: flex;
-              margin: auto;
-              margin-right: 30px;
-              .icon {
-                width: 30px;
-                height: 30px;
-                margin-left: 10px;
-                cursor: pointer;
-              }
-              .move {
-                width: 35px;
-                height: 35px;
-              }
-              .disabled {
-                cursor: no-drop;
-              }
-            }
-          }
-          .contentItem:hover {
-            background-color: #2a66ff1f;
-            .handlesBox {
-              display: flex;
-            }
-          }
-        }
-      }
-    .sendItemContent {
-      margin-left: 10px;
-      flex: 1;
-      height: 100%;
-      .chooseSendDate {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        .til {
-          font-weight: 600;
-          margin-bottom: 10px;
-        }
-        .chooseDateBox1 {
-          .chooseDateBoxRadio {
-            display: flex;
-            flex-direction: column;
-            .line-wrapper {
-              margin-bottom: 10px;
-              .ant-time-picker {
-                width: 120px;
-              }
-            }
-          }
-        }
-        .chooseDateBox2 {
-          display: flex;
-          align-items: center;
-        }
-      }
-    }
-  }
 .uploadFileInp {
   position: fixed;
   left: -100000px;
