@@ -68,7 +68,13 @@
                 class="cover_box"
                 v-else-if="item.type == 'cover'"
               >
-                <div class="add_img_box">
+                <div
+                  class="add_img_box"
+                  @click="()=>{
+                    modalState = true
+                    modalTitle ='上传图片'
+                  }"
+                >
                   <img
                     class="add_icon"
                     :src="require('@/assets/add_icon.svg')"
@@ -85,6 +91,10 @@
                 v-else-if="item.type == 'uploading'"
               >
                 <img
+                  @click="()=>{
+                    modalState = true
+                    modalTitle ='上传PDF'
+                  }"
                   class="uploading_icon"
                   :src="require('@/assets/upload_btn.png')"
                   alt=""
@@ -128,11 +138,108 @@
         </div>
       </div>
     </div>
+    <a-modal
+      v-model="modalState"
+      :title="modalTitle"
+      centered
+      width="700px"
+      @ok="setCatalog"
+      @cancel="()=>{
+        modalState = false
+        uploadUrl = ''
+        modelTab = 0
+      }"
+    >
+      <div class="model_input_box">
+        <div class="model_tab_box">
+          <div
+            class="model_tab"
+            :style="modelTab == index ? { color:'#1c96f0',borderBottom:'1px solid #1c96f0' }:{}"
+            @click="setModelTab(index)"
+            v-for="(item,index) in ['本地上传','素材库']"
+            :key="index"
+          >{{ item }}</div>
+        </div>
+        <div class="model_content">
+          <div
+            class="upload_box"
+            v-if="modelTab == 0"
+          >
+            <div
+              v-if="uploadUrl.length == 0"
+              class="upload_btn"
+              @click="getLink"
+            >
+              <img
+                class="upload_icon"
+                :src="require('@/assets/upload.svg')"
+                alt=""
+              >
+              <span class="upload_text">{{ modalTitle }}</span>
+            </div>
+            <img
+              v-else
+              :src="uploadUrl"
+              alt=""
+              @click="getLink"
+              style="cursor: pointer;max-width: 100%;height: auto;"
+            >
+          </div>
+          <div
+            class="material_library_box"
+            v-else
+          >
+            <div class="search_box">
+              <div class="hint">共有{{ medium.pagination.total }}个素材</div>
+              <div class="seach">
+                <a-input
+                  class="input"
+                  v-model="modelSearch"
+                  placeholder="输入要搜素的内容"
+                ></a-input>
+                <a-button
+                  type="primary"
+                  class="button"
+                  @click="searchMedium"
+                >搜索</a-button>
+                <a-button
+                  class="button"
+                  @click="resetMedium"
+                >清空</a-button>
+              </div>
+            </div>
+            <div class="table_box">
+              <a-table
+                :columns="medium.columns"
+                :row-selection="rowSelection"
+                :row-key="record => record.id"
+                :data-source="medium.data"
+                :pagination="medium.pagination"
+                @change="handleTableChange"
+              >
+
+              </a-table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a-modal>
+    <input
+      style="display:none"
+      type="file"
+      accept="image/jpeg, image/png"
+      ref="uploadPhotoRef"
+      @change="uploadPhoto"
+      class="uploadFileInp"
+    />
   </div>
 </template>
 
 <script>
 import QuillEditor from './components/QuillEditor'
+import { upLoad } from '@/api/common'
+import { materialLibraryList } from '@/api/mediumGroup'
+
 export default {
   components: { 'quill-editor': QuillEditor },
   data () {
@@ -321,13 +428,125 @@ export default {
             key: 'content'
           }
         ]
+      },
+      modalState: false,
+      modalTitle: '上传图片',
+      modelTab: 0,
+      uploadUrl: '',
+      modelSearch: '',
+      medium: {
+        columns: [
+          {
+            title: '标题',
+            dataIndex: 'title',
+            align: 'center'
+          },
+          {
+            title: '内容',
+            dataIndex: 'contents',
+            align: 'center',
+            scopedSlots: { customRender: 'contents' },
+            ellipsis: true
+          },
+          {
+            title: '上传者',
+            dataIndex: 'userName',
+            align: 'center',
+            width: 100
+          },
+          {
+            title: '发送次数',
+            dataIndex: 'sendCount',
+            align: 'center'
+          },
+          {
+            title: '素材来源',
+            dataIndex: 'mediumGroupName',
+            align: 'center',
+            width: 100
+          },
+          {
+            title: '类型',
+            dataIndex: 'type',
+            align: 'center',
+            width: 100
+          },
+          {
+            title: '添加时间',
+            dataIndex: 'createdAt',
+            align: 'center',
+            width: 120
+          }
+        ],
+        pagination: {
+          total: 0,
+          current: 1,
+          pageSize: 10,
+          showSizeChanger: true
+        },
+        data: []
       }
     }
   },
   created () {
     this.setType()
   },
+  computed: {
+    rowSelection () {
+      return {
+        type: 'radio', // 单选按钮定义
+        onChange: (selectedRowKeys, selectedRows) => {
+          console.log('选中的', selectedRowKeys, selectedRows)
+        }
+      }
+    }
+  },
   methods: {
+    handleTableChange ({ current, pageSize }) {
+      this.medium.pagination.current = current
+      this.medium.pagination.pageSize = pageSize
+      this.getMedium()
+    },
+    async uploadPhoto (e) {
+      console.log(e, '上传图片对象')
+      if (e && e.target && e.target.files.length !== 0) {
+        const file = e.target.files[0]
+        const fileArray = file.name.split('.')
+        const suffix = fileArray[fileArray.length - 1]
+        if (!['jpg', 'jpeg', 'png'].includes(suffix)) {
+          return this.$message.warn('请上传 JPG、JPEG及PNG格式的图片文件')
+        }
+        if (file.size > 10 * 1000 * 1000) {
+          return this.$message.warn('请上传小于10MB的图片文件')
+        }
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('time', 1)
+        const res = await upLoad(formData)
+        // const params = {
+        //   imgUrl: res.data.fullPath,
+        //   mediaName: file.name
+        // }
+        // console.log(params, '返回的对象'
+        console.log(res)
+        this.uploadUrl = res.data.fullPath
+      } else {
+        console.log(e)
+      }
+    },
+    getLink () {
+      this.$refs.uploadPhotoRef.value = ''
+      this.$nextTick(() => {
+        this.$refs['uploadPhotoRef'].click()
+      })
+    },
+    setModelTab (e) {
+      this.modelTab = e
+      if (e == 1) {
+        this.getMedium()
+      }
+    },
+    setCatalog () {},
     editorChange (html) {
       console.log(html)
     },
@@ -342,6 +561,33 @@ export default {
       } else {
         this.$set(this.setData, 'changeType', newInputType)
       }
+    },
+    searchMedium () {
+      this.medium.pagination.current = 1
+      this.getMedium()
+    },
+    resetMedium () {
+      this.medium.pagination.current = 1
+      this.medium.pagination.pageSize = 10
+      this.modelSearch = ''
+      this.getMedium()
+    },
+    getMedium () {
+      const obj = {
+        page: 1,
+        perPage: 10,
+        type: 2,
+        searchStr: this.modelSearch
+      }
+      materialLibraryList(obj).then((res) => {
+        const { page, list } = res.data
+        console.log(res)
+        this.medium.pagination.total = page.total
+        this.medium.data = list.map((item) => {
+          item.title = item.content.title
+          return item
+        })
+      })
     }
   }
 }
@@ -357,7 +603,7 @@ export default {
   font-style: normal;
   .a_card {
     width: 100%;
-    min-height: 770px;
+    // min-height: 770px;
     box-sizing: border-box;
     padding: 20px 30px;
     border: 1px solid #ccc;
@@ -467,5 +713,90 @@ export default {
       }
     }
   }
+}
+.model_input_box {
+  width: 700px;
+  height: 490px;
+  .model_tab_box {
+    width: 100%;
+    height: 50px;
+    font-family: 'Arial Normal', 'Arial';
+    font-weight: 400;
+    font-style: normal;
+    font-size: 13px;
+    border-bottom: 1px solid #e9e9e9;
+    display: flex;
+    align-items: center;
+    .model_tab {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding: 0 20px;
+      cursor: pointer;
+    }
+  }
+  .model_content {
+    .upload_box {
+      margin-top: 10px;
+      width: 100%;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .upload_btn {
+        width: 115px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background-color: #1c96f0;
+        border-radius: 5px;
+        color: #fff;
+        .upload_icon {
+          margin-right: 5px;
+          height: 15px;
+          width: auto;
+        }
+      }
+    }
+    .material_library_box {
+      width: 100%;
+      height: 440px;
+      overflow: auto;
+      .search_box {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px 18px;
+        .hint {
+          margin-bottom: 8px;
+        }
+        .seach {
+          display: flex;
+          align-items: center;
+          .input {
+            width: 165px;
+            height: 25px;
+          }
+          .button {
+            width: auto;
+            height: 25px;
+          }
+        }
+      }
+    }
+  }
+}
+::v-deep(.ant-modal-header) {
+  font-size: 14px;
+  text-align: start;
+  font-family: 'Arial Normal', 'Arial';
+  font-weight: 400;
+  color: #333333;
+  background-color: #e9e9e9;
+}
+
+::v-deep(.ant-modal-body) {
+  padding: 0;
 }
 </style>

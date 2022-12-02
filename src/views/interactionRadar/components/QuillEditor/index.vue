@@ -2,26 +2,13 @@
   <div
     class="quill_editor">
     <!-- 图片上传组件辅助-->
-    <a-upload
-      :loading="loading"
-      class="avatar-uploader"
-      :action="serverUrl"
-      name="file"
-      :headers="headers"
-      method="post"
-      :showUploadList="false"
-      list-type="picture-card"
-      :before-upload="beforeUpload"
-      @change="handleChange"
-      :data="{time:1}"
-    ></a-upload>
+    <div @click="getType(0)" class="quill_image"></div>
+    <div @click="getType(1)" class="quill_video"></div>
     <quill-editor
       class="editor"
       v-model="content"
       ref="myQuillEditor"
       :options="editorOption"
-      @blur="onEditorBlur($event)"
-      @focus="onEditorFocus($event)"
       @change="onEditorChange($event)"
     ></quill-editor>
   </div>
@@ -48,7 +35,7 @@ const toolbarOptions = [
   [{ font: [] }], // 字体种类
   [{ align: [] }], // 对齐方式
   ['clean'], // 清除文本格式
-  ['link', 'image'] // 链接、图片、视频
+  ['link', 'image', 'video'] // 链接、图片、视频
 ]
 Quill.register('modules/imageDrop', ImageDrop)
 Quill.register('modules/imageResize', ImageResize)
@@ -89,9 +76,17 @@ export default {
               image: function (value) {
                 if (value) {
                   // 触发input框选择图片文件
-                  document.querySelector('.avatar-uploader input').click()
+                  document.querySelector('.quill_image').click()
                 } else {
                   this.quill.format('image', false)
+                }
+              },
+              video: function (value) {
+                if (value) {
+                  // 触发input框选择图片文件
+                  document.querySelector('.quill_video').click()
+                } else {
+                  this.quill.format('video', false)
                 }
               }
             }
@@ -99,17 +94,7 @@ export default {
         }
       },
       serverUrl: process.env.VUE_APP_API_BASE_URL + '/common/upload', // 这里写你要上传的图片服务器地址
-      isShowCropper: false,
-      loading: false,
-      // imageUrl: '',
-      FileTypeArr: [
-        '',
-        ['jpg', 'png', 'jpeg'],
-        ['mp3', 'amr'],
-        ['mp4'],
-        ['doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'txt', 'pdf', 'Xmind']
-      ],
-      fileType: []
+      loading: false
     }
   },
   computed: {
@@ -126,49 +111,8 @@ export default {
     onEditorChange ({ editor, html, text }) {
       this.$emit('editorChange', html)
     },
-    // 失去焦点事件
-    onEditorBlur () {},
-    // 获得焦点事件
-    onEditorFocus () {},
-    // 富文本图片上传前
-    beforeUpload (file) {
-      const isJPG = file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
-      if (!isJPG) {
-        this.$message.error('支持JPG、PNG格式的图片，大小不得超过2M')
-      }
-      if (!isLt2M) {
-        this.$message.error('文件最大不得超过2M')
-      }
-      return isJPG && isLt2M
-    },
-    // 上传图片
-    handleChange (info) {
-      if (info.file.status === 'uploading') {
-        this.loading = true
-        return
-      }
-      if (info.file.status === 'done') {
-        const res = info.file.response
-        const quill = this.$refs.myQuillEditor.quill
-        const length = quill.getSelection().index
-        // 插入图片  res.url为服务器返回的图片地址
-        if (res.code == 200) {
-          quill.insertEmbed(length, 'image', res.data.fullPath)
-          // 调整光标到最后
-          quill.setSelection(length + 1)
-        } else {
-          this.$message.error('文件上传失败')
-        }
-        this.$emit('success', res.data)
-        this.loading = false
-      }
-      if (info.file.status === 'error') {
-        if (info.file.response) {
-          const data = info.file.response
-          this.$message.error(data.msg)
-        }
-      }
+    getType () {
+      console.log('ok')
     },
     HandleCustomMatcher (node, Delta) {
       const ops = []

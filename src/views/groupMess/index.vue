@@ -49,6 +49,7 @@
         </div>
         <div class="groupMess_table_box">
           <a-table
+            :loading="table.login"
             :row-key="record => record.id"
             :columns="table.columns"
             :data-source="table.tableData"
@@ -184,7 +185,8 @@ export default {
           showTotal: (total) => `共${total}条数据 `,
           pageSizeOptions: ['10', '20', '30', '50'],
           queue: false
-        }
+        },
+        login: false
       }
     }
   },
@@ -248,6 +250,7 @@ export default {
       this.getTableData()
     },
     getTableData () {
+      this.table.login = true
       const { current, pageSize, queue } = this.table.pagination
       const { data } = this.search
       const obj = {
@@ -259,6 +262,7 @@ export default {
       console.log(obj)
       workRoomShiftFind(obj).then((res) => {
         console.log(res)
+        this.table.login = false
         this.table.pagination.total = res.data.total
         this.table.tableData = res.data.datas.map((item) => {
           const arr = ['executeOwner', 'nonExecutionOwner', 'deliveryGroup', 'nonDeliveryGroup']
