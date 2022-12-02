@@ -263,8 +263,8 @@ export default {
       this.getTableData()
     },
     dealTaskStatus (array) {
-      let tempArray = Object.assign([], array)
-      let tempInfo = {
+      const tempArray = Object.assign([], array)
+      const tempInfo = {
         code: '-1',
         name: '全部'
       }
@@ -283,7 +283,7 @@ export default {
         perPage: this.pagination.pageSize,
         sopIdsStr: this.selectedList.join(',')
       }
-      if (this.searchInfo.executionState === '-1'){
+      if (this.searchInfo.executionState === '-1') {
         this.$set(params, 'executionState', '')
       } else {
         this.$set(params, 'executionState', this.searchInfo.executionState)
@@ -326,7 +326,7 @@ export default {
         page: this.pagination.current,
         perPage: this.pagination.pageSize
       }
-      if (this.searchInfo.executionState === '-1'){
+      if (this.searchInfo.executionState === '-1') {
         this.$set(params, 'executionState', '')
       } else {
         this.$set(params, 'executionState', this.searchInfo.executionState)
