@@ -4,9 +4,11 @@
       title="添加群聊"
       :maskClosable="false"
       :width="1400"
+      centered
       :visible="addGroupChatShowStatus"
       class="addGroupChatClass"
       @cancel="closeGroupChat()"
+      :dialogStyle="dialogStyle"
       :getContainer="() => $refs['group_chat_container']"
     >
       <a-spin :spinning="modalLoadingStatus">
@@ -36,7 +38,19 @@
             >
               <a-select-option :value="tagsTypeItem.value" v-for="tagsTypeItem in tagsTypeList" :key="tagsTypeItem.id">{{ tagsTypeItem.name }}</a-select-option>
             </a-select>
-            <SelectTagInput v-model="groupChatSearchInfo.tagsList" :screentags="true" :changeId="true" ref="SelectTagInput" />
+            <!-- <SelectTagInput v-model="groupChatSearchInfo.tagsList" :screentags="true" :changeId="true" ref="SelectTagInput" /> -->
+            <div class="selectLabelBox">
+              <span class="selectBtn" @click="openGroupSelectModal('searchObj.labels')">
+                <span class="emptyBtn" v-if="groupChatSearchInfo.tagsList.length == 0">+ 添加标签</span>
+                <span class="label_input_title" v-for="(item, index) in groupChatSearchInfo.tagsList.slice(0, 2)" :key="index">
+                  {{ item.itemName }}
+                  <span class="delete" @click.stop="delTagHandle(item.id, index)">+</span>
+                </span>
+                <span class="label_input_title" v-if="groupChatSearchInfo.tagsList.length > 2">
+                  + {{ groupChatSearchInfo.tagsList.length - 2 }}
+                </span>
+              </span>
+            </div>
           </div>
           <div class="item">
             <div class="title">群创建日期：</div>
@@ -107,16 +121,26 @@
         <a-button type="primary" :disabled="modalLoadingStatus" @click="confirmGroupChat" v-permission="permissionText">确定</a-button>
       </template>
     </a-modal>
+    <a-modal v-model="groupTagsModalShow" centered @ok="handleAddGroupTagsOk" width="60%">
+      <GroupTags v-model="groupTagsSelectList" ref="labelSelect"/>
+    </a-modal>
   </div>
 </template>
 
 <script>
+import GroupTags from './groupTags.vue'
 import { getGroupChatListMethod } from '@/api/cluster'
 import moment from 'moment'
 export default {
   name: 'GroupChat',
   data () {
     return {
+      dialogStyle: {
+        left: '130px'
+      },
+      lablesModalType: '',
+      groupTagsSelectList: [],
+      groupTagsModalShow: false, // 群标签弹框显示状态
       modalLoadingStatus: false, // 弹框加载中显示状态
       groupChatSelectedRowKeys: [],
       groupChatSearchInfo: {}, // 群聊查询对象
@@ -187,6 +211,9 @@ export default {
       }
     }
   },
+  components: {
+    GroupTags
+  },
   props: {
     permissionText: {
       type: String,
@@ -204,10 +231,6 @@ export default {
     }
   },
   watch: {
-    selectArrayString () {
-      console.log('selectArrayString', this.selectArrayString)
-      this.groupChatSelectedRowKeys = this.selectArrayString ? JSON.parse(this.selectArrayString) : []
-    },
     showStatus () {
       this.addGroupChatShowStatus = this.showStatus
       if (this.addGroupChatShowStatus) {
@@ -215,8 +238,9 @@ export default {
         //   console.log(response, '获取群聊列表')
         // })
         this.modalLoadingStatus = true
+        // 群主
         this.$set(this.groupChatSearchInfo, 'employeeIds', [])
-        this.$set(this.groupChatSearchInfo, 'tagsList', [])
+        // 标签
         this.$set(this.groupChatSearchInfo, 'tagsList', [])
         this.$set(this.groupChatSearchInfo, 'templateId', this.typeInfo.id)
         this.$set(this.groupChatSearchInfo, 'soptype', this.typeInfo.soptype)
@@ -230,7 +254,7 @@ export default {
   },
   mounted () {
     console.log('组件挂载')
-    this.$set(this.groupChatSearchInfo, 'tagType', 0)
+    // this.$set(this.groupChatSearchInfo, 'tagType', 0)
   },
   updated () {
     console.log('组件更新')
@@ -239,6 +263,59 @@ export default {
     console.log('组件卸载之前')
   },
   methods: {
+    openGroupSelectModal (t) {
+      let filterInputArr = []
+      if (t === 'searchObj.labels') {
+        filterInputArr = this.groupChatSearchInfo.tagsList
+      }
+      this.groupTagsSelectList = filterInputArr
+      this.lablesModalType = t
+      this.groupTagsModalShow = true
+    },
+    // 删除item
+    // -1 默认 -2 排除 -3 群组
+    delTagHandle (id, index) {
+      // let filterIdArr = []
+      // let filterInputArr = []
+      // filterIdArr = this.groupChatSearchInfo.tagsList.map((item) => item.id)
+      // filterInputArr = this.groupChatSearchInfo.tagsList
+      this.groupChatSearchInfo.tagsList = this.groupChatSearchInfo.tagsList.filter((_, i) => i != index)
+    },
+    // 标签弹窗确认
+    async handleAddGroupTagsOk () {
+      console.log('确认弹框', this.lablesModalType)
+      if (this.lablesModalType === 'searchObj.labels') {
+        this.groupChatSearchInfo.tagsList = this.groupTagsSelectList
+      } else {
+        if (this.lablesModalType === 'add') {
+          console.log('add')
+        } else if (this.lablesModalType === 'remove') {
+          console.log('remove')
+        }
+      }
+      this.groupTagsSelectList = []
+      this.groupTagsModalShow = false
+      // if (this.lablesModalType === 'searchObj.labels') {
+      //   this.searchObj.labels = this.groupTagsSelectList
+      // } else {
+      //   if (this.lablesModalType === 'add') {
+      //     await batchSetTagsReq({
+      //       ids: this.selectedTableRowKeys.join(','),
+      //       tagids: this.groupTagsSelectList.length ? this.groupTagsSelectList.map(it => it.id).join(',') : ''
+      //     })
+      //   } else if (this.lablesModalType === 'remove') {
+      //     await batchRemoveTagsReq({
+      //       ids: this.selectedTableRowKeys.join(','),
+      //       tagids: this.groupTagsSelectList.length ? this.groupTagsSelectList.map(it => it.id).join(',') : ''
+      //     })
+      //   }
+      //   this.getTableList()
+      //   this.$message.success('设置成功')
+      // }
+      // this.selectedTableRowKeys = []
+      // this.groupTagsSelectList = []
+      // this.groupTagsModalShow = false
+    },
     getDataList () {
       // this.groupChatDataList = [
       //   {
@@ -263,15 +340,33 @@ export default {
         page: this.groupChatPagination.current,
         perPage: this.groupChatPagination.pageSize
       }
+      this.$set(params, 'workRoomOwnerId', this.groupChatSearchInfo.employeeIds.join(','))
+      if (this.groupChatSearchInfo.tagsList.length !== 0) {
+        this.$set(params, 'workRoomTagIds', this.groupChatSearchInfo.tagsList.map(item => item.id).join(','))
+      } else {
+        this.groupChatSearchInfo.tagsList = []
+        this.$set(params, 'workRoomTagIds', this.groupChatSearchInfo.tagsList.join(','))
+      }
       this.modalLoadingStatus = true
       getGroupChatListMethod(params).then(response => {
         console.log(response, '获取群聊列表')
         this.groupChatDataList = response.data.list
         this.$set(this.groupChatPagination, 'total', Number(response.data.page.total))
         this.modalLoadingStatus = false
+        this.dealArray(this.groupChatDataList)
       }).catch(() => {
         this.modalLoadingStatus = false
       })
+    },
+    // 处理数组
+    dealArray (array) {
+      const tempArray = array.filter(item => item.checked === '1').map(info => info.workRoomId)
+      if (tempArray.length === 0) {
+        // 没有选中的数组
+        this.groupChatSelectedRowKeys = []
+      } else {
+        this.groupChatSelectedRowKeys = Object.assign([], tempArray)
+      }
     },
     /**
      * 选择框的默认属性配置
@@ -310,12 +405,18 @@ export default {
         this.$delete(this.groupChatSearchInfo, 'endTime')
       }
       console.log(this.groupChatSearchInfo, 'groupChatSearchInfo')
+      // debugger
       this.getDataList()
       // 执行搜索方法
     },
     // 重置搜索群聊
     resetGroupChatMethod () {
       this.groupChatSearchInfo = {}
+      this.$set(this.groupChatSearchInfo, 'employeeIds', [])
+      this.$set(this.groupChatSearchInfo, 'tagsList', [])
+      this.$set(this.groupChatSearchInfo, 'soptype', this.typeInfo.soptype)
+      this.$set(this.groupChatSearchInfo, 'templateId', this.typeInfo.id)
+      this.getDataList()
       // 执行搜索方法
     },
     // 关闭添加群聊弹框
@@ -327,10 +428,23 @@ export default {
     confirmGroupChat () {
       console.log('提交添加群聊')
       console.log(this.groupChatSelectedRowKeys)
+      const tempSelectList = []
+      const tempArray = this.groupChatDataList.filter(item => item.checked === '1').map(info => info.workRoomId)
+      for (const single of this.groupChatSelectedRowKeys) {
+        // 循环已选中的数组
+        const tempIndex = tempArray.findIndex(item => item === single)
+        // 查看禁用的数组中是否有已选中的元素
+        if (tempIndex === -1) {
+          // 没有
+          tempSelectList.push(single)
+        } else {
+          // 存在,不处理
+        }
+      }
+      console.log(tempSelectList, '可提交的元素')
       this.addGroupChatShowStatus = false
       this.$emit('update:showStatus', this.addGroupChatShowStatus)
-      // debugger
-      this.$emit('submitGroupChat', JSON.stringify(this.groupChatSelectedRowKeys))
+      this.$emit('submitGroupChat', JSON.stringify(tempSelectList))
     }
   }
 }
@@ -345,6 +459,50 @@ export default {
         flex-shrink: 0;
         text-align: left;
         width: auto;
+      }
+      .selectLabelBox {
+        min-width: 120px;
+        max-width: 85%;
+        position: relative;
+        .selectBtn {
+          min-width: 180px;
+          min-height: 38px;
+          display: flex;
+          align-items: center;
+          border-radius: 3px;
+          border: 1px dashed #8a8a8a;
+          position: relative;
+          cursor: pointer;
+          flex-wrap: wrap;
+          .emptyBtn {
+            width: 100%;
+            text-align: center;
+          }
+
+          .label_input_title {
+            margin: 4px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 28px;
+            color: rgba(0, 0, 0, 0.65);
+            font-size: 14px;
+            background: #f7f7f7;
+            border-radius: 4px;
+            border: 1px solid #e9e9e9;
+            .delete {
+              margin-left: 5px;
+              line-height: 20px;
+              font-size: 20px;
+              transform: rotate(45deg);
+
+              &:hover {
+                color: #0052d9;
+              }
+            }
+          }
+        }
       }
     }
     .ant-btn:nth-last-child(1) {
