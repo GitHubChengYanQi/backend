@@ -76,7 +76,7 @@
           @change="groupChatHandleTableChange"
         >
           <div slot="tagListStr" slot-scope="text">
-            <a-popover title="群标签">
+            <a-popover title="群标签" v-if="text !== ''">
               <template slot="content">
                 <div class="labelBox">
                   {{ text }}
@@ -86,9 +86,10 @@
                 查看
               </a-tag>
             </a-popover>
+            <div v-else>-</div>
           </div>
           <div slot="sopNameListStr" slot-scope="text">
-            <a-popover title="执行中的SOP">
+            <a-popover title="执行中的SOP" v-if="text !== ''">
               <template slot="content">
                 <div class="labelBox">
                   {{ text }}
@@ -98,9 +99,10 @@
                 查看
               </a-tag>
             </a-popover>
+            <div v-else>-</div>
           </div>
           <div slot="calendarNameListStr" slot-scope="text">
-            <a-popover title="执行中的群日历">
+            <a-popover title="执行中的群日历" v-if="text !== ''">
               <template slot="content">
                 <div class="labelBox">
                   {{ text }}
@@ -110,6 +112,7 @@
                 查看
               </a-tag>
             </a-popover>
+            <div v-else>-</div>
           </div>
         </a-table>
       </a-spin>
@@ -405,6 +408,7 @@ export default {
         this.$delete(this.groupChatSearchInfo, 'endTime')
       }
       console.log(this.groupChatSearchInfo, 'groupChatSearchInfo')
+      this.$set(this.groupChatPagination, 'current', 1)
       // debugger
       this.getDataList()
       // 执行搜索方法
@@ -416,6 +420,7 @@ export default {
       this.$set(this.groupChatSearchInfo, 'tagsList', [])
       this.$set(this.groupChatSearchInfo, 'soptype', this.typeInfo.soptype)
       this.$set(this.groupChatSearchInfo, 'templateId', this.typeInfo.id)
+      this.$set(this.groupChatPagination, 'current', 1)
       this.getDataList()
       // 执行搜索方法
     },

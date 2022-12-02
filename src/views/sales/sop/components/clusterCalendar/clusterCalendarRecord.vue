@@ -117,7 +117,7 @@
             <span style="font-weight: Bolder">第{{ index + 1 }}条:</span>
             <span style="color: red">加入规则</span>
             <span>{{ returnTimeText(item) }}</span>
-            <span>{{ item.executionState }}</span>
+            <span>{{ item.executionStateStr }}</span>
           </div>
           <div class="contentList">
             <div class="singleContent" v-for="(singleContentItem, singleContentIndex) in item.sendContentList" :key="singleContentIndex">
@@ -394,9 +394,9 @@ export default {
       const that = this
       const params = { id }
       this.$confirm({
-        title: '确定删除所选内容?',
+        title: '确定删除所选任务?',
         // content: 'Some descriptions',
-        okText: '确认删除',
+        okText: '确认',
         okType: 'danger',
         cancelText: '取消',
         onOk: async () => {
