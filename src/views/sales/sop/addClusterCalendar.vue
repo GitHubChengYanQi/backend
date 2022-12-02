@@ -94,34 +94,33 @@
       :maskClosable="false"
       :width="1000"
       :visible="sendCalendarContentModalShow"
-      
       @cancel="closeCalendarSendContentModal()"
       :getContainer="() => $refs['addSop_Page_Container']"
     >
       <div class="sendContentModal">
         <div class="chooseCalendarSendDate">
-            <div class="singleCalendarSendContentItem">
-              <div class="singleCalendarSendContentTitle">发送时间:</div>
-              <a-date-picker
-                dropdownClassName="addSop_Page_Container_selectSopItemDateBox"
-                :allowClear="false"
-                :showToday="false"
-                v-model="addCalendarContentInfo.sendTime"
-                valueFormat="YYYY-MM-DD HH:mm"
-                format="YYYY-MM-DD HH:mm"
-                show-time
-                :getPopupContainer="() => $refs['div_wrapper_container']"
-                @change="sendDateChange"
-              />
-            </div>
-            <div class="singleCalendarSendContentItem">
-              <div class="singleCalendarSendContentTitle">内容标题:</div>
-              <div class="inputCalendarSendTitleWrapper">
-                <a-input v-model="addCalendarContentInfo.sendTitle" class="inputCalendarSendTitleClass" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
-                <span class="len">{{ addCalendarContentInfo.sendTitle && addCalendarContentInfo.sendTitle.length ? addCalendarContentInfo.sendTitle.length :'0' }}/15</span>
-              </div>
+          <div class="singleCalendarSendContentItem">
+            <div class="singleCalendarSendContentTitle">发送时间:</div>
+            <a-date-picker
+              dropdownClassName="addSop_Page_Container_selectSopItemDateBox"
+              :allowClear="false"
+              :showToday="false"
+              v-model="addCalendarContentInfo.sendTime"
+              valueFormat="YYYY-MM-DD HH:mm"
+              format="YYYY-MM-DD HH:mm"
+              show-time
+              :getPopupContainer="() => $refs['div_wrapper_container']"
+              @change="sendDateChange"
+            />
+          </div>
+          <div class="singleCalendarSendContentItem">
+            <div class="singleCalendarSendContentTitle">内容标题:</div>
+            <div class="inputCalendarSendTitleWrapper">
+              <a-input v-model="addCalendarContentInfo.sendTitle" class="inputCalendarSendTitleClass" placeholder="请输入标题,标题不发给客户" @change="changeSopName"/>
+              <span class="len">{{ addCalendarContentInfo.sendTitle && addCalendarContentInfo.sendTitle.length ? addCalendarContentInfo.sendTitle.length :'0' }}/15</span>
             </div>
           </div>
+        </div>
         <!-- <a-form layout="horizontal">
           <a-form-item label="发送时间" :labelCol="{span: 2}" :wrapperCol="{span: 14}">
             <a-date-picker
@@ -418,7 +417,6 @@ export default {
       } else {
         this.$message.error('已过去的时间不可选择')
       }
-
     },
     // 监听用户输入框输入
     changeSopName (value) {
@@ -528,15 +526,13 @@ export default {
           tempId: new Date().getTime(),
           sendTime: moment().add(3, 'm').format('YYYY-MM-DD HH:mm'),
           sendTitle: '',
-          sendContentList: [],
-          sendTitle: ''
+          sendContentList: []
         }
         tempTaskList.push(tempInfo)
         this.selectSopItemIdx = tempInfo.tempId
         this.$set(this.addInfo, 'listTaskInfo', tempTaskList)
         this.chooseSopItem(tempInfo, this.addInfo.listTaskInfo.length - 1)
       }
-      
     },
     // 删除时间节点
     delSopItem (index, info) {
@@ -696,7 +692,6 @@ export default {
             margin: auto 0;
           }
         }
-        
       }
       .singleCalendarSendContentItem:nth-child(1) {
         margin-top: 0px;

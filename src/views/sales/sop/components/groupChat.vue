@@ -136,7 +136,7 @@ export default {
   data () {
     return {
       dialogStyle: {
-        left: "130px"
+        left: '130px'
       },
       lablesModalType: '',
       groupTagsSelectList: [],
@@ -275,14 +275,11 @@ export default {
     // 删除item
     // -1 默认 -2 排除 -3 群组
     delTagHandle (id, index) {
-      let filterIdArr = []
-      let filterInputArr = []
-      filterIdArr = this.groupChatSearchInfo.tagsList.map((item) => item.id)
-      filterInputArr = this.groupChatSearchInfo.tagsList
+      // let filterIdArr = []
+      // let filterInputArr = []
+      // filterIdArr = this.groupChatSearchInfo.tagsList.map((item) => item.id)
+      // filterInputArr = this.groupChatSearchInfo.tagsList
       this.groupChatSearchInfo.tagsList = this.groupChatSearchInfo.tagsList.filter((_, i) => i != index)
-      // this.$refs.labelSelect.setArr(id, index)
-      // this.$refs.labelSelect.idArr = filterIdArr
-      // this.$refs.labelSelect.inputArr = filterInputArr
     },
     // 标签弹窗确认
     async handleAddGroupTagsOk () {
@@ -363,7 +360,7 @@ export default {
     },
     // 处理数组
     dealArray (array) {
-      let tempArray = array.filter(item => item.checked === '1').map(info => info.workRoomId)
+      const tempArray = array.filter(item => item.checked === '1').map(info => info.workRoomId)
       if (tempArray.length === 0) {
         // 没有选中的数组
         this.groupChatSelectedRowKeys = []
@@ -431,11 +428,11 @@ export default {
     confirmGroupChat () {
       console.log('提交添加群聊')
       console.log(this.groupChatSelectedRowKeys)
-      let tempSelectList = []
-      let tempArray = this.groupChatDataList.filter(item => item.checked === '1').map(info => info.workRoomId)
-      for(let single of this.groupChatSelectedRowKeys) {
+      const tempSelectList = []
+      const tempArray = this.groupChatDataList.filter(item => item.checked === '1').map(info => info.workRoomId)
+      for (const single of this.groupChatSelectedRowKeys) {
         // 循环已选中的数组
-        let tempIndex = tempArray.findIndex(item => item === single)
+        const tempIndex = tempArray.findIndex(item => item === single)
         // 查看禁用的数组中是否有已选中的元素
         if (tempIndex === -1) {
           // 没有
