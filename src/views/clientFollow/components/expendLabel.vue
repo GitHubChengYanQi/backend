@@ -1,22 +1,10 @@
 <template>
   <div class="auto_lable">
-    <div class="table_header">
-      <div
-        class="table_title"
-        v-for="(item,index) in tabHeader"
-        v-permission="item.permission"
-        :style="{color: table == index ? '#1890ff':'',textShadow: '0 0 0.25px currentColor',border:table == index ? '':'none',display:item.hidden ? 'none':'' }"
-        @click="setTable(index)"
-        :key="index"
-      >
-        {{ item.title }}
-      </div>
-    </div>
     <a-card>
       <div class="table_operation">
         <div
           class="add_rule"
-          v-if="addRulePermission.includes(permissionButtonData.addRule[table])"
+          v-permission="'/expendAutoLabel/add@post'"
           @click="goAddPage"
         >添加规则</div>
         <div class="search_box">
@@ -229,15 +217,8 @@
             <a-button
               type="link"
               @click="particulars(record)"
-              v-if="table===3 || table===4"
               v-permission="permissionButtonData.info[table]"
-            >编辑</a-button>
-            <a-button
-              type="link"
-              @click="particulars(record)"
-              v-if="table!==3"
-              v-permission="permissionButtonData.info[table]"
-            >详情</a-button>
+            >{{ table == 3 ? '编辑':'详情' }}</a-button>
             <a-button
               type="link"
               @click="remove(record)"
@@ -280,13 +261,6 @@ export default {
         exactMatch: [],
         fuzzyMatching: []
       },
-      tabHeader: [
-        { title: '关键词打标签', permission: '/clientFollow/autoLabel/keyword', hidden: true },
-        { title: '客户入群行为打标签', permission: '/clientFollow/autoLabel/group' },
-        { title: '分时段打标签', permission: '/clientFollow/autoLabel/date' },
-        { title: '数值打标签', permission: '/clientFollow/autoLabel/number' },
-        { title: '消费属性打标签', permission: '/clientFollow/autoLabel/expend' }
-      ],
       permissionButtonData: {
         addRule: ['', '/groupAutoLabel/add@post', '/timeAutoLabel/add@post', '/numberAutoLabel/add@post', '/expendAutoLabel/add@post'],
         state: [
@@ -658,7 +632,7 @@ export default {
     },
     // 编辑
     particulars (record) {
-      if (this.table == 3 || this.table == 4) {
+      if (this.table == 3) {
         this.$router.push(`${'/clientFollow/addRule'}?id=${this.table}&label=${record.id}`)
         localStorage.setItem('autoLabel', JSON.stringify(record))
       } else {

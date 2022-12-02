@@ -312,14 +312,9 @@ export default {
     // 删除item
     // -1 默认 -2 排除 -3 群组
     delTagHandle (id, index) {
-      let filterIdArr = []
-      let filterInputArr = []
-      filterIdArr = this.searchObj.labels.map((item) => item.id)
-      filterInputArr = this.searchObj.labels
-      this.searchObj.labels = this.searchObj.labels.filter((_, i) => i != index)
-      this.$refs.labelSelect.setArr(id, index)
-      this.$refs.labelSelect.idArr = filterIdArr
-      this.$refs.labelSelect.inputArr = filterInputArr
+      const filD = this.searchObj.labels.filter((_, i) => i != index)
+      this.searchObj.labels = filD
+      this.groupTagsSelectList = filD
     },
     async handleSearch (val) {
       if (!val) {

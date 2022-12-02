@@ -22,8 +22,8 @@
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="SOP名称:" :labelCol="{span: 4}" :wrapper-col="{span: 20}">
-                <a-input placeholder="请输入SOP名称" v-model="searchInfo.sopName" class="inputClass" />
+              <a-form-item label="群日历名称:" :labelCol="{span: 6}" :wrapper-col="{span: 18}">
+                <a-input placeholder="请输入群日历名称" v-model="searchInfo.sopName" class="inputClass" />
               </a-form-item>
             </a-col>
           </a-row>
@@ -95,7 +95,7 @@
         :data-source="tableData"
         :columns="tableColumns"
         :pagination="pagination"
-        :scroll="{ x: 1500}"
+        :scroll="{ x: '100%'}"
         :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
         :customRow="rowClick"
         :rowClassName="setRowClassName"
@@ -181,37 +181,37 @@ export default {
           title: '群名称',
           dataIndex: 'clusterName',
           align: 'center',
-          width: 150
+          width: 100
         },
         {
           title: '群主',
           dataIndex: 'clusterOwnerName',
           align: 'center',
-          width: 150
+          width: 100
         },
         {
-          title: 'SOP名称',
+          title: '群日历名称',
           dataIndex: 'sopName',
           align: 'center',
-          width: 150
+          width: 100
         },
         {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
-          width: 200
+          width: 100
         },
         {
           title: '任务状态',
-          dataIndex: 'executionState',
+          dataIndex: 'executionStateStr',
           align: 'center',
-          width: 200
+          width: 100
         },
         {
           title: '操作',
           align: 'center',
-          width: 200,
-          fixed: 'right',
+          width: 100,
+          // fixed: 'right',
           scopedSlots: { customRender: 'options' },
           all: true
         }
@@ -257,9 +257,20 @@ export default {
     async getTaskStatusList () {
       const params = { dictType: 'execution_state' }
       await getDictData(params).then(response => {
-        this.taskStatusList = response.data
+        this.taskStatusList = this.dealTaskStatus(response.data)
       })
+      this.$set(this.searchInfo, 'executionState', this.taskStatusList[0].code)
       this.getTableData()
+    },
+    dealTaskStatus (array) {
+      const tempArray = Object.assign([], array)
+      const tempInfo = {
+        code: '-1',
+        name: '全部'
+      }
+      tempArray.unshift(tempInfo)
+      return tempArray
+      // console.log(this.taskStatusList, 'this.taskStatusList')
     },
     // 导出数据
     goExportData () {
@@ -272,8 +283,13 @@ export default {
         perPage: this.pagination.pageSize,
         sopIdsStr: this.selectedList.join(',')
       }
+      if (this.searchInfo.executionState === '-1') {
+        this.$set(params, 'executionState', '')
+      } else {
+        this.$set(params, 'executionState', this.searchInfo.executionState)
+      }
       exportClusterCalendarMethod(params).then(response => {
-        callDownLoadByBlob(response)
+        callDownLoadByBlob(response, '执行记录')
       })
     },
     // 选择任务状态
@@ -309,6 +325,11 @@ export default {
         clusterName: this.searchInfo.clusterName,
         page: this.pagination.current,
         perPage: this.pagination.pageSize
+      }
+      if (this.searchInfo.executionState === '-1') {
+        this.$set(params, 'executionState', '')
+      } else {
+        this.$set(params, 'executionState', this.searchInfo.executionState)
       }
       console.log(params, '查询数据提交接口的对象')
       await getExecuteRecordCalendarListMethod(params).then(response => {

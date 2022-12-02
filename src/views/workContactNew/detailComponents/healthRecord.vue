@@ -8,7 +8,7 @@
       <div v-if="!isComponent">
         <div
           class="edit"
-          v-if="['xyjl', 'xtjl'].includes(selectTag)"
+          v-if="['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(selectTag)"
           @click="handleBtnClick('edit')"
         >新增</div>
         <div v-else>
@@ -22,7 +22,7 @@
       <div
         class="specialListDetail"
         ref="specialListRef"
-        v-if="['xyjl', 'xtjl'].includes(selectTag)"
+        v-if="['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(selectTag)"
       >
         <a-table
           :dataSource="tagsDetailArr"
@@ -269,7 +269,7 @@ export default {
           contactId: this.isComponent ? this.contactId : this.$route.query.id,
           key
         }
-        if (['xyjl', 'xtjl'].includes(this.selectTag)) {
+        if (['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(this.selectTag)) {
           obj = {
             ...obj,
             page: this.pagination.current,
@@ -277,7 +277,7 @@ export default {
           }
         }
         const data = await getTabDetailReq(obj)
-        if (['xyjl', 'xtjl'].includes(this.selectTag)) {
+        if (['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(this.selectTag)) {
           const d = data.data.list
           const dataSource = []
           for (const item of d) {
@@ -292,6 +292,7 @@ export default {
             })
           }
           const cloumns = []
+
           cloumns.push({
             title: '类别',
             dataIndex: 'scopeName',

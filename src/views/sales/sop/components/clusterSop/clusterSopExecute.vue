@@ -29,7 +29,7 @@
         :data-source="tableData"
         :columns="tableColumns"
         :pagination="pagination"
-        :scroll="{ x: 1500}"
+        :scroll="{ x: '100%'}"
         :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
         :customRow="rowClick"
         :rowClassName="setRowClassName"
@@ -37,7 +37,7 @@
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
-              <a-button type="link" @click="deleteItem(record.id)" v-permission="'/sopCluster/delete@delete'">删除</a-button>
+              <a-button type="link" @click="deleteItem(record.id)" v-permission="'/sopCluster/delete@delete'">取消</a-button>
             </div>
           </template>
         </div>
@@ -129,7 +129,6 @@ export default {
           title: '操作',
           align: 'center',
           width: 120,
-          fixed: 'right',
           scopedSlots: { customRender: 'options' },
           all: true
         }

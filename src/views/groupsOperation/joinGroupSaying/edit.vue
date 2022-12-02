@@ -19,6 +19,7 @@
               <div
                 id="messageInput"
                 class="messageInput"
+                ref="messageInput"
                 contenteditable
                 @click="getRange"
                 @keyup="e => sendMessage(e, false)"
@@ -331,6 +332,8 @@ export default {
       if (e.length > 1000) {
         this.msgContent = e.slice(0, 1000)
         this.transfromHTMLMsg(e.slice(0, 1000))
+        this.$refs['messageInput'].blur()
+        this.$message.warning('文本最长长度不能超过1000！')
       }
     },
     'modalLinkObj.title' (e) {
@@ -456,16 +459,16 @@ export default {
       })
     },
     endInsert (val) {
-      const editBox = document.getElementById('messageInput')
+      const editBox = this.$refs['messageInput']
       editBox.appendChild(val)
     },
     onInputEditor () {
-      document.getElementById('messageInput').addEventListener('input', () => {
+      this.$refs['messageInput'].addEventListener('input', () => {
         this.range = this.savePosition()
       })
     },
     sendMessage (e, isInsert) {
-      const target = document.querySelector('#messageInput')
+      const target = this.$refs['messageInput']
       let str = ((e && e.target) || target).innerHTML.replace(/<[^>]*>/g, '')
       str = str.replace(/&nbsp;/g, ' ')
       str = str.replace(/&amp;/g, '&')
@@ -643,7 +646,7 @@ export default {
       this.contentLibraryObj.temporaryStroageArr = e
     },
     transfromHTMLMsg (content) {
-      document.querySelector('#messageInput').innerHTML = content.replace(/#{2}.*?#{2}/g, '<font color="#1890ff" contenteditable="false">$&</font>')
+      this.$refs['messageInput'].innerHTML = content.replace(/#{2}.*?#{2}/g, '<font color="#1890ff" contenteditable="false">$&</font>')
     },
     async sendJoinSays () {
       if (this.msgContent || this.mediaList.type) {
