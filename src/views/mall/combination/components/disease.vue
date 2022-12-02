@@ -29,16 +29,16 @@
                     <a-menu-item>
                       <a href="javascript:;" @click="handleClick('add', item)">新建子分类</a>
                     </a-menu-item>
-                    <a-menu-item v-if="item.level === 2 || item.level === 3">
+                    <a-menu-item v-if="(item.leaf === '0')">
                       <a href="javascript:;" @click="handleClick('edit', item)">修改分类</a>
                     </a-menu-item>
-                    <a-menu-item v-if="item.level === 2 || item.level === 3">
+                    <a-menu-item v-if="(item.leaf === '0')">
                       <a href="javascript:;" @click="handleClick('del', item)">删除分类</a>
                     </a-menu-item>
-                    <a-menu-item v-if="item.level === 2 || item.level === 3">
+                    <a-menu-item>
                       <a href="javascript:;" @click="handleClick('up', item)">向上移动</a>
                     </a-menu-item>
-                    <a-menu-item v-if="item.level === 2 || item.level === 3">
+                    <a-menu-item>
                       <a href="javascript:;" @click="handleClick('down', item)">向下移动</a>
                     </a-menu-item>
                   </a-menu>
@@ -52,22 +52,22 @@
 
       <!--detail-->
       <a-col :span="18">
-        <div class="box">
+        <div class="box" v-if="show">
           <a-breadcrumb class="breadcrumb">
             <a-breadcrumb-item href="">
               <a-icon type="home" />
             </a-breadcrumb-item>
-            <a-breadcrumb-item v-for="(item,index) in route" :key="index">
+            <a-breadcrumb-item v-for="(item,index) in info.path" :key="index">
               {{ item }}
             </a-breadcrumb-item>
           </a-breadcrumb>
-          <p>修改人：{{ info.person }}</p>
-          <p>修改时间：{{ info.time }}</p>
+          <p>修改人：{{ info.updateBy }}</p>
+          <p>修改时间：{{ info.updateAt }}</p>
           <p class="txt">
             <span>分类药品推荐:</span>
-            <a-textarea v-model="info.suggest" placeholder="Controlled autosize" :auto-size="{ minRows: 3, maxRows: 5 }" />
+            <a-textarea v-model="info.salesGuidance" placeholder="Controlled autosize" :auto-size="{ minRows: 3, maxRows: 5 }" />
           </p>
-          <a-button type="primary">保存</a-button>
+          <a-button type="primary" @click="handleSave">保存</a-button>
         </div>
       </a-col>
       <!--end detail-->
@@ -99,11 +99,8 @@
 </template>
 
 <script>
-// import moment from 'moment'
 import ActorDetail from './combinedDetail.vue'
-// import { relList, userRelExport } from '@/api/actor'
-// import { deepClone } from '@/utils/util'
-// import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import { treeList, treeSave, treeModify, treeDelete, searchSalesGuidance, modifySalesGuidance, moveUp, moveDown } from '@/api/mall'
 
 export default {
   components: {
@@ -111,61 +108,27 @@ export default {
   },
   data () {
     return {
+      show: false, //是否显示右侧详情
+      type: '', //选中树操作类型 add,edit,del,up,down
+      cur: '', //选中树数据
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       title: '',
       visible: false,
-      route: [],
       form: {
         name: ''
       },
       info: {
+        id: '',
         person: '',
         time: '',
-        suggest: ''
+        salesGuidance: ''
       },
       dataList: [],
       expandedKeys: [],
       searchValue: '',
       autoExpandParent: true,
-      policiesAndRegulationss: [
-        {
-          title: 'title0-0-0',
-          key: '0-0-0',
-          level: 1,
-          scopedSlots: {
-            title: 'custom'
-          },
-          children: [
-            {
-              title: 'title0-0-0-0',
-              key: '0-0-0-0',
-              level: 2,
-              scopedSlots: {
-                title: 'custom'
-              }
-            }
-          ]
-        },
-        {
-          title: 'title0-0-1',
-          key: '0-0-1',
-          level: 1,
-          scopedSlots: {
-            title: 'custom'
-          },
-          children: [
-            {
-              title: 'title0-0-1-0',
-              key: '0-0-1-0',
-              level: 2,
-              scopedSlots: {
-                title: 'custom'
-              }
-            }
-          ]
-        }
-      ],
+      policiesAndRegulationss: [],// 树
       rules: {
         name: [
           { required: true, message: '请输入分类名称', trigger: 'blur' }
@@ -174,16 +137,36 @@ export default {
     }
   },
   created () {
-    this.generateList(this.policiesAndRegulationss)
+    this.getList()
   },
   methods: {
+    /**
+     * 获取类别树
+     */
+    getList () {
+      treeList().then(res=>{
+        this.policiesAndRegulationss = [res.data]
+        this.generateList(this.policiesAndRegulationss)
+      })
+    },
     /**
      * 点击树
      * @param {*} key
      * @param {*} data
      */
     handleSelect (key, data) {
-      console.log(11111, key, data)
+      let node = data.selectedNodes[0].data.props
+      if (node.leaf === '1') {
+        const param = {
+          id: key[0]
+        }
+        searchSalesGuidance(param).then(res=>{
+          this.show = true
+          this.info = {id: key[0], ...res.data}
+        })
+      } else [
+        this.show = false
+      ]
     },
     /**
      * 树操作
@@ -191,25 +174,59 @@ export default {
      * @param {*} data
      */
     handleClick (type, data) {
-      // console.log(11111,type,data)
+      this.type = type
+      this.cur = data
+      this.title = ''
+      this.form = {}
       if (type === 'add') {
-        console.log(type, data)
         this.title = '新增分类'
         this.visible = true
       }
       if (type === 'edit') {
-        console.log(type, data)
+        this.form.name = data.name
         this.title = '编辑分类'
         this.visible = true
       }
       if (type === 'del') {
-        console.log(type, data)
+        let _this = this
+        this.$confirm({
+          title: '提示',
+          content: '确认后将会删除该分类，是否删除？',
+          okText: '删除',
+          okType: 'danger',
+          cancelText: '取消',
+          onOk () {
+            _this.loading = true
+            const param = {
+              id: data.id
+            }
+            treeDelete(param).then(res=>{
+              _this.loading = false
+              _this.$message.success('删除成功')
+              _this.getList()
+            })
+          }
+        })
       }
       if (type === 'up') {
-        console.log(type, data)
+        let param = {
+          id: data.id
+        }
+        moveUp(param).then(res => {
+          if (res.code === 200) {
+            this.$message('操作成功')
+          }
+        })
       }
       if (type === 'down') {
-        console.log(type, data)
+        let param = {
+          id: data.id
+        }
+        moveDown(param).then(res => {
+          if (res.code === 200) {
+            this.$message('操作成功')
+          }
+        })
       }
     },
     /**
@@ -220,8 +237,14 @@ export default {
       const data = arr
       for (let i = 0; i < data.length; i++) {
         const node = data[i]
+        node.key = node.id
+        node.title = node.name
+        node.scopedSlots = {
+          title: 'custom'
+        }
         const key = node.key
-        this.dataList.push({ key, title: key })
+        const title = node.title
+        this.dataList.push({ key, title })
         if (node.children) {
           this.generateList(node.children)
         }
@@ -278,13 +301,46 @@ export default {
      * 确定
      */
     handleOk () {
-      this.visible = false
+      if (this.type === 'add') {
+        let param = {
+          name: this.form.name,
+          parentId: this.cur.id
+        }
+        treeSave(param).then(res=>{
+          this.getList()
+          this.visible = false
+        })
+      }
+      if (this.type === 'edit') {
+        let param = {
+          name: this.form.name,
+          id: this.cur.id
+        }
+        treeModify(param).then(res=>{
+          this.getList()
+          this.visible = false
+        })
+      }
     },
     /**
      * 取消
      */
     handleCancel () {
       this.visible = false
+    },
+    /**
+     * 保存销售指导
+     */
+    handleSave () {
+      let param = {
+        id: this.info.id,
+        salesGuidance: this.info.salesGuidance
+      }
+      modifySalesGuidance(param).then(res=>{
+        if (res.code === 200) {
+          this.$message('保存成功')
+        }
+      })
     }
   }
 }

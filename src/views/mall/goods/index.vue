@@ -176,7 +176,7 @@
 <script>
 import moment from 'moment'
 import detail from './detail.vue'
-import { erpGoods, erpGoodsSync } from '@/api/mall'
+import { erpGoods } from '@/api/mall'
 import { deepClone } from '@/utils/util'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 export default {
