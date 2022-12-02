@@ -62,6 +62,8 @@
                 v-model="addInfo.listTaskInfo[selectSopItemIndex].sendTime"
                 valueFormat="YYYY-MM-DD HH:mm"
                 format="YYYY-MM-DD HH:mm"
+                :disabled-date="e => disabledBeforeDate(e, 'date')"
+                :disabled-time="e => disabledBeforeDate(e, 'time')"
                 show-time
                 :getPopupContainer="() => $refs['div_wrapper_container']"
                 @change="sendDateChange"
@@ -108,6 +110,8 @@
               v-model="addCalendarContentInfo.sendTime"
               valueFormat="YYYY-MM-DD HH:mm"
               format="YYYY-MM-DD HH:mm"
+              :disabled-date="e => disabledBeforeDate(e, 'date')"
+              :disabled-time="e => disabledBeforeDate(e, 'time')"
               show-time
               :getPopupContainer="() => $refs['div_wrapper_container']"
               @change="sendDateChange"
@@ -158,6 +162,7 @@
 </template>
 
 <script>
+import { disabledBeforeDate } from './sopUtils'
 import { addCalendarTemplateMethod, getCalendarTemplateDetailMethod, editCalendarTemplateMethod } from '@/api/cluster'
 import SendContent from './components/sendContent.vue'
 import moment from 'moment'
@@ -170,6 +175,7 @@ export default {
   },
   data () {
     return {
+      disabledBeforeDate,
       sendListTitle: '', // 列表模式内容标题
       sendCalendarContentModalShow: false, // 日历弹框是否显示
       sendCalendarContentArray: [], // 日历弹框内容数组
