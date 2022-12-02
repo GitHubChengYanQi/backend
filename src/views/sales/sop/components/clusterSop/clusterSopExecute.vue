@@ -22,6 +22,7 @@
           >重置</a-button>
         </a-form>
       </div>
+      <!-- :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }" -->
       <a-table
         :loading="tableLoading"
         class="tableBox"
@@ -30,7 +31,6 @@
         :columns="tableColumns"
         :pagination="pagination"
         :scroll="{ x: '100%'}"
-        :row-selection="{ selectedRowKeys: selectedList, onChange: onSelectionnChange }"
         :customRow="rowClick"
         :rowClassName="setRowClassName"
         @change="handleTableChange">
@@ -259,9 +259,9 @@ export default {
       const that = this
       const params = { id }
       this.$confirm({
-        title: '确定删除所选内容?',
+        title: '确定取消所选任务?',
         // content: 'Some descriptions',
-        okText: '确认删除',
+        okText: '确认',
         okType: 'danger',
         cancelText: '取消',
         onOk: async () => {
