@@ -44,6 +44,13 @@
       class="tableBox"
       :scroll="{ x: 1500}"
       @change="handleTableChange">
+      <div slot="beginAndEnd" slot-scope="text, record">
+        <template>
+          <div>
+            {{ record.beginTime + '-' + record.endTime }}
+          </div>
+        </template>
+      </div>
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
@@ -100,6 +107,13 @@ export default {
           dataIndex: 'createdByName',
           align: 'center',
           width: 200
+        },
+        {
+          title: '起止时间',
+          dataIndex: 'beginAndEnd',
+          align: 'center',
+          width: 250,
+          scopedSlots: { customRender: 'beginAndEnd' }
         },
         {
           title: '操作',
