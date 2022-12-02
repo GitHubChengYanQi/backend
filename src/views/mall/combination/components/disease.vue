@@ -108,9 +108,9 @@ export default {
   },
   data () {
     return {
-      show: false, //是否显示右侧详情
-      type: '', //选中树操作类型 add,edit,del,up,down
-      cur: '', //选中树数据
+      show: false, // 是否显示右侧详情
+      type: '', // 选中树操作类型 add,edit,del,up,down
+      cur: '', // 选中树数据
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       title: '',
@@ -128,7 +128,7 @@ export default {
       expandedKeys: [],
       searchValue: '',
       autoExpandParent: true,
-      policiesAndRegulationss: [],// 树
+      policiesAndRegulationss: [], // 树
       rules: {
         name: [
           { required: true, message: '请输入分类名称', trigger: 'blur' }
@@ -144,7 +144,7 @@ export default {
      * 获取类别树
      */
     getList () {
-      treeList().then(res=>{
+      treeList().then(res => {
         this.policiesAndRegulationss = [res.data]
         this.generateList(this.policiesAndRegulationss)
       })
@@ -155,18 +155,18 @@ export default {
      * @param {*} data
      */
     handleSelect (key, data) {
-      let node = data.selectedNodes[0].data.props
+      const node = data.selectedNodes[0].data.props
       if (node.leaf === '1') {
         const param = {
           id: key[0]
         }
-        searchSalesGuidance(param).then(res=>{
+        searchSalesGuidance(param).then(res => {
           this.show = true
-          this.info = {id: key[0], ...res.data}
+          this.info = { id: key[0], ...res.data }
         })
-      } else [
+      } else {
         this.show = false
-      ]
+      }
     },
     /**
      * 树操作
@@ -188,7 +188,7 @@ export default {
         this.visible = true
       }
       if (type === 'del') {
-        let _this = this
+        const _this = this
         this.$confirm({
           title: '提示',
           content: '确认后将会删除该分类，是否删除？',
@@ -200,7 +200,7 @@ export default {
             const param = {
               id: data.id
             }
-            treeDelete(param).then(res=>{
+            treeDelete(param).then(res => {
               _this.loading = false
               _this.$message.success('删除成功')
               _this.getList()
@@ -209,7 +209,7 @@ export default {
         })
       }
       if (type === 'up') {
-        let param = {
+        const param = {
           id: data.id
         }
         moveUp(param).then(res => {
@@ -219,7 +219,7 @@ export default {
         })
       }
       if (type === 'down') {
-        let param = {
+        const param = {
           id: data.id
         }
         moveDown(param).then(res => {
@@ -302,21 +302,21 @@ export default {
      */
     handleOk () {
       if (this.type === 'add') {
-        let param = {
+        const param = {
           name: this.form.name,
           parentId: this.cur.id
         }
-        treeSave(param).then(res=>{
+        treeSave(param).then(res => {
           this.getList()
           this.visible = false
         })
       }
       if (this.type === 'edit') {
-        let param = {
+        const param = {
           name: this.form.name,
           id: this.cur.id
         }
-        treeModify(param).then(res=>{
+        treeModify(param).then(res => {
           this.getList()
           this.visible = false
         })
@@ -332,11 +332,11 @@ export default {
      * 保存销售指导
      */
     handleSave () {
-      let param = {
+      const param = {
         id: this.info.id,
         salesGuidance: this.info.salesGuidance
       }
-      modifySalesGuidance(param).then(res=>{
+      modifySalesGuidance(param).then(res => {
         if (res.code === 200) {
           this.$message('保存成功')
         }
