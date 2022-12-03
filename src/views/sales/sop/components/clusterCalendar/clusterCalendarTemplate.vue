@@ -54,8 +54,8 @@
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
-            <a-button type="link" @click="addGroupChat(record)" v-permission="'/sopClusterCalendarTemplate/sopBindCluster@post'">添加群聊</a-button>
-            <a-button type="link" @click="editItem(record)" v-permission="'/sopClusterCalendarTemplate/update@post'">编辑</a-button>
+            <a-button type="link" v-if="isShowButton(record)" @click="addGroupChat(record)" v-permission="'/sopClusterCalendarTemplate/sopBindCluster@post'">添加群聊</a-button>
+            <a-button type="link" v-if="isShowButton(record)" @click="editItem(record)" v-permission="'/sopClusterCalendarTemplate/update@post'">编辑</a-button>
             <a-button type="link" @click="deleteItem(record.id)" v-permission="'/sopClusterCalendarTemplate/delete@delete'">删除</a-button>
           </div>
         </template>
@@ -69,6 +69,7 @@
 import { getCalendarTemplateListMethod, deleteCalendarTemplateMethod, bindCalendarTemplateMethod } from '@/api/cluster'
 // import { getTempSopList, deleteCalendarTemplateMethod, bindCalendarTemplateMethod } from '@/api/cluster'
 import GroupChatList from '../groupChat.vue'
+import moment from 'moment'
 export default {
   name: 'ClusterSopTemplate',
   components: {
@@ -148,6 +149,11 @@ export default {
     this.getTableData()
   },
   methods: {
+    // 是否显示按钮(添加群聊/修改)
+    isShowButton (info) {
+      const currentDate = moment().format('YYYY-MM-DD')
+      return moment(currentDate).isBefore(info.endTime, 'day')
+    },
     // 获取数据
     async getTableData () {
       // 临时注释掉
