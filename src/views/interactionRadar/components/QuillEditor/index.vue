@@ -1,9 +1,14 @@
 <template>
-  <div
-    class="quill_editor">
+  <div class="quill_editor">
     <!-- 图片上传组件辅助-->
-    <div @click="getType(0)" class="quill_image"></div>
-    <div @click="getType(1)" class="quill_video"></div>
+    <div
+      @click="getType(2)"
+      class="quill_image"
+    ></div>
+    <div
+      @click="getType(5)"
+      class="quill_video"
+    ></div>
     <quill-editor
       class="editor"
       v-model="content"
@@ -18,7 +23,6 @@
 import { quillEditor, Quill } from 'vue-quill-editor'
 import { ImageDrop } from 'quill-image-drop-module'
 import ImageResize from 'quill-image-resize-module'
-import storage from 'store'
 
 import { addQuillTitle } from './quill-title.js'
 const toolbarOptions = [
@@ -52,9 +56,7 @@ export default {
   },
   data () {
     return {
-      upload_tokey: {},
       content: this.value,
-      quillUpdateImg: false, // 根据图片上传状态来确定是否显示loading动画，刚开始是false,不显示
       editorOption: {
         placeholder: '',
         theme: 'snow', // or 'bubble'
@@ -92,17 +94,6 @@ export default {
             }
           }
         }
-      },
-      serverUrl: process.env.VUE_APP_API_BASE_URL + '/common/upload', // 这里写你要上传的图片服务器地址
-      loading: false
-    }
-  },
-  computed: {
-    headers () {
-      const token = storage.get('ACCESS_TOKEN')
-      return {
-        Accept: `application/json`,
-        Authorization: token
       }
     }
   },
@@ -111,8 +102,9 @@ export default {
     onEditorChange ({ editor, html, text }) {
       this.$emit('editorChange', html)
     },
-    getType () {
-      console.log('ok')
+    getType (e) {
+      console.log(e)
+      this.$emit('setMedium', e, true)
     },
     HandleCustomMatcher (node, Delta) {
       const ops = []
@@ -133,6 +125,14 @@ export default {
       Delta.ops = ops
 
       return Delta
+    },
+    getEditorData (type, http) {
+      const quill = this.$refs.myQuillEditor.quill
+      const length = quill.selection.savedRange.index
+      // 插入图片  res.url为服务器返回的图片地址
+      quill.insertEmbed(length, type, http)
+      // 调整光标到最后
+      quill.setSelection(length + 1)
     }
   },
   mounted () {
@@ -153,7 +153,7 @@ export default {
   width: 650px;
   line-height: normal !important;
 }
-.ant-upload-picture-card-wrapper{
+.ant-upload-picture-card-wrapper {
   display: none;
 }
 .ql-container {

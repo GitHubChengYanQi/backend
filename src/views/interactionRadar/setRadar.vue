@@ -12,7 +12,10 @@
             v-for="(item,index) in setData.changeType"
             :key="index"
           >
-            <span class="title"><span class="icon">*</span><span class="text">{{ item.title }}</span></span>
+            <span class="title"><span
+              class="icon"
+              v-if="item.title"
+            >*</span><span class="text">{{ item.title }}</span></span>
             <span class="import_box">
               <span
                 class="select_box"
@@ -68,18 +71,25 @@
                 class="cover_box"
                 v-else-if="item.type == 'cover'"
               >
-                <div
-                  class="add_img_box"
-                  @click="()=>{
-                    modalState = true
-                    modalTitle ='上传图片'
-                  }"
-                >
+                <div>
                   <img
-                    class="add_icon"
-                    :src="require('@/assets/add_icon.svg')"
+                    class="cover_img"
+                    @click="setMedium(2)"
+                    v-if="setData.inputData[item.key].length != 0"
+                    :src="setData.inputData[item.key]"
                     alt=""
                   >
+                  <div
+                    v-else
+                    class="add_img_box"
+                    @click="setMedium(2)"
+                  >
+                    <img
+                      class="add_icon"
+                      :src="require('@/assets/add_icon.svg')"
+                      alt=""
+                    >
+                  </div>
                 </div>
                 <div
                   class="hint"
@@ -91,10 +101,7 @@
                 v-else-if="item.type == 'uploading'"
               >
                 <img
-                  @click="()=>{
-                    modalState = true
-                    modalTitle ='上传PDF'
-                  }"
+                  @click="setMedium(7)"
                   class="uploading_icon"
                   :src="require('@/assets/upload_btn.png')"
                   alt=""
@@ -110,8 +117,20 @@
               >
                 <quill-editor
                   @editorChange="editorChange"
+                  @setMedium="setMedium"
                   :value="setData.inputData[item.key]"
+                  ref="editor"
                 />
+              </span>
+              <span
+                class="button_box"
+                v-else-if="item.type == 'button'"
+              >
+                <a-button
+                  type="primary"
+                  class="button"
+                  @click="setMedium(3)"
+                >{{ item.btnText }}</a-button>
               </span>
               <span
                 class="input_box"
@@ -144,21 +163,17 @@
       centered
       width="700px"
       @ok="setCatalog"
-      @cancel="()=>{
-        modalState = false
-        uploadUrl = ''
-        modelTab = 0
-      }"
+      @cancel="setMedium(-1)"
     >
       <div class="model_input_box">
         <div class="model_tab_box">
           <div
             class="model_tab"
             :style="modelTab == index ? { color:'#1c96f0',borderBottom:'1px solid #1c96f0' }:{}"
-            @click="setModelTab(index)"
-            v-for="(item,index) in ['本地上传','素材库']"
+            @click="setModelTab(item.key)"
+            v-for="(item,index) in isImageText ? tabArr.slice(1,2) : tabArr"
             :key="index"
-          >{{ item }}</div>
+          >{{ item.title }}</div>
         </div>
         <div class="model_content">
           <div
@@ -179,10 +194,10 @@
             </div>
             <img
               v-else
+              class="upload_image"
               :src="uploadUrl"
               alt=""
               @click="getLink"
-              style="cursor: pointer;max-width: 100%;height: auto;"
             >
           </div>
           <div
@@ -222,7 +237,11 @@
                   slot-scope="text, record"
                 >
                   <template>
-                    <img :src="record.content.imageFullPath" alt="" style="width:80px;height:80px;">
+                    <img
+                      :src="record.content.imageFullPath"
+                      alt=""
+                      style="width:80px;height:80px;"
+                    >
                   </template>
                 </div>
               </a-table>
@@ -297,10 +316,9 @@ export default {
         articleArr: {
           0: [
             {
-              title: '素材：',
-              type: 'input',
-              key: 'material',
-              fontNumber: 15
+              type: 'button',
+              btnText: '从素材库中引用',
+              key: 'material'
             }
           ],
           1: [
@@ -441,8 +459,13 @@ export default {
       modelTab: 0,
       uploadUrl: '',
       modelSearch: '',
+      isImageText: false,
+      tabArr: [
+        { title: '本地上传', key: 0 },
+        { title: '素材库', key: 1 }
+      ],
       medium: {
-        type: 2, // 类型 2图片
+        type: 2, // 类型 2图片 3图文 5 视频 7 文件
         columns: [
           {
             title: '标题',
@@ -494,19 +517,35 @@ export default {
           showSizeChanger: true
         },
         data: []
-      }
+      },
+      radio: {
+        id: -1,
+        content: {},
+        idArr: []
+      },
+      isEditor: false
     }
   },
   created () {
     this.setType()
   },
   computed: {
+    dataListSelectionKeys () {
+      return this.radio.idArr || []
+    },
     rowSelection () {
       return {
         type: 'radio', // 单选按钮定义
-        onChange: (selectedRowKeys, selectedRows) => {
-          console.log('选中的', selectedRowKeys, selectedRows)
-        }
+        selectedRowKeys: this.dataListSelectionKeys,
+        onChange: (key, row) => {
+          this.getRadio(key, row[0])
+        },
+        getCheckboxProps: (record) => ({
+          props: {
+            // 全部默认禁止选中
+            disabled: record.type == '文件' ? record.content.fileName.split('.')[1] != 'pdf' : false
+          }
+        })
       }
     }
   },
@@ -532,16 +571,17 @@ export default {
         formData.append('file', file)
         formData.append('time', 1)
         const res = await upLoad(formData)
-        // const params = {
-        //   imgUrl: res.data.fullPath,
-        //   mediaName: file.name
-        // }
-        // console.log(params, '返回的对象'
         console.log(res)
         this.uploadUrl = res.data.fullPath
       } else {
         console.log(e)
       }
+    },
+    getRadio (key, row) {
+      console.log(key, row)
+      this.radio.idArr = key
+      this.radio.id = key[0]
+      this.radio.content = row.content
     },
     getLink () {
       this.$refs.uploadPhotoRef.value = ''
@@ -553,11 +593,39 @@ export default {
       this.modelTab = e
       if (e == 1) {
         this.getMedium()
+      } else {
+        this.radio = {
+          id: -1,
+          content: {},
+          idArr: []
+        }
       }
     },
-    setCatalog () {},
+    setCatalog () {
+      if (this.modelTab == 0) {
+        if (this.medium.type == 2) {
+          if (!this.isEditor) {
+            this.setData.inputData.linkImg = this.uploadUrl
+          } else {
+            this.$refs.editor[0].getEditorData('image', this.uploadUrl)
+          }
+          this.uploadUrl = ''
+        }
+      } else {
+        if (this.radio.id == -1) return this.$message.warn('至少选择一个图片')
+        this.setData.inputData.linkImg = this.radio.content.imageFullPath
+        this.radio = {
+          id: -1,
+          content: {},
+          idArr: []
+        }
+        this.modelTab = 0
+      }
+
+      this.modalState = false
+    },
     editorChange (html) {
-      console.log(html)
+      // console.log(html)
     },
     setType () {
       const { contentType, contentSource } = this.setData.inputData
@@ -568,8 +636,10 @@ export default {
         console.log(articleType)
         this.$set(this.setData, 'changeType', articleType)
       } else {
+        this.setData.inputData.contentSource = '0'
         this.$set(this.setData, 'changeType', newInputType)
       }
+      this.setData.inputData.linkImg = ''
     },
     searchMedium () {
       this.medium.pagination.current = 1
@@ -586,7 +656,7 @@ export default {
       const obj = {
         page: current,
         perPage: pageSize,
-        type: 2,
+        type: this.medium.type,
         searchStr: this.modelSearch
       }
       materialLibraryList(obj).then((res) => {
@@ -598,6 +668,36 @@ export default {
           return item
         })
       })
+    },
+    setMedium (e, isEditor = false) {
+      this.isEditor = isEditor
+      const title = {
+        2: {
+          title: '上传图片'
+        },
+        3: {
+          title: '选择图文'
+        },
+        5: {
+          title: '上传视频'
+        },
+        7: {
+          title: '上传PDF'
+        }
+      }
+      this.medium.type = e == -1 ? 2 : e
+      this.modalTitle = e == -1 ? '上传图片' : title[e].title
+      this.modalState = e != -1
+      if (e == -1) {
+        this.uploadUrl = ''
+        this.medium.data = []
+        this.modelTab = 0
+        this.isImageText = false
+      } else if (e == 3) {
+        this.modelTab = 1
+        this.isImageText = true
+        this.getMedium()
+      }
     }
   }
 }
@@ -634,6 +734,7 @@ export default {
           .title {
             white-space: nowrap;
             margin-right: 10px;
+            min-width: 70px;
             .icon {
               color: red;
             }
@@ -673,6 +774,11 @@ export default {
             .cover_box {
               display: flex;
               align-items: flex-end;
+              .cover_img {
+                cursor: pointer;
+                width: 80px;
+                height: 80px;
+              }
               .add_img_box {
                 cursor: pointer;
                 display: flex;
@@ -746,6 +852,8 @@ export default {
     }
   }
   .model_content {
+    height: 440px;
+    overflow: auto;
     .upload_box {
       margin-top: 10px;
       width: 100%;
@@ -768,6 +876,12 @@ export default {
           height: 15px;
           width: auto;
         }
+      }
+
+      .upload_image {
+        cursor: pointer;
+        width: 80px;
+        height: auto;
       }
     }
     .material_library_box {
