@@ -217,7 +217,14 @@
                 :pagination="medium.pagination"
                 @change="handleTableChange"
               >
-
+                <div
+                  slot="contents"
+                  slot-scope="text, record"
+                >
+                  <template>
+                    <img :src="record.content.imageFullPath" alt="" style="width:80px;height:80px;">
+                  </template>
+                </div>
               </a-table>
             </div>
           </div>
@@ -435,6 +442,7 @@ export default {
       uploadUrl: '',
       modelSearch: '',
       medium: {
+        type: 2, // 类型 2图片
         columns: [
           {
             title: '标题',
@@ -446,7 +454,8 @@ export default {
             dataIndex: 'contents',
             align: 'center',
             scopedSlots: { customRender: 'contents' },
-            ellipsis: true
+            ellipsis: true,
+            width: 100
           },
           {
             title: '上传者',
@@ -573,9 +582,10 @@ export default {
       this.getMedium()
     },
     getMedium () {
+      const { current, pageSize } = this.medium.pagination
       const obj = {
-        page: 1,
-        perPage: 10,
+        page: current,
+        perPage: pageSize,
         type: 2,
         searchStr: this.modelSearch
       }

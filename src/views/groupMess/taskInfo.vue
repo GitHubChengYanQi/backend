@@ -22,14 +22,14 @@
               >{{ info.btnState[info.data.btn].txt }}</span>
               <span
                 class="hint"
-                v-if="info.data.btn == 3"
+                v-if="info.data.btn == 3 && cause.length > 0"
               >
                 <img
                   style="margin-right:10px;"
                   :src="require('@/assets/warning.svg')"
                   alt=""
                 >
-                任务创建失败，发送内容的小程序appid账号错误，请重新检查配置。
+                {{ cause }}
               </span>
             </span>
             <span
@@ -315,7 +315,8 @@ export default {
       },
       contentArray: [],
       keepState: false,
-      tableId: -1
+      tableId: -1,
+      cause: ''
     }
   },
   created () {
@@ -371,6 +372,7 @@ export default {
         this.info.data.occur = data.occur
         this.info.data.createdAt = data.createdAt
         this.info.data.btn = data.state - 1
+        this.cause = data.cause
       })
     },
     setTab (e) {

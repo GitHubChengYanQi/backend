@@ -267,8 +267,9 @@ export default {
         this.table.tableData = res.data.datas.map((item) => {
           const arr = ['executeOwner', 'nonExecutionOwner', 'deliveryGroup', 'nonDeliveryGroup']
           item.fruit.map((items, index) => {
-            item[arr[index]] = items
+            item[arr[index]] = item.state == '任务待开始' ? '-' : items
           })
+
           return item
         })
       })
