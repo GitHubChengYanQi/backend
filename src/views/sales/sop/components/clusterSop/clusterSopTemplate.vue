@@ -21,18 +21,19 @@
         </div>
         <a-button
           type="primary"
-          style="width: 54px;height: 34px;margin: 0 10px;"
+          style="margin: 0 10px;"
           @click="goSearch"
           permission="'/sopClusterTemplate/index@get'"
         >查询</a-button>
         <a-button
-          style="width: 54px;height: 34px;margin-right: 10px;"
+          style="margin-right: 10px;"
           @click="goReset"
           v-permission="'/sopClusterTemplate/index@get'"
         >重置</a-button>
       </div>
       <div class="handlesBox">
-        <div class="btn" @click="goAdd" v-permission="'/sopClusterTemplate/add@post'">创建群SOP模板</div>
+        <!-- <div class="btn" @click="goAdd" v-permission="'/sopClusterTemplate/add@post'">创建群SOP模板</div> -->
+        <a-button type="primary" @click="goAdd" v-permission="'/sopClusterTemplate/add@post'">创建群SOP模板</a-button>
       </div>
     </div>
     <a-table
@@ -310,7 +311,7 @@ export default {
         color: #333333;
         line-height: 40px;
         cursor: pointer;
-        background-color: rgba(52, 112, 255, 1);
+        background-color: #1890ff;
         border-radius: 4px;
         color: #fff;
       }

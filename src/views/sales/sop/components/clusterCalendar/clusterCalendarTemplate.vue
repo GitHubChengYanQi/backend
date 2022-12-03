@@ -21,18 +21,19 @@
         </div>
         <a-button
           type="primary"
-          style="width: 54px;height: 34px;margin: 0 10px;"
+          style="margin: 0 10px;"
           @click="goSearch"
           v-permission="'/sopClusterCalendarTemplate/index@get'"
         >查询</a-button>
         <a-button
-          style="width: 54px;height: 34px;margin-right: 10px;"
+          style="margin-right: 10px;"
           @click="goReset"
           v-permission="'/sopClusterCalendarTemplate/index@get'"
         >重置</a-button>
       </div>
       <div class="handlesBox">
-        <div class="btn" @click="goAdd" v-permission="'/sopClusterCalendarTemplate/add@post'">创建群日历</div>
+        <!-- <div class="btn" @click="goAdd" v-permission="'/sopClusterCalendarTemplate/add@post'">创建群日历</div> -->
+        <a-button type="primary" @click="goAdd" v-permission="'/sopClusterCalendarTemplate/add@post'">创建群日历</a-button>
       </div>
     </div>
     <a-table
@@ -308,17 +309,17 @@ export default {
     .handlesBox {
       margin-right: 10px;
       .btn {
-        height: 40px;
+        height: 36px;
         padding: 0 15px;
         font-family: 'FontAwesome', sans-serif;
         font-weight: 400;
         font-style: normal;
-        font-size: 15px;
+        font-size: 14px;
         color: #333333;
-        line-height: 40px;
+        line-height: 36px;
         cursor: pointer;
-        background-color: rgba(52, 112, 255, 1);
-        border-radius: 4px;
+        background-color: #1890ff;
+        border-radius: 2px;
         color: #fff;
       }
     }

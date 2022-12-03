@@ -11,12 +11,12 @@
           </a-form-item>
           <a-button
             type="primary"
-            style="width: 54px;height: 34px;margin: 0 10px;"
+            style="margin: 0 10px;"
             @click="goSearch"
             v-permission="'/sopCluster/getExecutionSop@get'"
           >查询</a-button>
           <a-button
-            style="width: 54px;height: 34px;margin-right: 10px;"
+            style="margin-right: 10px;"
             @click="goReset"
             v-permission="'/sopCluster/getExecutionSop@get'"
           >重置</a-button>
@@ -321,7 +321,7 @@ export default {
         margin-bottom: 10px;
       }
       /deep/.ant-table-tbody .clickRowStyle {
-        background-color: #cdd9e4 !important;
+        background-color: #e6f7ff !important;
       }
     }
     .rightContainer {
