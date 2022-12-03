@@ -80,9 +80,10 @@
           <span class="refresh" @click="getTableList()">更新数据</span>
         </div>
         <div class="rig">
-          <span class="btn" @click="getTableList(true)">导出</span>
-          <span class="btn" @click="batchSettingLabels('add')">批量打标签</span>
-          <span class="btn" @click="batchSettingLabels('remove')">批量移除标签</span>
+          <!-- class='btn' -->
+          <a-button type="primary" @click="batchSettingLabels('add')" style="margin: 0 10px;">批量打标签</a-button>
+          <a-button type="primary" @click="batchSettingLabels('remove')" style="margin: 0 10px;">批量移除标签</a-button>
+          <a-button type="primary" @click="getTableList(true)" style="margin-right:10px">导出</a-button>
         </div>
       </div>
       <a-table

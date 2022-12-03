@@ -62,8 +62,8 @@
             />
           </div>
           <div class="item">
-            <a-button type="primary" @click="searchGroupChatMethod()" v-permission="'/sopClusterTemplate/getClusterList@post'">查询</a-button>
-            <a-button @click="resetGroupChatMethod()" v-permission="'/sopClusterTemplate/getClusterList@post'">重置</a-button>
+            <a-button style="margin: 0 10px" type="primary" @click="searchGroupChatMethod()" v-permission="'/sopClusterTemplate/getClusterList@post'">查询</a-button>
+            <a-button style="margin-right: 10px" @click="resetGroupChatMethod()" v-permission="'/sopClusterTemplate/getClusterList@post'">重置</a-button>
           </div>
         </div>
         <a-table
@@ -457,6 +457,8 @@ export default {
 
 <style lang="less" scoped>
 .filter-input-row {
+  display: flex;
+  flex-wrap: wrap;
     .item {
       display: flex;
       align-items: center;
@@ -509,6 +511,9 @@ export default {
           }
         }
       }
+    }
+    .item:nth-last-child(1) {
+      margin-left: auto;
     }
     .ant-btn:nth-last-child(1) {
       margin-left: 4px;
