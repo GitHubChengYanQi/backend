@@ -395,9 +395,9 @@ export default {
       const that = this
       const params = { id }
       this.$confirm({
-        title: '确定删除所选内容?',
+        title: '确定删除所选任务?',
         // content: 'Some descriptions',
-        okText: '确认删除',
+        okText: '确认',
         okType: 'danger',
         cancelText: '取消',
         onOk: async () => {
