@@ -880,5 +880,26 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/interactionRadar/setRadar'),
     meta: { title: '新建互动雷达' }
-  }
+  },
+  '/study/lesson': {
+    path: '/study/lesson',
+    name: 'workContactIndex',
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/workContactNew/index'),
+    meta: { title: '课程管理' }
+  },
+  '/study/examination': {
+    path: '/study/examination',
+    name: 'workContactIndex',
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/workContactNew/index'),
+    meta: { title: '考试管理' }
+  },
+  '/study/task': {
+    path: '/study/task',
+    name: 'workContactIndex',
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/workContactNew/index'),
+    meta: { title: '任务列表' }
+  },
 }
