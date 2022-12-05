@@ -82,14 +82,22 @@
                       class="cover_img"
                       :src="setData.inputData[item.key]"
                       alt=""
-
                     >
                     <div
                       class="show_box"
                       v-if="isShow"
                     >
-                      <span class="btn">查看</span>
-                      <span class="btn" @click="close(item.key)">删除</span>
+                      <span
+                        class="btn"
+                        @click="()=>{
+                          modalVisible = true
+                          imageUrl = setData.inputData[item.key]
+                        }"
+                      >查看</span>
+                      <span
+                        class="btn"
+                        @click="close(item.key)"
+                      >删除</span>
                     </div>
                   </div>
                   <div
@@ -149,11 +157,19 @@
                 v-else-if="item.type == 'quillEditor'"
               >
                 <quill-editor
+                  class="quillEditor"
                   @editorChange="editorChange"
                   @setMedium="setMedium"
                   :value="setData.inputData[item.key]"
                   ref="editor"
                 />
+                <a-button
+                  type="primary"
+                  class="button"
+                  @click="()=>{
+                    preview = true
+                  }"
+                >预览</a-button>
               </span>
               <span
                 class="button_box"
@@ -164,6 +180,21 @@
                   class="button"
                   @click="setMedium(3)"
                 >{{ item.btnText }}</a-button>
+                <div
+                  class="article"
+                  v-if="setData.inputData[item.key].length > 0"
+                >
+                  <div
+                    class="close"
+                    @click.stop="close(item.key)"
+                  >+</div>
+                  <img
+                    class="article_img"
+                    :src="setData.inputData[item.key]"
+                    alt=""
+                  >
+                  <div class="article_txt">{{ maintitle }}</div>
+                </div>
               </span>
               <span
                 class="input_box"
@@ -399,6 +430,48 @@
       @transmitLabel="transmitLabel"
       @showBox="showBox"
     />
+    <a-modal
+      width="800px"
+      class="viewModal"
+      :visible="modalVisible"
+      @cancel="()=>{
+        modalVisible = false
+      }"
+      title="附件预览"
+    >
+      <div class="box">
+        <img :src="imageUrl" />
+      </div>
+      <template slot="footer">
+        <a-button
+          @click="()=>{
+            modalVisible = false
+          }"
+          key="back"
+        >关闭</a-button>
+      </template>
+    </a-modal>
+    <a-modal
+      width="800px"
+      class="viewModal"
+      :visible="preview"
+      @cancel="()=>{
+        preview = false
+      }"
+      title="附件预览"
+    >
+      <div class="box">
+        <img :src="imageUrl" />
+      </div>
+      <template slot="footer">
+        <a-button
+          @click="()=>{
+            modalVisible = false
+          }"
+          key="back"
+        >关闭</a-button>
+      </template>
+    </a-modal>
   </div>
 </template>
 
@@ -413,6 +486,7 @@ export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
   data () {
     return {
+      preview: false,
       isShow: false,
       setData: {
         inputType: [
@@ -599,10 +673,13 @@ export default {
         ]
       },
       modalState: false,
+      modalVisible: false,
+      imageUrl: '',
       modalTitle: '上传图片',
       modelTab: 0,
       uploadUrl: '',
       uploadName: '',
+      maintitle: '',
       modelSearch: '',
       isImageText: false,
       tabArr: [
@@ -712,6 +789,7 @@ export default {
     },
     close (key) {
       this.setData.inputData[key] = ''
+      this.isShow = false
     },
     empty (e) {
       this.tabsArr = this.tabsArr.filter((item) => {
@@ -865,6 +943,9 @@ export default {
           } else {
             this.$refs.editor[0].getEditorData('image', this.radio.content.imageFullPath)
           }
+        } else if (this.medium.type == 3) {
+          this.setData.inputData.material = this.radio.content.imageFullPath
+          this.maintitle = this.radio.content.maintitle
         } else if (this.medium.type == 5) {
           console.log(this.radio.content)
           this.$refs.editor[0].getEditorData('video', this.radio.content.videoFullPath)
@@ -879,7 +960,8 @@ export default {
           this.modelTab = 0
         }
       }
-
+      this.medium.pagination.current = 1
+      this.medium.pagination.pageSize = 10
       this.modalState = false
     },
     editorChange (html) {
@@ -951,6 +1033,8 @@ export default {
         this.medium.data = []
         this.modelTab = 0
         this.isImageText = false
+        this.medium.pagination.current = 1
+        this.medium.pagination.pageSize = 10
       } else if (e == 3) {
         this.modelTab = 1
         this.isImageText = true
@@ -1052,7 +1136,7 @@ export default {
                   left: 0;
                   width: 100%;
                   height: 100%;
-                  background-color: rgba(74, 74, 74,.6);
+                  background-color: rgba(74, 74, 74, 0.6);
                   color: #fff;
                   .btn {
                     cursor: pointer;
@@ -1138,8 +1222,60 @@ export default {
               }
             }
             .quillEditor_box {
-              width: 650px;
-              min-height: 350px;
+              position: relative;
+              width: 100%;
+              min-width: 800px;
+              overflow: auto;
+              display: flex;
+              align-items: flex-end;
+
+              .quillEditor {
+                width: 650px;
+                height: 350px;
+              }
+              .button {
+                margin-left: 50px;
+              }
+            }
+            .button_box {
+              .article {
+                position: relative;
+                margin-top: 20px;
+                display: flex;
+                box-sizing: border-box;
+                padding: 10px;
+                width: 260px;
+                height: 80px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                .article_img {
+                  width: 60px;
+                  height: 60px;
+                }
+
+                .article_txt {
+                  width: 165px;
+                  white-space: pre-wrap;
+                  margin-left: 10px;
+                }
+
+                .close {
+                  cursor: pointer;
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  width: 18px;
+                  height: 18px;
+                  background-color: rgba(87, 85, 85, 0.7);
+                  border-radius: 50%;
+                  color: #fff;
+                  transform: translate(50%, -50%) rotate(45deg);
+                  font-size: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+              }
             }
           }
         }
