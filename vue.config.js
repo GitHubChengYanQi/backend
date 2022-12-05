@@ -28,10 +28,10 @@ const assetsCDN = {
   css: [],
   // https://unpkg.com/browse/vue@2.6.10/
   js: [
-    '//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js',
-    '//cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js',
-    '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
-    '//cdn.jsdelivr.net/npm/axios@0.19.0/dist/axios.min.js'
+    './public/dll/vue.min.js',
+    './public/dll/vue-router.min.js',
+    './public/dll/vuex.min.js',
+    './public/dll/axios.min.js'
   ],
   dll: ['/dll/antDesignVue.dll.js', '/dll/echarts.dll.js', '/dll/vueCropper.dll.js', '/dll/corejs.dll.js', '/dll/vueContainerQuery.dll.js']
 }
