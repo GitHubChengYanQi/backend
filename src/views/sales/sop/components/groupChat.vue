@@ -79,7 +79,7 @@
             <a-popover title="群标签" v-if="text !== ''">
               <template slot="content">
                 <div class="labelBox">
-                  {{ text }}
+                  {{ returnText(text) }}
                 </div>
               </template>
               <a-tag type="button">
@@ -92,7 +92,7 @@
             <a-popover title="执行中的SOP" v-if="text !== ''">
               <template slot="content">
                 <div class="labelBox">
-                  {{ text }}
+                  {{ returnText(text) }}
                 </div>
               </template>
               <a-tag type="button">
@@ -105,7 +105,7 @@
             <a-popover title="执行中的群日历" v-if="text !== ''">
               <template slot="content">
                 <div class="labelBox">
-                  {{ text }}
+                  {{ returnText(text) }}
                 </div>
               </template>
               <a-tag type="button">
@@ -266,6 +266,10 @@ export default {
     console.log('组件卸载之前')
   },
   methods: {
+    returnText (text) {
+      const textArray = text.split(',')
+      return textArray.join(' , ')
+    },
     openGroupSelectModal (t) {
       let filterInputArr = []
       if (t === 'searchObj.labels') {
