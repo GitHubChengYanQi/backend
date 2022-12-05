@@ -881,11 +881,27 @@ export const routeList = {
     component: () => import('@/views/interactionRadar/setRadar'),
     meta: { title: '新建互动雷达' }
   },
-  '/study/lesson': {
-    path: '/study/lesson',
+  '/study/lesson/index': {
+    path: '/study/lesson/index',
     name: '课程管理',
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/lesson'),
+    meta: { title: '课程管理' }
+  },
+  '/study/lesson/Courseware': {
+    path: '/study/lesson/Courseware',
+    name: '课件管理',
+    hidden: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Courseware/index'),
+    meta: { title: '课件管理' }
+  },
+  '/study/lesson/detail': {
+    path: '/study/lesson/detail',
+    name: '课程管理',
+    hidden: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Detail/index'),
     meta: { title: '课程管理' }
   },
   '/study/examination': {
