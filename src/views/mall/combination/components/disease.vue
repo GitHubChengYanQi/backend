@@ -214,7 +214,8 @@ export default {
         }
         moveUp(param).then(res => {
           if (res.code === 200) {
-            this.$message('操作成功')
+            this.$message.success('操作成功')
+            this.getList()
           }
         })
       }
@@ -224,7 +225,8 @@ export default {
         }
         moveDown(param).then(res => {
           if (res.code === 200) {
-            this.$message('操作成功')
+            this.$message.success('操作成功')
+            this.getList()
           }
         })
       }
