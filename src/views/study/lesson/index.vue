@@ -1,0 +1,526 @@
+<template>
+  <div>
+    <a-card :bordered="false" class="table-search">
+      <a-form layout="inline">
+
+        <a-form-item
+          label="课程名称：">
+          <a-input v-model="screenData.name" placeholder="请输入课程名称"></a-input>
+        </a-form-item>
+
+        <a-form-item
+          label="课程分类：">
+          <a-input v-model="screenData.remark	" placeholder="请选择课程分类"></a-input>
+        </a-form-item>
+
+        <a-form-item
+          label="创建时间：">
+          <a-range-picker v-model="screenData.time" />
+        </a-form-item>
+
+        <a-form-item
+          label="创建人：">
+          <a-select v-model="screenData.user" style="width: 200px" placeholder="请选择创建人">
+            <a-select-option key="1">
+              123
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+
+        <a-form-item
+          label="关联考试：">
+          <a-select v-model="screenData.gender1" style="width: 200px" placeholder="请选择关联考试">
+            <a-select-option key="1">
+              123
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+
+        <a-form-item>
+          <div class="my-space">
+            <a-button
+              type="primary"
+              @click="() => { this.pagination.current = 1; this.getTableData() }"
+            >
+              查询
+            </a-button>
+            <a-button @click="reset">重置</a-button>
+            <a-button type="primary" @click="reset">导出</a-button>
+          </div>
+        </a-form-item>
+      </a-form>
+      <div class="table-wrapper">
+        <div class="btn">
+          <a-button @click="() => { this.getSynContact() }">
+            课件管理
+          </a-button>
+          <a-button @click="() => { this.getSynContact() }">
+            课程分类
+          </a-button>
+          <a-button @click="() => { this.getSynContact() }">
+            新建课程
+          </a-button>
+        </div>
+        <a-table
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.id"
+          :pagination="pagination"
+          :row-selection="{ onChange: selectChange }"
+          @change="handleTableChange">
+          <div slot="name" slot-scope="text, record">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <img
+                  height="500"
+                  src="data:image/jpeg;base64,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">
+              </div>
+              <div class="nickname">
+                <a-tooltip>
+                  <template slot="title">
+                    {{ record.name }}
+                  </template>
+                  {{ record.name }}
+                </a-tooltip>
+              </div>
+            </div>
+          </div>
+          <div slot="introduction" slot-scope="text">
+            <div class="introduction">
+              <a-tooltip>
+                <template slot="title">
+                  {{ text }}
+                </template>
+                {{ text }}
+              </a-tooltip>
+            </div>
+          </div>
+          <div slot="tag" slot-scope="text,row">
+            <template>
+              <a-popover title="添加的标签" v-if="row.tag && row.tag.length > 0">
+                <template slot="content">
+                  <div class="labelBox">
+                    <a-tag v-for="(item, index) in row.tag" :key="index">{{ item }}</a-tag>
+                  </div>
+                </template>
+                <a-tag type="button">
+                  查看
+                </a-tag>
+              </a-popover>
+              <span class="nolabel" style="align-items:center;" v-else>无标签</span>
+            </template>
+          </div>
+          <div slot="action" slot-scope="text, record">
+            <template>
+              <div>
+                <a-button type="link">编辑</a-button>
+                <a-button type="link">课程详情</a-button>
+                <a-button type="link">删除</a-button>
+              </div>
+            </template>
+          </div>
+        </a-table>
+      </div>
+    </a-card>
+  </div>
+</template>
+
+<script>
+import TagName from '@/views/workContactNew/components/tagName'
+import { groupChatList, customersSource, UserPortraitList, synContact } from '@/api/workContact'
+
+export default {
+  components: { TagName },
+  data () {
+    return {
+      groupChatModal: false,
+      screenData: {
+        gender: 3,
+        addWay: '全部',
+        fieldId: 0
+      },
+      columns: [
+        {
+          title: '课程名称',
+          dataIndex: 'name',
+          scopedSlots: { customRender: 'name' },
+          align: 'center',
+          width: '200px'
+        },
+        {
+          title: '课程简介',
+          width: '200px',
+          dataIndex: 'introduction',
+          scopedSlots: { customRender: 'introduction' },
+          align: 'center'
+        },
+        {
+          title: '课程分类',
+          dataIndex: 'class',
+          align: 'center'
+        },
+        {
+          title: '试用员工',
+          dataIndex: 'tag',
+          scopedSlots: { customRender: 'tag' },
+          align: 'center'
+        },
+        {
+          title: '试用总人数',
+          dataIndex: 'total',
+          align: 'center',
+          sorter: true
+        },
+        {
+          title: '完成人数',
+          dataIndex: 'employeeName',
+          align: 'center',
+          sorter: true
+        },
+        {
+          title: '参与人数',
+          dataIndex: 'createTime',
+          align: 'center',
+          sorter: true
+        },
+        {
+          title: '课件数',
+          align: 'center'
+        },
+        {
+          title: '关联考试',
+          align: 'center'
+        },
+        {
+          title: '创建人',
+          align: 'center'
+        },
+        {
+          title: '创建时间',
+          align: 'center',
+          sorter: true
+        },
+        {
+          title: '操作',
+          align: 'center',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
+        }
+      ],
+      tableData: [],
+      pagination: {
+        total: 0,
+        current: 1,
+        pageSize: 10,
+        showSizeChanger: true,
+        pageSizeOptions: ['10', '20', '30', '50'],
+        showTotal: (total) => `共 ${total} 条数据`
+      },
+      // 群聊表格Cloumn
+      groupColumns: [
+        {
+          title: '',
+          dataIndex: 'roomName',
+          key: 'roomName',
+          align: 'center',
+          scopedSlots: { customRender: 'roomName' }
+        }
+      ],
+      // 客户性别
+      genderList: [
+        {
+          label: '未知',
+          value: 0
+        },
+        {
+          label: '男',
+          value: 1
+        },
+        {
+          label: '女',
+          value: 2
+        },
+        {
+          label: '全部',
+          value: 3
+        }
+      ],
+      // 群聊列表
+      groupChatList: [],
+      // 群聊总人数
+      groupNumber: '',
+      // 群聊搜索
+      groupSearch: '',
+      roomIdList: [],
+      // 客户来源列表
+      customersSourceList: [],
+      // 持群列表
+      holdingGroupList: [
+        {
+          label: '无群',
+          value: 0
+        },
+        {
+          label: '一个',
+          value: 1
+        },
+        {
+          label: '多个',
+          value: 2
+        },
+        {
+          label: '全部',
+          value: 3
+        }
+      ],
+      // 用户画像下拉框
+      UserPortraitList: [],
+      // 成员弹框
+      choosePeopleShow: false,
+      department: [],
+      employeeIdList: '',
+      // 持群Id
+      groupNum: 3,
+      selectedRowKeys: [],
+      timeValue: [],
+      // 用户画像筛选属性类型
+      fieldType: '',
+      fieldTypeText: null,
+      fieldSelect: [],
+      optionsSelect: '',
+      employees: [],
+      searchKey: ''
+    }
+  },
+  created () {
+    this.getTableData()
+    this.getGroupChatList()
+    this.getCustomersSource()
+    this.getUserPortraitList()
+  },
+  methods: {
+    getTableData () {
+      const params = {
+        keyWords: this.screenData.keyWords,
+        remark: this.screenData.remark,
+        fieldId: this.screenData.fieldId,
+        fieldType: Number(this.fieldType),
+        fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
+        gender: this.screenData.gender,
+        addWay: this.screenData.addWay,
+        roomId: this.roomIdList.join(','),
+        groupNum: this.groupNum,
+        employeeId: this.employeeIdList,
+        startTime: this.screenData.startTime,
+        endTime: this.screenData.endTime,
+        businessNo: this.screenData.businessNo,
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize
+      }
+      // workContactList(params).then(res => {
+      //   this.roomIdList = []
+      //   this.employeeIdList = ''
+      //   this.employees = []
+      //   this.tableData = res.data.list
+      //   this.pagination.total = res.data.page.total
+      // })
+      this.roomIdList = []
+      this.employeeIdList = ''
+      this.employees = []
+      this.tableData = [{
+        id: '123',
+        name: '123',
+        introduction: '1',
+        tag: ['好', '4', '5', '消瘦']
+      }]
+      this.pagination.total = 666
+    },
+    // 群聊分组
+    getGroupChatList () {
+      groupChatList({
+        name: this.groupSearch
+      }).then(res => {
+        this.groupChatList = res.data.list
+        this.groupNumber = res.data.total
+      })
+    },
+    // 客户来源
+    getCustomersSource () {
+      customersSource().then(res => {
+        this.customersSourceList = res.data
+        const obj = {
+          addWay: '全部',
+          addWayText: '全部'
+        }
+        return this.customersSourceList.unshift(obj)
+      })
+    },
+    // 用户画像
+    getUserPortraitList () {
+      UserPortraitList().then(res => {
+        this.UserPortraitList = res.data
+      })
+    },
+    // 用户画像下拉框
+    portraitChange (value) {
+      this.UserPortraitList.map(item => {
+        if (item.fieldId === value) {
+          this.fieldType = item.type
+          this.fieldSelect = item
+          if (item.typeText === '文本' || item.typeText === '手机号' || item.typeText === '邮箱' || item.typeText === '日期' || item.typeText === '数字') {
+            this.fieldTypeText = true
+            this.screenData.fieldValue = ''
+          } else {
+            this.fieldTypeText = false
+            this.optionsSelect = ''
+          }
+        }
+      })
+    },
+    handleTableChange ({ current, pageSize }) {
+      this.pagination.current = current
+      this.pagination.pageSize = pageSize
+      this.getTableData()
+    },
+    onSearch (value) {
+      this.groupSearch = value
+      this.getGroupChatList()
+    },
+    selectChange (row) {
+      console.log(row)
+    },
+    // 群聊筛选
+    onSelectChange (selectedRowKeys) {
+      this.roomIdList = selectedRowKeys
+    },
+    // 时间改变
+    onTimeChange (value, dateString) {
+      this.timeValue = value
+      this.screenData.startTime = dateString[0]
+      this.screenData.endTime = dateString[1]
+    },
+    onOk (value) {
+    },
+    // 成员选择
+    peopleChange (data) {
+      const arr = []
+      data.map(item => {
+        arr.push(item.employeeId)
+      })
+      this.employeeIdList = arr.join(',')
+    },
+    // 同步客户
+    getSynContact () {
+      synContact().then(res => {
+        this.getTableData()
+        this.$message.info('后台同步中,请稍等')
+      })
+    },
+    // 重置
+    reset () {
+      this.screenData = {
+        gender: 3,
+        addWay: '全部',
+        fieldId: 0
+      }
+      this.timeValue = []
+      this.groupNum = 3
+      this.employeeIdList = ''
+      this.optionsSelect = ''
+      this.employees = []
+      this.searchKey = ''
+      this.roomIdList = []
+      this.groupSearch = ''
+    },
+    searchEmp (data) {
+      if (data.length === 0) {
+        this.employeeIdList = '空'
+      } else {
+        this.employeeIdList = data[0].id
+      }
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.footer {
+  margin-bottom: 24px;
+}
+
+.table-wrapper {
+
+  .btn {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+
+    .ant-btn {
+      margin-right: 10px;
+    }
+  }
+
+  .news {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .weixin {
+      color: #86CE76
+    }
+  }
+}
+
+.tbox {
+  .group {
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    .anticon {
+      font-size: 24px;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-left: 5px;
+    }
+  }
+}
+
+.user-info {
+  text-align: center;
+  justify-content: center;
+
+  img {
+    max-height: 33px;
+    max-width: 33px;
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+  }
+}
+
+.introduction {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+</style>

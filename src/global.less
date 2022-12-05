@@ -229,7 +229,7 @@ ol {
   }
 }
 
-.ant-input, .ant-select-selection,.ant-time-picker-input {
+.ant-input, .ant-select-selection, .ant-time-picker-input {
   background-color: #fff;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
@@ -400,4 +400,18 @@ ol {
     font-size: 0px + @i;
   }
   .fontSize(@n, (@i+@step));
+}
+
+.my-space {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-search {
+  .ant-form-inline {
+    .ant-form-item {
+      margin-bottom: 24px;
+    }
+  }
 }

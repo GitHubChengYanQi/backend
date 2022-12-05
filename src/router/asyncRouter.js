@@ -883,23 +883,23 @@ export const routeList = {
   },
   '/study/lesson': {
     path: '/study/lesson',
-    name: 'workContactIndex',
+    name: '课程管理',
     // hideChildrenInMenu: true,
-    component: () => import('@/views/workContactNew/index'),
+    component: () => import('@/views/study/lesson'),
     meta: { title: '课程管理' }
   },
   '/study/examination': {
     path: '/study/examination',
-    name: 'workContactIndex',
+    name: '考试管理',
     // hideChildrenInMenu: true,
-    component: () => import('@/views/workContactNew/index'),
+    component: () => import('@/views/study/examination'),
     meta: { title: '考试管理' }
   },
   '/study/task': {
     path: '/study/task',
-    name: 'workContactIndex',
+    name: '任务列表',
     // hideChildrenInMenu: true,
-    component: () => import('@/views/workContactNew/index'),
+    component: () => import('@/views/study/examination'),
     meta: { title: '任务列表' }
-  },
+  }
 }
