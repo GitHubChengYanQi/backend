@@ -226,4 +226,8 @@ ql-snow .ql-picker.ql-header .ql-picker-label[data-value='4']::before,
 .ql-snow .ql-picker.ql-font .ql-picker-item[data-value='monospace']::before {
   content: '等宽字体';
 }
+.ql-editor .ql-video {
+  width: 300px;
+  height: 150px;
+}
 </style>
