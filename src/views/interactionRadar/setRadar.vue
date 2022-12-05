@@ -72,13 +72,26 @@
                 v-else-if="item.type == 'cover'"
               >
                 <div>
-                  <img
-                    class="cover_img"
-                    @click="setMedium(2)"
+                  <div
                     v-if="setData.inputData[item.key].length != 0"
-                    :src="setData.inputData[item.key]"
-                    alt=""
+                    class="cover_img_box"
+                    @mouseenter.stop="mouseOver(1)"
+                    @mouseleave.stop="mouseOver(-1)"
                   >
+                    <img
+                      class="cover_img"
+                      :src="setData.inputData[item.key]"
+                      alt=""
+
+                    >
+                    <div
+                      class="show_box"
+                      v-if="isShow"
+                    >
+                      <span class="btn">查看</span>
+                      <span class="btn" @click="close(item.key)">删除</span>
+                    </div>
+                  </div>
                   <div
                     v-else
                     class="add_img_box"
@@ -100,12 +113,32 @@
                 class="uploading_box"
                 v-else-if="item.type == 'uploading'"
               >
-                <img
-                  @click="setMedium(7)"
-                  class="uploading_icon"
-                  :src="require('@/assets/upload_btn.png')"
-                  alt=""
-                >
+                <div>
+                  <img
+                    @click="setMedium(7)"
+                    v-if="setData.inputData[item.key].length == 0"
+                    class="uploading_icon"
+                    :src="require('@/assets/upload_btn.png')"
+                    alt=""
+                  >
+                  <div
+                    class="pdf_box"
+                    v-else
+                  >
+                    <div
+                      class="close"
+                      @click.stop="close(item.key)"
+                    >+</div>
+                    <div class="icon_box">
+                      <img
+                        class="icon"
+                        :src="require('@/assets/pdf.png')"
+                        alt=""
+                      >
+                    </div>
+                    <div class="title">{{ uploadName }}</div>
+                  </div>
+                </div>
                 <div
                   class="hint"
                   v-if="item.hint"
@@ -157,6 +190,40 @@
         </div>
       </div>
     </div>
+    <div class="a_link">
+      <div class="a_title">
+        链接追踪设置
+      </div>
+      <div class="a_content">
+        <a-checkbox-group
+          class="checkbox_box"
+          v-model="linkData.linkState"
+          :options="linkData.linkType"
+        />
+        <div
+          class="select_box"
+          v-if="linkData.linkState.includes('2')"
+        >
+          <div
+            class="select"
+            @click="showBox"
+          >选择标签</div>
+          <span
+            class="tabs"
+            v-for="(item,index) in tabsArr"
+            :key="index"
+          ><span>{{ item.name }}</span><span
+            class="empty"
+            @click="empty(item.id)"
+          >+</span></span>
+        </div>
+      </div>
+    </div>
+    <a-button
+      type="primary"
+      style="margin-top:50px;"
+      @click="setRadar"
+    >保存并创建</a-button>
     <a-modal
       v-model="modalState"
       :title="modalTitle"
@@ -192,13 +259,37 @@
               >
               <span class="upload_text">{{ modalTitle }}</span>
             </div>
-            <img
+            <div
+              class="show"
               v-else
-              class="upload_image"
-              :src="uploadUrl"
-              alt=""
               @click="getLink"
             >
+              <img
+                v-if="medium.type == 2"
+                class="upload_image"
+                :src="uploadUrl"
+                alt=""
+              >
+              <video
+                v-else-if="medium.type == 5"
+                :src="uploadUrl"
+                class="upload_image"
+              ></video>
+              <div
+                class="pdf_box"
+                v-else
+              >
+                <div class="icon_box">
+                  <img
+                    class="icon"
+                    :src="require('@/assets/pdf.png')"
+                    alt=""
+                  >
+                </div>
+                <div class="title">{{ uploadName }}</div>
+              </div>
+            </div>
+
           </div>
           <div
             class="material_library_box"
@@ -238,10 +329,38 @@
                 >
                   <template>
                     <img
+                      v-if="medium.type == 2"
                       :src="record.content.imageFullPath"
                       alt=""
                       style="width:80px;height:80px;"
                     >
+                    <div
+                      v-if="medium.type == 7"
+                      style="display: flex;flex-direction: column;"
+                    >
+                      <a-icon
+                        type="file"
+                        theme="twoTone"
+                        style="fontSize: 46px;"
+                      />
+                      <span style="fontSize: 10px;">{{ record.content.fileName }}</span>
+                    </div>
+                    <video
+                      v-if="medium.type == 5"
+                      :src="record.content.videoFullPath"
+                      style="width:80px;height:80px;"
+                    ></video>
+                    <div
+                      v-if="medium.type == 3"
+                      style="display: flex;flex-direction: column;position: relative;"
+                    >
+                      <img
+                        :src="record.content.imageFullPath"
+                        alt=""
+                        style="width:100%;height:80px;"
+                      >
+                      <span style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;">{{ record.content.maintitle }}</span>
+                    </div>
                   </template>
                 </div>
               </a-table>
@@ -258,6 +377,28 @@
       @change="uploadPhoto"
       class="uploadFileInp"
     />
+    <input
+      style="display:none"
+      type="file"
+      accept="video/*"
+      ref="uploadVideoRef"
+      @change="uploadVideo"
+      class="uploadFileInp"
+    />
+    <input
+      style="display:none"
+      type="file"
+      ref="uploadPDFRef"
+      @change="uploadPDF"
+      name="testFile"
+      accept="application/pdf"
+    >
+    <label-select
+      :state="ruleState"
+      ref="labelSelect"
+      @transmitLabel="transmitLabel"
+      @showBox="showBox"
+    />
   </div>
 </template>
 
@@ -265,11 +406,14 @@
 import QuillEditor from './components/QuillEditor'
 import { upLoad } from '@/api/common'
 import { materialLibraryList } from '@/api/mediumGroup'
+import LabelSelect from './components/LabelSelect'
+import SvgIcon from './components/SvgIcon.vue'
 
 export default {
-  components: { 'quill-editor': QuillEditor },
+  components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
   data () {
     return {
+      isShow: false,
       setData: {
         inputType: [
           {
@@ -458,6 +602,7 @@ export default {
       modalTitle: '上传图片',
       modelTab: 0,
       uploadUrl: '',
+      uploadName: '',
       modelSearch: '',
       isImageText: false,
       tabArr: [
@@ -470,7 +615,8 @@ export default {
           {
             title: '标题',
             dataIndex: 'title',
-            align: 'center'
+            align: 'center',
+            width: 60
           },
           {
             title: '内容',
@@ -478,7 +624,7 @@ export default {
             align: 'center',
             scopedSlots: { customRender: 'contents' },
             ellipsis: true,
-            width: 100
+            width: 120
           },
           {
             title: '上传者',
@@ -523,7 +669,17 @@ export default {
         content: {},
         idArr: []
       },
-      isEditor: false
+      linkData: {
+        linkType: [
+          { label: '行为通知 （当客户点击雷达链接时，发送雷达链接的员工将会收到消息提醒）', value: '0' },
+          { label: '动态通知（当客户点击雷达链接时，会将客户的打开行为记录在客户动态里）', value: '1' },
+          { label: '客户标签（给点击雷达链接的客户打上选中的标签）', value: '2' }
+        ],
+        linkState: []
+      },
+      ruleState: false,
+      isEditor: false,
+      tabsArr: []
     }
   },
   created () {
@@ -550,11 +706,38 @@ export default {
     }
   },
   methods: {
+    mouseOver (e) {
+      console.log(e)
+      this.isShow = e == 1
+    },
+    close (key) {
+      this.setData.inputData[key] = ''
+    },
+    empty (e) {
+      this.tabsArr = this.tabsArr.filter((item) => {
+        return item.id != e
+      })
+    },
+    showBox (e) {
+      this.ruleState = e != -1
+      if (e != -1) {
+        this.$refs.labelSelect.idArr = this.tabsArr.map((item) => {
+          return item.id
+        })
+        this.$refs.labelSelect.inputArr = this.tabsArr
+      }
+    },
+    transmitLabel (e) {
+      console.log(e)
+      this.tabsArr = e
+    },
+    setRadar () {},
     handleTableChange ({ current, pageSize }) {
       this.medium.pagination.current = current
       this.medium.pagination.pageSize = pageSize
       this.getMedium()
     },
+    // 上传图片
     async uploadPhoto (e) {
       console.log(e, '上传图片对象')
       if (e && e.target && e.target.files.length !== 0) {
@@ -577,6 +760,47 @@ export default {
         console.log(e)
       }
     },
+    // 上传PDF
+    async uploadPDF (e) {
+      console.log(e, '上传pdf')
+      // debugger
+      if (e && e.target && e.target.files.length !== 0) {
+        const file = e.target.files[0]
+        if (file.size > 20 * 1000 * 1000) {
+          return this.$message.warn('PDF文件大小不超过20M')
+        }
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('time', 1)
+        console.log(formData, 'formData')
+        const res = await upLoad(formData)
+        console.log(res)
+        this.uploadUrl = res.data.fullPath
+        this.uploadName = res.data.name
+      } else {
+        console.log(e)
+      }
+    },
+    // 上传视频
+    async uploadVideo (e) {
+      console.log(e, '上传视频')
+      // debugger
+      if (e && e.target && e.target.files.length !== 0) {
+        const file = e.target.files[0]
+        if (file.size > 10 * 1000 * 1000) {
+          return this.$message.warn('请上传小于10MB的视频文件')
+        }
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('time', 1)
+        console.log(formData, 'formData')
+        const res = await upLoad(formData)
+        console.log(res)
+        this.uploadUrl = res.data.fullPath
+      } else {
+        console.log(e)
+      }
+    },
     getRadio (key, row) {
       console.log(key, row)
       this.radio.idArr = key
@@ -584,10 +808,22 @@ export default {
       this.radio.content = row.content
     },
     getLink () {
-      this.$refs.uploadPhotoRef.value = ''
-      this.$nextTick(() => {
-        this.$refs['uploadPhotoRef'].click()
-      })
+      if (this.medium.type == 2) {
+        this.$refs.uploadPhotoRef.value = ''
+        this.$nextTick(() => {
+          this.$refs['uploadPhotoRef'].click()
+        })
+      } else if (this.medium.type == 5) {
+        this.$refs.uploadVideoRef.value = ''
+        this.$nextTick(() => {
+          this.$refs['uploadVideoRef'].click()
+        })
+      } else {
+        this.$refs.uploadPDFRef.value = ''
+        this.$nextTick(() => {
+          this.$refs['uploadPDFRef'].click()
+        })
+      }
     },
     setModelTab (e) {
       this.modelTab = e
@@ -610,16 +846,38 @@ export default {
             this.$refs.editor[0].getEditorData('image', this.uploadUrl)
           }
           this.uploadUrl = ''
+        } else if (this.medium.type == 5) {
+          this.$refs.editor[0].getEditorData('video', this.uploadUrl)
+        } else {
+          this.setData.inputData.radarPDF = this.uploadUrl
         }
       } else {
-        if (this.radio.id == -1) return this.$message.warn('至少选择一个图片')
-        this.setData.inputData.linkImg = this.radio.content.imageFullPath
-        this.radio = {
-          id: -1,
-          content: {},
-          idArr: []
+        if (this.radio.id == -1) return this.$message.warn('至少选择一个选项')
+        if (this.medium.type == 2) {
+          if (!this.isEditor) {
+            this.setData.inputData.linkImg = this.radio.content.imageFullPath
+            this.radio = {
+              id: -1,
+              content: {},
+              idArr: []
+            }
+            this.modelTab = 0
+          } else {
+            this.$refs.editor[0].getEditorData('image', this.radio.content.imageFullPath)
+          }
+        } else if (this.medium.type == 5) {
+          console.log(this.radio.content)
+          this.$refs.editor[0].getEditorData('video', this.radio.content.videoFullPath)
+        } else {
+          this.setData.inputData.radarPDF = this.radio.content.fileFullPath
+          this.uploadName = this.radio.content.fileName
+          this.radio = {
+            id: -1,
+            content: {},
+            idArr: []
+          }
+          this.modelTab = 0
         }
-        this.modelTab = 0
       }
 
       this.modalState = false
@@ -774,11 +1032,34 @@ export default {
             .cover_box {
               display: flex;
               align-items: flex-end;
-              .cover_img {
-                cursor: pointer;
+
+              .cover_img_box {
+                position: relative;
                 width: 80px;
                 height: 80px;
+                .cover_img {
+                  width: 100%;
+                  height: 100%;
+                }
+                .show_box {
+                  display: flex;
+                  align-items: center;
+                  box-sizing: border-box;
+                  padding: 10px;
+                  justify-content: space-between;
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background-color: rgba(74, 74, 74,.6);
+                  color: #fff;
+                  .btn {
+                    cursor: pointer;
+                  }
+                }
               }
+
               .add_img_box {
                 cursor: pointer;
                 display: flex;
@@ -808,6 +1089,42 @@ export default {
                 width: auto;
                 height: 36px;
               }
+
+              .pdf_box {
+                position: relative;
+                width: 260px;
+                height: 80px;
+                display: flex;
+                align-items: center;
+                box-sizing: border-box;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                .title {
+                  height: 50px;
+                  white-space: pre-wrap;
+                }
+                .icon {
+                  width: 70px;
+                  height: 70px;
+                }
+                .close {
+                  cursor: pointer;
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  width: 18px;
+                  height: 18px;
+                  background-color: rgba(87, 85, 85, 0.7);
+                  border-radius: 50%;
+                  color: #fff;
+                  transform: translate(50%, -50%) rotate(45deg);
+                  font-size: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+              }
               .hint {
                 width: 180px;
                 height: 36px;
@@ -824,6 +1141,74 @@ export default {
               width: 650px;
               min-height: 350px;
             }
+          }
+        }
+      }
+    }
+  }
+  .a_link {
+    margin-top: 25px;
+    width: 100%;
+    // min-height: 770px;
+    box-sizing: border-box;
+    padding: 20px 30px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 20px;
+    .a_title {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .a_content {
+      display: flex;
+      flex-direction: column;
+      .checkbox_box {
+        display: flex;
+        flex-direction: column;
+        ::v-deep(.ant-checkbox-wrapper) {
+          margin-bottom: 10px;
+        }
+      }
+      .select_box {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        .select {
+          width: 140px;
+          height: 40px;
+          margin: 0 20px 20px 0;
+          cursor: pointer;
+          border-radius: 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #ccc;
+        }
+        .tabs {
+          margin: 0 35px 20px 0;
+          position: relative;
+          min-width: 86px;
+          padding: 0 10px;
+          height: 40px;
+          border: 1px solid rgb(129, 211, 248);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          .empty {
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            background-color: rgba(87, 85, 85, 0.7);
+            border-radius: 50%;
+            color: #fff;
+            transform: translate(50%, -50%) rotate(45deg);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
       }
@@ -880,8 +1265,27 @@ export default {
 
       .upload_image {
         cursor: pointer;
-        width: 80px;
+        width: 350px;
         height: auto;
+      }
+      .pdf_box {
+        cursor: pointer;
+        width: 260px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        .title {
+          height: 50px;
+        }
+        .icon {
+          width: 70px;
+          height: 70px;
+        }
       }
     }
     .material_library_box {

@@ -261,7 +261,7 @@
                         v-else
                         class="pdf"
                       >
-                        <div class="title">{{ record.example.title + '.pdf' }}</div>
+                        <div class="title">{{ record.example.title }}</div>
                         <div class="icon_box">
                           <img
                             class="icon"

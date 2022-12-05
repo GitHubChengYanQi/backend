@@ -87,7 +87,7 @@
     <div class="groupTag_right_box">
       <div
         class="groupTag_content_box"
-        v-if="selectKey.length > 0 && selectKey[0] != '0'"
+        v-if="selectKey.length > 0"
       >
         <div class="groupTag_header_box">
           <div
@@ -294,7 +294,7 @@ export default {
           onCancel () {}
         })
       } else {
-        this.moveGroup(item.key, e == 3 ? 1 : -1)
+        this.moveGroup(item.key, e == 3 ? -1 : 1)
       }
     },
     onSearch () {
