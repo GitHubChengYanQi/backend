@@ -180,7 +180,7 @@ import {
 export default {
   data () {
     return {
-      expandedKeys: [],
+      expandedKeys: ['0'],
       backupsExpandedKeys: [],
       searchStr: '',
       searchValue: '',
@@ -202,6 +202,7 @@ export default {
   },
   created () {
     this.getTree()
+    this.getGroups(['0'])
   },
   mounted () {
     document.addEventListener('click', this.setselectdiv)
@@ -223,15 +224,11 @@ export default {
       this.add.addState = true
       this.add.addInput = ''
     },
-    getTree (e = []) {
+    getTree () {
       const obj = {}
       workRoomLabelTree(obj).then((res) => {
         console.log(res)
         this.groupData = [res.data.root]
-        const path = e.map((item) => {
-          return item.id.toString()
-        })
-        this.expandedKeys = e.length > 0 ? [...path] : ['0']
         console.log(this.expandedKeys)
       })
     },
@@ -280,7 +277,7 @@ export default {
       } else if (e == 2) {
         this.$confirm({
           title: '提示',
-          content: '是否删除',
+          content: '删除后同时会删除分类下的所有内容',
           okText: '确认',
           cancelText: '取消',
           onOk: () => {
@@ -299,6 +296,7 @@ export default {
     },
     onSearch () {
       this.searchValue = this.searchStr
+      console.log(this.searchValue)
       if (this.searchValue === '') {
         this.expandedKeys = []
       } else {
@@ -365,6 +363,7 @@ export default {
       }
     },
     onExpand (expandedKeys) {
+      console.log(expandedKeys)
       this.expandedKeys = expandedKeys
       this.autoExpandParent = false
     },
@@ -468,8 +467,8 @@ export default {
           font-size: 14px;
           color: #ccc;
 
-          &:hover{
-            color: rgba(0, 82,217);
+          &:hover {
+            color: rgba(0, 82, 217);
           }
 
           .icon {
