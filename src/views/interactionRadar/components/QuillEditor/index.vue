@@ -25,6 +25,7 @@ import { ImageDrop } from 'quill-image-drop-module'
 import ImageResize from 'quill-image-resize-module'
 
 import { addQuillTitle } from './quill-title.js'
+
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线
   ['blockquote'], // 引用  代码块, 'code-block'
@@ -225,5 +226,9 @@ ql-snow .ql-picker.ql-header .ql-picker-label[data-value='4']::before,
 .ql-snow .ql-picker.ql-font .ql-picker-label[data-value='monospace']::before,
 .ql-snow .ql-picker.ql-font .ql-picker-item[data-value='monospace']::before {
   content: '等宽字体';
+}
+.ql-editor .ql-video {
+  width: 300px;
+  height: 150px;
 }
 </style>

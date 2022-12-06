@@ -1,8 +1,8 @@
 <template>
-  <div class="a_page">
-    <div class="a_card">
-      <div class="a_content">
-        <div class="a_title">
+  <div class="setRadar_page">
+    <div class="setRadar_card">
+      <div class="setRadar_content">
+        <div class="setRadar_title">
           基础设置
         </div>
         <div class="content">
@@ -221,11 +221,11 @@
         </div>
       </div>
     </div>
-    <div class="a_link">
-      <div class="a_title">
+    <div class="setRadar_link">
+      <div class="setRadar_title">
         链接追踪设置
       </div>
-      <div class="a_content">
+      <div class="setRadar_content">
         <a-checkbox-group
           class="checkbox_box"
           v-model="linkData.linkState"
@@ -390,7 +390,9 @@
                         alt=""
                         style="width:100%;height:80px;"
                       >
-                      <span style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;">{{ record.content.maintitle }}</span>
+                      <span style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;">
+                        {{ record.content.maintitle }}
+                      </span>
                     </div>
                   </template>
                 </div>
@@ -458,15 +460,19 @@
       @cancel="()=>{
         preview = false
       }"
-      title="附件预览"
+      title="预览"
     >
-      <div class="box">
-        <img :src="imageUrl" />
+      <div class="preview_box">
+        <img :src="require('@/assets/phone14.jpg')" />
+        <div
+          class="content_box ql-editor"
+          v-html="setData.inputData.content"
+        ></div>
       </div>
       <template slot="footer">
         <a-button
           @click="()=>{
-            modalVisible = false
+            preview = false
           }"
           key="back"
         >关闭</a-button>
@@ -681,6 +687,7 @@ export default {
       uploadName: '',
       maintitle: '',
       modelSearch: '',
+      materialId: -1,
       isImageText: false,
       tabArr: [
         { title: '本地上传', key: 0 },
@@ -966,6 +973,7 @@ export default {
     },
     editorChange (html) {
       // console.log(html)
+      this.setData.inputData.content = html
     },
     setType () {
       const { contentType, contentSource } = this.setData.inputData
@@ -1046,14 +1054,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.a_page {
+.setRadar_page {
   width: 100%;
   color: #333333;
   font-size: 14px;
   font-family: 'Arial Normal', 'Arial';
   font-weight: 400;
   font-style: normal;
-  .a_card {
+  .setRadar_card {
     width: 100%;
     // min-height: 770px;
     box-sizing: border-box;
@@ -1061,9 +1069,9 @@ export default {
     border: 1px solid #ccc;
     background-color: #fff;
     border-radius: 20px;
-    .a_content {
+    .setRadar_content {
       width: 100%;
-      .a_title {
+      .setRadar_title {
         font-size: 16px;
         margin-bottom: 20px;
       }
@@ -1282,7 +1290,7 @@ export default {
       }
     }
   }
-  .a_link {
+  .setRadar_link {
     margin-top: 25px;
     width: 100%;
     // min-height: 770px;
@@ -1291,11 +1299,11 @@ export default {
     border: 1px solid #ccc;
     background-color: #fff;
     border-radius: 20px;
-    .a_title {
+    .setRadar_title {
       font-size: 16px;
       margin-bottom: 20px;
     }
-    .a_content {
+    .setRadar_content {
       display: flex;
       flex-direction: column;
       .checkbox_box {
@@ -1449,6 +1457,19 @@ export default {
         }
       }
     }
+  }
+}
+.preview_box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .content_box {
+    position: absolute;
+    background-color: #fff;
+    width: 350px;
+    height: 700px;
+    overflow: auto;
   }
 }
 ::v-deep(.ant-modal-header) {

@@ -880,5 +880,12 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/interactionRadar/setRadar'),
     meta: { title: '新建互动雷达' }
+  },
+  '/interactionRadar/radarInfo': {
+    path: '/interactionRadar/radarInfo',
+    name: '互动雷达详情',
+    hidden: true,
+    component: () => import('@/views/interactionRadar/radarInfo'),
+    meta: { title: '互动雷达详情' }
   }
 }
