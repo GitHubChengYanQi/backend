@@ -218,13 +218,19 @@ export default {
     // 绑定群聊回调
     submitGroupChatMethod (arrayText) {
       console.log(arrayText, '提交的绑定群聊')
+      this.tableLoading = true
       this.$set(this.bindGroupChatInfo, 'clusterIds', JSON.parse(arrayText))
       bindCalendarTemplateMethod(this.bindGroupChatInfo).then(response => {
         console.log(response, '绑定群聊返回状态')
         if (response.code === 200) {
           this.$message.success('绑定成功')
           this.getTableData()
+        } else {
+          this.tableLoading = false
         }
+      }).catch(() => {
+        this.tableLoading = false
+        // this.getTableData()
       })
     },
     // 创建群日历模板
