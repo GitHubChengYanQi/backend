@@ -153,7 +153,7 @@ export default {
     // 是否显示按钮(添加群聊/修改)
     isShowButton (info) {
       const currentDate = moment().format('YYYY-MM-DD HH:mm')
-      return moment(currentDate).isBefore(info.endTime, 'day')
+      return moment(currentDate).isBefore(info.endTime, 'minute')
     },
     // 获取数据
     async getTableData () {
