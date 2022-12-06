@@ -205,7 +205,12 @@ export default {
         if (response.code === 200) {
           this.$message.success('绑定成功')
           this.getTableData()
+        } else {
+          this.tableLoading = false
         }
+      }).catch(() => {
+        this.tableLoading = false
+        // this.getTableData()
       })
     },
     // 创建sop模板
