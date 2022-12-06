@@ -390,7 +390,9 @@
                         alt=""
                         style="width:100%;height:80px;"
                       >
-                      <span style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;">{{ record.content.maintitle }}</span>
+                      <span style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;">
+                        {{ record.content.maintitle }}
+                      </span>
                     </div>
                   </template>
                 </div>
@@ -458,15 +460,19 @@
       @cancel="()=>{
         preview = false
       }"
-      title="附件预览"
+      title="预览"
     >
-      <div class="box">
-        <img :src="imageUrl" />
+      <div class="preview_box">
+        <img :src="require('@/assets/phone14.jpg')" />
+        <div
+          class="content_box"
+          v-html="setData.inputData.content"
+        ></div>
       </div>
       <template slot="footer">
         <a-button
           @click="()=>{
-            modalVisible = false
+            preview = false
           }"
           key="back"
         >关闭</a-button>
@@ -966,6 +972,7 @@ export default {
     },
     editorChange (html) {
       // console.log(html)
+      this.setData.inputData.content = html
     },
     setType () {
       const { contentType, contentSource } = this.setData.inputData
@@ -1448,6 +1455,32 @@ export default {
           }
         }
       }
+    }
+  }
+}
+.preview_box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .content_box {
+    color: #fff;
+    position: absolute;
+    background-color: rgb(6, 40, 68);
+    width: 350px;
+    height: 700px;
+    overflow: auto;
+    color: #fff;
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 5px#fff;
+      background: #535353;
+    }
+
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 5px #fff;
+      border-radius: 10px;
+      background: #ededed;
     }
   }
 }
