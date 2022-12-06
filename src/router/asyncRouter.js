@@ -898,6 +898,15 @@ export const routeList = {
     component: () => import('@/views/study/lesson/Courseware/index'),
     meta: { title: '课程管理' }
   },
+  '/study/lesson/create': {
+    path: '/study/lesson/create',
+    name: '新建课程',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Create/index'),
+    meta: { title: '新建课程' }
+  },
   '/study/lesson/detail': {
     path: '/study/lesson/detail',
     name: '课件管理',

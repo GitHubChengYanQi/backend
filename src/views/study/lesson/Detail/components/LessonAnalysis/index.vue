@@ -1,6 +1,6 @@
 <template>
   <div class="lessonAnalysis">
-    <div class="space">
+    <div class="head">
       <div class="headImg">
         <img
           height="220"
@@ -17,15 +17,31 @@
           <div>分类：默认分类</div>
           <div>创建时间：2022.10.1</div>
         </div>
-        <div class="space">
-          <div>已学完：0人</div>
-          <div>未学：0人</div>
-          <div>进行中：0人</div>
-        </div>
-        <div class="space">
-          <div>考试：0人</div>
-          <div>通过：0人</div>
-          <div>未通过：0人</div>
+        <div class="count">
+          <div>
+            <div class="number"><span class="num">73</span>人</div>
+            已学完
+          </div>
+          <div>
+            <div class="number"><span class="num">73</span>人</div>
+            未学完
+          </div>
+          <div>
+            <div class="number"><span class="num">73</span>人</div>
+            进行中
+          </div>
+          <div>
+            <div class="number"><span class="num">73</span>人</div>
+            已考试
+          </div>
+          <div>
+            <div class="number"><span class="num">73</span>人</div>
+            已通过
+          </div>
+          <div>
+            <div class="number"><span class="num">73</span>人</div>
+            未通过
+          </div>
         </div>
         <div class="note">
           本次课程..............................
@@ -33,7 +49,7 @@
       </div>
     </div>
 
-    <a-card :bordered="false" class="table-search">
+    <a-card :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
@@ -83,71 +99,46 @@
 
         <a-form-item>
           <div class="my-space">
+            <a-button @click="reset">重置</a-button>
             <a-button
               type="primary"
+              ghost
               @click="() => { this.pagination.current = 1; this.getTableData() }"
             >
               查询
             </a-button>
-            <a-button @click="reset">重置</a-button>
-            <a-button @click="reset">导出</a-button>
+            <a-button type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
-      <div class="table-wrapper">
-        <a-table
-          :columns="columns"
-          :data-source="tableData"
-          :rowKey="record => record.id"
-          :pagination="pagination"
-          :row-selection="{ onChange: selectChange }"
-          @change="handleTableChange">
-          <div slot="name" slot-scope="text, record">
-            <div class="user-info flex">
-              <div class="avatar mr12">
-                <a-icon type="file-word" style="font-size: 24px" />
-              </div>
-              <div class="nickname">
-                <a-tooltip>
-                  <template slot="title">
-                    {{ record.name }}
-                  </template>
-                  {{ record.name }}
-                </a-tooltip>
-              </div>
+    </a-card>
+
+    <div class="my-table-wrapper">
+      <a-table
+        class="my-table"
+        :columns="columns"
+        :data-source="tableData"
+        :rowKey="record => record.id"
+        :pagination="pagination"
+        :row-selection="{ onChange: selectChange }"
+        @change="handleTableChange">
+        <div slot="name" slot-scope="text, record">
+          <div class="user-info flex">
+            <div class="avatar mr12">
+              <a-icon type="file-word" style="font-size: 24px" />
             </div>
-          </div>
-          <div slot="introduction" slot-scope="text">
-            <div class="introduction">
+            <div class="nickname">
               <a-tooltip>
                 <template slot="title">
-                  {{ text }}
+                  {{ record.name }}
                 </template>
-                {{ text }}
+                {{ record.name }}
               </a-tooltip>
             </div>
           </div>
-          <div slot="action" slot-scope="text, record">
-            <template>
-              <div>
-                <a-button type="link" @click="setVisible(record.name)">重命名</a-button>
-                <a-button type="link">下载</a-button>
-                <a-button type="link">预览</a-button>
-                <a-popconfirm
-                  disabled
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
-                >
-                  <a-button type="link" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-                </a-popconfirm>
-              </div>
-            </template>
-          </div>
-        </a-table>
-      </div>
-    </a-card>
+        </div>
+      </a-table>
+    </div>
   </div>
 </template>
 
@@ -303,16 +294,24 @@ export default {
 
 <style lang="less" scoped>
 .lessonAnalysis {
-  padding: 24px 0;
 
   .title {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 24px;
   }
 
   .space {
     display: flex;
     gap: 24px;
+  }
+
+  .head {
+    padding: 24px;
+    background-color: #fff;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 24px;
   }
 
   .column {
@@ -323,18 +322,19 @@ export default {
   }
 
   .note {
-    background-color: #eee;
     border-radius: 4px;
     padding: 12px;
-    min-height: 100px;
+    color: #a4a1a4;
+    font-size: 12px;
   }
 
   .headImg {
     display: inline-block;
+    width: 300px;
     position: relative;
 
     img {
-      height: 220px;
+      max-width: 300px;
       border-radius: 2px;
     }
 
@@ -347,6 +347,31 @@ export default {
       width: 100%;
       background-color: rgba(0, 0, 0, 0.3);
     }
+  }
+
+  .count {
+    background-color: #fbfbfb;
+    padding: 12px 24px;
+    border-radius: 8px;
+    display: flex;
+    width: max-content;
+
+    > div {
+      width: 100px;
+    }
+
+    .number {
+      font-weight: bold;
+
+      .num {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .my-table-search {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 }
 </style>

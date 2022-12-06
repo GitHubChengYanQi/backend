@@ -1,30 +1,17 @@
 <template>
   <div>
-    <div class="breadcrumb">
-      <a-breadcrumb>
-        <a-breadcrumb-item>
-          <div
-            style="display: inline-block;cursor:pointer;"
-            @click.stop="$router.back(-1)">
-            <span class="return_lt"></span>
-            <span class="return">返回</span>
-          </div>
-        </a-breadcrumb-item>
-        <a-breadcrumb-item>
-          <span class="pitch">课程详情</span>
-        </a-breadcrumb-item>
-      </a-breadcrumb>
-    </div>
-    <div class="courseware">
-      <div class="tabButton">
-        <a-button :type="key === '1' ? 'primary' : 'default'" @click="setKey('1')">课程分析</a-button>
-        <a-button :type="key === '2' ? 'primary' : 'default'" @click="setKey('2')">课件分析</a-button>
-        <a-button :type="key === '3' ? 'primary' : 'default'" @click="setKey('3')">考试分析</a-button>
-      </div>
-      <LessonAnalysis v-if="key === '1'" />
-      <CoursewareAnalysis v-if="key === '2'" />
-      <ExaminationAnalysis v-if="key === '3'" />
-    </div>
+    <breadcrumb :titles="['课程管理','课程详情']" back></breadcrumb>
+    <a-tabs v-model="key" class="tabs">
+      <a-tab-pane key="1" tab="课程分析">
+        <LessonAnalysis />
+      </a-tab-pane>
+      <a-tab-pane key="2" tab="课件分析">
+        <CoursewareAnalysis />
+      </a-tab-pane>
+      <a-tab-pane key="3" tab="考试分析">
+        <ExaminationAnalysis />
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
@@ -32,6 +19,7 @@
 import LessonAnalysis from './components/LessonAnalysis/index'
 import CoursewareAnalysis from './components/CoursewareAnalysis/index'
 import ExaminationAnalysis from './components/ExaminationAnalysis/index'
+import breadcrumb from '../../components/Breadcrumd/index'
 
 export default {
   data () {
@@ -44,23 +32,20 @@ export default {
       this.key = key
     }
   },
-  components: { LessonAnalysis, CoursewareAnalysis, ExaminationAnalysis }
+  components: { LessonAnalysis, CoursewareAnalysis, ExaminationAnalysis, breadcrumb }
 }
 </script>
 
 <style lang="less" scoped>
 
-.courseware {
-  background-color: #fff;
-  padding: 24px;
-  margin-top: 12px;
+.tabs {
 
-  .tabButton {
-    display: flex;
-
-    button {
-      width: 200px;
-    }
+  /deep/ .ant-tabs-bar {
+    background-color: #fff;
+    padding: 0 12px;
+    margin: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
   }
 }
 

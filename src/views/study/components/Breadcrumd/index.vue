@@ -34,7 +34,7 @@ export default {
 
 <style lang="less" scoped>
 .breadcrumb {
-  padding: 12px 0;
+  padding: 12px 0 0;
 }
 
 .back {

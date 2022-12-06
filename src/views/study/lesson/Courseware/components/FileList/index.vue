@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card :bordered="false" class="table-search">
+    <a-card :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
@@ -19,84 +19,89 @@
         </a-form-item>
         <a-form-item>
           <div class="my-space">
+            <a-button @click="reset">重置</a-button>
             <a-button
               type="primary"
+              ghost
               @click="() => { this.pagination.current = 1; this.getTableData() }"
             >
               查询
             </a-button>
-            <a-button @click="reset">重置</a-button>
+            <a-button type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
-      <div class="table-wrapper">
-        <div class="btn">
-          <a-button @click="uploadVisibleOpen">
-            上传文件
-          </a-button>
-          <a-button @click="download">
-            批量下载
-          </a-button>
-        </div>
-        <a-table
-          :columns="columns"
-          :data-source="tableData"
-          :rowKey="record => record.id"
-          :pagination="pagination"
-          :row-selection="{ onChange: selectChange }"
-          @change="handleTableChange">
-          <div slot="name" slot-scope="text, record">
-            <div class="user-info flex">
-              <div class="avatar mr12">
-                <a-icon type="file-word" style="font-size: 24px" />
-              </div>
-              <div class="nickname">
-                <a-tooltip>
-                  <template slot="title">
-                    {{ record.name }}
-                  </template>
-                  {{ record.name }}
-                </a-tooltip>
-              </div>
+    </a-card>
+    <div class="my-table-wrapper">
+      <div class="btn">
+        <a-icon type="question-circle" />
+        <a-button type="primary" @click="uploadVisibleOpen">
+          上传文件
+        </a-button>
+        <a-button @click="download">
+          批量下载
+        </a-button>
+      </div>
+      <a-table
+        class="my-table"
+        :columns="columns"
+        :data-source="tableData"
+        :rowKey="record => record.id"
+        :pagination="pagination"
+        :row-selection="{ onChange: selectChange }"
+        @change="handleTableChange">
+        <div slot="name" slot-scope="text, record">
+          <div class="user-info flex">
+            <div class="avatar mr12">
+              <a-icon type="file-word" style="font-size: 24px" />
             </div>
-          </div>
-          <div slot="introduction" slot-scope="text">
-            <div class="introduction">
+            <div class="nickname">
               <a-tooltip>
                 <template slot="title">
-                  {{ text }}
+                  {{ record.name }}
                 </template>
-                {{ text }}
+                {{ record.name }}
               </a-tooltip>
             </div>
           </div>
-          <div slot="action" slot-scope="text, record">
-            <template>
-              <div>
-                <a-button type="link" @click="setVisible(record.name)">重命名</a-button>
-                <a-button type="link">下载</a-button>
-                <a-button type="link">预览</a-button>
-                <a-popconfirm
-                  disabled
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
-                >
-                  <a-button type="link" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-                </a-popconfirm>
-              </div>
-            </template>
+        </div>
+        <div slot="introduction" slot-scope="text">
+          <div class="introduction">
+            <a-tooltip>
+              <template slot="title">
+                {{ text }}
+              </template>
+              {{ text }}
+            </a-tooltip>
           </div>
-        </a-table>
-      </div>
-    </a-card>
+        </div>
+        <div slot="action" slot-scope="text, record">
+          <template>
+            <div class="my-space">
+              <a-button class="warnButton" @click="setVisible(record.name)">重命名</a-button>
+              <a-button class="successButton">预览</a-button>
+              <a-button class="linkButton">下载</a-button>
+              <a-popconfirm
+                disabled
+                title="是否确认删除"
+                ok-text="确认"
+                cancel-text="取消"
+                @confirm="deleteAttribute(record.id)"
+              >
+                <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+              </a-popconfirm>
+            </div>
+          </template>
+        </div>
+      </a-table>
+    </div>
 
-    <a-modal v-model="visible" title="重命名" @ok="handleOk">
+    <a-modal centered v-model="visible" title="修改名称" @ok="handleOk" class="modal">
       <a-input v-model="fileName"></a-input>
     </a-modal>
 
     <a-modal
+      centered
       destroyOnClose
       v-model="uploadVisible"
       title="上传文件"
@@ -271,18 +276,19 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.table-wrapper {
 
-  .btn {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-
-    .ant-btn {
-      margin-right: 10px;
-    }
+.modal {
+  /deep/ .ant-modal-footer {
+    text-align: center;
   }
+}
+
+.my-table-search {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.table-wrapper {
 
   .news {
     width: 100%;

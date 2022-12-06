@@ -420,7 +420,7 @@ ol {
 
 .warnButton {
   color: rgba(255, 152, 0, 1);
-  background-color: rgba(252, 192, 104, 0.2);
+  background-color: rgba(252, 192, 104, 0.1);
   border: none;
   height: auto;
   padding: 4px 12px;
@@ -429,7 +429,7 @@ ol {
 
 .linkButton {
   color: #1890ff;
-  background-color: rgba(24, 144, 255, 0.2);
+  background-color: rgba(24, 144, 255, 0.1);
   border: none;
   height: auto;
   padding: 4px 12px;
@@ -438,7 +438,7 @@ ol {
 
 .delButton {
   color: #ff4d4f;
-  background-color: rgba(255, 77, 79, 0.2);
+  background-color: rgba(255, 77, 79, 0.1);
   border: none;
   height: auto;
   padding: 4px 12px;
@@ -447,7 +447,7 @@ ol {
 
 .successButton {
   color: #01ba77;
-  background-color: rgba(1, 186, 119, 0.2);
+  background-color: rgba(1, 186, 119, 0.1);
   border: none;
   height: auto;
   padding: 4px 12px;
@@ -456,6 +456,10 @@ ol {
 
 .my-table-search {
   border-radius: 8px;
+
+  .ant-form-inline .ant-form-item {
+    margin-bottom: 16px;
+  }
 
   .ant-input,
   .ant-select-selection,
@@ -475,12 +479,23 @@ ol {
   .btn {
     width: 100%;
     display: flex;
+    align-items: center;
     justify-content: flex-end;
-    padding: 20px 0;
+    padding: 24px;
 
     .ant-btn {
-      margin-right: 10px;
+      margin-left: 12px;
       border-radius: 8px;
+    }
+  }
+
+  .my-table {
+    background-color: #fff;
+
+    .ant-table-pagination {
+      padding: 24px;
+      float: none;
+      text-align: center;
     }
   }
 }

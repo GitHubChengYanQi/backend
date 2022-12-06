@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card :bordered="false" class="table-search">
+    <a-card :bordered="false" class="my-table-search">
       <a-form layout="inline">
         <a-form-item
           label="课件名称：">
@@ -17,71 +17,74 @@
         </a-form-item>
         <a-form-item>
           <div class="my-space">
+            <a-button @click="reset">重置</a-button>
             <a-button
               type="primary"
+              ghost
               @click="() => { this.pagination.current = 1; this.getTableData() }"
             >
               查询
             </a-button>
-            <a-button @click="reset">重置</a-button>
-            <a-button @click="reset">导出</a-button>
+            <a-button type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
-      <div class="table-wrapper">
-        <a-table
-          :columns="columns"
-          :data-source="tableData"
-          :rowKey="record => record.id"
-          :pagination="pagination"
-          :row-selection="{ onChange: selectChange }"
-          @change="handleTableChange">
-          <div slot="name" slot-scope="text, record">
-            <div class="user-info flex">
-              <div class="avatar mr12">
-                <a-icon type="file-word" style="font-size: 24px" />
-              </div>
-              <div class="nickname">
-                <a-tooltip>
-                  <template slot="title">
-                    {{ record.name }}
-                  </template>
-                  {{ record.name }}
-                </a-tooltip>
-              </div>
+    </a-card>
+
+    <div class="my-table-wrapper">
+      <a-table
+        class="my-table"
+        :columns="columns"
+        :data-source="tableData"
+        :rowKey="record => record.id"
+        :pagination="pagination"
+        :row-selection="{ onChange: selectChange }"
+        @change="handleTableChange">
+        <div slot="name" slot-scope="text, record">
+          <div class="user-info flex">
+            <div class="avatar mr12">
+              <a-icon type="file-word" style="font-size: 24px" />
             </div>
-          </div>
-          <div slot="introduction" slot-scope="text">
-            <div class="introduction">
+            <div class="nickname">
               <a-tooltip>
                 <template slot="title">
-                  {{ text }}
+                  {{ record.name }}
                 </template>
-                {{ text }}
+                {{ record.name }}
               </a-tooltip>
             </div>
           </div>
-          <div slot="action" slot-scope="text, record">
-            <template>
-              <div>
-                <a-button type="link" @click="setVisible(record.name)">重命名</a-button>
-                <a-button type="link">下载</a-button>
-                <a-button type="link">预览</a-button>
-                <a-popconfirm
-                  disabled
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
-                >
-                  <a-button type="link" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-                </a-popconfirm>
-              </div>
-            </template>
+        </div>
+        <div slot="introduction" slot-scope="text">
+          <div class="introduction">
+            <a-tooltip>
+              <template slot="title">
+                {{ text }}
+              </template>
+              {{ text }}
+            </a-tooltip>
           </div>
-        </a-table>
-      </div>
-    </a-card>
+        </div>
+        <div slot="action" slot-scope="text, record">
+          <template>
+            <div>
+              <a-button type="link" @click="setVisible(record.name)">重命名</a-button>
+              <a-button type="link">下载</a-button>
+              <a-button type="link">预览</a-button>
+              <a-popconfirm
+                disabled
+                title="是否确认删除"
+                ok-text="确认"
+                cancel-text="取消"
+                @confirm="deleteAttribute(record.id)"
+              >
+                <a-button type="link" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+              </a-popconfirm>
+            </div>
+          </template>
+        </div>
+      </a-table>
+    </div>
   </div>
 </template>
 
@@ -242,3 +245,31 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+
+.my-table-search {
+  margin-bottom: 24px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.table-wrapper {
+
+  .news {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .weixin {
+      color: #86CE76
+    }
+  }
+}
+</style>

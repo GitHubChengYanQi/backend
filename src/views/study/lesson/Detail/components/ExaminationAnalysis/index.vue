@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card :bordered="false" class="table-search">
+    <a-card :bordered="false" class="my-table-search">
       <a-form layout="inline">
         <a-form-item
           label="考试名称：">
@@ -28,39 +28,45 @@
           </div>
         </a-form-item>
       </a-form>
-      <div class="table-wrapper">
-        <a-table
-          :columns="columns"
-          :data-source="tableData"
-          :rowKey="record => record.id"
-          :pagination="pagination"
-          :row-selection="{ onChange: selectChange }"
-          @change="handleTableChange">
-          <div slot="name" slot-scope="text, record">
-            <div class="user-info flex">
-              <div class="avatar mr12">
-                <a-icon type="file-word" style="font-size: 24px" />
-              </div>
-              <div class="nickname">
-                <a-tooltip>
-                  <template slot="title">
-                    {{ record.name }}
-                  </template>
+    </a-card>
+    <div class="my-table-wrapper">
+      <a-table
+        class="my-table"
+        :columns="columns"
+        :data-source="tableData"
+        :rowKey="record => record.id"
+        :pagination="pagination"
+        :row-selection="{ onChange: selectChange }"
+        @change="handleTableChange">
+        <div slot="name" slot-scope="text, record">
+          <div class="user-info flex">
+            <div class="avatar mr12">
+              <a-icon type="file-word" style="font-size: 24px" />
+            </div>
+            <div class="nickname">
+              <a-tooltip>
+                <template slot="title">
                   {{ record.name }}
-                </a-tooltip>
-              </div>
+                </template>
+                {{ record.name }}
+              </a-tooltip>
             </div>
           </div>
-          <div slot="action" slot-scope="text, record">
-            <template>
-              <div>
-                <a-button type="link" @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?id=${record.id}`)">查看详情</a-button>
-              </div>
-            </template>
-          </div>
-        </a-table>
-      </div>
-    </a-card>
+        </div>
+        <div slot="action" slot-scope="text, record">
+          <template>
+            <div>
+              <a-button
+                class="successButton"
+                @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?id=${record.id}`)"
+              >
+                查看详情
+              </a-button>
+            </div>
+          </template>
+        </div>
+      </a-table>
+    </div>
   </div>
 </template>
 
@@ -208,3 +214,31 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+
+.my-table-search {
+  margin-bottom: 24px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.table-wrapper {
+
+  .news {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .weixin {
+      color: #86CE76
+    }
+  }
+}
+</style>
