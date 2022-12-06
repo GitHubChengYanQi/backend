@@ -134,7 +134,7 @@ export function setBreadcrumb (path, data) {
       returnPath: '/groupsOperation/joinGroupSaying/index'
     },
     21: {
-      path: ['/interactionRadar/setRadar'],
+      path: ['/interactionRadar/setRadar', '/interactionRadar/radarInfo'],
       returnPath: '/interactionRadar/index'
     }
   }

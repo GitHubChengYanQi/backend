@@ -540,7 +540,7 @@ export default {
       if (e != 3) {
         this.$router.push(`/interactionRadar/setRadar${e == 0 ? '' : '?id=' + item.id }`)
       } else {
-        this.$router.push(`/interactionRadar/radarData&id=${item.id}`)
+        this.$router.push(`/interactionRadar/radarInfo?id=${item.id}`)
       }
     },
     getSearch () {},
