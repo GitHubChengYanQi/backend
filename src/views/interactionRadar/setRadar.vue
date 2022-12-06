@@ -28,7 +28,7 @@
                 >
                   <a-select-option
                     v-for="(items,indexs) in selectArr[item.selectKey]"
-                    :value="items.code"
+                    :value="items.id"
                     :key="indexs"
                   >{{ items.name }}</a-select-option>
                 </a-select>
@@ -46,7 +46,7 @@
                 >
                   <a-select-option
                     v-for="(items,indexs) in selectArr[item.selectKey]"
-                    :value="items.code"
+                    :value="items.id"
                     :key="indexs"
                   >{{ items.name }}</a-select-option>
                 </a-select>
@@ -487,6 +487,7 @@ import { upLoad } from '@/api/common'
 import { materialLibraryList } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
+import { scrmRadarArticleSave, scrmRadarLabelFind } from '@/api/setRadar.js'
 
 export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
@@ -499,34 +500,34 @@ export default {
           {
             title: '雷达标题：',
             type: 'input',
-            key: 'radarTitle',
+            key: 'title',
             fontNumber: 15
           },
           {
             title: '选择分组：',
             type: 'select',
-            key: 'selectGrouping',
+            key: 'unitId',
             selectKey: 'grouping'
           },
           {
             title: '选择渠道：',
             type: 'checkbox',
-            key: 'selectChannel',
+            key: 'ditch',
             selectKey: 'channel',
             placeholder: '未选中渠道'
           },
           {
             title: '内容类型：',
             type: 'radio',
-            key: 'contentType',
+            key: 'shape',
             selectKey: 'type'
           }
         ],
         inputData: {
-          radarTitle: '',
-          selectGrouping: '',
-          selectChannel: [],
-          contentType: '1',
+          title: '',
+          unitId: '',
+          ditch: [],
+          shape: '1',
           radarLink: '',
           linkTitle: '',
           linkDigest: '',
@@ -603,7 +604,22 @@ export default {
           }
         ],
         grouping: [],
-        channel: [],
+        channel: [{
+          'id': 6,
+          'name': '渠道4'
+        },
+        {
+          'id': 5,
+          'name': '渠道3'
+        },
+        {
+          'id': 4,
+          'name': '渠道2'
+        },
+        {
+          'id': 3,
+          'name': '渠道1'
+        }],
         sourceType: [
           { code: '0', name: '素材库' },
           { code: '1', name: '公众号' },
@@ -768,6 +784,7 @@ export default {
   },
   created () {
     this.setType()
+    this.getFind()
   },
   computed: {
     dataListSelectionKeys () {
@@ -794,6 +811,16 @@ export default {
       console.log(e)
       this.isShow = e == 1
     },
+    getFind () {
+      const obj = {
+        left: 1
+      }
+      scrmRadarLabelFind(obj).then(res => {
+        console.log(res)
+        const { data } = res
+        this.selectArr.grouping = data.group
+      })
+    },
     close (key) {
       this.setData.inputData[key] = ''
       this.isShow = false
@@ -816,7 +843,32 @@ export default {
       console.log(e)
       this.tabsArr = e
     },
-    setRadar () {},
+    setRadar () {
+      const { inputData } = this.setData
+      const inputArr = ['title', 'unitId', 'ditch', 'shape']
+      const entry = {
+        1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
+        2: [],
+        3: [],
+        4: []
+      }
+      const obj = { entry: {} }
+      for (const key in inputData) {
+        if (inputArr.includes(key)) {
+          obj[key] = inputData[key]
+        } else {
+          if (entry[inputData.shape].includes(key)) {
+            console.log(inputData[key], key)
+            obj.entry[key] = inputData[key]
+          }
+        }
+      }
+      console.log(obj)
+      if (inputData) return
+      scrmRadarArticleSave(obj).then(res => {
+        console.log(res)
+      })
+    },
     handleTableChange ({ current, pageSize }) {
       this.medium.pagination.current = current
       this.medium.pagination.pageSize = pageSize
@@ -976,10 +1028,10 @@ export default {
       this.setData.inputData.content = html
     },
     setType () {
-      const { contentType, contentSource } = this.setData.inputData
+      const { shape, contentSource } = this.setData.inputData
       const { inputType, articleArr } = this.setData
-      const newInputType = inputType.concat(this.change[contentType])
-      if (contentType == 3) {
+      const newInputType = inputType.concat(this.change[shape])
+      if (shape == 3) {
         const articleType = newInputType.concat(articleArr[contentSource])
         console.log(articleType)
         this.$set(this.setData, 'changeType', articleType)
