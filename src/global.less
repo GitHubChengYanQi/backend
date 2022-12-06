@@ -402,6 +402,8 @@ ol {
   .fontSize(@n, (@i+@step));
 }
 
+
+// 学习中心通用样式
 .my-space {
   display: flex;
   align-items: center;
@@ -412,6 +414,73 @@ ol {
   .ant-form-inline {
     .ant-form-item {
       margin-bottom: 24px;
+    }
+  }
+}
+
+.warnButton {
+  color: rgba(255, 152, 0, 1);
+  background-color: rgba(252, 192, 104, 0.2);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.linkButton {
+  color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.2);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.delButton {
+  color: #ff4d4f;
+  background-color: rgba(255, 77, 79, 0.2);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.successButton {
+  color: #01ba77;
+  background-color: rgba(1, 186, 119, 0.2);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.my-table-search {
+  border-radius: 8px;
+
+  .ant-input,
+  .ant-select-selection,
+  .ant-time-picker-input {
+    border-radius: 8px !important;
+  }
+
+  .ant-btn {
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+}
+
+.my-table-wrapper {
+  border-radius: 8px;
+
+  .btn {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 0;
+
+    .ant-btn {
+      margin-right: 10px;
+      border-radius: 8px;
     }
   }
 }

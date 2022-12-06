@@ -17,6 +17,7 @@ export function exChangeMenu (path) {
     }
   }
 }
+
 export function setBreadcrumb (path, data) {
   const sideMenus = store.state.permission.sideMenus
   let firstTitle = ''
@@ -153,6 +154,11 @@ export function setBreadcrumb (path, data) {
       if (inner.path == path) {
         firstTitle = returnBtnPath.includes(inner.path) ? true : title
         secondTitle = inner.meta.title
+        if (inner.hiddenBreadcrumb) {
+          firstTitle = 'hiddenBreadcrumb'
+          secondTitle = 'hiddenBreadcrumb'
+          return
+        }
         if (inner.path == '/clientFollow/addRule' && data.label) {
           secondTitle = '编辑规则'
         }
@@ -188,6 +194,7 @@ export function setBreadcrumb (path, data) {
   })
   store.commit('SET_BREADCRUMB', [firstTitle, secondTitle])
 }
+
 export function resetRoutes () {
   router.matcher = newRouter().matcher
   store.commit('CLEAR_ROUTERS')

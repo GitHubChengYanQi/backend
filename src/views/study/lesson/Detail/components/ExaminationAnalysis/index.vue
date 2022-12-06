@@ -54,7 +54,7 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div>
-                <a-button type="link">查看详情</a-button>
+                <a-button type="link" @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?id=${record.id}`)">查看详情</a-button>
               </div>
             </template>
           </div>

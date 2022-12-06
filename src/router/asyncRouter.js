@@ -884,6 +884,7 @@ export const routeList = {
   '/study/lesson/index': {
     path: '/study/lesson/index',
     name: '课程管理',
+    hiddenBreadcrumb: true,
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/lesson'),
     meta: { title: '课程管理' }
@@ -892,21 +893,33 @@ export const routeList = {
     path: '/study/lesson/Courseware',
     name: '课件管理',
     hidden: true,
+    hiddenBreadcrumb: true,
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/lesson/Courseware/index'),
-    meta: { title: '课件管理' }
+    meta: { title: '课程管理' }
   },
   '/study/lesson/detail': {
     path: '/study/lesson/detail',
-    name: '课程管理',
+    name: '课件管理',
     hidden: true,
+    hiddenBreadcrumb: true,
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/lesson/Detail/index'),
     meta: { title: '课程管理' }
   },
+  '/study/examinationAnalysis/examintionDetail': {
+    path: '/study/examinationAnalysis/examintionDetail',
+    name: '考试分析详情',
+    hiddenBreadcrumb: true,
+    hidden: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Detail/components/ExaminationAnalysis/ExamintionDetail'),
+    meta: { title: '考试分析' }
+  },
   '/study/examination': {
     path: '/study/examination',
     name: '考试管理',
+    hiddenBreadcrumb: true,
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/examination'),
     meta: { title: '考试管理' }
@@ -914,6 +927,7 @@ export const routeList = {
   '/study/task': {
     path: '/study/task',
     name: '任务列表',
+    hiddenBreadcrumb: true,
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/examination'),
     meta: { title: '任务列表' }

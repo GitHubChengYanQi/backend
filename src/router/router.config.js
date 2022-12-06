@@ -69,7 +69,7 @@ export function dealPermissionData (data) {
                   if (routeList[linkUrl]) {
                     const meta = routeList[linkUrl].meta
                     Object.assign(meta, {
-                      title: name,
+                      title: meta.hidden ? meta.title : name,
                       icon: icon || 'menu',
                       actionList: []
                     })
