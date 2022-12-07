@@ -144,7 +144,7 @@
                         alt=""
                       >
                     </div>
-                    <div class="title">{{ uploadName }}</div>
+                    <div class="title">{{ setData.inputData.linkTitle }}</div>
                   </div>
                 </div>
                 <div
@@ -193,7 +193,10 @@
                     :src="setData.inputData[item.key]"
                     alt=""
                   >
-                  <div class="article_txt">{{ maintitle }}</div>
+                  <div class="article_txt">
+                    <div class="title">{{ setData.inputData.linkTitle }}</div>
+                    <div class="content">{{ setData.inputData.linkDigest }}</div>
+                  </div>
                 </div>
               </span>
               <span
@@ -213,6 +216,7 @@
                 <a-button
                   v-if="item.btnState"
                   type="primary"
+                  @click="getArticle"
                   class="button"
                 >生成雷达文章</a-button>
               </span>
@@ -487,7 +491,7 @@ import { upLoad } from '@/api/common'
 import { materialLibraryList } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
-import { scrmRadarArticleSave, scrmRadarLabelFind } from '@/api/setRadar.js'
+import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad } from '@/api/setRadar.js'
 
 export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
@@ -536,14 +540,14 @@ export default {
           content: '',
           contentSource: '0',
           articleLink: '',
-          material: ''
+          materialId: ''
         },
         articleArr: {
           0: [
             {
               type: 'button',
               btnText: '从素材库中引用',
-              key: 'material'
+              key: 'linkImg'
             }
           ],
           1: [
@@ -551,7 +555,6 @@ export default {
               title: '文章链接：',
               type: 'input',
               key: 'articleLink',
-              fontNumber: 15,
               placeholder: '已绑定的公众号文章链接',
               btnState: true
             }
@@ -604,22 +607,7 @@ export default {
           }
         ],
         grouping: [],
-        channel: [{
-          'id': 6,
-          'name': '渠道4'
-        },
-        {
-          'id': 5,
-          'name': '渠道3'
-        },
-        {
-          'id': 4,
-          'name': '渠道2'
-        },
-        {
-          'id': 3,
-          'name': '渠道1'
-        }],
+        channel: [],
         sourceType: [
           { code: '0', name: '素材库' },
           { code: '1', name: '公众号' },
@@ -631,7 +619,8 @@ export default {
           {
             title: '雷达链接：',
             type: 'input',
-            key: 'radarLink'
+            key: 'radarLink',
+            placeholder: '请输入http或https开头的链接地址'
           },
           {
             title: '链接标题：',
@@ -779,11 +768,13 @@ export default {
       },
       ruleState: false,
       isEditor: false,
-      tabsArr: []
+      tabsArr: [],
+      tableId: -1
     }
   },
   created () {
     this.setType()
+    this.getUrl()
     this.getFind()
   },
   computed: {
@@ -807,18 +798,86 @@ export default {
     }
   },
   methods: {
+    getArticle () {
+      console.log(this.setData.inputData.articleLink)
+      if (!this.isUrl(this.setData.inputData.articleLink, 1)) return this.$message.warn('微信文章链接 必须以 https://mp.weixin.qq.com/s/ 开头')
+    },
+    getUrl () {
+      const object = {}
+      // 1.获取？后面的所有内容包括问号
+      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+
+      // 2.截取？后面的字符
+      const urlData = url.substr(1)
+      // name=嘻嘻&hobby=追剧
+      if (urlData.length === 0) return
+      const strs = urlData.split('&')
+      for (let i = 0; i < strs.length; i++) {
+        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      }
+      if (!object.hasOwnProperty('id')) return
+      this.tableId = object.id
+      this.getInfo()
+    },
+    getInfo () {
+      console.log(this.tableId)
+      const obj = {
+        id: this.tableId
+      }
+      scrmRadarArticleLoad(obj).then((res) => {
+        console.log(res)
+        const { data } = res.data
+        const inputArr = ['title', 'unitId']
+        const { inputData } = this.setData
+
+        const entry = {
+          1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
+          2: ['radarPDF', 'linkTitle'],
+          3: {
+            0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId'],
+            1: ['linkTitle', 'linkImg', 'articleLink'],
+            2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+          },
+          4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+        }
+        // const shapeArr = ['链接', 'PDF', '图文/文章', '视频']
+        for (const key in data) {
+          if (inputArr.includes(key)) {
+            this.setData.inputData[key] = data[key]
+          }
+        }
+        this.setData.inputData.ditch = data.ditch.map((item) => {
+          return item.id
+        })
+        this.setData.inputData.shape = '1'
+        for (const key in data.entry) {
+          if (inputData.shape == '3') {
+            if (entry[inputData.shape][inputData.contentSource].includes(key)) {
+              console.log(inputData[key], key)
+              this.setData.inputData[key] = data.entry[key]
+            }
+          } else {
+            if (entry[inputData.shape].includes(key)) {
+              console.log(data.entry[key], key)
+              this.setData.inputData[key] = data.entry[key]
+            }
+          }
+        }
+        this.linkData.linkState = data.track.linkType
+        this.tabsArr = data.track.linkState
+      })
+    },
     mouseOver (e) {
       console.log(e)
       this.isShow = e == 1
     },
     getFind () {
-      const obj = {
-        left: 1
-      }
-      scrmRadarLabelFind(obj).then(res => {
+      const obj = {}
+      scrmRadarLabelFind(obj).then((res) => {
         console.log(res)
         const { data } = res
         this.selectArr.grouping = data.group
+        this.selectArr.channel = data.ditch
       })
     },
     close (key) {
@@ -845,28 +904,59 @@ export default {
     },
     setRadar () {
       const { inputData } = this.setData
+      const { linkState } = this.linkData
       const inputArr = ['title', 'unitId', 'ditch', 'shape']
       const entry = {
         1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
-        2: [],
-        3: [],
-        4: []
+        2: ['radarPDF', 'linkTitle'],
+        3: {
+          0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId'],
+          1: ['linkTitle', 'linkImg', 'articleLink'],
+          2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+        },
+        4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
       }
-      const obj = { entry: {} }
+      const obj = {
+        entry: {},
+        ditch: [],
+        track: {
+          linkType: linkState,
+          linkState: this.tabsArr.map((item) => {
+            const obj = {}
+            obj.id = item.id
+            obj.name = item.name
+            return obj
+          })
+        }
+      }
       for (const key in inputData) {
         if (inputArr.includes(key)) {
           obj[key] = inputData[key]
         } else {
-          if (entry[inputData.shape].includes(key)) {
-            console.log(inputData[key], key)
-            obj.entry[key] = inputData[key]
+          if (inputData.shape == '3') {
+            if (entry[inputData.shape][inputData.contentSource].includes(key)) {
+              console.log(inputData[key], key)
+              obj.entry[key] = inputData[key]
+            }
+          } else {
+            if (entry[inputData.shape].includes(key)) {
+              console.log(inputData[key], key)
+              obj.entry[key] = inputData[key]
+            }
           }
         }
       }
+      obj.ditch = this.selectArr.channel.filter((item) => {
+        return obj.ditch.includes(item.id)
+      })
+      if (!this.isUrl(obj.entry.radarLink) && obj.shape == 1) return this.$message.warn('请检查雷达链接')
       console.log(obj)
-      if (inputData) return
-      scrmRadarArticleSave(obj).then(res => {
+      if (this.tableId != -1) {
+        obj.id = this.tableId
+      }
+      scrmRadarArticleSave(obj).then((res) => {
         console.log(res)
+        this.$router.push('/interactionRadar/index')
       })
     },
     handleTableChange ({ current, pageSize }) {
@@ -974,7 +1064,15 @@ export default {
         }
       }
     },
+    isUrl (val, type = 0) {
+      // eslint-disable-next-line no-useless-escape
+      const str = /^(http|https):\/\/[\S]+$/
+      const wxStr = /^https:\/\/mp.weixin.qq.com\/s\/[\S]+/
+      const reg = type == 0 ? new RegExp(str) : new RegExp(wxStr)
+      return reg.test(val)
+    },
     setCatalog () {
+      const { id, content } = this.radio
       if (this.modelTab == 0) {
         if (this.medium.type == 2) {
           if (!this.isEditor) {
@@ -987,12 +1085,13 @@ export default {
           this.$refs.editor[0].getEditorData('video', this.uploadUrl)
         } else {
           this.setData.inputData.radarPDF = this.uploadUrl
+          this.setData.inputData.linkTitle = this.this.uploadName
         }
       } else {
         if (this.radio.id == -1) return this.$message.warn('至少选择一个选项')
         if (this.medium.type == 2) {
           if (!this.isEditor) {
-            this.setData.inputData.linkImg = this.radio.content.imageFullPath
+            this.setData.inputData.linkImg = content.imageFullPath
             this.radio = {
               id: -1,
               content: {},
@@ -1000,17 +1099,19 @@ export default {
             }
             this.modelTab = 0
           } else {
-            this.$refs.editor[0].getEditorData('image', this.radio.content.imageFullPath)
+            this.$refs.editor[0].getEditorData('image', content.imageFullPath)
           }
         } else if (this.medium.type == 3) {
-          this.setData.inputData.material = this.radio.content.imageFullPath
-          this.maintitle = this.radio.content.maintitle
+          this.setData.inputData.linkImg = content.imageFullPath
+          this.setData.inputData.linkTitle = content.title
+          this.setData.inputData.linkDigest = content.description
+          this.setData.inputData.materialId = id
         } else if (this.medium.type == 5) {
-          console.log(this.radio.content)
-          this.$refs.editor[0].getEditorData('video', this.radio.content.videoFullPath)
+          console.log(content)
+          this.$refs.editor[0].getEditorData('video', content.videoFullPath)
         } else {
-          this.setData.inputData.radarPDF = this.radio.content.fileFullPath
-          this.uploadName = this.radio.content.fileName
+          this.setData.inputData.radarPDF = content.fileFullPath
+          this.setData.inputData.linkTitle = content.fileName
           this.radio = {
             id: -1,
             content: {},
