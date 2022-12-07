@@ -28,12 +28,12 @@ const assetsCDN = {
   css: [],
   // https://unpkg.com/browse/vue@2.6.10/
   js: [
-    '/dll/vue.min.js',
-    '/dll/vue-router.min.js',
-    '/dll/vuex.min.js',
-    '/dll/axios.min.js'
+    './dll/vue.min.js',
+    './dll/vue-router.min.js',
+    './dll/vuex.min.js',
+    './dll/axios.min.js'
   ],
-  dll: ['/dll/antDesignVue.dll.js', '/dll/echarts.dll.js', '/dll/vueCropper.dll.js', '/dll/corejs.dll.js', '/dll/vueContainerQuery.dll.js']
+  dll: ['./dll/antDesignVue.dll.js', './dll/echarts.dll.js', './dll/vueCropper.dll.js', './dll/corejs.dll.js', './dll/vueContainerQuery.dll.js']
 }
 
 // vue.config.js
