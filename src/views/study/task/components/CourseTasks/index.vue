@@ -1,86 +1,40 @@
 <template>
   <div>
-
-    <breadcrumb :titles="['课程管理','课程详情','考试详情']" back></breadcrumb>
-
-    <div class="head">
-      <div class="box">
-        <a-icon type="form" class="icon" />
-        <div>
-          <div class="num">155</div>
-          考试人数
-        </div>
-      </div>
-      <div class="box">
-        <a-icon type="form" class="icon" />
-        <div>
-          <div class="num">155</div>
-          通过人数
-        </div>
-      </div>
-      <div class="box">
-        <a-icon type="form" class="icon" />
-        <div>
-          <div class="num">155</div>
-          未通过人数
-        </div>
-      </div>
-      <div class="box">
-        <a-icon type="form" class="icon" />
-        <div>
-          <div class="num">155</div>
-          考试中人数
-        </div>
-      </div>
-      <div class="box">
-        <a-icon type="form" class="icon" />
-        <div>
-          <div class="num">155</div>
-          通过率
-        </div>
-      </div>
-    </div>
-
     <a-card :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
-          label="员工姓名：">
-          <a-input v-model="screenData.name" placeholder="请输入员工姓名" :maxLength="20"></a-input>
+          label="课程名称">
+          <a-input v-model="screenData.name" placeholder="请输入课程名称" :maxLength="20"></a-input>
         </a-form-item>
 
         <a-form-item
-          label="所属机构：">
-          <a-input v-model="screenData.name" placeholder="请选择所属机构" :maxLength="20"></a-input>
+          label="课程分类">
+          <a-input v-model="screenData.remark	" placeholder="请选择课程分类"></a-input>
         </a-form-item>
 
         <a-form-item
-          label="所属门店：">
-          <a-input v-model="screenData.name" placeholder="请选择所属门店" :maxLength="20"></a-input>
+          label="创建时间">
+          <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
         <a-form-item
-          label="考试状态：">
+          label="创建人">
+          <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
+        </a-form-item>
+
+        <a-form-item
+          label="关联考试">
           <a-select
             :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
             v-model="screenData.gender1"
             style="width: 200px"
-            placeholder="请选择考试状态"
-          ></a-select>
-        </a-form-item>
-
-        <a-form-item
-          label="考试结果：">
-          <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'通过'},{value:2,label:'未通过'},{value:3,label:'未考试'}]"
-            v-model="screenData.gender1"
-            style="width: 200px"
-            placeholder="请选择考试结果"
+            placeholder="请选择关联考试"
           ></a-select>
         </a-form-item>
 
         <a-form-item>
-          <div class="my-space">
+          <div>
             <a-button @click="reset">重置</a-button>
             <a-button
               type="primary"
@@ -94,8 +48,12 @@
         </a-form-item>
       </a-form>
     </a-card>
-
     <div class="my-table-wrapper">
+      <div class="btn">
+        <a-button type="primary" @click="uploadVisibleOpen">
+          创建任务
+        </a-button>
+      </div>
       <a-table
         class="my-table"
         :columns="columns"
@@ -118,16 +76,32 @@
             </div>
           </div>
         </div>
+        <div slot="action" slot-scope="text, record">
+          <template>
+            <div class="my-space">
+              <a-button class="warnButton">详情</a-button>
+              <a-popconfirm
+                disabled
+                title="是否确认删除"
+                ok-text="确认"
+                cancel-text="取消"
+                @confirm="deleteAttribute(record.id)"
+              >
+                <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+              </a-popconfirm>
+            </div>
+          </template>
+        </div>
       </a-table>
     </div>
   </div>
 </template>
 
 <script>
-import breadcrumb from '../../../../../components/Breadcrumd/index'
+
+import { message } from 'ant-design-vue'
 
 export default {
-  components: { breadcrumb },
   data () {
     return {
       imgUrl: '',
@@ -142,54 +116,78 @@ export default {
       },
       columns: [
         {
-          title: '姓名',
+          title: '课程名称',
           dataIndex: 'name',
+          scopedSlots: { customRender: 'name' },
+          align: 'center'
+        },
+        {
+          title: '课程简介',
+          dataIndex: 'introduction',
+          scopedSlots: { customRender: 'introduction' },
+          align: 'center'
+        },
+        {
+          title: '课程分类',
+          dataIndex: 'class',
+          align: 'center'
+        },
+        {
+          title: '考核员工',
+          dataIndex: 'tag',
+          align: 'center'
+        },
+        {
+          title: '考核总人数',
+          dataIndex: 'total',
           align: 'center',
-          width: '200px'
+          sorter: true
         },
         {
-          title: '所属机构',
-          width: '200px',
-          dataIndex: 'size',
-          align: 'center'
-        },
-        {
-          title: '所属门店',
-          dataIndex: 'createTime',
-          align: 'center'
-        },
-        {
-          title: '考试状态',
-          dataIndex: 'user',
-          align: 'center'
-        },
-        {
-          title: '考试分数',
+          title: '完成人数',
           dataIndex: '1',
           align: 'center',
           sorter: true
         },
         {
-          title: '考试结果',
+          title: '参与人数',
           dataIndex: '2',
-          align: 'center'
+          align: 'center',
+          sorter: true
         },
         {
-          title: '考试次数',
+          title: '参与率',
           dataIndex: '3',
+          align: 'center',
+          sorter: true
+        },
+        {
+          title: '课件数',
+          dataIndex: '4',
           align: 'center'
         },
         {
-          title: '答卷时长',
-          dataIndex: '4',
+          title: '关联考试',
+          dataIndex: '5',
+          align: 'center'
+        },
+        {
+          title: '创建人',
+          dataIndex: '6',
+          align: 'center'
+        },
+        {
+          title: '创建时间',
+          dataIndex: '7',
           align: 'center',
           sorter: true
         },
         {
-          title: '交卷时间',
-          dataIndex: '5',
+          title: '操作',
+          width: 200,
           align: 'center',
-          sorter: true
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       tableData: [],
@@ -208,6 +206,28 @@ export default {
     this.getTableData()
   },
   methods: {
+    download () {
+      if (this.checkIds.length === 0) {
+        message.warn('请选择想要下载的文件！')
+      } else {
+        console.log(this.checkIds)
+      }
+    },
+    uploadVisibleOpen () {
+      this.imgUrl = ''
+      this.imgName = ''
+      this.uploadVisible = true
+    },
+    uploadSuccess (data = []) {
+      const file = data[0] || {}
+      console.log(file)
+      this.imgUrl = file.fullPath
+      this.imgName = file.name
+    },
+    setVisible (visible) {
+      this.fileName = visible
+      this.visible = true
+    },
     handleOk () {
       console.log('ok')
     },
@@ -271,39 +291,33 @@ export default {
 
 <style lang="less" scoped>
 
-.head {
-  padding: 24px;
-  background-color: #fff;
-  display: flex;
-  margin-bottom: 24px;
-  gap: 24px;
-  border-radius: 8px;
-
-  .box {
-    border-radius: 8px;
-    flex-grow: 1;
-    padding: 24px;
-    background-color: #fbfbfe;
-    gap: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    justify-items: center;
-
-    .icon {
-      font-size: 56px;
-      box-shadow: 0 0 5px 0 #02020275;
-    }
-
-    .num {
-      font-weight: bold;
-      font-size: 32px;
-    }
+.modal {
+  /deep/ .ant-modal-footer {
+    text-align: center;
   }
 }
 
 .my-table-search {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.table-wrapper {
+
+  .news {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .weixin {
+      color: #86CE76
+    }
+  }
 }
 </style>

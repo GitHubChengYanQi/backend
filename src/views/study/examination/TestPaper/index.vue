@@ -1,17 +1,12 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理']"></breadcrumb>
+    <breadcrumb :titles="['考试管理','试卷管理']" back></breadcrumb>
     <a-card :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
-          label="课程名称">
-          <a-input v-model="screenData.name" placeholder="请输入课程名称" :maxLength="20"></a-input>
-        </a-form-item>
-
-        <a-form-item
-          label="课程分类">
-          <a-input v-model="screenData.remark	" placeholder="请选择课程分类"></a-input>
+          label="试卷名称">
+          <a-input v-model="screenData.name" placeholder="请输入试卷名称" :maxLength="20"></a-input>
         </a-form-item>
 
         <a-form-item
@@ -22,16 +17,6 @@
         <a-form-item
           label="创建人">
           <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
-        </a-form-item>
-
-        <a-form-item
-          label="关联考试">
-          <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender1"
-            style="width: 200px"
-            placeholder="请选择关联考试"
-          ></a-select>
         </a-form-item>
 
         <a-form-item>
@@ -55,18 +40,12 @@
           type="primary"
           ghost
           @click="() => $router.push('/study/lesson/Courseware')">
-          课件管理
-        </a-button>
-        <a-button
-          type="primary"
-          ghost
-          @click="openLessonClass">
-          课程分类
+          导入试卷
         </a-button>
         <a-button
           type="primary"
           @click="() => $router.push('/study/lesson/create')">
-          新建课程
+          创建试卷
         </a-button>
       </div>
       <a-table
@@ -93,37 +72,9 @@
             </div>
           </div>
         </div>
-        <div slot="introduction" slot-scope="text">
-          <div class="introduction">
-            <a-tooltip>
-              <template slot="title">
-                {{ text }}
-              </template>
-              {{ text }}
-            </a-tooltip>
-          </div>
-        </div>
-        <div slot="tag" slot-scope="text,row">
-          <template>
-            <a-popover title="添加的标签" v-if="row.tag && row.tag.length > 0">
-              <template slot="content">
-                <div class="labelBox">
-                  <a-tag v-for="(item, index) in row.tag" :key="index">{{ item }}</a-tag>
-                </div>
-              </template>
-              <a-tag type="button">
-                查看
-              </a-tag>
-            </a-popover>
-            <span class="nolabel" style="align-items:center;" v-else>无标签</span>
-          </template>
-        </div>
         <div slot="action" slot-scope="text, record">
           <template>
             <div class="my-space">
-              <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.id}`)">
-                详情
-              </a-button>
               <a-button class="successButton" @click="() => $router.push('/study/lesson/create')">
                 编辑
               </a-button>
@@ -141,27 +92,15 @@
         </div>
       </a-table>
     </div>
-    <a-modal
-      centered
-      destroyOnClose
-      v-model="lessonClassVisible"
-      title="课程分类"
-      :footer="null"
-    >
-      <div>
-        <lessonClass></lessonClass>
-      </div>
-    </a-modal>
   </div>
 </template>
 
 <script>
 import TagName from '@/views/workContactNew/components/tagName'
-import breadcrumb from '../components/Breadcrumd/index'
-import lessonClass from './components/LessonClass'
+import breadcrumb from '../..//components/Breadcrumd/index'
 
 export default {
-  components: { TagName, breadcrumb, lessonClass },
+  components: { TagName, breadcrumb },
   data () {
     return {
       lessonClassVisible: false,
@@ -172,62 +111,33 @@ export default {
       },
       columns: [
         {
-          title: '课程名称',
+          title: '试卷名称',
           dataIndex: 'name',
           scopedSlots: { customRender: 'name' },
           align: 'center',
           width: '200px'
         },
         {
-          title: '课程简介',
+          title: '总题数',
           width: '200px',
           dataIndex: 'introduction',
           scopedSlots: { customRender: 'introduction' },
           align: 'center'
         },
         {
-          title: '课程分类',
+          title: '总分数',
           dataIndex: 'class',
           align: 'center'
         },
         {
-          title: '试用员工',
+          title: '创建人',
           dataIndex: 'tag',
           scopedSlots: { customRender: 'tag' },
           align: 'center'
         },
         {
-          title: '试用总人数',
-          dataIndex: 'total',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '完成人数',
-          dataIndex: 'employeeName',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '参与人数',
-          dataIndex: 'createTime',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '课件数',
-          align: 'center'
-        },
-        {
-          title: '关联考试',
-          align: 'center'
-        },
-        {
-          title: '创建人',
-          align: 'center'
-        },
-        {
           title: '创建时间',
+          dataIndex: 'total',
           align: 'center',
           sorter: true
         },

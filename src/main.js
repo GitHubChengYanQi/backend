@@ -26,6 +26,8 @@ import stepNews from '@/components/StepNews/StepNews'
 import ExportExcel from '@/components/ExportDownload/ExportExcel'
 import preview from '@/components/Preview/index'
 import More from '@/components/More/More'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 
 // 引入富文本编辑器
 import '@/assets/css/quill.core.css'
@@ -51,6 +53,8 @@ Vue.config.productionTip = false
 Vue.use(VueQuillEditor)
 Vue.use(VueQuillEditor)
 Vue.use(VueViewer)
+
+Vue.use(ElementUI)
 
 Vue.use(VueAxios)
 Vue.component('SelectEmployee', selectEmployee)

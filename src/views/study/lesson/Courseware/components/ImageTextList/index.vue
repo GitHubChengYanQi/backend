@@ -35,7 +35,7 @@
 
     <div class="my-table-wrapper">
       <div class="btn">
-        <a-button type="primary" @click="uploadVisibleOpen(false)">
+        <a-button type="primary" @click="() => $router.push('/study/lesson/createImageText')">
           创建图文
         </a-button>
       </div>
@@ -74,7 +74,7 @@
         <div slot="action" slot-scope="text, record">
           <template>
             <div class="my-space">
-              <a-button class="successButton" @click="uploadVisibleOpen(true)">编辑</a-button>
+              <a-button class="successButton" @click="() => $router.push('/study/lesson/createImageText')">编辑</a-button>
               <a-button class="linkButton">预览</a-button>
               <a-popconfirm
                 disabled

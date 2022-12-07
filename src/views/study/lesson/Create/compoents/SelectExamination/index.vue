@@ -11,15 +11,15 @@
 export default {
   props: {
     value: {
-      type: Array,
+      type: String,
       default () {
-        return []
+        return ''
       }
     }
   },
   methods: {
     add () {
-      this.$emit('change', [123])
+      this.$emit('change', '')
     }
   }
 }

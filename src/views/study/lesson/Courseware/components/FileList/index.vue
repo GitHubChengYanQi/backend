@@ -38,7 +38,7 @@
         <a-button type="primary" @click="uploadVisibleOpen">
           上传文件
         </a-button>
-        <a-button @click="download">
+        <a-button type="primary" ghost @click="download">
           批量下载
         </a-button>
       </div>

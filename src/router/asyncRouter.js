@@ -909,12 +909,30 @@ export const routeList = {
   },
   '/study/lesson/detail': {
     path: '/study/lesson/detail',
-    name: '课件管理',
+    name: '课程详情',
     hidden: true,
     hiddenBreadcrumb: true,
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/lesson/Detail/index'),
-    meta: { title: '课程管理' }
+    meta: { title: '课程详情' }
+  },
+  '/study/lesson/createVideo': {
+    path: '/study/lesson/createVideo',
+    name: '上传视频',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Courseware/components/VideoList/Create/index'),
+    meta: { title: '上传视频' }
+  },
+  '/study/lesson/createImageText': {
+    path: '/study/lesson/createImageText',
+    name: '课件管理',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Courseware/components/ImageTextList/Create/index'),
+    meta: { title: '上传视频' }
   },
   '/study/examinationAnalysis/examintionDetail': {
     path: '/study/examinationAnalysis/examintionDetail',
@@ -933,12 +951,39 @@ export const routeList = {
     component: () => import('@/views/study/examination'),
     meta: { title: '考试管理' }
   },
+  '/study/examination/create': {
+    path: '/study/examination/create',
+    name: '创建试卷',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/Create/index'),
+    meta: { title: '创建试卷' }
+  },
+  '/study/examination/detail': {
+    path: '/study/examination/detail',
+    name: '考试详情',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/Detail/index'),
+    meta: { title: '考试详情' }
+  },
+  '/study/examination/testPaper': {
+    path: '/study/examination/testPaper',
+    name: '试卷管理',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/TestPaper/index'),
+    meta: { title: '试卷管理' }
+  },
   '/study/task': {
     path: '/study/task',
     name: '任务列表',
     hiddenBreadcrumb: true,
     // hideChildrenInMenu: true,
-    component: () => import('@/views/study/examination'),
+    component: () => import('@/views/study/task'),
     meta: { title: '任务列表' }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="breadcrumb">
+  <div class="breadcrumb" :style="{'padding-bottom':back ? '0' : '12px'}">
     <a-breadcrumb separator=">">
       <a-breadcrumb-item
         v-for="(item, index) in titles"
