@@ -219,6 +219,24 @@
                   @click="getArticle"
                   class="button"
                 >生成雷达文章</a-button>
+                <div
+                  class="article"
+                  v-if="item.btnState && setData.inputData.linkImg.length > 0"
+                >
+                  <div
+                    class="close"
+                    @click.stop="close('linkImg')"
+                  >+</div>
+                  <img
+                    class="article_img"
+                    :src="setData.inputData.linkImg"
+                    alt=""
+                  >
+                  <div class="article_txt">
+                    <div class="title">{{ setData.inputData.linkTitle }}</div>
+                    <div class="content">{{ setData.inputData.linkDigest }}</div>
+                  </div>
+                </div>
               </span>
             </span>
           </div>
@@ -491,7 +509,7 @@ import { upLoad } from '@/api/common'
 import { materialLibraryList } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
-import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad } from '@/api/setRadar.js'
+import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad, scrmRadarArticleGrab } from '@/api/setRadar.js'
 
 export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
@@ -539,6 +557,7 @@ export default {
           radarPDF: '',
           content: '',
           contentSource: '0',
+          tsLink: '',
           articleLink: '',
           materialId: ''
         },
@@ -554,7 +573,7 @@ export default {
             {
               title: '文章链接：',
               type: 'input',
-              key: 'articleLink',
+              key: 'tsLink',
               placeholder: '已绑定的公众号文章链接',
               btnState: true
             }
@@ -692,7 +711,6 @@ export default {
       uploadName: '',
       maintitle: '',
       modelSearch: '',
-      materialId: -1,
       isImageText: false,
       tabArr: [
         { title: '本地上传', key: 0 },
@@ -799,8 +817,19 @@ export default {
   },
   methods: {
     getArticle () {
-      console.log(this.setData.inputData.articleLink)
-      if (!this.isUrl(this.setData.inputData.articleLink, 1)) return this.$message.warn('微信文章链接 必须以 https://mp.weixin.qq.com/s/ 开头')
+      console.log(this.setData.inputData.tsLink)
+      if (!this.isUrl(this.setData.inputData.tsLink, 1)) { return this.$message.warn('微信文章链接 必须以 https://mp.weixin.qq.com/s/ 开头') }
+      const obj = {
+        link: this.setData.inputData.tsLink
+      }
+      scrmRadarArticleGrab(obj).then((res) => {
+        console.log(res)
+        this.setData.inputData.articleLink = this.setData.inputData.tsLink
+        console.log(this.setData.inputData.articleLink)
+        for (const key in res.data) {
+          this.setData.inputData[key] = res.data[key]
+        }
+      })
     },
     getUrl () {
       const object = {}
@@ -835,7 +864,7 @@ export default {
           2: ['radarPDF', 'linkTitle'],
           3: {
             0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId'],
-            1: ['linkTitle', 'linkImg', 'articleLink'],
+            1: ['linkTitle', 'linkImg', 'articleLink', 'linkDigest'],
             2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
           },
           4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
@@ -849,11 +878,13 @@ export default {
         this.setData.inputData.ditch = data.ditch.map((item) => {
           return item.id
         })
-        this.setData.inputData.shape = '1'
+        this.setData.inputData.shape = data.shape
+        this.setData.inputData.contentSource = data.entry.contentSource
+
         for (const key in data.entry) {
           if (inputData.shape == '3') {
             if (entry[inputData.shape][inputData.contentSource].includes(key)) {
-              console.log(inputData[key], key)
+              console.log(data.entry[key], key)
               this.setData.inputData[key] = data.entry[key]
             }
           } else {
@@ -863,8 +894,11 @@ export default {
             }
           }
         }
+        if (this.setData.inputData.shape == 3) {
+        }
         this.linkData.linkState = data.track.linkType
         this.tabsArr = data.track.linkState
+        this.setType(false)
       })
     },
     mouseOver (e) {
@@ -910,9 +944,9 @@ export default {
         1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
         2: ['radarPDF', 'linkTitle'],
         3: {
-          0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId'],
-          1: ['linkTitle', 'linkImg', 'articleLink'],
-          2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+          0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId', 'contentSource', 'articleLink'],
+          1: ['linkTitle', 'linkImg', 'linkDigest', 'articleLink', 'contentSource'],
+          2: ['linkImg', 'linkTitle', 'linkDigest', 'content', 'contentSource']
         },
         4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
       }
@@ -1085,7 +1119,7 @@ export default {
           this.$refs.editor[0].getEditorData('video', this.uploadUrl)
         } else {
           this.setData.inputData.radarPDF = this.uploadUrl
-          this.setData.inputData.linkTitle = this.this.uploadName
+          this.setData.inputData.linkTitle = this.uploadName
         }
       } else {
         if (this.radio.id == -1) return this.$message.warn('至少选择一个选项')
@@ -1105,6 +1139,7 @@ export default {
           this.setData.inputData.linkImg = content.imageFullPath
           this.setData.inputData.linkTitle = content.title
           this.setData.inputData.linkDigest = content.description
+          this.setData.inputData.articleLink = content.imageLink
           this.setData.inputData.materialId = id
         } else if (this.medium.type == 5) {
           console.log(content)
@@ -1112,14 +1147,15 @@ export default {
         } else {
           this.setData.inputData.radarPDF = content.fileFullPath
           this.setData.inputData.linkTitle = content.fileName
-          this.radio = {
-            id: -1,
-            content: {},
-            idArr: []
-          }
-          this.modelTab = 0
         }
       }
+      this.radio = {
+        id: -1,
+        content: {},
+        idArr: []
+      }
+      this.medium.data = []
+      this.modelTab = 0
       this.medium.pagination.current = 1
       this.medium.pagination.pageSize = 10
       this.modalState = false
@@ -1128,7 +1164,7 @@ export default {
       // console.log(html)
       this.setData.inputData.content = html
     },
-    setType () {
+    setType (isState = true) {
       const { shape, contentSource } = this.setData.inputData
       const { inputType, articleArr } = this.setData
       const newInputType = inputType.concat(this.change[shape])
@@ -1140,7 +1176,12 @@ export default {
         this.setData.inputData.contentSource = '0'
         this.$set(this.setData, 'changeType', newInputType)
       }
-      this.setData.inputData.linkImg = ''
+      const resetArr = ['linkImg', 'radarLink', 'linkTitle', 'linkDigest', 'content', 'articleLink']
+      if (isState) {
+        resetArr.map(item => {
+          this.setData.inputData[item] = ''
+        })
+      }
     },
     searchMedium () {
       this.medium.pagination.current = 1
@@ -1246,7 +1287,8 @@ export default {
             .input_box {
               position: relative;
               display: flex;
-              align-items: center;
+              flex-wrap: wrap;
+              // align-items: center;
               .input {
                 width: 200px;
                 height: 40px;
@@ -1259,7 +1301,62 @@ export default {
                 transform: translate(-50%, -50%);
               }
               .button {
+                margin-top: 2px;
                 margin-left: 20px;
+              }
+              .article {
+                position: relative;
+                top: 60px;
+                left: -330px;
+                margin-bottom: 100px;
+                display: flex;
+                box-sizing: border-box;
+                padding: 10px;
+                width: 260px;
+                height: 80px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                .article_img {
+                  width: 60px;
+                  height: 60px;
+                }
+
+                .article_txt {
+                  width: 165px;
+                  white-space: pre-wrap;
+                  margin-left: 10px;
+                  .title {
+                    color: #000;
+                    font-weight: 800;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  }
+                  .content {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    width: 100%;
+                    height: 40px;
+                    text-overflow: ellipsis;
+                  }
+                }
+
+                .close {
+                  cursor: pointer;
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  width: 18px;
+                  height: 18px;
+                  background-color: rgba(87, 85, 85, 0.7);
+                  border-radius: 50%;
+                  color: #fff;
+                  transform: translate(50%, -50%) rotate(45deg);
+                  font-size: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
               }
             }
             .select_box {
@@ -1418,6 +1515,20 @@ export default {
                   width: 165px;
                   white-space: pre-wrap;
                   margin-left: 10px;
+                  .title {
+                    color: #000;
+                    font-weight: 800;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  }
+                  .content {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    width: 100%;
+                    height: 40px;
+                    text-overflow: ellipsis;
+                  }
                 }
 
                 .close {

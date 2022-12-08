@@ -2,7 +2,12 @@
   <div class="interactionRadar_page">
     <a-card class="interactionRadar_card">
       <div class="interactionRadar_content">
-        <div class="interactionRadar_catalog">
+        <div
+          class="interactionRadar_catalog"
+          @click="()=>{
+            catalogIndex = -1
+            getTableData()
+          }">
           <div class="header">
             <div class="title">
               分组名称
@@ -23,7 +28,7 @@
               class="catalog"
               :style="catalogIndex == item.id ? {backgroundColor:'rgba(129, 211, 248, 1)'}:{}"
               v-for="(item,index) in catalog"
-              @click="()=>{
+              @click.stop="()=>{
                 catalogIndex = item.id
                 getTableData()
               }"
@@ -232,7 +237,7 @@
                           <div class="content">{{ record.entry.linkDigest }}</div>
                         </div>
                         <div class="right">
-                          <video
+                          <img
                             class="img"
                             :src="record.entry.linkImg"
                             alt=""
@@ -533,7 +538,7 @@ export default {
       scrmRadarShiftSend(obj).then(res => {
         console.log(res)
         const inputNode = document.createElement('input') // 创建input
-        inputNode.value = res.data.id // 赋值给 input 值
+        inputNode.value = res.data.link // 赋值给 input 值
         document.body.appendChild(inputNode) // 插入进去
         inputNode.select() // 选择对象
         document.execCommand('Copy') // 原生调用执行浏览器复制命令
@@ -570,7 +575,6 @@ export default {
         shape: '0',
         title: ''
       }
-      this.catalogIndex = -1
       this.table.pagination.current = 1
       this.table.pagination.pageSize = 10
       this.getTableData()
