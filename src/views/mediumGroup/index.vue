@@ -748,7 +748,7 @@
                     :btnType="false"
                     :file-type="1"></upload>
                 </div>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-model-item>
               <a-form-model-item label="填写标题：" prop="title">
                 <a-input v-model="imageTextData.title" />
@@ -804,7 +804,7 @@
                   @success="uploadSuccess"
                   :btnType="false"
                   :file-type="1"></upload>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-item>
               <a-form-item label="填写标题：">
                 <a-input v-model="materialDetail.content.title" />
@@ -860,7 +860,7 @@
                   @success="uploadSuccess"
                   :btnType="false"
                   :file-type="1"></upload>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-item>
             </a-form>
             <template slot="footer">
@@ -915,7 +915,7 @@
                     :btnType="false"
                     :file-type="1"></upload>
                 </div>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-item>
             </a-form-model>
             <template slot="footer">
@@ -1080,7 +1080,7 @@
                       <a-input v-model="appletsData.title" />
                     </a-form-model-item>
                     <a-form-model-item label="卡片图片：">
-                      <p>上传图片不超过1M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
+                      <p>上传图片不超过10M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
                       <upload
                         v-if="imgUrl === ''"
                         :imageUrl="imgUrl"
@@ -1149,7 +1149,7 @@
                       <a-input v-model="materialDetail.content.title" />
                     </a-form-item>
                     <a-form-item label="卡片图片：">
-                      <p>上传图片不超过1M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
+                      <p>上传图片不超过10M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
                       <div>
                         <img
                           style="height:80px; width: 80px;"
