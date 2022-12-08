@@ -45,7 +45,7 @@
     </div>
     <div class="rightContainer">
       <div class="rightTitleDiv">推送内容</div>
-      <div class="sendContentList">
+      <div class="sendContentList" v-if="(sendArray.length !== 0)">
         <div class="singleSendContent" v-for="(item, index) in sendArray" :key="item.id">
           <div class="singleSendTitle">
             <span style="font-weight: Bolder">第{{ index + 1 }}条:</span>
@@ -203,8 +203,10 @@ export default {
         this.tableLoading = false
         console.log(response, '获取字典列表数据')
         this.tableData = response.data.list
-        // 设置默认选中的数据
-        this.setDefaultSelect()
+        if (this.tableData.length !== 0) {
+          // 设置默认选中的数据
+          this.setDefaultSelect()
+        }
         this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
           // 列表中没有数据
@@ -215,6 +217,8 @@ export default {
             this.getTableData()
           } else {
             // 是真没有数据
+            this.$set(this.pagination, 'current', 1)
+            this.sendArray = []
           }
         }
       }).catch(() => {

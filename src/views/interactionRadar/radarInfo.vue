@@ -114,7 +114,7 @@
           <div
             class="tab_box"
             @click="setTableTab(index)"
-            v-for="(item,index) in ['机构数据','门店数据','员工数据']"
+            v-for="(item,index) in ['客户数据','渠道数据','员工数据']"
             :key="index"
           >
             <span>{{ item }}</span>
@@ -152,6 +152,17 @@
                 v-model="search.tableData[table.tab][item.key]"
                 v-if="item.type == 'date'"
               />
+              <a-select
+                class="input"
+                v-model="search.tableData[table.tab][item.key]"
+                v-if="item.type == 'select'"
+              >
+                <a-select-option
+                  v-for="(items,indexs) in selectArr[item.selectKey]"
+                  :value="items.code"
+                  :key="indexs"
+                >{{ items.name }}</a-select-option>
+              </a-select>
             </span>
           </span>
           <div class="button_box">
@@ -393,115 +404,71 @@ export default {
           ]
         }
       },
+      selectArr: {
+        channel: []
+      },
       table: {
         tab: 0,
         columns: {
           0: [
             {
               align: 'center',
-              title: '机构名称',
+              title: '客户昵称',
               fixed: 'left',
               dataIndex: 'employeeAgencyName',
               width: 150
             },
             {
               align: 'center',
-              title: '员工数量',
-              sorter: true,
-              // sortOrder: this.table.order.columnKey === 'name' && this.table.order,
+              title: '是否是企业用户',
               dataIndex: 'infoEmployeeCount',
               width: 150
             },
             {
               align: 'center',
-              title: '总客户数',
-              sorter: true,
+              title: '查看时间',
               dataIndex: 'infoContactCount',
               width: 150
             },
             {
               align: 'center',
-              title: '总流失客户数',
-              sorter: true,
+              title: '查看渠道',
               dataIndex: 'contactLoseCount',
               width: 150
             },
             {
               align: 'center',
-              title: '总流失率',
+              title: '客户查看次数',
+              sorter: true,
               dataIndex: 'contactLoseRatio',
               width: 150
             },
             {
               align: 'center',
-              title: '总流失会员数',
+              title: '客户查看时长（分钟）',
               sorter: true,
               dataIndex: 'fellowLoseCount',
               width: 150
-            },
-            {
-              align: 'center',
-              title: '流失会员占比',
-              dataIndex: 'fellowLoseRatio',
-              width: 150
-            },
-            {
-              align: 'center',
-              title: '员工删除客户流失人数',
-              sorter: true,
-              dataIndex: 'deleteClientCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '员工删除客户流失占比',
-              dataIndex: 'deleteClientRatio',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '客户删除员工流失人数',
-              sorter: true,
-              dataIndex: 'deleteStaffCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '客户删除员工流失占比',
-              dataIndex: 'deleteStaffRatio',
-              width: 200
-            },
-            {
-              align: 'center',
-              sorter: true,
-              title: '离职继承失败流失人数',
-              dataIndex: 'deleteOverCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '离职继承失败流失占比',
-              dataIndex: 'deleteOverRatio',
-              width: 200
             }
           ],
           1: [
             {
               align: 'center',
-              title: '门店名称',
+              title: '渠道名称',
               fixed: 'left',
               dataIndex: 'employeeOutletName',
               width: 150
             },
             {
               align: 'center',
-              title: '所属机构',
+              title: '本链接查看次数',
+              sorter: true,
               dataIndex: 'employeeAgencyName',
               width: 150
             },
             {
               align: 'center',
-              title: '员工数量',
+              title: '本链接查看人数',
               sorter: true,
               dataIndex: 'infoEmployeeCount',
               width: 150
@@ -509,79 +476,22 @@ export default {
             {
               align: 'center',
               sorter: true,
-              title: '总客户数',
+              title: '渠道总查看次数',
               dataIndex: 'infoContactCount',
               width: 150
             },
             {
               align: 'center',
               sorter: true,
-              title: '总流失客户数',
+              title: '渠道总查看人数',
               dataIndex: 'contactLoseCount',
               width: 150
-            },
-            {
-              align: 'center',
-              title: '总流失率',
-              dataIndex: 'contactLoseRatio',
-              width: 150
-            },
-            {
-              align: 'center',
-              title: '总流失会员数',
-              dataIndex: 'fellowLoseCount',
-              width: 150
-            },
-            {
-              align: 'center',
-              title: '流失会员占比',
-              dataIndex: 'fellowLoseRatio',
-              width: 150
-            },
-            {
-              align: 'center',
-              sorter: true,
-              title: '员工删除客户流失人数',
-              dataIndex: 'deleteClientCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '员工删除客户流失占比',
-              dataIndex: 'deleteClientRatio',
-              width: 200
-            },
-            {
-              align: 'center',
-              sorter: true,
-              title: '客户删除员工流失人数',
-              dataIndex: 'deleteStaffCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '客户删除员工流失占比',
-              dataIndex: 'deleteStaffRatio',
-              width: 200
-            },
-            {
-              align: 'center',
-              sorter: true,
-              title: '离职继承失败流失人数',
-              dataIndex: 'deleteOverCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '离职继承失败流失占比',
-              dataIndex: 'deleteOverRatio',
-              width: 200
             }
           ],
           2: [
             {
               align: 'center',
-              title: '员工名称',
+              title: '发送员工',
               fixed: 'left',
               dataIndex: 'employeeInfoName',
               width: 150
@@ -600,74 +510,17 @@ export default {
             },
             {
               align: 'center',
-              title: '总客户数',
+              title: '发送本链接次数',
               dataIndex: 'infoContactCount',
               sorter: true,
               width: 150
             },
             {
               align: 'center',
-              title: '总流失客户数',
+              title: '查看本链接人数',
               sorter: true,
               dataIndex: 'contactLoseCount',
               width: 150
-            },
-            {
-              align: 'center',
-              title: '总流失率',
-              dataIndex: 'contactLoseRatio',
-              width: 150
-            },
-            {
-              align: 'center',
-              title: '总流失会员数',
-              dataIndex: 'fellowLoseCount',
-              width: 150
-            },
-            {
-              align: 'center',
-              title: '流失会员占比',
-              dataIndex: 'fellowLoseRatio',
-              width: 150
-            },
-            {
-              align: 'center',
-              title: '员工删除客户流失人数',
-              sorter: true,
-              dataIndex: 'deleteClientCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '员工删除客户流失占比',
-              dataIndex: 'deleteClientRatio',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '客户删除员工流失人数',
-              sorter: true,
-              dataIndex: 'deleteStaffCount',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '客户删除员工流失占比',
-              dataIndex: 'deleteStaffRatio',
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '离职继承失败流失人数',
-              dataIndex: 'deleteOverCount',
-              sorter: true,
-              width: 200
-            },
-            {
-              align: 'center',
-              title: '离职继承失败流失占比',
-              dataIndex: 'deleteOverRatio',
-              width: 200
             }
           ]
         },
@@ -685,23 +538,49 @@ export default {
         table: {
           0: [
             {
-              title: '所属机构',
-              type: 'selct_checkbox',
+              title: '点击渠道：',
+              type: 'select',
               key: 'employeeAgencyId',
+              selectKey: 'channel',
               placeholder: '请选择机构'
             }
           ],
           1: [
             {
-              title: '所属门店',
-              type: 'selct_checkbox',
+              title: '时间筛选：',
+              type: 'date',
+              key: 'timeData',
+              placeholder: '请选择门店'
+            },
+            {
+              title: '点击渠道：',
+              type: 'select',
+              selectKey: 'channel',
               key: 'employeeOutletId',
               placeholder: '请选择门店'
             }
           ],
           2: [
             {
-              title: '所属员工',
+              title: '选择机构：',
+              type: 'selct_checkbox',
+              key: 'employeeAgencyId',
+              placeholder: '请选择机构'
+            },
+            {
+              title: '选择门店：',
+              type: 'selct_checkbox',
+              key: 'employeeOutletId',
+              placeholder: '请选择门店'
+            },
+            {
+              title: '时间筛选：',
+              type: 'date',
+              key: 'timeData',
+              placeholder: '请选择门店'
+            },
+            {
+              title: '发送员工：',
               type: 'model',
               key: 'employeeInfoId',
               placeholder: '请选择员工'
@@ -710,8 +589,8 @@ export default {
         },
         tableData: {
           0: { employeeAgencyId: [] },
-          1: { employeeOutletId: [] },
-          2: { employeeInfoId: [] }
+          1: { employeeOutletId: [], timeData: [] },
+          2: { employeeAgencyId: [], employeeOutletId: [], timeData: [], employeeInfoId: [] }
         }
       }
     }
@@ -724,18 +603,10 @@ export default {
     setDate (e) {
       this.dataDetails.date = e
     },
-    getSearch () {
-
-    },
-    exportsElxe () {
-
-    },
-    reset () {
-
-    },
-    handleTableChange () {
-
-    },
+    getSearch () {},
+    exportsElxe () {},
+    reset () {},
+    handleTableChange () {},
     setTableTab (e) {
       this.table.tab = e
     }
