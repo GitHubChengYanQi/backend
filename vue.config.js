@@ -28,12 +28,12 @@ const assetsCDN = {
   css: [],
   // https://unpkg.com/browse/vue@2.6.10/
   js: [
-    '//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js',
-    '//cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js',
-    '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
-    '//cdn.jsdelivr.net/npm/axios@0.19.0/dist/axios.min.js'
+    './dll/vue.min.js',
+    './dll/vue-router.min.js',
+    './dll/vuex.min.js',
+    './dll/axios.min.js'
   ],
-  dll: ['/dll/antDesignVue.dll.js', '/dll/echarts.dll.js', '/dll/vueCropper.dll.js', '/dll/corejs.dll.js', '/dll/vueContainerQuery.dll.js']
+  dll: ['./dll/antDesignVue.dll.js', './dll/echarts.dll.js', './dll/vueCropper.dll.js', './dll/corejs.dll.js', './dll/vueContainerQuery.dll.js']
 }
 
 // vue.config.js
@@ -122,7 +122,7 @@ const vueConfig = {
     // development server port 8000
     disableHostCheck: true,
     port: 8000,
-    host: 'localhost',
+    // host: 'localhost',
     open: true,
     overlay: {
       warnings: false,
@@ -130,13 +130,13 @@ const vueConfig = {
     },
     proxy: {
       '/api': {
-        // target: 'https://apijavascrm.yifeijiankang.com/',// 测试
+        // target: 'https://apijavascrm.yifeijiankang.com/', // 测试
         target: 'https://devjavascrm.yifeijiankang.com/', // 开发
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.253:6007/',
         // target: 'http://124.70.77.92:6007/',
         // target: 'http://192.168.31.18:6007/',
-        // target: 'http:/192.168.50.143:6001/',
+        // target: 'http://192.168.50.109:6007/',
         // target: 'http://192.168.31.18:6007/',
         ws: false,
         changeOrigin: true,

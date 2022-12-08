@@ -1,0 +1,47 @@
+.searchBar {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  align-items: center;
+  position: relative;
+  .searchItem {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    .label {
+      white-space: nowrap;
+    }
+  }
+  .rigBox {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    .ant-btn {
+      width: 130px;
+    }
+  }
+}
+.tableBox {
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 5px 20px;
+  .btns {
+    cursor: pointer;
+    color: #1890ff;
+    .btn {
+      margin-left: 10px;
+    }
+    .btn:first-child {
+      margin-left: 0;
+    }
+  }
+  .joinGroupTxt {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+}

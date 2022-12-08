@@ -71,9 +71,9 @@
         <div class="tag" v-if="currentEmployee.employeeId">
           <div class="flex">
             <div class="title">个人标签：</div>
-            <div class="tags" v-if="data.contactCorpTag.length">
-              <span v-for="group in data.contactCorpTag" :key="group.id">
-                <a-tag v-for="tag in group.tags" :key="tag.tagId">{{ tag.tagName }}</a-tag>
+            <div class="tags" v-if="data.employeeCustomLabelList.length">
+              <span v-for="group in data.employeeCustomLabelList" :key="group.id">
+                <a-tag>{{ group.tagName }}</a-tag>
               </span>
               <!--              <span v-if="currentEmployee.employeeId" @click="tagsEdit" style="color: #1890ff;cursor: pointer;"><a-icon type="edit" />编辑</span>-->
             </div>

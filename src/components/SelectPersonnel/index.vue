@@ -132,6 +132,7 @@ export default {
       immediate: true,
       deep: true,
       handler (val) {
+        console.log(val)
         this.setValue(val)
       }
     },
@@ -143,6 +144,9 @@ export default {
         this.rows = this.getNodes(this.treeData, this.value)[0]
       }
     }
+  },
+  created () {
+    this.openModal(true, true)
   },
   methods: {
     deepCopy (data) {
@@ -182,7 +186,7 @@ export default {
       this.$set(this, 'keys', val)
       this.rows = this.getNodes(this.treeData, val)[0]
     },
-    openModal () {
+    openModal (e = false, state = false) {
       if (this.record.length === 0) {
         this.loading = true
         departmentEmp().then(res => {
@@ -190,7 +194,7 @@ export default {
           this.treeData = this.formatTree(res.data)
           this.rows = this.getNodes(this.treeData, this.value)[0]
           sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
-          this.$refs.SelectPersonnel.modalShow = true
+          this.$refs.SelectPersonnel.modalShow = !state
         })
       } else {
         sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
@@ -224,10 +228,12 @@ export default {
     getKeys (e, type) {
       this.$set(this, 'keys', e)
       const arr = this.getNodes(this.treeData, this.keys)
+      console.log(arr)
       sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
       this.rows = arr[0]
       if (type === 'ok') {
         this.$emit('getVal', this.keys)
+        this.$emit('getRows', this.rows)
         this.$emit('input', this.keys)
       }
     },
@@ -252,7 +258,8 @@ export default {
         this.keys = []
         this.rows = []
         this.$emit('input', [])
-        this.$emit('getValue', [])
+        this.$emit('getRows', [])
+        this.$emit('getVal', [])
       } else {
         const keys = []
         for (let i = 0; i < e.length; i++) {
@@ -277,6 +284,7 @@ export default {
       }
       this.$set(this, 'keys', keys)
       this.$set(this, 'rows', rows)
+      this.$emit('getVal', this.keys)
       this.$emit('input', this.keys)
     }
   }

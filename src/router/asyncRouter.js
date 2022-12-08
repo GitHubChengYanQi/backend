@@ -35,7 +35,7 @@ export const routeList = {
     path: '/corp/create',
     name: 'corpCreate',
     // hidden: true,
-    component: () => import(/* webpackChunkName: "corpCreate" */'@/views/corp/create'),
+    component: () => import(/* webpackChunkName: "corpCreate" */ '@/views/corp/create'),
     meta: { title: '添加企业' }
   },
   '/corp/configManage': {
@@ -466,6 +466,26 @@ export const routeList = {
     component: () => import('@/views/clientFollow/addRule'),
     meta: { title: '添加规则' }
   },
+  '/clientFollow/momentsOperation': {
+    path: '/clientFollow/momentsOperation',
+    name: 'momentsOperation',
+    component: () => import('@/views/clientFollow/momentsOperation'),
+    meta: { title: '朋友圈运营' }
+  },
+  '/clientFollow/momentsOperation/add': {
+    path: '/clientFollow/momentsOperation/add',
+    name: 'momentsAdd',
+    hidden: true,
+    component: () => import('@/views/clientFollow/momentsEdit'),
+    meta: { title: '创建朋友圈' }
+  },
+  '/clientFollow/momentsOperation/edit': {
+    path: '/clientFollow/momentsOperation/edit',
+    name: 'momentsEdit',
+    hidden: true,
+    component: () => import('@/views/clientFollow/momentsEdit'),
+    meta: { title: '编辑朋友圈' }
+  },
   '/sales/sop': {
     path: '/sales/sop',
     name: 'sop',
@@ -475,6 +495,46 @@ export const routeList = {
       nav: ['群发助手SOP', '群发活动SOP', '定时提醒SOP', '好友SOP', '生日SOP'],
       course: true
     }
+  },
+  '/sop/clusterSop': {
+    path: '/sop/clusterSop',
+    name: '群SOP',
+    component: () => import('@/views/sales/sop/clusterSop'),
+    meta: { title: '群SOP' }
+  },
+  '/sop/addClusterSop': {
+    path: '/sop/addClusterSop',
+    name: '新增群SOP模板',
+    component: () => import('@/views/sales/sop/addClusterSop'),
+    hidden: true,
+    meta: { title: '新增群SOP模板' }
+  },
+  '/sop/editClusterSop': {
+    path: '/sop/editClusterSop',
+    name: '修改群SOP模板',
+    component: () => import('@/views/sales/sop/addClusterSop'),
+    hidden: true,
+    meta: { title: '修改群SOP模板' }
+  },
+  '/sop/clusterCalendar': {
+    path: '/sop/clusterCalendar',
+    name: '群日历',
+    component: () => import('@/views/sales/sop/clusterCalendar'),
+    meta: { title: '群日历' }
+  },
+  '/sop/addClusterCalendar': {
+    path: '/sop/addClusterCalendar',
+    name: '新增群日历',
+    component: () => import('@/views/sales/sop/addClusterCalendar'),
+    hidden: true,
+    meta: { title: '新增群日历' }
+  },
+  '/sop/editClusterCalendar': {
+    path: '/sop/editClusterCalendar',
+    name: '修改群日历',
+    component: () => import('@/views/sales/sop/addClusterCalendar'),
+    hidden: true,
+    meta: { title: '修改群日历' }
   },
   '/sales/generalAdd': {
     path: '/sales/generalAdd',
@@ -492,14 +552,14 @@ export const routeList = {
   },
   '/sales/activityAdd': {
     path: '/sales/activityAdd',
-    name: 'generalAdd',
+    name: 'activityAdd',
     component: () => import('@/views/sales/sop/components/activityAdd'),
     hidden: true,
     meta: { title: '新增群发活动SOP' }
   },
   '/sales/activityEdit': {
     path: '/sales/activityEdit',
-    name: 'generalEdit',
+    name: 'activityEdit',
     component: () => import('@/views/sales/sop/components/activityAdd'),
     hidden: true,
     meta: { title: '修改群发活动SOP' }
@@ -560,12 +620,12 @@ export const routeList = {
     hidden: true,
     meta: { title: '修改群SOP' }
   },
-  '/salesManagement/userSop': {
-    path: '/salesManagement/userSop',
-    name: 'userSop',
-    component: () => import('@/views/salesManagement/userSop'),
-    meta: { title: '客户SOP' }
-  },
+  // '/salesManagement/userSop': {
+  //   path: '/salesManagement/userSop',
+  //   name: 'userSop',
+  //   component: () => import('@/views/salesManagement/userSop'),
+  //   meta: { title: '客户SOP' }
+  // },
   '/salesManagement/addSop': {
     path: '/salesManagement/addSop',
     name: 'addSop',
@@ -606,6 +666,34 @@ export const routeList = {
     name: 'creatingScoringTemplate',
     component: () => import('@/views/riskEarlyWarning/creatingScoringTemplate'),
     meta: { title: '新建评分模型' }
+  },
+  // 商城-商品库
+  '/mall/goods': {
+    path: '/mall/goods',
+    name: '商品库',
+    component: () => import('@/views/mall/goods/index'),
+    meta: { title: '商品库' }
+  },
+  // 商城-联合用药
+  '/mall/combination': {
+    path: '/mall/combination',
+    name: '联合用药',
+    component: () => import('@/views/mall/combination/index'),
+    meta: { title: '联合用药' }
+  },
+  '/mall/combination/edit': {
+    hidden: true,
+    path: '/mall/combination/edit',
+    name: '新增联合用药',
+    component: () => import('@/views/mall/combination/components/combinedDetail'),
+    meta: { title: '新增联合用药' }
+  },
+  '/mall/combination/add': {
+    hidden: true,
+    path: '/mall/combination/add',
+    name: '编辑联合用药',
+    component: () => import('@/views/mall/combination/components/combinedDetail'),
+    meta: { title: '编辑联合用药' }
   },
   // 客户跟进-公司话术
   '/speechcraft/company': {
@@ -720,5 +808,84 @@ export const routeList = {
     name: '流失分析',
     component: () => import('@/views/lossAnalysis/index'),
     meta: { title: '流失分析' }
+  },
+  '/groupTag/index': {
+    path: '/groupTag/index',
+    name: '群标签',
+    component: () => import('@/views/groupTag/index'),
+    meta: { title: '群标签' }
+  },
+  '/groupMess/index': {
+    path: '/groupMess/index',
+    name: '群群发',
+    component: () => import('@/views/groupMess/index'),
+    meta: { title: '群群发' }
+  },
+  '/groupsOperation/groupList/index': {
+    path: '/groupsOperation/groupList/index',
+    name: '群列表',
+    component: () => import('@/views/groupsOperation/groupList/index'),
+    meta: { title: '群列表' }
+  },
+  '/groupsOperation/groupList/groupItemDetail': {
+    path: '/groupsOperation/groupList/groupItemDetail',
+    name: '客户群详情',
+    component: () => import('@/views/groupsOperation/groupList/groupItemDetail'),
+    meta: { title: '客户群详情' },
+    hidden: true
+  },
+  '/groupsOperation/joinGroupSaying/index': {
+    path: '/groupsOperation/joinGroupSaying/index',
+    name: '入群欢迎语',
+    component: () => import('@/views//groupsOperation/joinGroupSaying/index'),
+    meta: { title: '入群欢迎语' }
+  },
+  '/groupsOperation/joinGroupSaying/add': {
+    path: '/groupsOperation/joinGroupSaying/add',
+    name: '创建欢迎语',
+    component: () => import('@/views//groupsOperation/joinGroupSaying/edit'),
+    meta: { title: '创建欢迎语' },
+    hidden: true
+  },
+  '/groupsOperation/joinGroupSaying/edit': {
+    path: '/groupsOperation/joinGroupSaying/edit',
+    name: '编辑欢迎语',
+    component: () => import('@/views//groupsOperation/joinGroupSaying/edit'),
+    meta: { title: '编辑欢迎语' },
+    hidden: true
+  },
+  '/groupMess/setGroup': {
+    path: '/groupMess/setGroup',
+    name: '新建群群发',
+    hidden: true,
+    component: () => import('@/views/groupMess/setGroup'),
+    meta: { title: '新建群群发' }
+  },
+  '/groupMess/taskInfo': {
+    path: '/groupMess/taskInfo',
+    name: '任务详情',
+    hidden: true,
+    component: () => import('@/views/groupMess/taskInfo'),
+    meta: { title: '任务详情' }
+  },
+  '/interactionRadar/index': {
+    path: '/interactionRadar/index',
+    name: '互动雷达',
+    component: () => import('@/views/interactionRadar/index'),
+    meta: { title: '互动雷达' }
+  },
+  '/interactionRadar/setRadar': {
+    path: '/interactionRadar/setRadar',
+    name: '新建互动雷达',
+    hidden: true,
+    component: () => import('@/views/interactionRadar/setRadar'),
+    meta: { title: '新建互动雷达' }
+  },
+  '/interactionRadar/radarInfo': {
+    path: '/interactionRadar/radarInfo',
+    name: '互动雷达详情',
+    hidden: true,
+    component: () => import('@/views/interactionRadar/radarInfo'),
+    meta: { title: '互动雷达详情' }
   }
 }
