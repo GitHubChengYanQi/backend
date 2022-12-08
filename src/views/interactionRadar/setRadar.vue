@@ -1,8 +1,8 @@
 <template>
-  <div class="a_page">
-    <div class="a_card">
-      <div class="a_content">
-        <div class="a_title">
+  <div class="setRadar_page">
+    <div class="setRadar_card">
+      <div class="setRadar_content">
+        <div class="setRadar_title">
           基础设置
         </div>
         <div class="content">
@@ -28,7 +28,7 @@
                 >
                   <a-select-option
                     v-for="(items,indexs) in selectArr[item.selectKey]"
-                    :value="items.code"
+                    :value="items.id"
                     :key="indexs"
                   >{{ items.name }}</a-select-option>
                 </a-select>
@@ -46,7 +46,7 @@
                 >
                   <a-select-option
                     v-for="(items,indexs) in selectArr[item.selectKey]"
-                    :value="items.code"
+                    :value="items.id"
                     :key="indexs"
                   >{{ items.name }}</a-select-option>
                 </a-select>
@@ -144,7 +144,7 @@
                         alt=""
                       >
                     </div>
-                    <div class="title">{{ uploadName }}</div>
+                    <div class="title">{{ setData.inputData.linkTitle }}</div>
                   </div>
                 </div>
                 <div
@@ -193,7 +193,10 @@
                     :src="setData.inputData[item.key]"
                     alt=""
                   >
-                  <div class="article_txt">{{ maintitle }}</div>
+                  <div class="article_txt">
+                    <div class="title">{{ setData.inputData.linkTitle }}</div>
+                    <div class="content">{{ setData.inputData.linkDigest }}</div>
+                  </div>
                 </div>
               </span>
               <span
@@ -213,6 +216,7 @@
                 <a-button
                   v-if="item.btnState"
                   type="primary"
+                  @click="getArticle"
                   class="button"
                 >生成雷达文章</a-button>
               </span>
@@ -221,11 +225,11 @@
         </div>
       </div>
     </div>
-    <div class="a_link">
-      <div class="a_title">
+    <div class="setRadar_link">
+      <div class="setRadar_title">
         链接追踪设置
       </div>
-      <div class="a_content">
+      <div class="setRadar_content">
         <a-checkbox-group
           class="checkbox_box"
           v-model="linkData.linkState"
@@ -465,7 +469,7 @@
       <div class="preview_box">
         <img :src="require('@/assets/phone14.jpg')" />
         <div
-          class="content_box"
+          class="content_box ql-editor"
           v-html="setData.inputData.content"
         ></div>
       </div>
@@ -487,6 +491,7 @@ import { upLoad } from '@/api/common'
 import { materialLibraryList } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
+import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad } from '@/api/setRadar.js'
 
 export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
@@ -499,34 +504,34 @@ export default {
           {
             title: '雷达标题：',
             type: 'input',
-            key: 'radarTitle',
+            key: 'title',
             fontNumber: 15
           },
           {
             title: '选择分组：',
             type: 'select',
-            key: 'selectGrouping',
+            key: 'unitId',
             selectKey: 'grouping'
           },
           {
             title: '选择渠道：',
             type: 'checkbox',
-            key: 'selectChannel',
+            key: 'ditch',
             selectKey: 'channel',
             placeholder: '未选中渠道'
           },
           {
             title: '内容类型：',
             type: 'radio',
-            key: 'contentType',
+            key: 'shape',
             selectKey: 'type'
           }
         ],
         inputData: {
-          radarTitle: '',
-          selectGrouping: '',
-          selectChannel: [],
-          contentType: '1',
+          title: '',
+          unitId: '',
+          ditch: [],
+          shape: '1',
           radarLink: '',
           linkTitle: '',
           linkDigest: '',
@@ -535,14 +540,14 @@ export default {
           content: '',
           contentSource: '0',
           articleLink: '',
-          material: ''
+          materialId: ''
         },
         articleArr: {
           0: [
             {
               type: 'button',
               btnText: '从素材库中引用',
-              key: 'material'
+              key: 'linkImg'
             }
           ],
           1: [
@@ -550,7 +555,6 @@ export default {
               title: '文章链接：',
               type: 'input',
               key: 'articleLink',
-              fontNumber: 15,
               placeholder: '已绑定的公众号文章链接',
               btnState: true
             }
@@ -615,7 +619,8 @@ export default {
           {
             title: '雷达链接：',
             type: 'input',
-            key: 'radarLink'
+            key: 'radarLink',
+            placeholder: '请输入http或https开头的链接地址'
           },
           {
             title: '链接标题：',
@@ -687,6 +692,7 @@ export default {
       uploadName: '',
       maintitle: '',
       modelSearch: '',
+      materialId: -1,
       isImageText: false,
       tabArr: [
         { title: '本地上传', key: 0 },
@@ -762,11 +768,14 @@ export default {
       },
       ruleState: false,
       isEditor: false,
-      tabsArr: []
+      tabsArr: [],
+      tableId: -1
     }
   },
   created () {
     this.setType()
+    this.getUrl()
+    this.getFind()
   },
   computed: {
     dataListSelectionKeys () {
@@ -789,9 +798,87 @@ export default {
     }
   },
   methods: {
+    getArticle () {
+      console.log(this.setData.inputData.articleLink)
+      if (!this.isUrl(this.setData.inputData.articleLink, 1)) return this.$message.warn('微信文章链接 必须以 https://mp.weixin.qq.com/s/ 开头')
+    },
+    getUrl () {
+      const object = {}
+      // 1.获取？后面的所有内容包括问号
+      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+
+      // 2.截取？后面的字符
+      const urlData = url.substr(1)
+      // name=嘻嘻&hobby=追剧
+      if (urlData.length === 0) return
+      const strs = urlData.split('&')
+      for (let i = 0; i < strs.length; i++) {
+        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      }
+      if (!object.hasOwnProperty('id')) return
+      this.tableId = object.id
+      this.getInfo()
+    },
+    getInfo () {
+      console.log(this.tableId)
+      const obj = {
+        id: this.tableId
+      }
+      scrmRadarArticleLoad(obj).then((res) => {
+        console.log(res)
+        const { data } = res.data
+        const inputArr = ['title', 'unitId']
+        const { inputData } = this.setData
+
+        const entry = {
+          1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
+          2: ['radarPDF', 'linkTitle'],
+          3: {
+            0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId'],
+            1: ['linkTitle', 'linkImg', 'articleLink'],
+            2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+          },
+          4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+        }
+        // const shapeArr = ['链接', 'PDF', '图文/文章', '视频']
+        for (const key in data) {
+          if (inputArr.includes(key)) {
+            this.setData.inputData[key] = data[key]
+          }
+        }
+        this.setData.inputData.ditch = data.ditch.map((item) => {
+          return item.id
+        })
+        this.setData.inputData.shape = '1'
+        for (const key in data.entry) {
+          if (inputData.shape == '3') {
+            if (entry[inputData.shape][inputData.contentSource].includes(key)) {
+              console.log(inputData[key], key)
+              this.setData.inputData[key] = data.entry[key]
+            }
+          } else {
+            if (entry[inputData.shape].includes(key)) {
+              console.log(data.entry[key], key)
+              this.setData.inputData[key] = data.entry[key]
+            }
+          }
+        }
+        this.linkData.linkState = data.track.linkType
+        this.tabsArr = data.track.linkState
+      })
+    },
     mouseOver (e) {
       console.log(e)
       this.isShow = e == 1
+    },
+    getFind () {
+      const obj = {}
+      scrmRadarLabelFind(obj).then((res) => {
+        console.log(res)
+        const { data } = res
+        this.selectArr.grouping = data.group
+        this.selectArr.channel = data.ditch
+      })
     },
     close (key) {
       this.setData.inputData[key] = ''
@@ -815,7 +902,63 @@ export default {
       console.log(e)
       this.tabsArr = e
     },
-    setRadar () {},
+    setRadar () {
+      const { inputData } = this.setData
+      const { linkState } = this.linkData
+      const inputArr = ['title', 'unitId', 'ditch', 'shape']
+      const entry = {
+        1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
+        2: ['radarPDF', 'linkTitle'],
+        3: {
+          0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId'],
+          1: ['linkTitle', 'linkImg', 'articleLink'],
+          2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+        },
+        4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+      }
+      const obj = {
+        entry: {},
+        ditch: [],
+        track: {
+          linkType: linkState,
+          linkState: this.tabsArr.map((item) => {
+            const obj = {}
+            obj.id = item.id
+            obj.name = item.name
+            return obj
+          })
+        }
+      }
+      for (const key in inputData) {
+        if (inputArr.includes(key)) {
+          obj[key] = inputData[key]
+        } else {
+          if (inputData.shape == '3') {
+            if (entry[inputData.shape][inputData.contentSource].includes(key)) {
+              console.log(inputData[key], key)
+              obj.entry[key] = inputData[key]
+            }
+          } else {
+            if (entry[inputData.shape].includes(key)) {
+              console.log(inputData[key], key)
+              obj.entry[key] = inputData[key]
+            }
+          }
+        }
+      }
+      obj.ditch = this.selectArr.channel.filter((item) => {
+        return obj.ditch.includes(item.id)
+      })
+      if (!this.isUrl(obj.entry.radarLink) && obj.shape == 1) return this.$message.warn('请检查雷达链接')
+      console.log(obj)
+      if (this.tableId != -1) {
+        obj.id = this.tableId
+      }
+      scrmRadarArticleSave(obj).then((res) => {
+        console.log(res)
+        this.$router.push('/interactionRadar/index')
+      })
+    },
     handleTableChange ({ current, pageSize }) {
       this.medium.pagination.current = current
       this.medium.pagination.pageSize = pageSize
@@ -921,7 +1064,15 @@ export default {
         }
       }
     },
+    isUrl (val, type = 0) {
+      // eslint-disable-next-line no-useless-escape
+      const str = /^(http|https):\/\/[\S]+$/
+      const wxStr = /^https:\/\/mp.weixin.qq.com\/s\/[\S]+/
+      const reg = type == 0 ? new RegExp(str) : new RegExp(wxStr)
+      return reg.test(val)
+    },
     setCatalog () {
+      const { id, content } = this.radio
       if (this.modelTab == 0) {
         if (this.medium.type == 2) {
           if (!this.isEditor) {
@@ -934,12 +1085,13 @@ export default {
           this.$refs.editor[0].getEditorData('video', this.uploadUrl)
         } else {
           this.setData.inputData.radarPDF = this.uploadUrl
+          this.setData.inputData.linkTitle = this.this.uploadName
         }
       } else {
         if (this.radio.id == -1) return this.$message.warn('至少选择一个选项')
         if (this.medium.type == 2) {
           if (!this.isEditor) {
-            this.setData.inputData.linkImg = this.radio.content.imageFullPath
+            this.setData.inputData.linkImg = content.imageFullPath
             this.radio = {
               id: -1,
               content: {},
@@ -947,17 +1099,19 @@ export default {
             }
             this.modelTab = 0
           } else {
-            this.$refs.editor[0].getEditorData('image', this.radio.content.imageFullPath)
+            this.$refs.editor[0].getEditorData('image', content.imageFullPath)
           }
         } else if (this.medium.type == 3) {
-          this.setData.inputData.material = this.radio.content.imageFullPath
-          this.maintitle = this.radio.content.maintitle
+          this.setData.inputData.linkImg = content.imageFullPath
+          this.setData.inputData.linkTitle = content.title
+          this.setData.inputData.linkDigest = content.description
+          this.setData.inputData.materialId = id
         } else if (this.medium.type == 5) {
-          console.log(this.radio.content)
-          this.$refs.editor[0].getEditorData('video', this.radio.content.videoFullPath)
+          console.log(content)
+          this.$refs.editor[0].getEditorData('video', content.videoFullPath)
         } else {
-          this.setData.inputData.radarPDF = this.radio.content.fileFullPath
-          this.uploadName = this.radio.content.fileName
+          this.setData.inputData.radarPDF = content.fileFullPath
+          this.setData.inputData.linkTitle = content.fileName
           this.radio = {
             id: -1,
             content: {},
@@ -975,10 +1129,10 @@ export default {
       this.setData.inputData.content = html
     },
     setType () {
-      const { contentType, contentSource } = this.setData.inputData
+      const { shape, contentSource } = this.setData.inputData
       const { inputType, articleArr } = this.setData
-      const newInputType = inputType.concat(this.change[contentType])
-      if (contentType == 3) {
+      const newInputType = inputType.concat(this.change[shape])
+      if (shape == 3) {
         const articleType = newInputType.concat(articleArr[contentSource])
         console.log(articleType)
         this.$set(this.setData, 'changeType', articleType)
@@ -1053,14 +1207,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.a_page {
+.setRadar_page {
   width: 100%;
   color: #333333;
   font-size: 14px;
   font-family: 'Arial Normal', 'Arial';
   font-weight: 400;
   font-style: normal;
-  .a_card {
+  .setRadar_card {
     width: 100%;
     // min-height: 770px;
     box-sizing: border-box;
@@ -1068,9 +1222,9 @@ export default {
     border: 1px solid #ccc;
     background-color: #fff;
     border-radius: 20px;
-    .a_content {
+    .setRadar_content {
       width: 100%;
-      .a_title {
+      .setRadar_title {
         font-size: 16px;
         margin-bottom: 20px;
       }
@@ -1289,7 +1443,7 @@ export default {
       }
     }
   }
-  .a_link {
+  .setRadar_link {
     margin-top: 25px;
     width: 100%;
     // min-height: 770px;
@@ -1298,11 +1452,11 @@ export default {
     border: 1px solid #ccc;
     background-color: #fff;
     border-radius: 20px;
-    .a_title {
+    .setRadar_title {
       font-size: 16px;
       margin-bottom: 20px;
     }
-    .a_content {
+    .setRadar_content {
       display: flex;
       flex-direction: column;
       .checkbox_box {
@@ -1464,24 +1618,11 @@ export default {
   align-items: center;
   justify-content: center;
   .content_box {
-    color: #fff;
     position: absolute;
-    background-color: rgb(6, 40, 68);
+    background-color: #fff;
     width: 350px;
     height: 700px;
     overflow: auto;
-    color: #fff;
-    &::-webkit-scrollbar-thumb {
-      border-radius: 10px;
-      -webkit-box-shadow: inset 0 0 5px#fff;
-      background: #535353;
-    }
-
-    &::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 5px #fff;
-      border-radius: 10px;
-      background: #ededed;
-    }
   }
 }
 ::v-deep(.ant-modal-header) {
