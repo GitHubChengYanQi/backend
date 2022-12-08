@@ -2,7 +2,59 @@
   <div id="clusterExecute_Page_Container" ref="clusterExecute_Page_Container">
     <div class="leftContainer">
       <div class="leftContainerTop">
-        <a-form layout="horizontal">
+        <div class="formDiv">
+          <div class="singleForm">
+            <div class="singleFormTitle">群名称:</div>
+            <a-input placeholder="请输入群名称" v-model="searchInfo.clusterName" class="inputClass" />
+          </div>
+          <div class="singleForm">
+            <div class="singleFormTitle">群主:</div>
+            <!-- style="width: 200px" -->
+            <selectPersonnel
+              class="selectPersonClass"
+              name="请选择创建者"
+              :changeId="true"
+              :num="1"
+              v-model="searchInfo.employeeIds"
+            />
+          </div>
+          <div class="singleForm">
+            <div class="singleFormTitle">群日历名称:</div>
+            <a-input placeholder="请输入群日历名称" v-model="searchInfo.sopName" class="inputClass" />
+          </div>
+          <div class="singleForm">
+            <div class="singleFormTitle">任务状态:</div>
+            <a-select
+              placeholder="请选择"
+              v-model="searchInfo.executionState"
+              @change="changeTaskStatus"
+              class="selectPersonClass"
+            >
+              <a-select-option :value="taskStatusItem.code" v-for="taskStatusItem in taskStatusList" :key="taskStatusItem.code">{{ taskStatusItem.name }}</a-select-option>
+            </a-select>
+          </div>
+          <div class="singleButtonForm">
+            <a-button
+              type="primary"
+              style="margin: 0 10px;"
+              @click="goSearch"
+              v-permission="'/sopClusterCalendar/getExecutionLog@get'"
+            >查询</a-button>
+            <a-button
+              style="margin-right: 10px;"
+              @click="goReset"
+              v-permission="'/sopClusterCalendar/getExecutionLog@get'"
+            >重置</a-button>
+            <a-button
+              type="primary"
+              style="margin: 0 10px;"
+              @click="goExportData"
+              v-permission="'/sopClusterCalendar/getExecutionLogExcel@get'"
+              :disabled="(tableData.length === 0)"
+            >导出</a-button>
+          </div>
+        </div>
+        <!-- <a-form layout="horizontal">
           <a-row :gutter="4">
             <a-col :span="8">
               <a-form-item label="群名称:" :labelCol="{span: 4}" :wrapper-col="{span: 20}">
@@ -11,7 +63,6 @@
             </a-col>
             <a-col :span="8">
               <a-form-item label="群主:" :labelCol="{span: 4}" :wrapper-col="{span: 20}">
-                <!-- class="selectPersonnelCom" -->
                 <selectPersonnel
                   style="width: 90%"
                   name="请选择创建者"
@@ -63,31 +114,7 @@
               </div>
             </a-col>
           </a-row>
-          <!-- <a-form-item label="任务状态:">
-            <a-select
-              placeholder="请选择"
-              v-model="searchInfo.executionState"
-              style="width: 200px"
-              @change="changeTaskStatus"
-            >
-              <a-select-option :value="taskStatusItem.code" v-for="taskStatusItem in taskStatusList" :key="taskStatusItem.code">{{ taskStatusItem.name }}</a-select-option>
-            </a-select>
-          </a-form-item> -->
-          <!-- <a-button
-            type="primary"
-            style="width: 54px;height: 34px;margin: 0 10px;"
-            @click="goSearch"
-          >查询</a-button>
-          <a-button
-            style="width: 54px;height: 34px;margin-right: 10px;"
-            @click="goReset"
-          >重置</a-button>
-          <a-button
-            type="primary"
-            style="width: 54px;height: 34px;margin: 0 10px;"
-            @click="goExportData"
-          >导出</a-button> -->
-        </a-form>
+        </a-form> -->
       </div>
       <a-table
         :loading="tableLoading"
@@ -459,6 +486,38 @@ export default {
       padding: 20px;
       .leftContainerTop {
         margin-bottom: 10px;
+        .formDiv {
+          display: flex;
+          flex-wrap: wrap;
+          width: 100%;
+          justify-content: space-between;
+          .singleForm {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 0px 10px;
+            .singleFormTitle {
+              font-size: 14px;
+              flex-shrink: 0;
+            }
+            .inputClass {
+              flex: 1;
+              width: 180px;
+              margin-left: 4px;
+            }
+            .selectPersonClass {
+              margin-left: 4px;
+              width: 180px;
+            }
+          }
+          .singleButtonForm {
+            display: flex;
+            justify-content: flex-end;
+            flex: 1;
+          }
+        }
       }
       /deep/.ant-table-tbody .clickRowStyle {
         background-color: #e6f7ff !important;
