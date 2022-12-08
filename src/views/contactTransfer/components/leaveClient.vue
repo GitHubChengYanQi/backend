@@ -55,7 +55,7 @@
               type="buttonGhost"
               name="分配客户"
               :multiple="false"
-              :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+              :fieldNames="{ children: 'children', title: 'title', key: 'wxUserId' }"
               :transferTip="true"
               v-permission="'/contactTransfer/resignIndex@allocation'" />
             <a-button type="primary" ghost @click="$router.push('/contactTransfer/resignAllotRecord')" v-permission="'/contactTransfer/resignIndex@resignAllotRecord'">分配记录</a-button>
