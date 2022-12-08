@@ -11,6 +11,7 @@
           <span class="search_input">
             <a-input
               class="input"
+              :maxLength="35"
               v-model="search.data[item.key]"
               :placeholder="item.placeholder"
               v-if="item.type == 'input'"
@@ -111,7 +112,7 @@
                 <div class="client_info">
                   <div class="nickname f-blod fz13">
                     <a-tooltip>
-                      {{  row.contactInfoNick?.length > 0 ? row.contactInfoNick : '--' }}
+                      {{ row.contactInfoName.length > 0 ? row.contactInfoName : row.contactInfoNick.length > 0 ? row.contactInfoNick :'--' }}
                     </a-tooltip>
                   </div>
                   <div class="rek fz12">
@@ -281,6 +282,7 @@ export default {
             align: 'center',
             title: '客户',
             dataIndex: 'contactInfoName',
+            fixed: 'left',
             scopedSlots: { customRender: 'contactInfoName' },
             width: 150
           },
@@ -368,7 +370,6 @@ export default {
             align: 'center',
             title: '成为会员时间',
             dataIndex: 'tradeApplyDate',
-            fixed: 'right',
             width: 200
           }
         ],
@@ -398,6 +399,7 @@ export default {
       })
     },
     getSearch () {
+      this.table.pagination.current = 1
       this.getTable()
     },
     reset () {
@@ -570,6 +572,13 @@ export default {
         }
       }
     }
+  }
+}
+
+.labelBox{
+  width:400px;
+  span{
+    margin-bottom:10px;
   }
 }
 </style>
