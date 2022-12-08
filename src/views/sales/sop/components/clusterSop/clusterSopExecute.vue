@@ -95,6 +95,7 @@
 <script>
 // import { getTempExecuteSopList, deleteExecutingSopMethod } from '@/api/cluster'
 import { getExecutingSopListMethod, deleteExecutingSopMethod } from '@/api/cluster'
+import moment from 'moment'
 export default {
   name: 'ClusterSopExecute',
   data () {
@@ -123,7 +124,10 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
-          width: 100
+          width: 100,
+          sorter: (a, b) => {
+            return moment(a.createdAt).isBefore(b.createdAt) ? 1 : -1
+          }
         },
         {
           title: '操作',
