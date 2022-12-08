@@ -7,14 +7,13 @@
     :headers="headers"
     :file-list="fileList"
     method="post"
-    :show-upload-list="true"
+    :show-upload-list="false"
     :action="uploadApi"
     :before-upload="beforeUpload"
     @change="handleChange"
   >
-    <a-button>
-      <a-icon type="upload" />
-      上传
+    <a-button type="primary">
+      上传文件
     </a-button>
   </a-upload>
 </template>
@@ -68,23 +67,24 @@ export default {
     this.fileList = this.value
   },
   methods: {
-    handleChange (info) {
-      this.fileList = info.fileList.length > 0 ? [info.fileList[info.fileList.length - 1]] : []
+    handleChange ({ fileList, file, event }) {
+      this.$emit('on-percent', event ? event.percent : 0)
+      this.fileList = fileList.length > 0 ? [fileList[fileList.length - 1]] : []
 
       if (this.fileList.length === 0) {
         this.$emit('success', this.fileList)
       }
-      if (info.file.status === 'uploading') {
+      if (file.status === 'uploading') {
         this.loading = true
         return
       }
-      if (info.file.status === 'done') {
+      if (file.status === 'done') {
         this.$emit('success', this.fileList.map(item => (item.response.data)))
         this.loading = false
       }
-      if (info.file.status === 'error') {
-        if (info.file.response) {
-          const data = info.file.response
+      if (file.status === 'error') {
+        if (file.response) {
+          const data = file.response
           this.$message.error(data.msg)
         }
       }
@@ -108,7 +108,11 @@ export default {
         }, 0)
         this.$message.error('上传文件过大')
       }
-      return flag && fileMaxSize
+      const res = flag && fileMaxSize
+      if (res) {
+        this.$emit('upload')
+      }
+      return res
     },
     // 获取文件后缀
     _getFileSuffix (imgName) {
@@ -120,7 +124,11 @@ export default {
 <style lang="less">
 
 .my-upload {
-  width: 100%;
+  //width: 100%;
+  .ant-btn {
+    margin-left: 12px;
+    border-radius: 8px
+  }
 }
 
 .avatar-uploader > .ant-upload {

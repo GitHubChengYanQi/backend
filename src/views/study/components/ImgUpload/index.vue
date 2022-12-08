@@ -12,7 +12,8 @@
   >
     <div>
       <div v-if="value" class="img-wrapper">
-        <img class="img" :src="value" alt="avatar" />
+        <img v-if="fileType === 1" class="img" :src="value" alt="avatar" />
+        <div v-else-if="fileType === 3">上传成功！</div>
       </div>
       <div v-else>
         <a-icon :type="loading ? 'loading' : 'plus'" />

@@ -35,9 +35,13 @@
     <div class="my-table-wrapper">
       <div class="btn">
         <a-icon type="question-circle" />
-        <a-button type="primary" @click="uploadVisibleOpen">
-          上传文件
-        </a-button>
+        <upload
+          @upload="upload"
+          @on-percent="onPercent"
+          :default-file-type-list="['jpg','png','ppt','pptx','pdf','doc','docx']"
+          style="display: inline-block"
+          @success="uploadSuccess"
+          :file-type="1" />
         <a-button type="primary" ghost @click="download">
           批量下载
         </a-button>
@@ -96,7 +100,7 @@
       </a-table>
     </div>
 
-    <a-modal centered v-model="visible" title="修改名称" @ok="handleOk" class="modal">
+    <a-modal centered v-model="visible" title="修改名称" @ok="handleOk" class="my-modal">
       <a-input v-model="fileName"></a-input>
     </a-modal>
 
@@ -104,22 +108,10 @@
       centered
       destroyOnClose
       v-model="uploadVisible"
-      title="上传文件"
-      :okButtonProps="{props: {disabled:!imgUrl}, on: {}}"
-      @ok="handleOk"
+      title="上传中"
+      :footer="[]"
     >
-      <div style="text-align: center">
-        <div style="text-align: left;padding-bottom: 24px">
-          <a-icon type="warning" style="padding-right: 8px;color: #faad14" />
-          图片大小不超过2M，支持JPG、JPEG及PNG格式
-        </div>
-        <upload
-          :value="imgUrl ? [imgUrl] : []"
-          :default-file-type-list="['jpg','png','ppt','pptx','pdf','doc','docx']"
-          style="display: inline-block"
-          @success="uploadSuccess"
-          :file-type="1"></upload>
-      </div>
+      <a-progress :percent="percent" />
     </a-modal>
   </div>
 </template>
@@ -132,6 +124,7 @@ import { message } from 'ant-design-vue'
 export default {
   data () {
     return {
+      percent: 0,
       imgUrl: '',
       imgName: '',
       uploadVisible: false,
@@ -191,6 +184,14 @@ export default {
     this.getTableData()
   },
   methods: {
+    upload () {
+      this.uploadVisible = true
+    },
+    onPercent (percent) {
+      if (percent > this.percent) {
+        this.percent = percent
+      }
+    },
     download () {
       if (this.checkIds.length === 0) {
         message.warn('请选择想要下载的文件！')
@@ -198,14 +199,12 @@ export default {
         console.log(this.checkIds)
       }
     },
-    uploadVisibleOpen () {
-      this.imgUrl = ''
-      this.imgName = ''
-      this.uploadVisible = true
-    },
     uploadSuccess (data = []) {
+      setTimeout(() => {
+        this.uploadVisible = false
+        this.percent = 0
+      }, 1000)
       const file = data[0] || {}
-      console.log(file)
       this.imgUrl = file.fullPath
       this.imgName = file.name
     },
@@ -276,12 +275,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
-.modal {
-  /deep/ .ant-modal-footer {
-    text-align: center;
-  }
-}
 
 .my-table-search {
   border-top-left-radius: 0;

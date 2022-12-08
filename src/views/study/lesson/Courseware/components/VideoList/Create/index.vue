@@ -26,9 +26,10 @@
         <a-form-item label="上传视频">
           <div class="my-space">
             <ImgUpload
-              v-decorator="['fmt', { rules: [{ required: true, message: '请上传视频!'}],initialValue: '' }]"
+              :fileType="3"
+              v-decorator="['sp', { rules: [{ required: true, message: '请上传视频!'}],initialValue: '' }]"
             />
-            建议尺寸：750 × 1448
+            上传支持：mp4，不能超过500m
           </div>
         </a-form-item>
         <a-form-item label="封面图">

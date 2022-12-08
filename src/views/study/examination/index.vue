@@ -45,7 +45,7 @@
         <a-button
           type="primary"
           @click="() => $router.push('/study/examination/create')">
-          创建试卷
+          新建考试
         </a-button>
       </div>
       <a-table
