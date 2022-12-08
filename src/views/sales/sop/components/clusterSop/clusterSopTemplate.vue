@@ -64,6 +64,7 @@
 import { getSopTemplateListMethod, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
 // import { getTempSopList, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
 import GroupChatList from '../groupChat.vue'
+import moment from 'moment'
 export default {
   name: 'ClusterSopTemplate',
   components: {
@@ -95,6 +96,10 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
+          defaultSortOrder: 'descend',
+          sorter: (a, b) => {
+            return moment(a.createdAt).isBefore(b.createdAt) ? 1 : -1
+          },
           width: 200
         },
         {
@@ -144,6 +149,7 @@ export default {
         idsStr: this.searchInfo.employeeIds.join(','),
         page: this.pagination.current,
         perPage: this.pagination.pageSize
+        // sort: this.sorter
       }
       console.log(params, '查询数据提交接口的对象')
       await getSopTemplateListMethod(params).then(response => {
@@ -172,6 +178,7 @@ export default {
     handleTableChange ({ current, pageSize }) {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
+      // console.log(sorter, 'sorter')
       this.getTableData()
     },
     // 搜索

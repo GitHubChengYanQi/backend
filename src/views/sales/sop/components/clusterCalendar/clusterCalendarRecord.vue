@@ -191,6 +191,7 @@
 // import { getTempExecuteSopList, deleteExecuteRecordSopMethod } from '@/api/cluster'
 import { getExecuteRecordCalendarListMethod, deleteExecuteRecordCalendarMethod, exportClusterCalendarMethod, getDictData } from '@/api/cluster'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import moment from 'moment'
 export default {
   name: 'ClusterSopExecute',
   data () {
@@ -227,6 +228,9 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
+          sorter: (a, b) => {
+            return moment(a.createdAt).isBefore(b.createdAt) ? 1 : -1
+          },
           width: 100
         },
         {
