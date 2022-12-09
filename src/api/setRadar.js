@@ -69,14 +69,6 @@ export function scrmRadarShiftSend (data) {
   })
 }
 
-export function scrmRadarArticleGrab (data) {
-  return request({
-    url: 'scrm_radar_article/grab',
-    method: 'post',
-    data
-  })
-}
-
 // 分组 渠道信息
 export function scrmRadarLabelFind (data) {
   return request({

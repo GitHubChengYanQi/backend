@@ -98,7 +98,8 @@
                 </div>
                 <img :src="modalLinkObj.pic.url" alt class="image" />
                 <div class="handleBtns">
-                  <a-icon class="btn" type="form" @click="modalLinkEdit" />
+                  <a-icon v-if="modalLinkObj.radarLink !== '1'" class="btn" type="form" @click="modalLinkEdit" />
+                  <span v-else>{{ modalLinkObj.radarName }}</span>
                   <a-icon class="btn" type="delete" @click="deleteLink" />
                 </div>
               </div>
@@ -249,6 +250,8 @@
     <a-modal v-model="contentLibraryModalShow" centered @ok="handleAddLibraryOk" width="95%">
       <MediumGroup :is-component="true" v-if="contentLibraryModalShow" @materialSelect="librarySelectChange" />
     </a-modal>
+    <!-- 雷达选择toast -->
+    <RadarChoose v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk" />
     <label-select :state="chooseUserTagsModalShow" :addState="false" ref="labelSelect" />
   </div>
 </template>
@@ -260,9 +263,11 @@ import { departmentEmp, upLoad } from '@/api/common'
 import LabelSelect from './components/LabelSelect.vue'
 import { defaultLinkObj, defaultLibraryObj, isUrl, getLibraryMediaType, disabledBeforeDate, getMediaData, returnLabelJSONData } from './components/momentsUtils'
 import { addMomentsItemReq, getMomentsItemInfoReq, setMomentsItemInfoReq, getMomentsItemExpectedNumReq } from '@/api/momentsOperation'
+import RadarChoose from './components/radarToastComponent.vue'
 export default {
   components: {
     'label-select': LabelSelect,
+    RadarChoose,
     'MediumGroup': () => import('@/views/mediumGroup/index.vue')
   },
   data () {
@@ -298,6 +303,10 @@ export default {
         {
           name: '素材库',
           type: 'library'
+        },
+        {
+          name: '雷达',
+          type: 'radar'
         }
       ],
       // 发送内容
@@ -310,6 +319,10 @@ export default {
       contentLibraryModalShow: false,
       mediaFormLibrary: false, // 媒体来源是否为素材库(二次修改添加判断)
       modalLibraryObj: { ...defaultLibraryObj },
+      radarVisible: false,
+      modalRadarObj: {
+
+      },
       sendDateType: 2,
       chooseSendDate: '',
       disabledBeforeDate,
@@ -447,6 +460,8 @@ export default {
           this.mediaFormLibrary = false
         } else if (type === 'library') {
           this.contentLibraryModalShow = true
+        } else if (type === 'radar') {
+          this.radarVisible = true
         }
       }
     },
@@ -757,6 +772,25 @@ export default {
     async getDepartmentEmp () {
       const { data } = await departmentEmp()
       this.treeData = data
+    },
+    handleAddRadarOk (list) {
+      if (list.length !== 1) {
+        this.$message.warning('只能选择一条内容')
+        return
+      }
+      const target = list[0]
+      const content = target.entry
+      this.modalLinkObj = {
+        title: content.linkTitle,
+        url: target.link,
+        pic: { url: content.linkImg, path: content.linkImgPath || content.linkImg.slice(43, content.linkImg.indexOf('?')) },
+        desc: content.linkDigest,
+        radarLink: '1',
+        radarName: target.channelTxt
+      }
+      console.log(this.modalLinkObj, 'this.modalLinkObj')
+      this.mediaType = 'link'
+      this.radarVisible = false
     }
   }
 }
