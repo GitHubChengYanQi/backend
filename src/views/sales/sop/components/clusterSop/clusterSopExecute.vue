@@ -99,6 +99,7 @@ export default {
   name: 'ClusterSopExecute',
   data () {
     return {
+      sorter: '',
       currentRow: {},
       selectedList: [],
       sendArray: [
@@ -123,7 +124,9 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
-          width: 100
+          width: 100,
+          sorter: true,
+          sortDirections: ['descend', 'ascend']
         },
         {
           title: '操作',
@@ -196,7 +199,8 @@ export default {
         sopName: this.searchInfo.sopName,
         clusterName: this.searchInfo.clusterName,
         page: this.pagination.current,
-        perPage: this.pagination.pageSize
+        perPage: this.pagination.pageSize,
+        sort: this.sorter
       }
       console.log(params, '查询数据提交接口的对象')
       await getExecutingSopListMethod(params).then(response => {
@@ -238,10 +242,19 @@ export default {
       }
     },
     // 群SOP模板切换页码
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.selectedList = []
       this.pagination.current = current
       this.pagination.pageSize = pageSize
+      if (sorter.order) {
+        if (sorter.order === 'ascend') {
+          this.sorter = 'asc'
+        } else {
+          this.sorter = 'desc'
+        }
+      } else {
+        this.sorter = ''
+      }
       this.getTableData()
     },
     // 搜索
