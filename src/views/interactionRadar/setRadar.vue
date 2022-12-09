@@ -39,6 +39,7 @@
               >
                 <a-select
                   class="checkbox"
+                  :maxTagCount="1"
                   allowClear
                   mode="multiple"
                   :placeholder="item.placeholder"

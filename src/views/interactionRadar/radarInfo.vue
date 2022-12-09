@@ -15,11 +15,16 @@
             class="arrData"
             v-if="item.type"
           >
-            <span
-              class="tabs"
-              v-for="(items,indexs) in radarInfo.data[item.key] "
-              :key="indexs"
-            >{{ items }}</span>
+            <span v-if="radarInfo.data[item.key].length != 0">
+              <span
+                class="tabs"
+                v-for="(items,indexs) in radarInfo.data[item.key] "
+                :key="indexs"
+              >{{ items.name }}</span>
+            </span>
+            <span v-else>
+              无标签
+            </span>
           </span>
           <span
             class="data"
@@ -153,13 +158,14 @@
                 v-if="item.type == 'date'"
               />
               <a-select
+                placeholder="请选择"
                 class="input"
                 v-model="search.tableData[table.tab][item.key]"
                 v-if="item.type == 'select'"
               >
                 <a-select-option
                   v-for="(items,indexs) in selectArr[item.selectKey]"
-                  :value="items.code"
+                  :value="items.id"
                   :key="indexs"
                 >{{ items.name }}</a-select-option>
               </a-select>
@@ -206,69 +212,73 @@
 </template>
 
 <script>
+import moment from 'moment'
+import { scrmRadarVisitorIndex, scrmRadarVisitorChart, scrmRadarVisitorVisit, scrmRadarVisitorDitch, scrmRadarVisitorShift } from '@/api/setRadar.js'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
+
 export default {
   data () {
     return {
       radarInfo: {
         type: [
-          { title: '雷达标题：', key: 'radarTitle' },
-          { title: '创建人：', key: 'creator' },
-          { title: '所属分组：', key: 'Group' },
+          { title: '雷达标题：', key: 'title' },
+          { title: '创建人：', key: 'userName' },
+          { title: '所属分组：', key: 'unitName' },
           { title: '行为通知：', key: 'officeAction' },
-          { title: '创建时间：', key: 'creationTime' },
+          { title: '创建时间：', key: 'createdAt' },
           { title: '动态通知：', key: 'dynamicInform' },
           { title: '客户标签：', key: 'customersTag', type: 'tabs' }
         ],
         data: {
-          radarTitle: '111',
-          creator: '111',
-          Group: '111',
-          officeAction: '2222',
-          creationTime: '1111',
-          dynamicInform: '1111',
-          customersTag: ['222', '111']
+          title: '',
+          userName: '',
+          unitName: '',
+          officeAction: '',
+          createdAt: '',
+          dynamicInform: '',
+          customersTag: []
         }
       },
       dataOverview: {
         type: [
           {
             title: '发送总次数',
-            key: '1',
+            key: '0',
             hint: '当前雷达在侧边栏被员工发送的总次数（sop/朋友圈以任务完成计算次数）。'
           },
           {
             title: '查看总次数',
-            key: '2',
+            key: '1',
             hint: '当前雷达被客户打开的总次数，不去重。'
           },
           {
             title: '查看总人数',
-            key: '3',
+            key: '2',
             hint: '当前雷达被客户打开的总人数，去重。'
           },
           {
             title: '今日发送总次数',
-            key: '4',
+            key: '3',
             hint: '今日当前雷达在侧边栏被员工发送的总次数（sop/朋友圈以任务完成计算次数）。'
           },
           {
             title: '今日查看总次数',
-            key: '5',
+            key: '4',
             hint: '今日当前雷达被客户打开的总次数，不去重。'
           },
           {
             title: '今日查看总人数',
-            key: '6',
+            key: '5',
             hint: '今日当前雷达被客户打开的总人数，去重。'
           }
         ],
         data: {
+          0: '0',
           1: '0',
           2: '0',
           3: '0',
           4: '0',
-          5: '0',
-          6: '0'
+          5: '0'
         }
       },
       dataDetails: {
@@ -310,7 +320,7 @@ export default {
           xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ['0', '1', '2'],
+            data: [],
             axisLabel: {
               interval: 'auto',
               rotate: 0,
@@ -355,7 +365,7 @@ export default {
             {
               name: '发送次数',
               type: 'line',
-              data: [0, 1, 2],
+              data: [],
               smooth: true,
               stack: 'Total',
               showSymbol: false,
@@ -415,39 +425,39 @@ export default {
               align: 'center',
               title: '客户昵称',
               fixed: 'left',
-              dataIndex: 'employeeAgencyName',
+              dataIndex: 'contactNick',
               width: 150
             },
             {
               align: 'center',
               title: '是否是企业用户',
-              dataIndex: 'infoEmployeeCount',
+              dataIndex: 'contactExist',
               width: 150
             },
             {
               align: 'center',
               title: '查看时间',
-              dataIndex: 'infoContactCount',
+              dataIndex: 'createdAt',
               width: 150
             },
             {
               align: 'center',
               title: '查看渠道',
-              dataIndex: 'contactLoseCount',
+              dataIndex: 'viewingChannels',
               width: 150
             },
             {
               align: 'center',
               title: '客户查看次数',
               sorter: true,
-              dataIndex: 'contactLoseRatio',
+              dataIndex: 'viewingNumber',
               width: 150
             },
             {
               align: 'center',
               title: '客户查看时长（分钟）',
               sorter: true,
-              dataIndex: 'fellowLoseCount',
+              dataIndex: 'viewingDuration',
               width: 150
             }
           ],
@@ -456,35 +466,35 @@ export default {
               align: 'center',
               title: '渠道名称',
               fixed: 'left',
-              dataIndex: 'employeeOutletName',
+              dataIndex: 'ditchName',
               width: 150
             },
             {
               align: 'center',
               title: '本链接查看次数',
               sorter: true,
-              dataIndex: 'employeeAgencyName',
+              dataIndex: 'linkNumber',
               width: 150
             },
             {
               align: 'center',
               title: '本链接查看人数',
               sorter: true,
-              dataIndex: 'infoEmployeeCount',
+              dataIndex: 'linkPeopleNumber',
               width: 150
             },
             {
               align: 'center',
               sorter: true,
               title: '渠道总查看次数',
-              dataIndex: 'infoContactCount',
+              dataIndex: 'channelNumber',
               width: 150
             },
             {
               align: 'center',
               sorter: true,
               title: '渠道总查看人数',
-              dataIndex: 'contactLoseCount',
+              dataIndex: 'channelPeopleNumber',
               width: 150
             }
           ],
@@ -493,33 +503,39 @@ export default {
               align: 'center',
               title: '发送员工',
               fixed: 'left',
-              dataIndex: 'employeeInfoName',
+              dataIndex: 'employeeName',
               width: 150
             },
             {
               align: 'center',
               title: '所属门店',
-              dataIndex: 'employeeOutletName',
+              dataIndex: 'outletName',
               width: 150
             },
             {
               align: 'center',
               title: '所属机构',
-              dataIndex: 'employeeAgencyName',
+              dataIndex: 'agencyName',
               width: 150
             },
             {
               align: 'center',
               title: '发送本链接次数',
-              dataIndex: 'infoContactCount',
+              dataIndex: 'sendLinkNumber',
               sorter: true,
               width: 150
             },
             {
               align: 'center',
               title: '查看本链接人数',
+              dataIndex: 'lookLinkNumber',
+              width: 150
+            },
+            {
+              align: 'center',
+              title: '本链接使用渠道数',
               sorter: true,
-              dataIndex: 'contactLoseCount',
+              dataIndex: 'linkChannelNumber',
               width: 150
             }
           ]
@@ -532,7 +548,8 @@ export default {
           pageSizeOptions: ['10', '20', '30', '50']
         },
         tableData: [],
-        order: {}
+        order: {},
+        articleId: -1
       },
       search: {
         table: {
@@ -540,7 +557,7 @@ export default {
             {
               title: '点击渠道：',
               type: 'select',
-              key: 'employeeAgencyId',
+              key: 'channel',
               selectKey: 'channel',
               placeholder: '请选择机构'
             }
@@ -549,14 +566,14 @@ export default {
             {
               title: '时间筛选：',
               type: 'date',
-              key: 'timeData',
+              key: 'createdAt',
               placeholder: '请选择门店'
             },
             {
               title: '点击渠道：',
               type: 'select',
               selectKey: 'channel',
-              key: 'employeeOutletId',
+              key: 'channel',
               placeholder: '请选择门店'
             }
           ],
@@ -564,51 +581,206 @@ export default {
             {
               title: '选择机构：',
               type: 'selct_checkbox',
-              key: 'employeeAgencyId',
+              key: 'agencyId',
               placeholder: '请选择机构'
             },
             {
               title: '选择门店：',
               type: 'selct_checkbox',
-              key: 'employeeOutletId',
+              key: 'outletId',
               placeholder: '请选择门店'
             },
             {
               title: '时间筛选：',
               type: 'date',
-              key: 'timeData',
+              key: 'createdAt',
               placeholder: '请选择门店'
             },
             {
               title: '发送员工：',
               type: 'model',
-              key: 'employeeInfoId',
+              key: 'employeeId',
               placeholder: '请选择员工'
             }
           ]
         },
         tableData: {
-          0: { employeeAgencyId: [] },
-          1: { employeeOutletId: [], timeData: [] },
-          2: { employeeAgencyId: [], employeeOutletId: [], timeData: [], employeeInfoId: [] }
+          0: { channel: undefined },
+          1: { channel: undefined, createdAt: [] },
+          2: { agencyId: [], outletId: [], createdAt: [], employeeId: [] }
         }
       }
     }
   },
+  created () {
+    this.getUrl()
+  },
   methods: {
+    getUrl () {
+      const object = {}
+      // 1.获取？后面的所有内容包括问号
+      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+
+      // 2.截取？后面的字符
+      const urlData = url.substr(1)
+      // name=嘻嘻&hobby=追剧
+      if (urlData.length === 0) return
+      const strs = urlData.split('&')
+      for (let i = 0; i < strs.length; i++) {
+        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      }
+      if (!object.hasOwnProperty('id')) return
+      this.articleId = object.id
+      this.getInfo()
+      this.setDate(0)
+      this.getTableData()
+    },
+    getInfo () {
+      if (this.articleId == -1) return
+      const obj = {
+        articleId: this.articleId
+      }
+      scrmRadarVisitorIndex(obj).then((res) => {
+        console.log(res)
+        const obj = {}
+        const { data } = res
+        this.radarInfo.data = data.data
+        this.radarInfo.data.customersTag = data.data.track.linkState
+        this.radarInfo.data.officeAction = data.data.track.linkType.includes('0') ? '已开启' : '未开启'
+        this.radarInfo.data.dynamicInform = data.data.track.linkType.includes('1') ? '已开启' : '未开启'
+        this.selectArr.channel = data.ditch
+        data.today.concat(data.total).map((item, index) => {
+          obj[index] = item
+        })
+        this.dataOverview.data = obj
+      })
+    },
     setSearchData (e, string) {
       console.log(e, string)
+      if (this.dataDetails.data.length == 0) return
+      this.getChart(string)
       console.log(this.dataDetails.data)
     },
     setDate (e) {
       this.dataDetails.date = e
+      console.log(e)
+      if (e != 2) {
+        const date = [
+          e == 0 ? moment().add(-6, 'd').format('YYYY-MM-DD') : moment().subtract(1, 'months').format('YYYY-MM-DD'),
+          moment().format('YYYY-MM-DD')
+        ]
+        this.getChart(date)
+      }
     },
-    getSearch () {},
-    exportsElxe () {},
-    reset () {},
-    handleTableChange () {},
+    getChart (createdAt) {
+      scrmRadarVisitorChart({ createdAt, articleId: this.articleId }).then((res) => {
+        console.log(res)
+        this.dataDetails.lineChart.xAxis.data = res.data.xData
+        this.dataDetails.lineChart.series = this.dataDetails.lineChart.series.map((item, index) => {
+          item.data = res.data.yData[index]
+          return item
+        })
+      })
+    },
+    getSearch () {
+      this.getTableData()
+    },
+    exportsElxe () {
+      callDownLoadByBlob()
+    },
+    reset () {
+      this.search.tableData = {
+        0: { channel: undefined },
+        1: { channel: undefined, createdAt: [] },
+        2: { agencyId: [], outletId: [], createdAt: [], employeeId: [] }
+      }
+      this.table.pagination.current = 1
+      this.table.pagination.pageSize = 10
+      this.getTableData()
+    },
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.table.pagination.current = current
+      this.table.pagination.pageSize = pageSize
+      this.table.order = sorter
+      this.getTableData()
+    },
     setTableTab (e) {
       this.table.tab = e
+      this.search.tableData = {
+        0: { channel: undefined },
+        1: { channel: undefined, createdAt: [] },
+        2: { agencyId: [], outletId: [], createdAt: [], employeeId: [] }
+      }
+      this.table.pagination.current = 1
+      this.table.pagination.pageSize = 10
+      this.getTableData()
+    },
+    getTableData () {
+      const { pagination, tab, order } = this.table
+      const { tableData } = this.search
+      console.log(tableData[tab], '111111111')
+      console.log(order)
+      const searchKey = {
+        viewingNumber: 'id',
+        viewingDuration: 'shift_id',
+        linkNumber: 'data$0',
+        linkPeopleNumber: 'data$1',
+        channelNumber: 'data$2',
+        channelPeopleNumber: 'data$3',
+        sendLinkNumber: 'id',
+        linkChannelNumber: 'ditch_id'
+      }
+      const obj = {
+        articleId: this.articleId,
+        current: pagination.current,
+        size: pagination.pageSize,
+        order: order.columnKey ? searchKey[order.columnKey] : '',
+        queue: order.order ? order.order == 'ascend' : ''
+      }
+      if (tableData[tab].createdAt && tableData[tab].createdAt.length > 0) {
+        obj.createdAt = tableData[tab].createdAt.map(item => {
+          return moment(item).format('YYYY-MM-DD')
+        })
+      }
+      if (tableData[tab].channel) {
+        obj.ditchId = tableData[tab].channel
+      }
+      if (tab == 2) {
+        const setArr = ['agencyId', 'outletId', 'employeeId']
+        for (const key in tableData[tab]) {
+          if (setArr.includes(key)) {
+            if (key != 'employeeId') {
+              obj[key] = tableData[tab][key].map(item => {
+                return item.value
+              }).join(',')
+            } else {
+              obj[key] = tableData[tab][key].join(',')
+            }
+          }
+        }
+      }
+      console.log(obj)
+      const apiArr = [scrmRadarVisitorVisit, scrmRadarVisitorDitch, scrmRadarVisitorShift]
+      apiArr[tab](obj).then((res) => {
+        const { data } = res
+        console.log(res)
+        const tableArr = {
+          0: ['viewingNumber', 'viewingDuration'],
+          1: ['linkNumber', 'linkPeopleNumber', 'channelNumber', 'channelPeopleNumber'],
+          2: ['sendLinkNumber', 'lookLinkNumber', 'linkChannelNumber']
+        }
+        this.table.tableData = data.datas.map((item, index) => {
+          item.id = index
+          if (tab == 0) {
+            item.viewingChannels = item.ditchId[0].name
+          }
+          item.data.map((items, indexs) => {
+            item[tableArr[tab][indexs]] = items
+          })
+          return item
+        })
+        this.table.pagination.total = data.total
+      })
     }
   }
 }

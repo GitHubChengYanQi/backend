@@ -17,6 +17,46 @@ export function scrmRadarArticleDrop (data) {
   })
 }
 
+export function scrmRadarVisitorIndex (data) {
+  return request({
+    url: 'scrm_radar_visitor/index',
+    method: 'post',
+    data
+  })
+}
+
+export function scrmRadarVisitorChart (data) {
+  return request({
+    url: 'scrm_radar_visitor/chart',
+    method: 'post',
+    data
+  })
+}
+
+export function scrmRadarVisitorVisit (data) {
+  return request({
+    url: 'scrm_radar_visitor/visit',
+    method: 'post',
+    data
+  })
+}
+
+export function scrmRadarVisitorDitch (data) {
+  return request({
+    url: 'scrm_radar_visitor/ditch',
+    method: 'post',
+    data
+  })
+}
+
+export function scrmRadarVisitorShift (data) {
+  return request({
+    url: 'scrm_radar_visitor/shift',
+    method: 'post',
+    data
+  })
+}
+
 // 批量删除文章
 export function scrmRadarArticleAway (data) {
   return request({

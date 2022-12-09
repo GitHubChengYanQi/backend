@@ -214,7 +214,7 @@
                   slot-scope="text,record"
                 >
                   <template>
-                    <div class="example">
+                    <div class="example" v-if="record.entry">
                       <div
                         v-if="record.type == 2"
                         class="pdf"
@@ -331,6 +331,7 @@
 import { getDict } from '@/api/common.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 import { scrmRadarLabelFind, scrmRadarLabelSave, scrmRadarLabelDrop, scrmRadarArticleFind, scrmRadarArticleDrop, scrmRadarArticleAway, scrmRadarArticleMove, scrmRadarArticleDown, scrmRadarShiftSend } from '@/api/setRadar.js'
+import moment from 'moment'
 
 export default {
   data () {
@@ -644,10 +645,20 @@ export default {
     },
     getTableData () {
       const { current, pageSize } = this.table.pagination
+      const { data } = this.searchData
       const obj = {
-        ...this.searchData.data,
         current,
         size: pageSize
+      }
+      for (const key in data) {
+        if (key != 'createdAt') {
+          obj[key] = data[key]
+        }
+      }
+      if (data.createdAt.length > 0) {
+        obj.createdAt = data.createdAt.map(item => {
+          return moment(item).format('YYYY-MM-DD')
+        })
       }
       if (this.catalogIndex != -1) {
         obj.unitId = this.catalogIndex
@@ -660,7 +671,6 @@ export default {
             return items.name == item.shape
           })
           item.type = typeArr.length == 0 ? 3 : typeArr[0].code
-          console.log(item.type)
           return item
         })
         this.table.pagination.total = res.data.total
