@@ -78,6 +78,7 @@ export default {
   },
   data () {
     return {
+      sorter: '',
       bindGroupChatInfo: {}, // 群日历模板绑定群聊对象
       selectArrayString: '',
       searchInfo: {}, // 查询列表对象
@@ -102,9 +103,8 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
-          sorter: (a, b) => {
-            return moment(a.createdAt).isBefore(b.createdAt) ? 1 : -1
-          },
+          sorter: true,
+          sortDirections: ['descend', 'ascend'],
           width: 200
         },
         {
@@ -166,7 +166,8 @@ export default {
         sopName: this.searchInfo.sopName,
         idsStr: this.searchInfo.employeeIds.join(','),
         page: this.pagination.current,
-        perPage: this.pagination.pageSize
+        perPage: this.pagination.pageSize,
+        sort: this.sorter
       }
       // console.log(params, '查询数据提交接口的对象')
       await getCalendarTemplateListMethod(params).then(response => {
@@ -192,9 +193,18 @@ export default {
       // this.tableData = getTempSopList()
     },
     // 群日历模板切换页码
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
+      if (sorter.order) {
+        if (sorter.order === 'ascend') {
+          this.sorter = 'asc'
+        } else {
+          this.sorter = 'desc'
+        }
+      } else {
+        this.sorter = ''
+      }
       this.getTableData()
     },
     // 搜索
