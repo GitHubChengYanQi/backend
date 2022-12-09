@@ -44,7 +44,7 @@
         </a-button>
         <a-button
           type="primary"
-          @click="() => $router.push('/study/lesson/create')">
+          @click="() => $router.push('/study/testPaper/create')">
           创建试卷
         </a-button>
       </div>
