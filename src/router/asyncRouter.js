@@ -951,6 +951,15 @@ export const routeList = {
     component: () => import('@/views/study/examination'),
     meta: { title: '考试管理' }
   },
+  '/study/examination/create': {
+    path: '/study/examination/create',
+    name: '新建考试',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/Create/index'),
+    meta: { title: '新建考试' }
+  },
   '/study/examination/detail': {
     path: '/study/examination/detail',
     name: '考试详情',

@@ -30,7 +30,11 @@
             v-decorator="['class', { rules: [{ required: true, message: '请选择模板分类!' }] }]"
           />
         </a-form-item>
-        <a-form-item label="选择课件">
+        <a-form-item
+          label="选择课件"
+          :label-col="{ span: 3 }"
+          :wrapper-col="{ span: 19 }"
+        >
           <selectCourseware
             placeholder="请选择课件"
             v-decorator="['kejian', { rules: [{ required: true, message: '请选择课件!' }],initialValue:[] }]"
@@ -46,18 +50,8 @@
           </div>
         </a-form-item>
         <a-form-item label="试用员工">
-          <a-radio-group
-            v-decorator="['syyg', { rules: [{ required: true, message: '请选择试用员工!' }] }]"
-            name="radioGroup"
-            :default-value="1"
-          >
-            <a-radio :value="1">
-              全体员工
-            </a-radio>
-            <a-radio :value="2">
-              部分员工
-            </a-radio>
-          </a-radio-group>
+          <Employee
+            v-decorator="['syyg', { rules: [{ required: true, message: '请选择试用员工!' }],initialValue:['all'] }]"></Employee>
         </a-form-item>
         <a-form-item label="关联考试">
           <SelectExamination
@@ -83,9 +77,10 @@ import selectCourseware from './compoents/SelectCourseware'
 import SelectExamination from './compoents/SelectExamination'
 import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../components/ImgUpload/index'
+import Employee from '../../components/Employee/index'
 
 export default {
-  components: { breadcrumb, selectCourseware, VueQuillEditor, ImgUpload, SelectExamination },
+  components: { breadcrumb, selectCourseware, VueQuillEditor, ImgUpload, SelectExamination, Employee },
   data () {
     return {
       data: {},

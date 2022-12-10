@@ -2,7 +2,7 @@
   <div>
     <a-button v-if="!name" style="width: 200px;border-radius: 8px" class="add" @click="visible = true">
       <a-icon type="plus" />
-      关联
+      添加试卷
     </a-button>
     <div v-else>
       <a-badge>
@@ -21,42 +21,34 @@
       :footer="null"
       destroyOnClose
       :width="1200"
-      title="选择考试"
+      title="选择试卷"
       :visible="visible"
       @cancel="visible = false"
     >
-      <div class="my-table-search">
-        <a-form layout="inline">
+      <a-form layout="inline">
 
-          <a-form-item
-            label="考试名称">
-            <a-input placeholder="请输入试卷名称" />
-          </a-form-item>
+        <a-form-item
+          label="试卷名称">
+          <a-input placeholder="请输入试卷名称" />
+        </a-form-item>
 
-          <a-form-item
-            label="考试时间">
-            <a-range-picker />
-          </a-form-item>
+        <a-form-item
+          label="创建时间">
+          <a-range-picker />
+        </a-form-item>
 
-          <a-form-item
-            label="创建人">
-            <a-input placeholder="请输入创建人" />
-          </a-form-item>
-
-          <a-form-item>
-            <div>
-              <a-button
-                type="primary"
-                ghost
-                @click="() => { this.pagination.current = 1; this.getTableData() }"
-              >
-                查询
-              </a-button>
-            </div>
-          </a-form-item>
-        </a-form>
-      </div>
-
+        <a-form-item>
+          <div>
+            <a-button
+              type="primary"
+              ghost
+              @click="() => { this.pagination.current = 1; this.getTableData() }"
+            >
+              查询
+            </a-button>
+          </div>
+        </a-form-item>
+      </a-form>
       <a-table
         class="my-table"
         bordered
@@ -87,15 +79,20 @@ export default {
     return {
       columns: [
         {
-          title: '考试名称',
+          title: '试卷名称',
           dataIndex: 'name',
           align: 'center',
           width: '200px'
         },
         {
-          title: '试卷名称',
+          title: '总题数',
           width: '200px',
           dataIndex: 'introduction',
+          align: 'center'
+        },
+        {
+          title: '总分数 ',
+          dataIndex: 'class',
           align: 'center'
         },
         {
@@ -103,11 +100,6 @@ export default {
           dataIndex: 'total',
           align: 'center',
           sorter: true
-        },
-        {
-          title: '创建人',
-          dataIndex: 'user',
-          align: 'center'
         }
       ],
       tableData: [],
