@@ -373,18 +373,7 @@ export default {
         type: []
       },
       table: {
-        data: [
-          {
-            id: 0,
-            radarTab: ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
-            example: {
-              title: '12', // 标题 在pdf类型是名称
-              text: '12312', // 摘要
-              imgUrl: '' // 封面图片地址
-            },
-            type: 1
-          }
-        ],
+        data: [],
         columns: [
           {
             align: 'center',
@@ -427,8 +416,7 @@ export default {
           {
             align: 'center',
             title: '类型',
-            dataIndex: 'shape',
-            width: 150
+            dataIndex: 'shape'
           },
           {
             align: 'center',
@@ -581,7 +569,19 @@ export default {
       this.getTableData()
     },
     exportsElxe () {
-      const obj = { ...this.searchData.data }
+      const { data } = this.searchData
+
+      const obj = {}
+      for (const key in data) {
+        if (key != 'createdAt') {
+          obj[key] = data[key]
+        }
+      }
+      if (data.createdAt.length > 0) {
+        obj.createdAt = data.createdAt.map(item => {
+          return moment(item).format('YYYY-MM-DD')
+        })
+      }
       if (this.table.rowSelection.length != 0) {
         obj.kagi = this.table.rowSelection
         obj.current = 1
