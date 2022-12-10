@@ -104,6 +104,10 @@ export const handleBtnArr = [
     type: 'library'
   },
   {
+    name: '互动雷达',
+    type: 'radar'
+  },
+  {
     name: '小程序',
     type: 'embed'
   }
