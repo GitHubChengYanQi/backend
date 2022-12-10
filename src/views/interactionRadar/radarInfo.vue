@@ -15,7 +15,10 @@
             class="arrData"
             v-if="item.type"
           >
-            <span v-if="radarInfo.data[item.key].length != 0" style="display:flex;">
+            <span
+              v-if="radarInfo.data[item.key].length != 0"
+              style="display:flex;"
+            >
               <span
                 class="tabs"
                 v-for="(items,indexs) in radarInfo.data[item.key] "
@@ -158,6 +161,9 @@
                 v-if="item.type == 'date'"
               />
               <a-select
+                :maxTagCount="1"
+                allowClear
+                mode="multiple"
                 placeholder="请选择"
                 class="input"
                 v-model="search.tableData[table.tab][item.key]"
@@ -213,7 +219,14 @@
 
 <script>
 import moment from 'moment'
-import { scrmRadarVisitorIndex, scrmRadarVisitorChart, scrmRadarVisitorVisit, scrmRadarVisitorDitch, scrmRadarVisitorShift, scrmRadarVisitorExcel } from '@/api/setRadar.js'
+import {
+  scrmRadarVisitorIndex,
+  scrmRadarVisitorChart,
+  scrmRadarVisitorVisit,
+  scrmRadarVisitorDitch,
+  scrmRadarVisitorShift,
+  scrmRadarVisitorExcel
+} from '@/api/setRadar.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 
 export default {
@@ -605,8 +618,8 @@ export default {
           ]
         },
         tableData: {
-          0: { channel: undefined },
-          1: { channel: undefined, createdAt: [] },
+          0: { channel: [] },
+          1: { channel: [], createdAt: [] },
           2: { agencyId: [], outletId: [], createdAt: [], employeeId: [] }
         }
       }
@@ -707,21 +720,23 @@ export default {
         type: tab
       }
       if (tableData[tab].createdAt && tableData[tab].createdAt.length > 0) {
-        obj.createdAt = tableData[tab].createdAt.map(item => {
+        obj.createdAt = tableData[tab].createdAt.map((item) => {
           return moment(item).format('YYYY-MM-DD')
         })
       }
-      if (tableData[tab].channel) {
-        obj.ditchId = tableData[tab].channel
+      if (tableData[tab].channel && tableData[tab].channel.length > 0) {
+        obj.ditchId = tableData[tab].channel.join(',')
       }
       if (tab == 2) {
         const setArr = ['agencyId', 'outletId', 'employeeId']
         for (const key in tableData[tab]) {
           if (setArr.includes(key) && tableData[tab][key].length > 0) {
             if (key != 'employeeId') {
-              obj[key] = tableData[tab][key].map(item => {
-                return item.value
-              }).join(',')
+              obj[key] = tableData[tab][key]
+                .map((item) => {
+                  return item.value
+                })
+                .join(',')
             } else {
               obj[key] = tableData[tab][key].join(',')
             }
@@ -729,14 +744,14 @@ export default {
         }
       }
       const title = ['客户数据', '渠道数据', '员工数据']
-      scrmRadarVisitorExcel(obj).then(res => {
+      scrmRadarVisitorExcel(obj).then((res) => {
         callDownLoadByBlob(res, title[tab])
       })
     },
     reset () {
       this.search.tableData = {
-        0: { channel: undefined },
-        1: { channel: undefined, createdAt: [] },
+        0: { channel: [] },
+        1: { channel: [], createdAt: [] },
         2: { agencyId: [], outletId: [], createdAt: [], employeeId: [] }
       }
       this.table.pagination.current = 1
@@ -752,8 +767,8 @@ export default {
     setTableTab (e) {
       this.table.tab = e
       this.search.tableData = {
-        0: { channel: undefined },
-        1: { channel: undefined, createdAt: [] },
+        0: { channel: [] },
+        1: { channel: [], createdAt: [] },
         2: { agencyId: [], outletId: [], createdAt: [], employeeId: [] }
       }
       this.table.pagination.current = 1
@@ -783,21 +798,23 @@ export default {
         queue: order.order ? order.order == 'ascend' : ''
       }
       if (tableData[tab].createdAt && tableData[tab].createdAt.length > 0) {
-        obj.createdAt = tableData[tab].createdAt.map(item => {
+        obj.createdAt = tableData[tab].createdAt.map((item) => {
           return moment(item).format('YYYY-MM-DD')
         })
       }
-      if (tableData[tab].channel) {
-        obj.ditchId = tableData[tab].channel
+      if (tableData[tab].channel && tableData[tab].channel.length > 0) {
+        obj.ditchId = tableData[tab].channel.join(',')
       }
       if (tab == 2) {
         const setArr = ['agencyId', 'outletId', 'employeeId']
         for (const key in tableData[tab]) {
           if (setArr.includes(key) && tableData[tab][key].length > 0) {
             if (key != 'employeeId') {
-              obj[key] = tableData[tab][key].map(item => {
-                return item.value
-              }).join(',')
+              obj[key] = tableData[tab][key]
+                .map((item) => {
+                  return item.value
+                })
+                .join(',')
             } else {
               obj[key] = tableData[tab][key].join(',')
             }
