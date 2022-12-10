@@ -107,6 +107,13 @@ export default {
         return flag && file10M
       }
 
+      if (fileType === 'image') {
+        if (!file10M) {
+          this.$message.error('上传文件过大')
+        }
+        return flag && file10M
+      }
+
       if (!file2M) {
         this.$message.error('上传文件过大')
       }
