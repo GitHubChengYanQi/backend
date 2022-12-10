@@ -213,10 +213,21 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 .tree {
   /deep/ .el-tree-node__content {
     height: auto;
+    width: 100%;
+    background-color: #fff;
+    align-items: normal;
+
+    .custom-tree-node {
+      width: 100%;
+    }
+
+    .el-tree-node__expand-icon.is-leaf {
+      min-height: 100%;
+      padding: 0;
+    }
   }
 }
 

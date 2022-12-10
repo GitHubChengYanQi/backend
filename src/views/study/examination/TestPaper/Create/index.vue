@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="create">
     <breadcrumb :titles="['考试管理','试卷管理','创建试卷']" back></breadcrumb>
 
     <div>
@@ -8,22 +8,22 @@
           <div class="box">
             <a-icon type="form" class="icon" />
             <div>
-              <div class="num">155</div>
+              <div class="num">{{ questions.length }}</div>
               总题数
             </div>
           </div>
           <div class="box">
             <a-icon type="form" class="icon" />
             <div>
-              <div class="num">155</div>
+              <div class="num">{{ totalFen }}</div>
               当前总分
             </div>
           </div>
         </div>
         <div class="set">
           <div :style="{width: '120px'}">每题相同分：</div>
-          <a-switch />
-          <a-input-number class="input" v-model="number" />
+          <a-switch v-model="sname" @change="switchChange" />
+          <a-input-number class="input" v-model="number" @change="numberChange" />
           分
         </div>
 
@@ -50,11 +50,7 @@
             :data="questions"
             icon-class="icon"
             node-key="index"
-            @node-drag-start="handleDragStart"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-leave="handleDragLeave"
             @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
             @node-drop="handleDrop"
             draggable
             :allow-drop="allowDrop"
@@ -62,14 +58,12 @@
             <div
               class="custom-tree-node"
               slot-scope="{ node, data:questionItem }"
-              @mouseenter="mouseenter(node)"
-              @mouseleave="mouseleave(node)"
             >
               <div
                 class="questionItem"
               >
                 <div class="question">
-                  <div class="questionTitle">问题{{ questionItem.index }}</div>
+                  <div class="questionTitle">问题{{ questionItem.index + 1 }}</div>
                   <div class="questionContent">
                     <a-form-item label="试卷题目">
                       <a-input
@@ -96,30 +90,55 @@
                     </a-form-item>
 
                     <div v-if="questionItem.type !== 'judge'">
-                      <a-form-item
-                        v-for="(option,optionIndex) in Object.keys(questionItem.options || {'A':''})"
-                        :key="optionIndex"
-                        :label="option"
-                        :label-col="{ span: 2 }"
-                        :wrapper-col="{ span: 12 }"
-                      >
-                        <div class="option">
-                          <a-input
-                            placeholder="请输入选项"
-                            v-decorator="[`questions[${questionItem.index}].options.${option}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
-                          />
-                          <div class="other">
-                            <div class="actions">
-                              <a-icon type="plus-square" @click="addOption(option,questionItem.index)" />
-                              <a-icon
-                                v-if="Object.keys(questionItem.options || {'A':''}).length !== 1"
-                                type="minus-square"
-                                @click="removeOption(option,questionItem.index)" />
-                              <DragIcon :width="24" />
+                      <el-tree
+                        class="tree optionTree"
+                        :data="Object.keys(questionItem.options || {'A':''}).map(item=>({option:item,key:questionItem.index}))"
+                        icon-class="icon"
+                        node-key="option"
+                        @node-drag-over="optionsHandleDragOver"
+                        @node-drop="optionsHandleDrop"
+                        draggable
+                        :allow-drop="optionsAlowDrop"
+                        :allow-drag="(node)=>optionsAllowDrag(node.data.option+questionItem.index)">
+                        <div
+                          class="custom-tree-node"
+                          slot-scope="{ node, data:{option} }"
+                        >
+                          <a-form-item
+                            :label="option"
+                            :label-col="{ span: 2 }"
+                            :wrapper-col="{ span: 12 }"
+                          >
+                            <div class="option">
+                              <a-input
+                                placeholder="请输入选项"
+                                v-decorator="[`questions[${questionItem.index}].options.${option}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
+                              />
+                              <div class="other">
+                                <div class="actions">
+                                  <a-icon
+                                    v-if="Object.keys(questionItem.options || {'A':''}).length < 6"
+                                    type="plus-square"
+                                    @click="addOption(option,questionItem.index)"
+                                  />
+                                  <a-icon
+                                    v-if="Object.keys(questionItem.options || {'A':''}).length !== 1"
+                                    type="minus-square"
+                                    @click="removeOption(option,questionItem.index)" />
+                                  <div
+                                    @mouseenter="optionMouseenter(option+questionItem.index)"
+                                    @mouseleave="optionMouseleave()"
+                                  >
+                                    <DragIcon
+                                      :width="24"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          </a-form-item>
                         </div>
-                      </a-form-item>
+                      </el-tree>
                     </div>
 
 
@@ -145,6 +164,8 @@
                               :wrapper-col="{ span: 12 }"
                             >
                               <a-input-number
+                                :disabled="sname"
+                                @change="count"
                                 class="input"
                                 v-decorator="[`questions[${questionItem.index}].fen`, { initialValue:0 }]"
                               />
@@ -157,9 +178,17 @@
                   </div>
                 </div>
                 <div class="actions">
-                  <a-icon type="plus-square" @click="addQuestion" />
+                  <a-icon v-if="questionItem.index === questions.length - 1" type="plus-square" @click="addQuestion" />
                   <a-icon type="delete" v-if="questions.length !== 1" @click="removeQuestion(questionItem.index)" />
-                  <DragIcon :width="24" />
+                  <div
+                    @mouseenter="mouseenter(questionItem)"
+                    @mouseleave="mouseleave(questionItem)"
+                  >
+                    <DragIcon
+                      :width="24"
+                    />
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -180,8 +209,12 @@ import DragIcon from '../../../components/DragIcon'
 export default {
   data () {
     return {
+      totalFen: 0,
+      dragQuestions: -1,
+      dragOptions: -1,
       form: this.$form.createForm(this, { name: 'coordinated' }),
       number: 0,
+      sname: false,
       questions: [{
         index: 0,
         type: 'single',
@@ -193,6 +226,38 @@ export default {
   },
   components: { breadcrumb, DragIcon },
   methods: {
+    switchChange (checked) {
+      setTimeout(() => {
+        const questions = this.form.getFieldValue('questions')
+        this.form.setFieldsValue({ questions: questions.map((item) => ({ ...item, fen: checked ? this.number : 0 })) })
+        this.count()
+      }, 0)
+
+    },
+    numberChange (number) {
+      if (this.sname) {
+        const questions = this.form.getFieldValue('questions')
+        this.form.setFieldsValue({ questions: questions.map((item) => ({ ...item, fen: number })) })
+        this.count()
+      }
+    },
+    count () {
+      setTimeout(() => {
+        const questions = this.form.getFieldValue('questions')
+        if (!Array.isArray(questions)) {
+          return 0
+        }
+        if (this.sname) {
+          this.totalFen = questions.length * this.number
+          return
+        }
+        let num = 0
+        questions.forEach(item => {
+          num += item.fen
+        })
+        this.totalFen = num
+      }, 0)
+    },
     handleSubmit () {
       this.form.validateFields((err, values) => {
         console.log(values)
@@ -208,6 +273,7 @@ export default {
         }
         return item
       })
+      this.form.setFieldsValue({ [`questions[${key}].answer`]: [] })
     },
     addQuestion () {
       this.questions.push({
@@ -217,11 +283,15 @@ export default {
           'A': ''
         }
       })
+      this.switchChange(this.sname)
     },
     removeQuestion (key) {
       const question = this.form.getFieldValue('questions')
-      this.form.setFieldsValue({ questions: question.filter((item, index) => index !== key) })
       this.questions = this.questions.filter((item, index) => index !== key).map((item, index) => ({ ...item, index }))
+      setTimeout(() => {
+        this.form.setFieldsValue({ questions: question.filter((item, index) => index !== key) })
+        this.count()
+      }, 0)
     },
     addOption (char = '', key) {
       const updateFileds = {}
@@ -265,6 +335,7 @@ export default {
           })
           return { ...item, options: newOptions }
         }
+        return item
       })
 
       setTimeout(() => {
@@ -272,34 +343,65 @@ export default {
       }, 0)
     },
     mouseenter (node) {
-      this.visible = node.id
+      this.dragQuestions = node.index
     },
-    mouseleave (node) {
-      this.visible = -1
+    mouseleave () {
+      this.dragQuestions = -1
     },
-    handleDragStart (node, ev) {
-
+    optionMouseenter (key) {
+      this.dragOptions = key
     },
-    handleDragEnter (draggingNode, dropNode, ev) {
-
-    },
-    handleDragLeave (draggingNode, dropNode, ev) {
-
+    optionMouseleave () {
+      this.dragOptions = -1
     },
     handleDragOver (draggingNode, dropNode, ev) {
 
     },
-    handleDragEnd (draggingNode, dropNode, dropType, ev) {
-
-    },
     handleDrop (draggingNode, dropNode, dropType, ev) {
+      this.questions = this.questions.map((item, index) => {
+        return { ...item, index }
+      })
 
+      const startQuestion = this.form.getFieldValue(`questions[${draggingNode.data.index}]`)
+      const endQuestion = this.form.getFieldValue(`questions[${dropNode.data.index}]`)
+
+      setTimeout(() => {
+        this.form.setFieldsValue({
+          [`questions[${draggingNode.data.index}]`]: endQuestion,
+          [`questions[${dropNode.data.index}]`]: startQuestion
+        })
+      }, 0)
     },
     allowDrop (draggingNode, dropNode, type) {
       return type !== 'inner'
     },
     allowDrag (draggingNode) {
-      return true
+      return draggingNode.data.index === this.dragQuestions
+    },
+
+    optionsHandleDragOver (draggingNode, dropNode, ev) {
+
+    },
+    optionsHandleDrop (draggingNode, dropNode, dropType, ev) {
+      this.questions = this.questions.map((item) => {
+        return item
+      })
+
+      const startOption = this.form.getFieldValue(`questions[${draggingNode.data.key}].options.${draggingNode.data.option}`)
+      const endOption = this.form.getFieldValue(`questions[${dropNode.data.key}].options.${dropNode.data.option}`)
+
+      setTimeout(() => {
+        this.form.setFieldsValue({
+          [`questions[${draggingNode.data.key}].options.${draggingNode.data.option}`]: endOption,
+          [`questions[${dropNode.data.key}].options.${dropNode.data.option}`]: startOption
+        })
+      }, 0)
+    },
+    optionsAlowDrop (draggingNode, dropNode, type) {
+      return type !== 'inner'
+    },
+    optionsAllowDrag (key) {
+      return key === this.dragOptions
     }
   }
 }
@@ -307,30 +409,56 @@ export default {
 
 <style lang="less" scoped>
 
+.create {
+
+}
+
 .tree {
   /deep/ .el-tree-node__content {
     height: auto;
     width: 100%;
     background-color: #fff;
+    align-items: normal;
 
     .custom-tree-node {
       width: 100%;
     }
+
+    .el-tree-node__expand-icon.is-leaf {
+      min-height: 100%;
+      padding: 0;
+    }
   }
 }
+
+//
+//.optionTree {
+//  /deep/ .el-tree-node {
+//    margin-bottom: 24px;
+//
+//    .el-tree-node__content {
+//      height: auto;
+//
+//      .ant-form-item {
+//        margin-bottom: 0;
+//      }
+//    }
+//  }
+//}
 
 .head {
   display: flex;
   align-items: center;
   padding: 24px;
   background-color: #fff;
-  margin-bottom: 24px;
+  margin: 24px 0;
   gap: 24px;
   border-radius: 8px;
 
   .total {
     display: flex;
     width: 50%;
+    gap: 24px;
 
     .box {
       border-radius: 8px;
