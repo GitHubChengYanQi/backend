@@ -69,7 +69,7 @@ export default {
           },
           clipboard: {
             // 粘贴版，处理粘贴时候的自带样式
-            matchers: [[Node.ELEMENT_NODE, this.HandleCustomMatcher]]
+            // matchers: [[Node.ELEMENT_NODE, this.HandleCustomMatcher]]
           },
           // theme:'snow',
           toolbar: {
@@ -107,26 +107,26 @@ export default {
       console.log(e)
       this.$emit('setMedium', e, true)
     },
-    HandleCustomMatcher (node, Delta) {
-      const ops = []
+    // HandleCustomMatcher (node, Delta) {
+    //   const ops = []
 
-      Delta.ops.forEach((op) => {
-        if (op.insert && typeof op.insert === 'string') {
-          ops.push({
-            insert: op.insert
-          })
-        } else {
-          ops.push({
-            insert: op.insert
-          })
-          console.log(op.insert)
-        }
-      })
+    //   Delta.ops.forEach((op) => {
+    //     if (op.insert && typeof op.insert === 'string') {
+    //       ops.push({
+    //         insert: op.insert
+    //       })
+    //     } else {
+    //       ops.push({
+    //         insert: op.insert
+    //       })
+    //       console.log(op.insert)
+    //     }
+    //   })
 
-      Delta.ops = ops
+    //   Delta.ops = ops
 
-      return Delta
-    },
+    //   return Delta
+    // },
     getEditorData (type, http) {
       const quill = this.$refs.myQuillEditor.quill
       const length = quill.selection.savedRange.index

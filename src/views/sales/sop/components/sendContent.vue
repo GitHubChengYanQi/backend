@@ -235,6 +235,8 @@
         @materialSelect="librarySelectChange"
       />
     </a-modal>
+    <!-- 雷达选择toast -->
+    <RadarChoose v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk" />
   </div>
 </template>
 <script>
@@ -243,10 +245,12 @@ import { handleBtnArr, isUrl } from '../sopUtils'
 // import { deepClonev2 } from '@/utils/util'
 // import { userSopTaskItemSettingReq } from '@/api/salesManagement'
 import { upLoad } from '@/api/common'
+import RadarChoose from '../../../clientFollow/components/radarToastComponent.vue'
 export default {
   name: 'SendContent',
   data () {
     return {
+      radarVisible: false, // 互动雷达弹框
       isSopEditStatus: false,
       chooseEditIndex: '', // 当前选择编辑的下标
       submitType: '', // 提交状态,新增与修改
@@ -273,6 +277,7 @@ export default {
     }
   },
   components: {
+    RadarChoose,
     'MediumGroup': () => import('@/views/mediumGroup/index.vue')
   },
   props: {
@@ -344,6 +349,34 @@ export default {
     }
   },
   methods: {
+    // 选择互动雷达回调
+    handleAddRadarOk (e) {
+      console.log(e, '选择互动雷达回调')
+      if ((this.sendContentArray.length + e.length) > 10) {
+        this.$message.warning('发送条数不能超过十条！')
+        return
+      }
+      this.isSopEditStatus = true
+      for (const item of e) {
+        const singleInfo = { type: 4 }
+        singleInfo.linkTitle = item.entry.linkTitle
+        singleInfo.linkUrl = item.link
+        singleInfo.linkPhoto = item.entry.linkImg
+        singleInfo.desc = item.entry.linkDigest
+        singleInfo.radarLink = '1'
+        singleInfo.radarName = item.channelTxt
+        this.sendContentArray.push(singleInfo)
+        // title: content.linkTitle,
+        // url: target.link,
+        // pic: { url: content.linkImg, path: content.linkImgPath || content.linkImg.slice(43, content.linkImg.indexOf('?')) },
+        // desc: content.linkDigest,
+        // radarLink: '1',
+        // radarName: target.channelTxt
+      }
+      this.radarVisible = false
+      this.$emit('update:isSopEdit', this.isSopEditStatus)
+      this.$emit('update:contentArray', this.sendContentArray)
+    },
     returnErrorText (url) {
       return '暂不支持显示 .avi 格式的视频'
     },
@@ -390,6 +423,9 @@ export default {
           break
         case 'embed':
           this.contentMiniModalShow = true
+          break
+        case 'radar':
+          this.radarVisible = true
           break
       }
     },
