@@ -57,6 +57,14 @@
                 <span class="say">小程序</span>
               </div>
             </div>
+            <div :class="`content ${item.type === 6 ? 'link' : ''}`" v-else-if="item.type === 6">
+              <div class="lef">
+                <span class="til">{{ item.linkTitle }}</span>
+                <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
+                <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+              </div>
+              <img :src="item.linkPhoto" alt class="image" />
+            </div>
             <div class="handlesBox" v-if="sendContentArray && sendContentArray[selectSopItemIdx] && isDisableEdit === false">
               <img
                 src="../images/move.svg"
@@ -227,6 +235,55 @@
         <a-button type="primary" @click="confirmContentMini">确定</a-button>
       </template>
     </a-modal>
+    <a-modal
+      title="新增互动雷达"
+      :maskClosable="false"
+      :width="600"
+      :visible="contentRadarModalShow"
+      @cancel="closeLinkModal()"
+      :getContainer="() => $refs['send_content_container']"
+    >
+      <div class="contentLinkModal">
+        <div class="formBox">
+          <div class="line">
+            <a-input v-model="contentRadarObj.radarDitchName" placeholder="请输入雷达渠道（必填）" disabled/>
+            <span class="len">{{ (contentRadarObj.radarDitchName && contentRadarObj.radarDitchName.length) ? contentRadarObj.radarDitchName.length : '0' }}/200</span>
+          </div>
+          <div class="line">
+            <a-input v-model="contentRadarObj.linkTitle" placeholder="请输入链接标题（必填）" />
+            <span class="len">{{ (contentRadarObj.linkTitle && contentRadarObj.linkTitle.length) ? contentRadarObj.linkTitle.length : '0' }}/200</span>
+          </div>
+          <div class="line">
+            <a-input v-model="contentRadarObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
+            <span class="len">{{ (contentRadarObj.linkUrl && contentRadarObj.linkUrl.length) ? contentRadarObj.linkUrl.length : '0' }}/500</span>
+          </div>
+          <div class="line textarea">
+            <a-textarea v-model="contentRadarObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
+            <span class="len">{{ (contentRadarObj.linkShow && contentRadarObj.linkShow.length) ? contentRadarObj.linkShow.length : '0' }}/170</span>
+          </div>
+        </div>
+        <div class="pic">
+          <div
+            class="addPic image"
+            v-if="!contentRadarObj.linkPhoto"
+            @click="openSelectPhoto('addRadarPhoto')"
+          >+</div>
+          <img
+            class="image"
+            v-else
+            :src="contentRadarObj.linkPhoto"
+            @click="openSelectPhoto('addRadarPhoto')"
+          />
+          <span class="tip">图片限制在2MB以内</span>
+        </div>
+      </div>
+      <template slot="footer">
+        <a-button
+          @click="closeRadarModal()"
+        >取消</a-button>
+        <a-button type="primary" @click="confirmContentRadar">确定</a-button>
+      </template>
+    </a-modal>
     <!-- 添加素材库弹窗 -->
     <a-modal v-model="contentLibraryModalShow" centered @ok="handleAddLibraryOk" width="95%">
       <MediumGroup
@@ -250,6 +307,8 @@ export default {
   name: 'SendContent',
   data () {
     return {
+      contentRadarObj: {}, // 互动雷达对象
+      contentRadarModalShow: false, // 修改互动雷达弹框
       radarVisible: false, // 互动雷达弹框
       isSopEditStatus: false,
       chooseEditIndex: '', // 当前选择编辑的下标
@@ -358,13 +417,15 @@ export default {
       }
       this.isSopEditStatus = true
       for (const item of e) {
-        const singleInfo = { type: 4 }
+        const singleInfo = { type: 6 }
         singleInfo.linkTitle = item.entry.linkTitle
         singleInfo.linkUrl = item.link
         singleInfo.linkPhoto = item.entry.linkImg
-        singleInfo.desc = item.entry.linkDigest
-        singleInfo.radarLink = '1'
-        singleInfo.radarName = item.channelTxt
+        singleInfo.linkShow = item.entry.linkDigest
+        singleInfo.radarPDF = item.entry.radarPDF
+        singleInfo.radarArticleId = item.id
+        singleInfo.radarDitchId = item.selectChannel
+        singleInfo.radarDitchName = item.channelTxt
         this.sendContentArray.push(singleInfo)
         // title: content.linkTitle,
         // url: target.link,
@@ -516,6 +577,38 @@ export default {
       this.contentLinkObj = {}
       this.submitType = ''
       this.uploadPhotoType = ''
+    },
+    // 关闭互动雷达修改弹框
+    closeRadarModal () {
+      this.contentRadarModalShow = false
+      this.contenRadarObj = {}
+      this.submitType = ''
+      this.uploadPhotoType = ''
+    },
+    // 提交互动雷达
+    confirmContentRadar () {
+      if (!this.contenRadarObj.linkTitle) {
+        return this.$message.warn('请输入链接标题！')
+      } else if (!this.contenRadarObj.linkUrl) {
+        return this.$message.warn('请输入链接地址！')
+      } else if (!this.contenRadarObj.linkUrl) {
+        return this.$message.warn('请输入正确的链接地址！')
+      } else if (!this.contenRadarObj.linkPhoto) {
+        return this.$message.warn('请上传封面图片！')
+      }
+      this.$set(this.contenRadarObj, 'type', 6)
+      if (this.submitType === 'add') {
+        this.sendContentArray.push(this.contenRadarObj)
+      } else {
+        this.sendContentArray.splice(this.chooseEditIndex, 1, this.contenRadarObj)
+      }
+      this.isSopEditStatus = true
+      this.$emit('update:isSopEdit', this.isSopEditStatus)
+      this.contentRadarModalShow = false
+      this.submitType = ''
+      this.uploadPhotoType = ''
+      this.$emit('update:contentArray', this.sendContentArray)
+      this.contentRadarObj = {}
     },
     // 提交小程序
     confirmContentMini () {
@@ -671,6 +764,9 @@ export default {
         this.chooseImage()
       } else if (singleType === 3) {
         this.chooseVideo()
+      } else if (singleType === 6) {
+        this.contentRadarObj = { ...info }
+        this.contentRadarModalShow = true
       }
       // this.isEditingItem = true
       // this.editIdx = index
