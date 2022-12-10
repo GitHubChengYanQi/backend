@@ -15,7 +15,7 @@
             class="arrData"
             v-if="item.type"
           >
-            <span v-if="radarInfo.data[item.key].length != 0">
+            <span v-if="radarInfo.data[item.key].length != 0" style="display:flex;">
               <span
                 class="tabs"
                 v-for="(items,indexs) in radarInfo.data[item.key] "
