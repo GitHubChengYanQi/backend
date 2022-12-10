@@ -416,8 +416,7 @@ export default {
           {
             align: 'center',
             title: '类型',
-            dataIndex: 'shape',
-            width: 150
+            dataIndex: 'shape'
           },
           {
             align: 'center',
