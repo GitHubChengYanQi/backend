@@ -213,7 +213,7 @@
 
 <script>
 import moment from 'moment'
-import { scrmRadarVisitorIndex, scrmRadarVisitorChart, scrmRadarVisitorVisit, scrmRadarVisitorDitch, scrmRadarVisitorShift } from '@/api/setRadar.js'
+import { scrmRadarVisitorIndex, scrmRadarVisitorChart, scrmRadarVisitorVisit, scrmRadarVisitorDitch, scrmRadarVisitorShift, scrmRadarVisitorExcel } from '@/api/setRadar.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 
 export default {
@@ -686,7 +686,52 @@ export default {
       this.getTableData()
     },
     exportsElxe () {
-      callDownLoadByBlob()
+      const { tab, order } = this.table
+      const { tableData } = this.search
+
+      const searchKey = {
+        viewingNumber: 'id',
+        viewingDuration: 'shift_id',
+        linkNumber: 'data$0',
+        linkPeopleNumber: 'data$1',
+        channelNumber: 'data$2',
+        channelPeopleNumber: 'data$3',
+        sendLinkNumber: 'id',
+        linkChannelNumber: 'ditch_id'
+      }
+
+      const obj = {
+        articleId: this.articleId,
+        order: order.columnKey ? searchKey[order.columnKey] : '',
+        queue: order.order ? order.order == 'ascend' : '',
+        type: tab
+      }
+      if (tableData[tab].createdAt && tableData[tab].createdAt.length > 0) {
+        obj.createdAt = tableData[tab].createdAt.map(item => {
+          return moment(item).format('YYYY-MM-DD')
+        })
+      }
+      if (tableData[tab].channel) {
+        obj.ditchId = tableData[tab].channel
+      }
+      if (tab == 2) {
+        const setArr = ['agencyId', 'outletId', 'employeeId']
+        for (const key in tableData[tab]) {
+          if (setArr.includes(key) && tableData[tab][key].length > 0) {
+            if (key != 'employeeId') {
+              obj[key] = tableData[tab][key].map(item => {
+                return item.value
+              }).join(',')
+            } else {
+              obj[key] = tableData[tab][key].join(',')
+            }
+          }
+        }
+      }
+      const title = ['客户数据', '渠道数据', '员工数据']
+      scrmRadarVisitorExcel(obj).then(res => {
+        callDownLoadByBlob(res, title[tab])
+      })
     },
     reset () {
       this.search.tableData = {
@@ -748,7 +793,7 @@ export default {
       if (tab == 2) {
         const setArr = ['agencyId', 'outletId', 'employeeId']
         for (const key in tableData[tab]) {
-          if (setArr.includes(key)) {
+          if (setArr.includes(key) && tableData[tab][key].length > 0) {
             if (key != 'employeeId') {
               obj[key] = tableData[tab][key].map(item => {
                 return item.value
@@ -771,8 +816,8 @@ export default {
         }
         this.table.tableData = data.datas.map((item, index) => {
           item.id = index
-          if (tab == 0) {
-            item.viewingChannels = item.ditchId[0].name
+          if (tab == 0 && item.ditchList.length > 0) {
+            item.viewingChannels = item.ditchList[0].name
           }
           item.data.map((items, indexs) => {
             item[tableArr[tab][indexs]] = items
@@ -974,7 +1019,9 @@ export default {
         width: 100%;
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         .search_box {
+          margin-bottom: 10px;
           display: flex;
           align-items: center;
           .search_title {

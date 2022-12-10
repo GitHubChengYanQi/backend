@@ -16,7 +16,7 @@ export function scrmRadarArticleDrop (data) {
     data
   })
 }
-
+// 数据信息
 export function scrmRadarVisitorIndex (data) {
   return request({
     url: 'scrm_radar_visitor/index',
@@ -24,7 +24,7 @@ export function scrmRadarVisitorIndex (data) {
     data
   })
 }
-
+// 数据图表
 export function scrmRadarVisitorChart (data) {
   return request({
     url: 'scrm_radar_visitor/chart',
@@ -32,7 +32,7 @@ export function scrmRadarVisitorChart (data) {
     data
   })
 }
-
+// 客户数据
 export function scrmRadarVisitorVisit (data) {
   return request({
     url: 'scrm_radar_visitor/visit',
@@ -40,7 +40,33 @@ export function scrmRadarVisitorVisit (data) {
     data
   })
 }
+// 文章获取
+export function scrmRadarArticleGrab (data) {
+  return request({
+    url: 'scrm_radar_article/grab',
+    method: 'post',
+    data
+  })
+}
 
+export function scrmRadarVisitorExcel (data) {
+  return request({
+    url: 'scrm_radar_visitor/excel',
+    method: 'post',
+    data,
+    responseType: 'blob'
+  })
+}
+
+export function getScrmRadarVisitorVisit (data) {
+  return request({
+    url: 'scrm_radar_visitor/visit',
+    method: 'get',
+    data,
+    responseType: 'blob'
+  })
+}
+// 渠道数据
 export function scrmRadarVisitorDitch (data) {
   return request({
     url: 'scrm_radar_visitor/ditch',
@@ -48,7 +74,7 @@ export function scrmRadarVisitorDitch (data) {
     data
   })
 }
-
+// 员工数据
 export function scrmRadarVisitorShift (data) {
   return request({
     url: 'scrm_radar_visitor/shift',
