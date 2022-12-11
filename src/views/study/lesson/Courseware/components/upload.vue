@@ -47,6 +47,7 @@ export default {
   },
   data () {
     return {
+      fileSize: 0,
       fileList: [],
       loading: false,
       FileTypeArr: [],
@@ -79,7 +80,8 @@ export default {
         return
       }
       if (file.status === 'done') {
-        this.$emit('success', this.fileList.map(item => (item.response.data)))
+        console.log(this.fileList)
+        this.$emit('success', this.fileList.map(item => ({ ...item.response.data, size: item.size })))
         this.loading = false
       }
       if (file.status === 'error') {

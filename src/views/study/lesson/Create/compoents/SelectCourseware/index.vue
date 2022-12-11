@@ -5,7 +5,7 @@
       添加
     </a-button>
 
-    <div class="table">
+    <div class="table" :hidden="tableView.length === 0">
       <el-table
         :data="tableView"
         row-key="id"
@@ -20,18 +20,18 @@
         </el-table-column>
         <el-table-column prop="sortNo" label="标题" />
         <el-table-column prop="date" label="学习时长" width="418">
-          <template slot-scope="scope">
+          <template slot-scope="{ row, column, $index}">
             <div class="my-space">
               <div class="time" style="gap: 0">
-                <a-input-number id="inputNumber" />
+                <a-input-number v-model="row.date.h" id="inputNumber" />
                 <span class="unit">时</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number id="inputNumber" />
+                <a-input-number v-model="row.date.m" id="inputNumber" />
                 <span class="unit">分</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number id="inputNumber" />
+                <a-input-number v-model="row.date.s" id="inputNumber" />
                 <span class="unit">秒</span>
               </div>
             </div>
@@ -157,7 +157,6 @@ export default {
       ],
       tableData: [],
       selectRows: [],
-      data: [],
       name: '',
       pagination: {
         total: 0,
@@ -168,32 +167,15 @@ export default {
         showTotal: (total) => `共 ${total} 条数据`
       },
       visible: false,
-      tableView: [
-        {
-          id: 1,
-          sortNo: 2,
-          date: '2016-05-03',
-          name: 'Tom'
-        },
-        {
-          id: 2,
-          sortNo: 3,
-          date: '2016-05-02',
-          name: 'Tom'
-        },
-        {
-          id: 3,
-          sortNo: 1,
-          date: '2016-05-04',
-          name: 'Tom'
-        },
-        {
-          id: 4,
-          sortNo: 4,
-          date: '2016-05-01',
-          name: 'Tom'
-        }
-      ]
+      tableView: []
+    }
+  },
+  watch: {
+    tableView: {
+      handler () {
+        this.$emit('change', this.tableView)
+      },
+      deep: true
     }
   },
   mounted () {
@@ -206,9 +188,6 @@ export default {
       animation: 300, // 拖拽延时，效果更好看
       onEnd: async (evt) => {
         this.tableView.splice(evt.newIndex, 0, this.tableView.splice(evt.oldIndex, 1)[0])
-        this.tableView.forEach((item, index) => {
-          item.sortNo = index + 1 // 重新给sortNo赋值
-        })
         // 接口(param).then((res) => {})
       }
     })
@@ -216,7 +195,32 @@ export default {
   },
   methods: {
     submit () {
-      this.data = this.selectRow
+      this.tableView = [
+        {
+          id: 1,
+          sortNo: 2,
+          date: { h: 1, m: 1, s: 1 },
+          name: 'Tom'
+        },
+        {
+          id: 2,
+          sortNo: 3,
+          date: { h: 1, m: 1, s: 1 },
+          name: 'Tom'
+        },
+        {
+          id: 3,
+          sortNo: 1,
+          date: { h: 1, m: 1, s: 1 },
+          name: 'Tom'
+        },
+        {
+          id: 4,
+          sortNo: 4,
+          date: { h: 1, m: 1, s: 1 },
+          name: 'Tom'
+        }
+      ]
       this.visible = false
     },
     selectChange (ids, rows) {

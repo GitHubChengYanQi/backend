@@ -1,104 +1,142 @@
 <template>
   <div>
-    <el-tree
-      class="tree"
-      :data="data"
-      icon-class="icon"
-      node-key="id"
-      @node-drag-start="handleDragStart"
-      @node-drag-enter="handleDragEnter"
-      @node-drag-leave="handleDragLeave"
-      @node-drag-over="handleDragOver"
-      @node-drag-end="handleDragEnd"
-      @node-drop="handleDrop"
-      draggable
-      :allow-drop="allowDrop"
-      :allow-drag="allowDrag">
-      <div
-        class="custom-tree-node"
-        slot-scope="{ node, data }"
-        @mouseenter="mouseenter(node)"
-        @mouseleave="mouseleave(node)"
+    <a-spin :spinning="tableLoading">
+      <el-tree
+        class="tree"
+        :data="data"
+        icon-class="icon"
+        node-key="key"
+        @node-drag-start="handleDragStart"
+        @node-drag-enter="handleDragEnter"
+        @node-drag-leave="handleDragLeave"
+        @node-drag-over="handleDragOver"
+        @node-drag-end="handleDragEnd"
+        @node-drop="handleDrop"
+        draggable
+        :allow-drop="allowDrop"
       >
-        <div>
-          <DragIcon></DragIcon>
-          <span>{{ node.label }}</span>
-        </div>
-        <div class="my-space">
-          <div v-if="visible === node.id" style="padding-right: 8px">
-            <el-button
-              type="text"
-              size="mini"
-              @click="() => addChildren(node, data)">
-              <a-icon type="plus-circle" />
-            </el-button>
-            <el-button
-              type="text"
-              size="mini"
-              @click="() => update(node, data)">
-              <a-icon type="edit" />
-            </el-button>
-            <el-button
-              type="text"
-              size="mini"
-              @click="() => remove(node, data)">
-              <a-icon type="delete" />
-            </el-button>
+        <div
+          class="custom-tree-node"
+          slot-scope="{ node, data }"
+          @mouseenter="mouseenter(node)"
+          @mouseleave="mouseleave(node)"
+        >
+          <div>
+            <DragIcon></DragIcon>
+            <span>{{ data.title }}</span>
           </div>
-          <div v-if="Array.isArray(data.children) && data.children.length > 0">
-            <el-button
-              v-if="!node.expanded"
-              type="text"
-              size="mini"
-            >
-              <a-icon type="left" />
-            </el-button>
-            <el-button
-              v-else
-              type="text"
-              size="mini"
-            >
-              <a-icon type="down" />
-            </el-button>
+          <div class="my-space">
+            <div v-if="visible === node.key" style="padding-right: 8px">
+              <el-button
+                v-if="data.level === 1"
+                type="text"
+                size="mini"
+                @click="() => {
+                  className = ''
+                  parentClassId = data.key
+                  openAddChildrenClass = true
+                }">
+                <a-icon type="plus-circle" />
+              </el-button>
+              <el-button
+                type="text"
+                size="mini"
+                @click="() => update(node, data)">
+                <a-icon type="edit" />
+              </el-button>
+              <el-button
+                type="text"
+                size="mini"
+                @click="() => remove(node, data)">
+                <a-icon type="delete" />
+              </el-button>
+            </div>
+            <div v-if="Array.isArray(data.children) && data.children.length > 0">
+              <el-button
+                v-if="!node.expanded"
+                type="text"
+                size="mini"
+              >
+                <a-icon type="left" />
+              </el-button>
+              <el-button
+                v-else
+                type="text"
+                size="mini"
+              >
+                <a-icon type="down" />
+              </el-button>
+            </div>
           </div>
         </div>
-      </div>
-    </el-tree>
+      </el-tree>
+    </a-spin>
 
     <a-button
       icon="plus"
       style="width: 100%;margin-top: 12px;border-radius: 4px"
-      @click="()=>openAddClass = true"
+      @click="()=>{
+        className = ''
+        openAddClass = true
+      }"
     >
       添加分类
     </a-button>
 
-    <a-modal centered v-model="openAddClass" title="新建分类" class="my-modal">
+    <a-modal
+      centered
+      v-model="openAddClass"
+      title="新建分类"
+      class="my-modal"
+      :okButtonProps="{props:{loading}}"
+      @ok="addClass()"
+    >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="addClassName" placeholder="请输入分类名称"></a-input>
+        <a-input v-model="className" placeholder="请输入分类名称"></a-input>
       </div>
     </a-modal>
 
-    <a-modal centered v-model="openAddChildrenClass" title="新建子分类" class="my-modal">
+    <a-modal
+      centered
+      v-model="openAddChildrenClass"
+      title="新建子分类"
+      class="my-modal"
+      :okButtonProps="{props:{loading}}"
+      @ok="addClass(parentClassId)"
+    >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="addChildrenClassName" placeholder="请输入分类名称"></a-input>
+        <a-input v-model="className" placeholder="请输入分类名称"></a-input>
       </div>
     </a-modal>
 
-    <a-modal centered v-model="openUpdateClass" title="编辑分类" class="my-modal">
+    <a-modal
+      centered
+      v-model="openUpdateClass"
+      title="编辑分类"
+      class="my-modal"
+      :okButtonProps="{props:{loading}}"
+      @ok="edit"
+    >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="updateClassName" placeholder="请输入分类名称"></a-input>
+        <a-input v-model="updateClass.title" placeholder="请输入分类名称"></a-input>
       </div>
     </a-modal>
 
-    <a-modal centered v-model="openDelClass" title="提示" class="my-modal">
+    <a-modal
+      centered
+      v-model="openDelClass"
+      title="提示"
+      class="my-modal"
+      :okButtonProps="{props:{loading}}"
+      @ok="deleteClass"
+    >
       <div class="my-space">
         <a-icon type="exclamation-circle" theme="filled" style="color: red;font-size: 24px;" />
         <div>
-          删除该分类后，分类下的子分类及创建的课程列表都会被删除确定删除“1234”分类吗?
+          删除该分类后，分类下的子分类及创建的课程列表都会被删除确定删除“{{ delClass.title }}”分类吗?
         </div>
       </div>
     </a-modal>
@@ -108,75 +146,97 @@
 
 <script>
 import DragIcon from '../../../components/DragIcon'
+import { courseClassAdd, courseClassDelete, courseClassTreeView, courseClassUpdate } from '@/api/study/lessonClass'
 
 export default {
   data () {
     return {
-      addClassName: '',
+      tableLoading: false,
+      loading: false,
+      className: '',
+      delClass: {},
       addChildrenClassName: '',
-      updateClassName: '',
+      updateClass: {},
+      parentClassId: '',
       openUpdateClass: false,
       openAddClass: false,
       openDelClass: false,
       openAddChildrenClass: false,
       visible: -1,
-      data: [{
-        id: 1,
-        label: '一级 1',
-        level: 1,
-        children: [{
-          id: 4,
-          label: '二级 1-1',
-          level: 2
-        }]
-      }, {
-        id: 2,
-        label: '一级 2',
-        level: 1,
-        children: [{
-          id: 5,
-          label: '二级 2-1',
-          level: 2
-        }, {
-          id: 6,
-          label: '二级 2-2',
-          level: 2
-        }]
-      }, {
-        id: 3,
-        label: '一级 3',
-        level: 1,
-        children: [{
-          id: 7,
-          label: '二级 3-1',
-          level: 2
-        }, {
-          id: 8,
-          label: '二级 3-2',
-          level: 2
-        }]
-      }],
+      data: [],
       defaultProps: {
         children: 'children',
         label: 'label'
       }
     }
   },
+  created () {
+    this.getTreeData()
+  },
   methods: {
+    getTreeData () {
+      this.tableLoading = true
+      courseClassTreeView().then((res) => {
+        const formatTree = (data, level) => {
+          if (!Array.isArray(data)) {
+            return []
+          }
+          return data.map(item => ({ ...item, level, children: formatTree(item.children, level + 1) }))
+        }
+        this.data = formatTree(res.data, 1)
+      }).finally(() => {
+        this.tableLoading = false
+      })
+    },
+    addClass (pid) {
+      if (!this.className) {
+        return this.$message.warning('请输入分类名称！')
+      }
+      this.loading = true
+      courseClassAdd({ name: this.className, pid: pid || 0 }).then((res) => {
+        this.$message.success('添加成功!')
+        this.openAddClass = false
+        this.openAddChildrenClass = false
+        this.getTreeData()
+      }).finally(() => {
+        this.loading = false
+      })
+    },
+    edit () {
+      if (!this.updateClass.title) {
+        return this.$message.warning('请输入分类名称！')
+      }
+      this.loading = true
+      courseClassUpdate({ courseClassId: this.updateClass.key, name: this.updateClass.title }).then((res) => {
+        this.$message.success('修改成功!')
+        this.openUpdateClass = false
+        this.getTreeData()
+      }).finally(() => {
+        this.loading = false
+      })
+    },
+    deleteClass () {
+      this.loading = true
+      courseClassDelete({ courseClassId: this.delClass.key }).then((res) => {
+        this.$message.success('删除成功!')
+        this.getTreeData()
+        this.openDelClass = false
+      }).finally(() => {
+        this.loading = false
+      })
+    },
     mouseenter (node) {
-      this.visible = node.id
+      this.visible = node.key
     },
     mouseleave (node) {
       this.visible = -1
     },
-    addChildren (node, data) {
-      this.openAddChildrenClass = true
-    },
     update (node) {
-      this.updateClassName = node.label
+      this.updateClass = { ...node.data }
       this.openUpdateClass = true
     },
-    remove () {
+    remove (node) {
+      this.delClass = node.data
       this.openDelClass = true
     },
     handleDragStart (node, ev) {
@@ -203,9 +263,6 @@ export default {
       } else {
         return false
       }
-    },
-    allowDrag (draggingNode) {
-      return draggingNode.data.label.indexOf('三级 3-2-2') === -1
     }
   },
   components: { DragIcon }

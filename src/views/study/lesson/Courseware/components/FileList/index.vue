@@ -46,58 +46,50 @@
           批量下载
         </a-button>
       </div>
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :row-selection="{ onChange: selectChange }"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
-            </div>
-            <div class="nickname">
-              <a-tooltip>
-                <template slot="title">
-                  {{ record.name }}
-                </template>
-                {{ record.name }}
-              </a-tooltip>
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.courseWareId"
+          :pagination="pagination"
+          :row-selection="{ onChange: selectChange }"
+          @change="handleTableChange">
+          <div slot="fileName" slot-scope="text">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <a-icon type="file-word" style="font-size: 24px" />
+              </div>
+              <div class="nickname">
+                <a-tooltip>
+                  <template slot="title">
+                    {{ text }}
+                  </template>
+                  {{ text }}
+                </a-tooltip>
+              </div>
             </div>
           </div>
-        </div>
-        <div slot="introduction" slot-scope="text">
-          <div class="introduction">
-            <a-tooltip>
-              <template slot="title">
-                {{ text }}
-              </template>
-              {{ text }}
-            </a-tooltip>
+          <div slot="action" slot-scope="text, record">
+            <template>
+              <div class="my-space">
+                <a-button class="warnButton" @click="setVisible(record.name)">重命名</a-button>
+                <a-button class="successButton">预览</a-button>
+                <a-button class="linkButton">下载</a-button>
+                <a-popconfirm
+                  disabled
+                  title="是否确认删除"
+                  ok-text="确认"
+                  cancel-text="取消"
+                  @confirm="deleteAttribute(record.id)"
+                >
+                  <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+                </a-popconfirm>
+              </div>
+            </template>
           </div>
-        </div>
-        <div slot="action" slot-scope="text, record">
-          <template>
-            <div class="my-space">
-              <a-button class="warnButton" @click="setVisible(record.name)">重命名</a-button>
-              <a-button class="successButton">预览</a-button>
-              <a-button class="linkButton">下载</a-button>
-              <a-popconfirm
-                disabled
-                title="是否确认删除"
-                ok-text="确认"
-                cancel-text="取消"
-                @confirm="deleteAttribute(record.id)"
-              >
-                <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-              </a-popconfirm>
-            </div>
-          </template>
-        </div>
-      </a-table>
+        </a-table>
+      </a-spin>
     </div>
 
     <a-modal centered v-model="visible" title="修改名称" @ok="handleOk" class="my-modal">
@@ -120,10 +112,13 @@
 
 import upload from '../upload'
 import { message } from 'ant-design-vue'
+import { courseWareAdd, courseWareList } from '@/api/study/courseWare'
+import moment from 'moment'
 
 export default {
   data () {
     return {
+      loading: false,
       percent: 0,
       imgUrl: '',
       imgName: '',
@@ -138,8 +133,8 @@ export default {
       columns: [
         {
           title: '文件名称',
-          dataIndex: 'name',
-          scopedSlots: { customRender: 'name' },
+          dataIndex: 'fileName',
+          scopedSlots: { customRender: 'fileName' },
           align: 'center',
           width: '200px'
         },
@@ -147,11 +142,17 @@ export default {
           title: '大小',
           width: '200px',
           dataIndex: 'size',
-          align: 'center'
+          align: 'center',
+          customRender: (text) => {
+            return text + 'kb'
+          }
         },
         {
           title: '上传时间',
-          dataIndex: 'createTime',
+          dataIndex: 'createdAt',
+          customRender: (text) => {
+            return (text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-')
+          },
           align: 'center',
           sorter: true
         },
@@ -175,7 +176,7 @@ export default {
         current: 1,
         pageSize: 10,
         showSizeChanger: true,
-        pageSizeOptions: ['10', '20', '30', '50'],
+        pageSizeOptions: ['5', '10', '20', '30', '50'],
         showTotal: (total) => `共 ${total} 条数据`
       }
     }
@@ -185,6 +186,7 @@ export default {
   },
   methods: {
     upload () {
+      this.percent = 0
       this.uploadVisible = true
     },
     onPercent (percent) {
@@ -205,6 +207,18 @@ export default {
         this.percent = 0
       }, 1000)
       const file = data[0] || {}
+      const fileSize = file.size / 1024
+      courseWareAdd({
+        courseWareType: 'file',
+        fileName: file.name,
+        fileType: file.mimeType,
+        suffix: file.name.split('.')[file.name.split('.').length - 1],
+        size: fileSize,
+        mediaUrl: file.fullPath
+      }).then(() => {
+        message.success('上传成功！')
+        this.getTableData()
+      })
       this.imgUrl = file.fullPath
       this.imgName = file.name
     },
@@ -236,21 +250,19 @@ export default {
       //   page: this.pagination.current,
       //   perPage: this.pagination.pageSize
       // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      courseWareList({}, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current
+      }).then(res => {
+        this.roomIdList = []
+        this.employeeIdList = ''
+        this.employees = []
+        this.tableData = res.data
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
     handleTableChange ({ current, pageSize }) {
       this.pagination.current = current
@@ -275,6 +287,24 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
+.user-info {
+  text-align: center;
+  justify-content: center;
+
+  img {
+    max-height: 33px;
+    max-width: 33px;
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 
 .my-table-search {
   border-top-left-radius: 0;
