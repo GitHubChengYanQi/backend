@@ -68,13 +68,13 @@
           <div class="fl"></div>
           <div class="fr">
             <a-button
-              v-permission="'/mall/goods@search'"
+              v-permission="'/erpGoods/list@get'"
               type="primary"
               @click="search">查询</a-button>
-            <a-button @click="resetSearch">重置</a-button>
+            <a-button @click="resetSearch" v-permission="'/erpGoods/list@get'">重置</a-button>
             <a-upload
               name="file"
-              v-permission="'/mall/goods@import'"
+              v-permission="'/erpGoods/import@get'"
               accept=".xlsx"
               :showUploadList="false"
               :customRequest="importFn"
@@ -84,12 +84,12 @@
             <a-button
               type="primary"
               :loading="loading"
-              v-permission="'/mall/goods@export'"
+              v-permission="'/erpGoods/export@get'"
               @click="exportFn()">导出</a-button>
           </div>
         </div>
         <a-table
-          rowKey="contactId"
+          rowKey="id"
           :loading="loading"
           :columns="columns"
           :data-source="tableData"
@@ -104,7 +104,7 @@
               <a-switch
                 :checked="record.status == 1"
                 @click="setRules(record)"
-                v-permission="'/mall/goods@state'"
+                v-permission="'/erpGoods/status@put'"
                 checked-children="开"
                 un-checked-children="关"
               />
@@ -114,10 +114,14 @@
             slot="action"
             class="action"
             slot-scope="text, record">
-            <template>
-              <a @click="editFn(record)" v-permission="'/mall/goods@edit'">编辑</a>
-              <a @click="detailFn(record)" v-permission="'/mall/goods@detail'">详情</a>
-            </template>
+            <!-- <template>
+              <a @click="editFn(record)" v-permission="'/erpGoods/detail@get'">编辑</a>
+              <a @click="detailFn(record)" v-permission="'/erpGoods/detailAll@get'">详情</a>
+            </template> -->
+            <div style="display: flex;justify-content: space-around;">
+              <a-button type="link" @click="editFn(record)" v-permission="'/erpGoods/detail@get'">编辑</a-button>
+              <a-button type="link" @click="detailFn(record.id)" v-permission="'/erpGoods/detailAll@get'">详情</a-button>
+            </div>
           </div>
         </a-table>
       </div>
@@ -126,7 +130,13 @@
     </a-card>
 
     <!-- edit -->
-    <a-modal v-model="showEdit" title="编辑">
+    <a-modal
+      :visible="showEdit"
+      title="编辑"
+      :width="800"
+      :maskClosable="false"
+      @cancel="closeEditModal"
+    >
       <a-form :label-col="{ span: 5 }" :wrapper-col="{ span: 17 }">
         <a-form-item label="药品名称">
           <span>美林</span>
@@ -151,8 +161,8 @@
       </a-form>
       <template slot="footer">
         <div class="btn">
-          <a-button @click="showEdit = false">取消</a-button>
-          <a-button type="primary" @click="ok" :loading="loading">确定</a-button>
+          <a-button @click="closeEditModal">取消</a-button>
+          <a-button type="primary" @click="editSubmitSure" :loading="loading" v-permission="'/erpGoods/update@put'">确定</a-button>
         </div>
       </template>
     </a-modal>
@@ -256,6 +266,18 @@ export default {
           width: 150
         },
         {
+          title: '销售状态',
+          dataIndex: 'saleStatus',
+          align: 'center',
+          width: 150
+        },
+        {
+          title: '商品状态',
+          dataIndex: 'status',
+          align: 'center',
+          width: 150
+        },
+        {
           title: '更新时间',
           dataIndex: 'createdAt',
           sorter: true,
@@ -331,6 +353,16 @@ export default {
     initFn () {
       this.getTableData()
     },
+    // 编辑弹框选择药品通用名
+    handleChange () {},
+    // 编辑弹框点击确定
+    editSubmitSure () {},
+    closeEditModal () {
+      this.showEdit = false
+    },
+    setRules (info) {
+      console.log(info, 'info')
+    },
     /**
      * 拉取列表
      */
@@ -345,8 +377,8 @@ export default {
       params.maintainerIds = params.maintainerIds ? params.maintainerIds.join(',') : ''
       erpGoods(params).then((res) => {
         this.loading = false
-        this.tableData = res.data.records
-        this.pagination.total = res.data.total
+        this.tableData = res.data.list
+        this.pagination.total = res.data.page.total
       })
     },
     /**
@@ -409,6 +441,7 @@ export default {
      * @param {*} selectedRowKeys
      */
     onSelectChange (selectedRowKeys, row) {
+      console.log(selectedRowKeys, row, '表格选择监听')
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = row
     },
