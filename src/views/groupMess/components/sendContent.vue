@@ -315,10 +315,13 @@
         @materialSelect="librarySelectChange"
       />
     </a-modal>
+    <RadarChoose v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk" />
   </div>
 </template>
 <script>
 import { handleBtnArr, isUrl } from './sopUtils'
+import RadarChoose from './radarToastComponent.vue'
+
 import { upLoad } from '@/api/common'
 export default {
   data () {
@@ -346,11 +349,13 @@ export default {
       // 素材库选择数组
       contentLibraryArray: [],
       // 添加素材库弹框
-      contentLibraryModalShow: false
+      contentLibraryModalShow: false,
+      radarVisible: false
     }
   },
   components: {
-    MediumGroup: () => import('@/views/mediumGroup/index.vue')
+    MediumGroup: () => import('@/views/mediumGroup/index.vue'),
+    RadarChoose
   },
   props: {
     isDisableEdit: {
@@ -460,7 +465,35 @@ export default {
         case 'embed':
           this.contentMiniModalShow = true
           break
+        case 'radar':
+          this.radarVisible = true
       }
+    },
+    handleAddRadarOk (e) {
+      if ((this.sendContentArray.length + e.length) > 9) {
+        this.$message.warning('发送条数不能超过九条！')
+        return
+      }
+      this.isSopEditStatus = true
+      for (const item of e) {
+        const singleInfo = { type: 4 }
+        singleInfo.linkTitle = item.entry.linkTitle
+        singleInfo.linkUrl = item.link
+        singleInfo.linkPhoto = item.entry.linkImg
+        singleInfo.desc = item.entry.linkDigest
+        singleInfo.radarLink = '1'
+        singleInfo.radarName = item.channelTxt
+        this.sendContentArray.push(singleInfo)
+        // title: content.linkTitle,
+        // url: target.link,
+        // pic: { url: content.linkImg, path: content.linkImgPath || content.linkImg.slice(43, content.linkImg.indexOf('?')) },
+        // desc: content.linkDigest,
+        // radarLink: '1',
+        // radarName: target.channelTxt
+      }
+      this.radarVisible = false
+      this.$emit('update:isSopEdit', this.isSopEditStatus)
+      this.$emit('update:contentArray', this.sendContentArray)
     },
     // 提交文字
     confirmContentText () {
