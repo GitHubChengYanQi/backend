@@ -742,6 +742,12 @@ export default {
               width: 20px;
               transform: rotate(90deg);
             }
+            .title {
+              white-space: nowrap;
+              width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
           }
         }
       }
