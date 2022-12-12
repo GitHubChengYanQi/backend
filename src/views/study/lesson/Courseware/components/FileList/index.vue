@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card :bordered="false" class="my-table-search">
+    <a-card v-if="!select" :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
@@ -33,7 +33,7 @@
       </a-form>
     </a-card>
     <div class="my-table-wrapper">
-      <div class="btn">
+      <div v-if="!select" class="btn">
         <a-icon type="question-circle" />
         <upload
           @upload="upload"
@@ -53,12 +53,16 @@
           :data-source="tableData"
           :rowKey="record => record.courseWareId"
           :pagination="pagination"
-          :row-selection="{ onChange: selectChange }"
-          @change="handleTableChange">
-          <div slot="fileName" slot-scope="text">
+          :row-selection="{...rowSelection,selectedRowKeys}"
+          @change="handleTableChange"
+        >
+          <div slot="fileName" slot-scope="text,record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <a-icon type="file-word" style="font-size: 24px" />
+                <img height="50" v-if="['jpg','png'].includes(record.suffix)" :src="record.mediaUrl">
+                <a-icon v-if="['doc','docx'].includes(record.suffix)" type="file-word" style="font-size: 24px" />
+                <a-icon v-if="['ppt','pptx'].includes(record.suffix)" type="file-ppt" style="font-size: 24px" />
+                <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />
               </div>
               <div class="nickname">
                 <a-tooltip>
@@ -116,8 +120,39 @@ import { courseWareAdd, courseWareList } from '@/api/study/courseWare'
 import moment from 'moment'
 
 export default {
+  props: {
+    selectRows: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    select: Boolean
+  },
   data () {
     return {
+      selectedRowKeys: [],
+      checkedRows: [],
+      rowSelection: {
+        onSelect: (record, selected) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, record])
+          } else {
+            this.onChangeRows(this.checkedRows.filter(item => item[this.rowKey] !== record[this.rowKey]))
+          }
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, ...changeRows])
+          } else {
+            const deleteIds = changeRows.map((item) => {
+              return item[this.rowKey]
+            })
+            this.onChangeRows(this.checkedRows.filter(item => !deleteIds.some(deleKey => item[this.rowKey] === deleKey)))
+          }
+        }
+      },
+      rowKey: 'courseWareId',
       loading: false,
       percent: 0,
       imgUrl: '',
@@ -160,13 +195,6 @@ export default {
           title: '上传人',
           dataIndex: 'user',
           align: 'center'
-        },
-        {
-          title: '操作',
-          align: 'center',
-          width: 270,
-          dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
         }
       ],
       tableData: [],
@@ -176,15 +204,31 @@ export default {
         current: 1,
         pageSize: 10,
         showSizeChanger: true,
-        pageSizeOptions: ['5', '10', '20', '30', '50'],
+        pageSizeOptions: ['10', '20', '30', '50'],
         showTotal: (total) => `共 ${total} 条数据`
       }
     }
   },
   created () {
+    this.checkedRows = this.selectRows
+    this.selectedRowKeys = this.selectRows.map(item => item[this.rowKey])
+    if (!this.select) {
+      this.columns.push({
+        title: '操作',
+        align: 'center',
+        width: 270,
+        dataIndex: 'action',
+        scopedSlots: { customRender: 'action' }
+      })
+    }
     this.getTableData()
   },
   methods: {
+    onChangeRows (rows) {
+      this.selectedRowKeys = rows.map(item => item[this.rowKey])
+      this.checkedRows = rows
+      this.$emit('selectRows', rows)
+    },
     upload () {
       this.percent = 0
       this.uploadVisible = true
@@ -202,10 +246,6 @@ export default {
       }
     },
     uploadSuccess (data = []) {
-      setTimeout(() => {
-        this.uploadVisible = false
-        this.percent = 0
-      }, 1000)
       const file = data[0] || {}
       const fileSize = file.size / 1024
       courseWareAdd({
@@ -218,6 +258,9 @@ export default {
       }).then(() => {
         message.success('上传成功！')
         this.getTableData()
+      }).finally(() => {
+        this.uploadVisible = false
+        this.percent = 0
       })
       this.imgUrl = file.fullPath
       this.imgName = file.name
@@ -233,31 +276,14 @@ export default {
       console.log(id)
     },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
       this.loading = true
-      courseWareList({}, {
+      const data = {
+        courseWareType: 'file'
+      }
+      courseWareList(data, {
         limit: this.pagination.pageSize,
         page: this.pagination.current
       }).then(res => {
-        this.roomIdList = []
-        this.employeeIdList = ''
-        this.employees = []
         this.tableData = res.data
         this.pagination.total = res.count
       }).finally(() => {
@@ -293,8 +319,6 @@ export default {
   justify-content: center;
 
   img {
-    max-height: 33px;
-    max-width: 33px;
     border-radius: 2px;
   }
 

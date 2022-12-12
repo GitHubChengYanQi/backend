@@ -128,6 +128,7 @@ export default {
     // 富文本内容改变事件
     onEditorChange ({ editor, html, text }) {
       this.$emit('editorChange', html)
+      this.$emit('change', html)
     },
     // 失去焦点事件
     onEditorBlur () {

@@ -11,9 +11,12 @@
     @change="handleChange"
   >
     <div>
-      <div v-if="value" class="img-wrapper">
+      <div v-if="value && !loading" class="img-wrapper">
         <img v-if="fileType === 1" class="img" :src="value" alt="avatar" />
-        <div v-else-if="fileType === 3">上传成功！</div>
+        <div v-if="fileType === 3">
+          <video :src="value" style="width: 200px" controls></video>
+          <a-button type="link">重新上传</a-button>
+        </div>
       </div>
       <div v-else>
         <a-icon :type="loading ? 'loading' : 'plus'" />
@@ -73,6 +76,7 @@ export default {
       if (info.file.status === 'done') {
         const data = info.file.response.data
         this.$emit('change', data.fullPath)
+        this.$emit('success', info.file)
         this.loading = false
       }
       if (info.file.status === 'error') {

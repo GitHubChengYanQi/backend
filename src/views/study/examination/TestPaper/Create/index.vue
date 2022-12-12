@@ -194,7 +194,7 @@
             </div>
           </el-tree>
           <div class="submit">
-            <a-button style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
+            <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
           </div>
         </a-form>
       </div>
@@ -205,10 +205,14 @@
 <script>
 import breadcrumb from '../../../components/Breadcrumd'
 import DragIcon from '../../../components/DragIcon'
+import { learningQuestionnaireAdd } from '@/api/study/testPager'
+import { message } from 'ant-design-vue'
+import router from '@/router'
 
 export default {
   data () {
     return {
+      loading: false,
       totalFen: 0,
       dragQuestions: -1,
       dragOptions: -1,
@@ -229,10 +233,19 @@ export default {
     switchChange (checked) {
       setTimeout(() => {
         const questions = this.form.getFieldValue('questions')
-        this.form.setFieldsValue({ questions: questions.map((item) => ({ ...item, fen: checked ? this.number : 0 })) })
+        this.form.setFieldsValue({
+          questions: questions.map((item, index) => {
+            if (index === questions.length - 1) {
+              return {
+                ...item,
+                fen: checked ? this.number : 0
+              }
+            }
+            return item
+          })
+        })
         this.count()
       }, 0)
-
     },
     numberChange (number) {
       if (this.sname) {
@@ -245,7 +258,7 @@ export default {
       setTimeout(() => {
         const questions = this.form.getFieldValue('questions')
         if (!Array.isArray(questions)) {
-          return 0
+          return
         }
         if (this.sname) {
           this.totalFen = questions.length * this.number
@@ -260,9 +273,49 @@ export default {
     },
     handleSubmit () {
       this.form.validateFields((err, values) => {
-        console.log(values)
         if (!err) {
-          // console.log(values)
+          this.loading = true
+          const data = {
+            questionnaireName: values.name,
+            questionParams: values.questions.map((item, index) => {
+              return {
+                questionContent: item.name,
+                questionType: item.type,
+                sort: index,
+                score: item.fen,
+                answerParams: item.type === 'judge' ? [{
+                  answerContent: 'true',
+                  isTrue: item.answer === 'true' ? 1 : 0,
+                  sort: 0
+                }, {
+                  answerContent: 'false',
+                  isTrue: item.answer === 'false' ? 1 : 0,
+                  sort: 1
+                }] : Object.keys(item.options).map((optionItem, optionIndex) => {
+                  let answer = false
+                  switch (item.type) {
+                    case 'single':
+                      answer = item.answer === optionItem
+                      break
+                    case 'multiple':
+                      answer = item.answer.find(answer => answer === optionItem)
+                      break
+                  }
+                  return {
+                    answerContent: item.options[optionItem],
+                    isTrue: answer ? 1 : 0,
+                    sort: index
+                  }
+                })
+              }
+            })
+          }
+          learningQuestionnaireAdd(data).then(() => {
+            router.back()
+            message.success('创建试卷成功!')
+          }).finally(() => {
+            this.loading = false
+          })
         }
       })
     },

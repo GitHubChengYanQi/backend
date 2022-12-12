@@ -8,7 +8,7 @@
     <div class="table" :hidden="tableView.length === 0">
       <el-table
         :data="tableView"
-        row-key="id"
+        row-key="courseWareId"
         style="width: 100%"
         border
         header-row-class-name="header"
@@ -18,9 +18,28 @@
             目录{{ $index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column prop="sortNo" label="标题" />
+        <el-table-column prop="sortNo" label="标题">
+          <template slot-scope="{ row, column}">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <img height="50" v-if="['jpg','png'].includes(row.suffix)" :src="row.coverImageUrl || row.mediaUrl">
+                <a-icon v-if="['doc','docx'].includes(row.suffix)" type="file-word" style="font-size: 24px" />
+                <a-icon v-if="['ppt','pptx'].includes(row.suffix)" type="file-ppt" style="font-size: 24px" />
+                <a-icon v-if="['pdf'].includes(row.suffix)" type="file-pdf" style="font-size: 24px" />
+              </div>
+              <div class="nickname">
+                <a-tooltip>
+                  <template slot="title">
+                    {{ row.fileName || row.title }}
+                  </template>
+                  {{ row.fileName || row.title }}
+                </a-tooltip>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="date" label="学习时长" width="418">
-          <template slot-scope="{ row, column, $index}">
+          <template slot-scope="{row}">
             <div class="my-space">
               <div class="time" style="gap: 0">
                 <a-input-number v-model="row.date.h" id="inputNumber" />
@@ -38,10 +57,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="action" label="操作" width="270">
-          <template slot-scope="scope">
-            <div class="my-space">
+          <template slot-scope="{row}">
+            <div class="my-space" style="cursor: pointer">
               <button class="linkButton">预览</button>
-              <button class="delButton">删除</button>
+              <button class="delButton" @click="remove(row)">删除</button>
               <button class="successButton">关联考试</button>
               <div class="my-handle">
                 <DragIcon :width="24" />
@@ -65,48 +84,26 @@
         <a-tab-pane key="2" tab="视频" />
         <a-tab-pane key="3" tab="图文" />
       </a-tabs>
-      <div class="my-table-search">
-        <a-form layout="inline">
 
-          <a-form-item
-            label="考试名称">
-            <a-input placeholder="请输入试卷名称" />
-          </a-form-item>
+      <FileList
+        :selectRows="courseWares['fileList']"
+        select
+        v-if="key === '1'"
+        @selectRows="(rows)=>selectRows('fileList',rows)"
+      />
+      <VideoList
+        :selectRows="courseWares['videoList']"
+        select
+        v-if="key === '2'"
+        @selectRows="(rows)=>selectRows('videoList',rows)"
+      />
+      <ImageTextList
+        :selectRows="courseWares['imageTextList']"
+        select
+        v-if="key === '3'"
+        @selectRows="(rows)=>selectRows('imageTextList',rows)"
+      />
 
-          <a-form-item
-            label="考试时间">
-            <a-range-picker />
-          </a-form-item>
-
-          <a-form-item
-            label="创建人">
-            <a-input placeholder="请输入创建人" />
-          </a-form-item>
-
-          <a-form-item>
-            <div>
-              <a-button
-                type="primary"
-                ghost
-                @click="() => { this.pagination.current = 1; this.getTableData() }"
-              >
-                查询
-              </a-button>
-            </div>
-          </a-form-item>
-        </a-form>
-      </div>
-
-      <a-table
-        class="my-table"
-        bordered
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :rowSelection="{type:'checkbox', onChange: selectChange}"
-        @change="handleTableChange">
-      </a-table>
       <div style="text-align: center">
         <a-button
           type="primary"
@@ -124,48 +121,18 @@
 <script>
 import Sortable from 'sortablejs'
 import DragIcon from '../../../../components/DragIcon/index'
+import FileList from '../../../Courseware/components/FileList/index'
+import VideoList from '../../../Courseware/components/VideoList/index'
+import ImageTextList from '../../../Courseware/components/ImageTextList/index'
 
 export default {
-  components: { DragIcon },
+  components: { DragIcon, FileList, VideoList, ImageTextList },
   data () {
     return {
+      courseWares: {},
       key: '1',
-      columns: [
-        {
-          title: '考试名称',
-          dataIndex: 'name',
-          align: 'center',
-          width: '200px'
-        },
-        {
-          title: '试卷名称',
-          width: '200px',
-          dataIndex: 'introduction',
-          align: 'center'
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'total',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '创建人',
-          dataIndex: 'user',
-          align: 'center'
-        }
-      ],
       tableData: [],
-      selectRows: [],
       name: '',
-      pagination: {
-        total: 0,
-        current: 1,
-        pageSize: 10,
-        showSizeChanger: true,
-        pageSizeOptions: ['10', '20', '30', '50'],
-        showTotal: (total) => `共 ${total} 条数据`
-      },
       visible: false,
       tableView: []
     }
@@ -191,36 +158,25 @@ export default {
         // 接口(param).then((res) => {})
       }
     })
-    this.getTableData()
   },
   methods: {
+    remove (row) {
+      this.courseWares = {
+        fileList: (this.courseWares.fileList || []).filter(item => item.courseWareId !== row.courseWareId),
+        videoList: (this.courseWares.videoList || []).filter(item => item.courseWareId !== row.courseWareId),
+        imageTextList: (this.courseWares.imageTextList || []).filter(item => item.courseWareId !== row.courseWareId)
+      }
+      this.tableView = this.tableView.filter(item => item.courseWareId !== row.courseWareId)
+    },
+    selectRows (type, rows) {
+      this.courseWares[type] = rows
+    },
     submit () {
       this.tableView = [
-        {
-          id: 1,
-          sortNo: 2,
-          date: { h: 1, m: 1, s: 1 },
-          name: 'Tom'
-        },
-        {
-          id: 2,
-          sortNo: 3,
-          date: { h: 1, m: 1, s: 1 },
-          name: 'Tom'
-        },
-        {
-          id: 3,
-          sortNo: 1,
-          date: { h: 1, m: 1, s: 1 },
-          name: 'Tom'
-        },
-        {
-          id: 4,
-          sortNo: 4,
-          date: { h: 1, m: 1, s: 1 },
-          name: 'Tom'
-        }
-      ]
+        ...(this.courseWares.fileList || []),
+        ...(this.courseWares.videoList || []),
+        ...(this.courseWares.imageTextList || [])
+      ].map(item => ({ ...item, date: {} }))
       this.visible = false
     },
     selectChange (ids, rows) {
@@ -230,16 +186,31 @@ export default {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
-    },
-    getTableData () {
-      this.tableData = new Array(999).fill('').map((item, index) => ({ id: index }))
-      this.pagination.total = 999
     }
   }
 }
 </script>
 
 <style lang="less">
+
+.user-info {
+  text-align: center;
+  justify-content: center;
+
+  img {
+    max-height: 33px;
+    max-width: 33px;
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .table {
   margin-top: 12px;
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <breadcrumb :titles="['课程管理','课件管理']" back></breadcrumb>
-    <a-tabs v-model="key" class="tabs">
+    <a-tabs v-model="key" class="tabs" @change="setKey">
       <a-tab-pane key="1" tab="文件">
         <FileList />
       </a-tab-pane>
@@ -20,6 +20,7 @@ import FileList from './components/FileList/index'
 import VideoList from './components/VideoList/index'
 import ImageTextList from './components/ImageTextList/index'
 import breadcrumb from '../../components/Breadcrumd'
+import router from '@/router'
 
 export default {
   data () {
@@ -27,9 +28,12 @@ export default {
       key: '1'
     }
   },
+  created () {
+    this.key = router.history.current.query.key || '1'
+  },
   methods: {
     setKey (key) {
-      this.key = key
+      router.replace({ path: `/study/lesson/Courseware?key=${key}` })
     }
   },
   components: { FileList, VideoList, ImageTextList, breadcrumb }

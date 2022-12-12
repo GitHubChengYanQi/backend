@@ -20,14 +20,15 @@
         <a-form-item label="标题">
           <a-input
             placeholder="请输入标题"
-            v-decorator="['note', { rules: [{ required: true, message: '请输入标题!' }] }]"
+            v-decorator="['title', { rules: [{ required: true, message: '请输入标题!' }] }]"
           />
         </a-form-item>
         <a-form-item label="上传视频">
           <div class="my-space">
             <ImgUpload
               :fileType="3"
-              v-decorator="['sp', { rules: [{ required: true, message: '请上传视频!'}],initialValue: '' }]"
+              v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!'}],initialValue: '' }]"
+              @success="upload"
             />
             上传支持：mp4，不能超过500m
           </div>
@@ -36,7 +37,7 @@
           <div class="my-space">
             <ImgUpload
               placeholder="请选择封面图"
-              v-decorator="['fmt', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
+              v-decorator="['coverImageUrl', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
             />
             建议尺寸：750 × 1448
           </div>
@@ -45,13 +46,13 @@
           <VueQuillEditor
             :height="'auto'"
             placeholder="请输入课程详情"
-            v-decorator="['kcjj', { rules: [{ required: true, message: '请输入课程详情!' }],initialValue:'' }]"
+            v-decorator="['note', { rules: [{ required: true, message: '请输入课程详情!' }],initialValue:'' }]"
           />
         </a-form-item>
       </a-form>
 
       <div style="text-align: center">
-        <a-button style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
+        <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
       </div>
     </div>
   </div>
@@ -61,21 +62,40 @@
 import breadcrumb from '../../../../../components/Breadcrumd'
 import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
+import { courseWareAdd } from '@/api/study/courseWare'
+import { message } from 'ant-design-vue'
+import router from '@/router'
 
 export default {
   components: { breadcrumb, VueQuillEditor, ImgUpload },
   data () {
     return {
+      size: 0,
+      loading: false,
       data: {},
       form: this.$form.createForm(this, { name: 'coordinated' })
     }
   },
   methods: {
+    upload (file) {
+      this.size = file.size
+    },
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          console.log('Received values of form: ', values)
+          this.loading = true
+          courseWareAdd({
+            courseWareType: 'video',
+            suffix: 'jpg',
+            size: this.size / 1024,
+            ...values
+          }).then(() => {
+            router.back()
+            message.success('课件创建成功！')
+          }).finally(() => {
+            this.loading = false
+          })
         }
       })
     }

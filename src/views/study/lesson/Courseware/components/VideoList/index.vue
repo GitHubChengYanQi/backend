@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card :bordered="false" class="my-table-search">
+    <a-card v-if="!select" :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
@@ -34,97 +34,101 @@
     </a-card>
 
     <div class="my-table-wrapper">
-      <div class="btn">
+      <div v-if="!select" class="btn">
         <a-button type="primary" @click="() => $router.push('/study/lesson/createVideo')">
           上传视频
         </a-button>
       </div>
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :row-selection="{ onChange: selectChange }"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
-            </div>
-            <div class="nickname">
-              <a-tooltip>
-                <template slot="title">
-                  {{ record.name }}
-                </template>
-                {{ record.name }}
-              </a-tooltip>
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.courseWareId"
+          :pagination="pagination"
+          :row-selection="!select ? null :{...rowSelection,selectedRowKeys}"
+          @change="handleTableChange">
+          <div slot="titleRender" slot-scope="text, record">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <img height="50" :src="record.coverImageUrl">
+              </div>
+              <div class="nickname">
+                <a-tooltip>
+                  <template slot="title">
+                    {{ text }}
+                  </template>
+                  {{ text }}
+                </a-tooltip>
+              </div>
             </div>
           </div>
-        </div>
-        <div slot="introduction" slot-scope="text">
-          <div class="introduction">
-            <a-tooltip>
-              <template slot="title">
-                {{ text }}
-              </template>
-              {{ text }}
-            </a-tooltip>
+          <div slot="action" slot-scope="text, record">
+            <template>
+              <div class="my-space">
+                <a-button class="successButton" @click="() => $router.push('/study/lesson/createVideo')">
+                  编辑
+                </a-button>
+                <a-button class="linkButton">预览</a-button>
+                <a-popconfirm
+                  disabled
+                  title="是否确认删除"
+                  ok-text="确认"
+                  cancel-text="取消"
+                  @confirm="deleteAttribute(record.id)"
+                >
+                  <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+                </a-popconfirm>
+              </div>
+            </template>
           </div>
-        </div>
-        <div slot="action" slot-scope="text, record">
-          <template>
-            <div class="my-space">
-              <a-button class="successButton" @click="() => $router.push('/study/lesson/createVideo')">
-                编辑
-              </a-button>
-              <a-button class="linkButton">预览</a-button>
-              <a-popconfirm
-                disabled
-                title="是否确认删除"
-                ok-text="确认"
-                cancel-text="取消"
-                @confirm="deleteAttribute(record.id)"
-              >
-                <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-              </a-popconfirm>
-            </div>
-          </template>
-        </div>
-      </a-table>
+        </a-table>
+      </a-spin>
     </div>
 
-    <a-modal
-      centered
-      destroyOnClose
-      v-model="uploadVisible"
-      title="上传视频"
-      :okButtonProps="{props: {disabled:!uploadDefine}, on: {}}"
-      @ok="handleOk"
-    >
-      <div style="text-align: center">
-        <vpload
-          @successDefine="uploadSuccess"
-          :file-type="3"></vpload>
-        <div>(视频上传大小不超过10M，支持MP4格式)</div>
-        <div v-if="uploadDefine" style="color: red">上传成功</div>
-      </div>
-    </a-modal>
   </div>
 </template>
 
 <script>
 
-import upload from '../upload'
-import vpload from '../vpload'
-import { message } from 'ant-design-vue'
+import { courseWareList } from '@/api/study/courseWare'
+import moment from 'moment'
 
 export default {
+  props: {
+    selectRows: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    select: Boolean
+  },
   data () {
     return {
-      uploadDefine: '',
-      uploadVisible: false,
-      fileName: String,
+      selectedRowKeys: [],
+      checkedRows: [],
+      rowSelection: {
+        onSelect: (record, selected) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, record])
+          } else {
+            this.onChangeRows(this.checkedRows.filter(item => item[this.rowKey] !== record[this.rowKey]))
+          }
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, ...changeRows])
+          } else {
+            const deleteIds = changeRows.map((item) => {
+              return item[this.rowKey]
+            })
+            this.onChangeRows(this.checkedRows.filter(item => !deleteIds.some(deleKey => item[this.rowKey] === deleKey)))
+          }
+        }
+      },
+      rowKey: 'courseWareId',
+      loading: false,
       visible: false,
       screenData: {
         gender: 3,
@@ -134,8 +138,8 @@ export default {
       columns: [
         {
           title: '标题',
-          dataIndex: 'name',
-          scopedSlots: { customRender: 'name' },
+          dataIndex: 'title',
+          scopedSlots: { customRender: 'titleRender' },
           align: 'center',
           width: '200px'
         },
@@ -147,7 +151,10 @@ export default {
         },
         {
           title: '上传时间',
-          dataIndex: 'createTime',
+          dataIndex: 'createdAt',
+          customRender: (text) => {
+            return (text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-')
+          },
           align: 'center',
           sorter: true
         },
@@ -155,13 +162,6 @@ export default {
           title: '上传人',
           dataIndex: 'user',
           align: 'center'
-        },
-        {
-          title: '操作',
-          align: 'center',
-          width: 270,
-          dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
         }
       ],
       tableData: [],
@@ -178,73 +178,50 @@ export default {
     }
   },
   created () {
+    this.checkedRows = this.selectRows
+    this.selectedRowKeys = this.selectRows.map(item => item[this.rowKey])
+    if (!this.select) {
+      this.columns.push({
+        title: '操作',
+        align: 'center',
+        width: 270,
+        dataIndex: 'action',
+        scopedSlots: { customRender: 'action' }
+      })
+    }
     this.getTableData()
   },
   methods: {
-    uploadVisibleOpen (edit) {
-      if (edit) {
-        message.warn('课件已被xxx，xxx课程引用，不可编辑')
-      } else {
-        this.uploadDefine = false
-        this.uploadVisible = true
-      }
+    onChangeRows (rows) {
+      this.selectedRowKeys = rows.map(item => item[this.rowKey])
+      this.checkedRows = rows
+      this.$emit('selectRows', rows)
     },
-    uploadSuccess (data) {
-      this.upLoadRes.voicePath = data.path
-      this.upLoadRes.voiceName = data.name
-      this.uploadDefine = true
-    },
-    setVisible (visible) {
-      this.fileName = visible
-      this.visible = true
-    },
-    handleOk () {
-      console.log('ok')
+    selectChange (row) {
+      this.checkIds = row
     },
     deleteAttribute (id) {
       console.log(id)
     },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      const data = {
+        courseWareType: 'video'
+      }
+      courseWareList(data, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current
+      }).then(res => {
+        this.tableData = res.data
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
     handleTableChange ({ current, pageSize }) {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
-    },
-    selectChange (row) {
-      this.checkIds = row
     },
     // 群聊筛选
     // 重置
@@ -255,12 +232,27 @@ export default {
         fieldId: 0
       }
     }
-  },
-  components: { upload, vpload }
+  }
 }
 </script>
 
 <style lang="less" scoped>
+
+.user-info {
+  text-align: center;
+  justify-content: center;
+
+  img {
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 
 .my-table-search {
   border-top-left-radius: 0;
