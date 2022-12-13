@@ -1,5 +1,13 @@
 import request, { fileRequest } from '@/utils/request'
 
+// 获取字典
+export function getDictData (params) {
+  return request({
+    url: '/dictData/getListByType',
+    method: 'get',
+    params
+  })
+}
 // 列表
 export function erpGoods (params) {
   return request({
@@ -28,12 +36,12 @@ export function erpGoodsExport (params) {
 }
 
 // 导入
-export function erpGoodsImport (params) {
+export function erpGoodsImport (data) {
   return fileRequest({
-    url: '/erpGoods/import',
-    method: 'get',
+    url: '/erpGoods/importExcel',
+    method: 'post',
     responseType: 'blob',
-    params
+    data
   })
 }
 
