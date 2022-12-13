@@ -12,9 +12,11 @@ function resolve (dir) {
 function getGitHash () {
   try {
     return GitRevision.version()
-  } catch (e) {}
+  } catch (e) {
+  }
   return 'unknown'
 }
+
 const isProd = process.env.NODE_ENV === 'production'
 
 const assetsCDN = {
@@ -138,6 +140,7 @@ const vueConfig = {
         // target: 'http://192.168.31.18:6007/',
         // target: 'http://192.168.50.109:6007/',
         // target: 'http://192.168.31.18:6007/',
+        // target: 'http://localhost:6007/',
         ws: false,
         changeOrigin: true,
         pathRewrite: {

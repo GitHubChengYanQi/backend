@@ -1,13 +1,5 @@
 import request from '@/utils/request'
 
-// courseClass 课程分类表
-//
-// course/课程表
-//
-// courseWare/课件
-//
-// exam/考试
-
 export function courseClassAdd (data) {
   return request({
     url: '/courseClass/add',

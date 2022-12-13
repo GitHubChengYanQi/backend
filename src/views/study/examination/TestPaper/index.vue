@@ -1,7 +1,7 @@
 <template>
   <div>
-    <breadcrumb :titles="['考试管理','试卷管理']" back></breadcrumb>
-    <a-card :bordered="false" class="my-table-search">
+    <breadcrumb v-if="!select" :titles="['考试管理','试卷管理']" back></breadcrumb>
+    <a-card v-if="!select" :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
@@ -35,7 +35,7 @@
       </a-form>
     </a-card>
     <div class="my-table-wrapper">
-      <div class="btn">
+      <div v-if="!select" class="btn">
         <a-button
           type="primary"
           ghost
@@ -54,6 +54,7 @@
           :columns="columns"
           :data-source="tableData"
           :rowKey="record => record.questionnaireId"
+          :rowSelection="select ? {type:'radio', onChange: selectChange} : null"
           :pagination="pagination"
           @change="handleTableChange">
           <div slot="questionnaireName" slot-scope="text">
@@ -100,6 +101,9 @@ import moment from 'moment'
 
 export default {
   components: { TagName, breadcrumb },
+  props: {
+    select: Boolean
+  },
   data () {
     return {
       loading: false,
@@ -145,13 +149,6 @@ export default {
           customRender: (text) => {
             return (text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-')
           }
-        },
-        {
-          title: '操作',
-          width: 200,
-          align: 'center',
-          dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
         }
       ],
       tableData: [],
@@ -166,6 +163,15 @@ export default {
     }
   },
   created () {
+    if (!this.select) {
+      this.columns.push({
+        title: '操作',
+        width: 200,
+        align: 'center',
+        dataIndex: 'action',
+        scopedSlots: { customRender: 'action' }
+      })
+    }
     this.getTableData()
   },
   methods: {
@@ -187,8 +193,8 @@ export default {
       this.pagination.pageSize = pageSize
       this.getTableData()
     },
-    selectChange (row) {
-      console.log(row)
+    selectChange (ids, rows) {
+      this.$emit('selectRow', rows[0])
     },
     // 群聊筛选
     // 重置

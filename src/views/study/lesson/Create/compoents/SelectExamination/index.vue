@@ -25,48 +25,10 @@
       :visible="visible"
       @cancel="visible = false"
     >
-      <div class="my-table-search">
-        <a-form layout="inline">
-
-          <a-form-item
-            label="考试名称">
-            <a-input placeholder="请输入试卷名称" />
-          </a-form-item>
-
-          <a-form-item
-            label="考试时间">
-            <a-range-picker />
-          </a-form-item>
-
-          <a-form-item
-            label="创建人">
-            <a-input placeholder="请输入创建人" />
-          </a-form-item>
-
-          <a-form-item>
-            <div>
-              <a-button
-                type="primary"
-                ghost
-                @click="() => { this.pagination.current = 1; this.getTableData() }"
-              >
-                查询
-              </a-button>
-            </div>
-          </a-form-item>
-        </a-form>
-      </div>
-
-      <a-table
-        class="my-table"
-        bordered
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :rowSelection="{type:'radio', onChange: selectChange}"
-        @change="handleTableChange">
-      </a-table>
+      <examination
+        select
+        @selectRow="selectExamination"
+      />
       <div style="text-align: center">
         <a-button
           type="primary"
@@ -82,74 +44,30 @@
 </template>
 
 <script>
+import examination from '../../../../examination/index'
+
 export default {
+  components: { examination },
   data () {
     return {
-      columns: [
-        {
-          title: '考试名称',
-          dataIndex: 'name',
-          align: 'center',
-          width: '200px'
-        },
-        {
-          title: '试卷名称',
-          width: '200px',
-          dataIndex: 'introduction',
-          align: 'center'
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'total',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '创建人',
-          dataIndex: 'user',
-          align: 'center'
-        }
-      ],
-      tableData: [],
-      selectId: '',
       selectRow: {},
       name: '',
-      pagination: {
-        total: 0,
-        current: 1,
-        pageSize: 10,
-        showSizeChanger: true,
-        pageSizeOptions: ['10', '20', '30', '50'],
-        showTotal: (total) => `共 ${total} 条数据`
-      },
       visible: false
     }
   },
-  created () {
-    this.getTableData()
-  },
   methods: {
+    selectExamination (row) {
+      this.selectRow = row
+    },
     remove () {
       this.name = ''
       this.$emit('change', null)
     },
     submit () {
-      this.name = this.selectRow.name || '试卷试卷试卷'
-      this.$emit('change', this.selectId)
+      this.name = this.selectRow.name
+      this.$emit('change', this.selectRow.examId)
+      this.$emit('input', this.selectRow.examId)
       this.visible = false
-    },
-    selectChange (ids, rows) {
-      this.selectId = ids[0]
-      this.selectRow = rows[0] || {}
-    },
-    handleTableChange ({ current, pageSize }) {
-      this.pagination.current = current
-      this.pagination.pageSize = pageSize
-      this.getTableData()
-    },
-    getTableData () {
-      this.tableData = new Array(999).fill('').map((item, index) => ({ id: index }))
-      this.pagination.total = 999
     }
   }
 }

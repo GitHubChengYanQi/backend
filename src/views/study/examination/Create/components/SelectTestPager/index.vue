@@ -25,40 +25,10 @@
       :visible="visible"
       @cancel="visible = false"
     >
-      <a-form layout="inline">
-
-        <a-form-item
-          label="试卷名称">
-          <a-input placeholder="请输入试卷名称" />
-        </a-form-item>
-
-        <a-form-item
-          label="创建时间">
-          <a-range-picker />
-        </a-form-item>
-
-        <a-form-item>
-          <div>
-            <a-button
-              type="primary"
-              ghost
-              @click="() => { this.pagination.current = 1; this.getTableData() }"
-            >
-              查询
-            </a-button>
-          </div>
-        </a-form-item>
-      </a-form>
-      <a-table
-        class="my-table"
-        bordered
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :rowSelection="{type:'radio', onChange: selectChange}"
-        @change="handleTableChange">
-      </a-table>
+      <TestPaper
+        select
+        @selectRow="selectTestPager"
+      />
       <div style="text-align: center">
         <a-button
           type="primary"
@@ -74,7 +44,10 @@
 </template>
 
 <script>
+import TestPaper from '../../../TestPaper/index'
+
 export default {
+  components: { TestPaper },
   data () {
     return {
       columns: [
@@ -118,30 +91,20 @@ export default {
     }
   },
   created () {
-    this.getTableData()
+
   },
   methods: {
+    selectTestPager (row) {
+      this.selectRow = row
+    },
     remove () {
       this.name = ''
       this.$emit('change', null)
     },
     submit () {
-      this.name = this.selectRow.name || '试卷试卷试卷'
-      this.$emit('change', this.selectId)
+      this.name = this.selectRow.questionnaireName
+      this.$emit('change', this.selectRow.questionnaireId)
       this.visible = false
-    },
-    selectChange (ids, rows) {
-      this.selectId = ids[0]
-      this.selectRow = rows[0] || {}
-    },
-    handleTableChange ({ current, pageSize }) {
-      this.pagination.current = current
-      this.pagination.pageSize = pageSize
-      this.getTableData()
-    },
-    getTableData () {
-      this.tableData = new Array(999).fill('').map((item, index) => ({ id: index }))
-      this.pagination.total = 999
     }
   }
 }

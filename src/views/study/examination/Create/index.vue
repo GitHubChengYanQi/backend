@@ -17,14 +17,13 @@
         <a-form-item label="考试名称">
           <a-input
             placeholder="请输入考试名称"
-            v-decorator="['note', { rules: [{ required: true, message: '请输入考试名称!' }] }]"
+            v-decorator="['name', { rules: [{ required: true, message: '请输入考试名称!' }] ,initialValue: '' }]"
           />
         </a-form-item>
         <a-form-item label="重复考试">
           <a-radio-group
-            v-decorator="['cfks', { rules: [{ required: true, message: '请选择重复考试!' }] }]"
+            v-decorator="['reexam', { rules: [{ required: true, message: '请选择重复考试!' }] ,initialValue: 1}]"
             name="radioGroup"
-            :default-value="1"
           >
             <a-radio :value="1">
               允许重复考试
@@ -38,51 +37,46 @@
           </a-radio-group>
         </a-form-item>
         <a-form-item label="试卷选择">
-          <SelectTestPager v-decorator="['sj', { rules: [{ required: true, message: '请选择试卷选择!' }] }]" />
+          <SelectTestPager
+            v-decorator="['questionnaireId', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: '' }]" />
         </a-form-item>
         <a-form-item label="封面图">
           <div class="my-space">
             <ImgUpload
               placeholder="请选择封面图"
-              v-decorator="['fmt', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
+              v-decorator="['coverImageUrl', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
             />
             建议尺寸：750 × 1448
           </div>
         </a-form-item>
         <a-form-item label="答卷时长">
-          <a-radio-group
-            v-decorator="['djsc', { rules: [{ required: true, message: '请选择答卷时长!' }] }]"
-            name="radioGroup"
-            :default-value="1"
+          <TimeLimit
+            v-decorator="['timeLimit', { rules: [{ required: true, message: '请选择答卷时长!' }],initialValue: 0 }]"
           >
-            <a-radio :value="1">
-              限定时长
-            </a-radio>
-            <a-radio :value="2">
-              不限定时长
-            </a-radio>
-          </a-radio-group>
+          </TimeLimit>
         </a-form-item>
         <a-form-item label="通过分数">
           <a-input-number
             placeholder="请输入通过分数"
-            v-decorator="['note', { rules: [{ required: true, message: '请输入通过分数!' }] }]"
+            v-decorator="['passScore', { rules: [{ required: true, message: '请输入通过分数!' }] ,initialValue: 0}]"
           />
           分
         </a-form-item>
         <a-form-item label="试用员工">
           <Employee
-            v-decorator="['syyg', { rules: [{ required: true, message: '请选择试用员工!' }],initialValue:['all'] }]"></Employee>
+            v-decorator="['applicableObject', { rules: [{ required: true, message: '请选择试用员工!' }],initialValue:['all'] }]"
+          >
+          </Employee>
         </a-form-item>
         <a-form-item label="考试说明">
           <VueQuillEditor
             :height="'auto'"
             placeholder="请输入考试说明"
-            v-decorator="['kcjj', { rules: [{ required: true, message: '请输入考试说明!' }],initialValue:'' }]"
+            v-decorator="['note', { rules: [{ required: true, message: '请输入考试说明!' }],initialValue:'' }]"
           />
         </a-form-item>
         <div style="text-align: center">
-          <a-button style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
+          <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
         </div>
       </a-form>
     </div>
@@ -95,12 +89,17 @@ import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../components/ImgUpload/index'
 import Employee from '../../components/Employee/index'
 import SelectTestPager from './components/SelectTestPager'
+import router from '@/router'
+import { message } from 'ant-design-vue'
+import TimeLimit from './components/TimeLimit'
+import { examAdd } from '@/api/study/exam'
 
 export default {
-  components: { breadcrumb, VueQuillEditor, ImgUpload, Employee, SelectTestPager },
+  components: { breadcrumb, VueQuillEditor, ImgUpload, Employee, SelectTestPager, TimeLimit },
   data () {
     return {
       data: {},
+      loading: false,
       form: this.$form.createForm(this, { name: 'coordinated' })
     }
   },
@@ -108,8 +107,25 @@ export default {
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
+        console.log({
+          ...values,
+          questionnaireIds: [values.questionnaireId],
+          applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
+          empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject
+        })
         if (!err) {
-          console.log('Received values of form: ', values)
+          this.loading = true
+          examAdd({
+            ...values,
+            questionnaireIds: [values.questionnaireId],
+            applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
+            empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject
+          }).then(() => {
+            router.back()
+            message.success('考试创建成功！')
+          }).finally(() => {
+            this.loading = false
+          })
         }
       })
     }

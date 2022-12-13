@@ -281,6 +281,10 @@ export default {
       width: 100%;
     }
 
+    .el-tree-node__content > .el-tree-node__expand-icon {
+      padding: 0;
+    }
+
     .el-tree-node__expand-icon.is-leaf {
       min-height: 100%;
       padding: 0;

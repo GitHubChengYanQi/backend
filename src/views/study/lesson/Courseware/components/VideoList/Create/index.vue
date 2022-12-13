@@ -83,6 +83,12 @@ export default {
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
+        console.log({
+          courseWareType: 'video',
+          suffix: 'jpg',
+          size: this.size / 1024,
+          ...values
+        })
         if (!err) {
           this.loading = true
           courseWareAdd({

@@ -18,8 +18,8 @@
             目录{{ $index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column prop="sortNo" label="标题">
-          <template slot-scope="{ row, column}">
+        <el-table-column prop="sortNo" label="标题" minWidth="200">
+          <template slot-scope="{ row}">
             <div class="user-info flex">
               <div class="avatar mr12">
                 <img height="50" v-if="['jpg','png'].includes(row.suffix)" :src="row.coverImageUrl || row.mediaUrl">
@@ -42,26 +42,33 @@
           <template slot-scope="{row}">
             <div class="my-space">
               <div class="time" style="gap: 0">
-                <a-input-number v-model="row.date.h" id="inputNumber" />
+                <a-input-number v-model="row.hour" id="inputNumber" />
                 <span class="unit">时</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number v-model="row.date.m" id="inputNumber" />
+                <a-input-number v-model="row.minute" id="inputNumber" />
                 <span class="unit">分</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number v-model="row.date.s" id="inputNumber" />
+                <a-input-number v-model="row.second" id="inputNumber" />
                 <span class="unit">秒</span>
               </div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="action" label="操作" width="270">
+        <el-table-column align="center" prop="action" label="关联考试" minWidth="200">
+          <template slot-scope="{row}">
+            <SelectExamination
+              v-model="row.examId"
+              placeholder="请选择关联考试"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="action" label="操作" width="180">
           <template slot-scope="{row}">
             <div class="my-space" style="cursor: pointer">
               <button class="linkButton">预览</button>
               <button class="delButton" @click="remove(row)">删除</button>
-              <button class="successButton">关联考试</button>
               <div class="my-handle">
                 <DragIcon :width="24" />
               </div>
@@ -124,9 +131,10 @@ import DragIcon from '../../../../components/DragIcon/index'
 import FileList from '../../../Courseware/components/FileList/index'
 import VideoList from '../../../Courseware/components/VideoList/index'
 import ImageTextList from '../../../Courseware/components/ImageTextList/index'
+import SelectExamination from '../SelectExamination/index'
 
 export default {
-  components: { DragIcon, FileList, VideoList, ImageTextList },
+  components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination },
   data () {
     return {
       courseWares: {},
@@ -140,6 +148,7 @@ export default {
   watch: {
     tableView: {
       handler () {
+        console.log(this.tableView)
         this.$emit('change', this.tableView)
       },
       deep: true
@@ -176,7 +185,7 @@ export default {
         ...(this.courseWares.fileList || []),
         ...(this.courseWares.videoList || []),
         ...(this.courseWares.imageTextList || [])
-      ].map(item => ({ ...item, date: {} }))
+      ]
       this.visible = false
     },
     selectChange (ids, rows) {

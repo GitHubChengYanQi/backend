@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课程详情']" back></breadcrumb>
+    <breadcrumb :titles="['考试管理','考试详情']" back></breadcrumb>
     <a-tabs v-model="key" class="tabs">
       <a-tab-pane key="1" tab="试卷详情">
         <TestPaperDetail />
