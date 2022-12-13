@@ -172,6 +172,7 @@
             :not-found-content="fetching ? undefined : null"
             @search="fetchSearch"
           >
+            <a-spin slot="notFoundContent" v-if="fetching" />
             <a-select-option v-for="item in commonNameList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
             <!-- <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
               {{ (i + 9).toString(36) + i }}
@@ -596,12 +597,16 @@ export default {
     },
     // 输入框输入查询
     fetchSearch (value) {
-      console.log(value, 'value')
-      const params = { name: value }
-      getCommonNameList(params).then(response => {
-        console.log(response, '获取通用名列表')
-        this.commonNameList = response.data
-      })
+      if (value) {
+        this.fetching = true
+        console.log(value, 'value')
+        const params = { name: value }
+        getCommonNameList(params).then(response => {
+          console.log(response, '获取通用名列表')
+          this.commonNameList = response.data
+          this.fetching = false
+        })
+      }
     },
     /**
      *
