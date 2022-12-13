@@ -423,7 +423,9 @@ export default {
     },
     contentArray () {
       console.log(this.contentArray, '子组件contentArray数组')
-      this.sendContentArray = Object.assign([], this.contentArray)
+      this.sendContentArray = Object.assign([], this.contentArray.filter(item => {
+        return item.type != 1
+      }))
     }
   },
   methods: {
@@ -475,11 +477,13 @@ export default {
         return
       }
       this.isSopEditStatus = true
+      console.log(e)
       for (const item of e) {
         const singleInfo = { type: 4 }
         singleInfo.linkTitle = item.entry.linkTitle
         singleInfo.linkUrl = item.link
         singleInfo.linkPhoto = item.entry.linkImg
+        singleInfo.linkShow = item.entry.linkDigest
         singleInfo.desc = item.entry.linkDigest
         singleInfo.radarLink = '1'
         singleInfo.radarName = item.channelTxt
