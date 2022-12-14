@@ -447,7 +447,7 @@ export default {
             // 是真没有数据
           }
         } else {
-          const tempList = this.tableData.filter(item => (item.status === '2' || item.saleStatus === '0'))
+          const tempList = this.tableData.filter(item => (item.effective === '0'))
           if (tempList.length !== 0) {
             this.invalidRowIdList = tempList.map(item => item.id)
           } else {
@@ -635,25 +635,53 @@ export default {
      * 导入
      */
     importFn (e) {
+      const that = this
       this.tableLoading = true
       console.log(e.file, 'e.file')
       const formData = new FormData()
       formData.append('file', e.file)
       erpGoodsImport(formData).then(response => {
-        if (response.code === 200) {
-          this.$message.success('导入成功')
-          this.tableLoading = false
-          // 重新将页码换成1
-          this.$set(this.pagination, 'current', 1)
-          this.getTableData()
+        console.log(response, '请求得到的response')
+        const r = new FileReader()
+        r.readAsText(response)
+        r.onload = function () {
+          try {
+            const resData = JSON.parse(r.result)
+            console.log(resData, '请求后得到处理后的参数')
+            if (resData.code === 200) {
+              that.$message.success('导入成功')
+              that.tableLoading = false
+              // 重新将页码换成1
+              that.$set(that.pagination, 'current', 1)
+              that.getTableData()
+            }
+          } catch (error) {
+            console.log(error, 'error')
+          }
         }
-        console.log(response)
+        // const tempResponseInfo = JSON.parse(r)
+        // console.log(tempResponseInfo, 'tempResponseInfo')
+        // if (response.code === 200) {
+        //   this.$message.success('导入成功')
+        //   this.tableLoading = false
+        //   // 重新将页码换成1
+        //   this.$set(this.pagination, 'current', 1)
+        //   this.getTableData()
+        // }
+        // console.log(response)
       }).catch((error) => {
         console.log(error)
-        // console.log(error.message, '导入失败message')
-        // console.log(error.response.data.error, '导入失败response')
-        // console.log(error.request, '导入失败request')
-        // console.log(error.status, '导入失败status')
+        const errorFileReader = new FileReader()
+        errorFileReader.readAsText(error.response.data)
+        errorFileReader.onload = function () {
+          try {
+            const resErrorData = JSON.parse(errorFileReader.result)
+            console.log(resErrorData, '请求失败得到处理后的参数')
+            that.$message.error(resErrorData.msg)
+          } catch (error) {
+            console.log(error, 'error')
+          }
+        }
         this.tableLoading = false
       })
     },
