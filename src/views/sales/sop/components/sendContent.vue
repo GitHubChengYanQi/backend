@@ -83,6 +83,7 @@
                 src="../images/edit.svg"
                 alt
                 class="icon"
+                v-if="item.type !== 6"
                 :class="(item.type === 6) ? 'icon move disabled' : 'icon move'"
                 @click="handleEditClick(item, index)"
               />
