@@ -40,8 +40,8 @@
             <div :class="`content ${item.type === 4 ? 'link' : ''}`" v-else-if="item.type === 4">
               <div class="lef">
                 <span class="til">{{ item.linkTitle }}</span>
-                <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span>
+                <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
               </div>
               <img :src="item.linkPhoto" alt class="image" />
             </div>
@@ -60,8 +60,8 @@
             <div :class="`content ${item.type === 6 ? 'link' : ''}`" v-else-if="item.type === 6">
               <div class="lef">
                 <span class="til">{{ item.linkTitle }}</span>
-                <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                <!-- <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span> -->
+                <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
               </div>
               <img :src="item.linkPhoto" alt class="image" />
             </div>
