@@ -124,6 +124,7 @@
                 @click="handleMoveClick(index, 'down')"
               />
               <img
+                v-if="!item.isEdit"
                 src="../images/edit.svg"
                 alt
                 class="icon"
@@ -487,6 +488,7 @@ export default {
         singleInfo.desc = item.entry.linkDigest
         singleInfo.radarLink = '1'
         singleInfo.radarName = item.channelTxt
+        singleInfo.isEdit = true
         this.sendContentArray.push(singleInfo)
         // title: content.linkTitle,
         // url: target.link,
