@@ -9,7 +9,7 @@
               label="联合用药名称："
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
-              <a-input v-model="screenData.contactName" placeholder="请输入联合用药名称"></a-input>
+              <a-input v-model="screenData.name" placeholder="请输入联合用药名称"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8" :md="6">
@@ -142,7 +142,7 @@
 <script>
 import moment from 'moment'
 // import combinedDetail from './combinedDetail.vue'
-import { relList } from '@/api/actor'
+import { combinList } from '@/api/mall'
 import { deepClone } from '@/utils/util'
 export default {
   components: {
@@ -282,7 +282,7 @@ export default {
       }
       params.storeIds = this.storeIds.length !== 0 ? this.storeIds.join(',') : ''
       params.maintainerIds = params.maintainerIds ? params.maintainerIds.join(',') : ''
-      relList(params).then((res) => {
+      combinList(params).then((res) => {
         this.loading = false
         this.tableData = res.data.records
         this.pagination.total = res.data.total
