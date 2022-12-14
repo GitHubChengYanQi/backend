@@ -105,3 +105,14 @@ export function moveDown (data) {
     data
   })
 }
+
+/**
+ * 联合用药
+ */
+export function combinList (params) {
+  return request({
+    url: '/drugCombination/list',
+    method: 'get',
+    params
+  })
+}
