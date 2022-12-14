@@ -189,11 +189,11 @@
 // import { getTempExecuteSopList, deleteExecuteRecordSopMethod } from '@/api/cluster'
 import { getExecuteRecordSopListMethod, deleteExecuteRecordSopMethod, exportClusterSopMethod, getDictData } from '@/api/cluster'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
-import moment from 'moment'
 export default {
   name: 'ClusterSopExecute',
   data () {
     return {
+      sorter: '',
       currentRow: {},
       selectedList: [],
       // 任务状态列表
@@ -226,9 +226,8 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
-          sorter: (a, b) => {
-            return moment(a.createdAt).isBefore(b.createdAt) ? 1 : -1
-          },
+          sorter: true,
+          sortDirections: ['descend', 'ascend'],
           width: 100
         },
         {
@@ -311,7 +310,8 @@ export default {
         clusterName: this.searchInfo.clusterName,
         page: this.pagination.current,
         perPage: this.pagination.pageSize,
-        sopIdsStr: this.selectedList.join(',')
+        sopIdsStr: this.selectedList.join(','),
+        sort: this.sorter
       }
       if (this.searchInfo.executionState === '-1') {
         this.$set(params, 'executionState', '')
@@ -354,7 +354,8 @@ export default {
         sopName: this.searchInfo.sopName,
         clusterName: this.searchInfo.clusterName,
         page: this.pagination.current,
-        perPage: this.pagination.pageSize
+        perPage: this.pagination.pageSize,
+        sort: this.sorter
       }
       if (this.searchInfo.executionState === '-1') {
         this.$set(params, 'executionState', '')
@@ -402,10 +403,19 @@ export default {
       }
     },
     // 群SOP模板切换页码
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.selectedList = []
       this.pagination.current = current
       this.pagination.pageSize = pageSize
+      if (sorter.order) {
+        if (sorter.order === 'ascend') {
+          this.sorter = 'asc'
+        } else {
+          this.sorter = 'desc'
+        }
+      } else {
+        this.sorter = ''
+      }
       this.getTableData()
     },
     // 搜索

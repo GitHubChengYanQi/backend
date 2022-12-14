@@ -16,6 +16,63 @@ export function scrmRadarArticleDrop (data) {
     data
   })
 }
+// 数据信息
+export function scrmRadarVisitorIndex (data) {
+  return request({
+    url: 'scrm_radar_visitor/index',
+    method: 'post',
+    data
+  })
+}
+// 数据图表
+export function scrmRadarVisitorChart (data) {
+  return request({
+    url: 'scrm_radar_visitor/chart',
+    method: 'post',
+    data
+  })
+}
+// 客户数据
+export function scrmRadarVisitorVisit (data) {
+  return request({
+    url: 'scrm_radar_visitor/visit',
+    method: 'post',
+    data
+  })
+}
+// 文章获取
+export function scrmRadarArticleGrab (data) {
+  return request({
+    url: 'scrm_radar_article/grab',
+    method: 'post',
+    data
+  })
+}
+// 数据导出
+export function scrmRadarVisitorExcel (data) {
+  return request({
+    url: 'scrm_radar_visitor/excel',
+    method: 'post',
+    data,
+    responseType: 'blob'
+  })
+}
+// 渠道数据
+export function scrmRadarVisitorDitch (data) {
+  return request({
+    url: 'scrm_radar_visitor/ditch',
+    method: 'post',
+    data
+  })
+}
+// 员工数据
+export function scrmRadarVisitorShift (data) {
+  return request({
+    url: 'scrm_radar_visitor/shift',
+    method: 'post',
+    data
+  })
+}
 
 // 批量删除文章
 export function scrmRadarArticleAway (data) {
@@ -42,7 +99,7 @@ export function scrmRadarArticleFind (data) {
     data
   })
 }
-// 导出文章列表
+// 导出文章列表 已创建
 export function scrmRadarArticleDown (data) {
   return request({
     url: 'scrm_radar_article/down',
@@ -60,18 +117,10 @@ export function scrmRadarArticleLoad (data) {
     data
   })
 }
-
+// 获取渠道地址
 export function scrmRadarShiftSend (data) {
   return request({
     url: 'scrm_radar_shift/send',
-    method: 'post',
-    data
-  })
-}
-
-export function scrmRadarArticleGrab (data) {
-  return request({
-    url: 'scrm_radar_article/grab',
     method: 'post',
     data
   })

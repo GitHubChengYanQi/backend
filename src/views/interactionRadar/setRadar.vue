@@ -39,6 +39,7 @@
               >
                 <a-select
                   class="checkbox"
+                  :maxTagCount="1"
                   allowClear
                   mode="multiple"
                   :placeholder="item.placeholder"
@@ -204,6 +205,7 @@
                 v-else
               >
                 <a-input
+                  :disabled="item.key == 'title'&& tableId != -1"
                   class="input"
                   :placeholder="item.placeholder"
                   v-model="setData.inputData[item.key]"

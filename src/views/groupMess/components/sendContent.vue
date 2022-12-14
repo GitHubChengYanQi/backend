@@ -124,6 +124,7 @@
                 @click="handleMoveClick(index, 'down')"
               />
               <img
+                v-if="!item.isEdit"
                 src="../images/edit.svg"
                 alt
                 class="icon"
@@ -315,10 +316,13 @@
         @materialSelect="librarySelectChange"
       />
     </a-modal>
+    <RadarChoose v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk" />
   </div>
 </template>
 <script>
 import { handleBtnArr, isUrl } from './sopUtils'
+import RadarChoose from './radarToastComponent.vue'
+
 import { upLoad } from '@/api/common'
 export default {
   data () {
@@ -346,11 +350,13 @@ export default {
       // 素材库选择数组
       contentLibraryArray: [],
       // 添加素材库弹框
-      contentLibraryModalShow: false
+      contentLibraryModalShow: false,
+      radarVisible: false
     }
   },
   components: {
-    MediumGroup: () => import('@/views/mediumGroup/index.vue')
+    MediumGroup: () => import('@/views/mediumGroup/index.vue'),
+    RadarChoose
   },
   props: {
     isDisableEdit: {
@@ -418,7 +424,9 @@ export default {
     },
     contentArray () {
       console.log(this.contentArray, '子组件contentArray数组')
-      this.sendContentArray = Object.assign([], this.contentArray)
+      this.sendContentArray = Object.assign([], this.contentArray.filter(item => {
+        return item.type != 1
+      }))
     }
   },
   methods: {
@@ -460,7 +468,38 @@ export default {
         case 'embed':
           this.contentMiniModalShow = true
           break
+        case 'radar':
+          this.radarVisible = true
       }
+    },
+    handleAddRadarOk (e) {
+      if ((this.sendContentArray.length + e.length) > 9) {
+        this.$message.warning('发送条数不能超过九条！')
+        return
+      }
+      this.isSopEditStatus = true
+      console.log(e)
+      for (const item of e) {
+        const singleInfo = { type: 4 }
+        singleInfo.linkTitle = item.entry.linkTitle
+        singleInfo.linkUrl = item.link
+        singleInfo.linkPhoto = item.entry.linkImg
+        singleInfo.linkShow = item.entry.linkDigest
+        singleInfo.desc = item.entry.linkDigest
+        singleInfo.radarLink = '1'
+        singleInfo.radarName = item.channelTxt
+        singleInfo.isEdit = true
+        this.sendContentArray.push(singleInfo)
+        // title: content.linkTitle,
+        // url: target.link,
+        // pic: { url: content.linkImg, path: content.linkImgPath || content.linkImg.slice(43, content.linkImg.indexOf('?')) },
+        // desc: content.linkDigest,
+        // radarLink: '1',
+        // radarName: target.channelTxt
+      }
+      this.radarVisible = false
+      this.$emit('update:isSopEdit', this.isSopEditStatus)
+      this.$emit('update:contentArray', this.sendContentArray)
     },
     // 提交文字
     confirmContentText () {
