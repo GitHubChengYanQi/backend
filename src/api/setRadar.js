@@ -48,20 +48,11 @@ export function scrmRadarArticleGrab (data) {
     data
   })
 }
-
+// 数据导出
 export function scrmRadarVisitorExcel (data) {
   return request({
     url: 'scrm_radar_visitor/excel',
     method: 'post',
-    data,
-    responseType: 'blob'
-  })
-}
-
-export function getScrmRadarVisitorVisit (data) {
-  return request({
-    url: 'scrm_radar_visitor/visit',
-    method: 'get',
     data,
     responseType: 'blob'
   })
@@ -108,7 +99,7 @@ export function scrmRadarArticleFind (data) {
     data
   })
 }
-// 导出文章列表
+// 导出文章列表 已创建
 export function scrmRadarArticleDown (data) {
   return request({
     url: 'scrm_radar_article/down',
@@ -126,7 +117,7 @@ export function scrmRadarArticleLoad (data) {
     data
   })
 }
-
+// 获取渠道地址
 export function scrmRadarShiftSend (data) {
   return request({
     url: 'scrm_radar_shift/send',

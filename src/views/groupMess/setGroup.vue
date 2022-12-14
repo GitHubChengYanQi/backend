@@ -269,16 +269,17 @@ export default {
     }
   },
   watch: {
-    contentArray: {
-      handler (val) {
-        if (this.type != 1) {
-          this.isDisableEdit = val.length == 9
-        }
-        if (this.previewArr.length > 0 && this.previewArr[0].isText) {
-          this.previewArr = [this.previewArr[0], ...val]
-        } else {
-          this.previewArr = val
-        }
+    contentArray (e) {
+      console.log(e)
+      if (this.type != 1) {
+        this.isDisableEdit = e.length == 9
+      }
+      if (this.previewArr.length > 0 && this.previewArr[0].isText) {
+        this.previewArr = [this.previewArr[0], ...e.filter(item => {
+          return item.type != 1
+        })]
+      } else {
+        this.previewArr = e
       }
     }
   },
