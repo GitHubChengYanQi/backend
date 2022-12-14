@@ -15,3 +15,11 @@ export function courseList (data) {
     data
   })
 }
+
+export function courseDetail (data) {
+  return request({
+    url: '/course/detail',
+    method: 'post',
+    data
+  })
+}

@@ -66,7 +66,7 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="successButton" @click="() => $router.push('/study/lesson/createImageText')">编辑
+                <a-button class="successButton" @click="() => $router.push(`/study/lesson/createImageText?id=${record.courseWareId}`)">编辑
                 </a-button>
                 <a-button class="linkButton">预览</a-button>
                 <a-popconfirm

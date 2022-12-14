@@ -16,3 +16,12 @@ export function courseWareList (data, params) {
     params
   })
 }
+
+export function courseWareDetail (data, params) {
+  return request({
+    url: '/courseWare/detail',
+    method: 'post',
+    data,
+    params
+  })
+}

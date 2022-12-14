@@ -15,3 +15,11 @@ export function examList (data) {
     data
   })
 }
+
+export function examDetail (data) {
+  return request({
+    url: '/exam/detail',
+    method: 'post',
+    data
+  })
+}

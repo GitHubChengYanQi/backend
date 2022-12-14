@@ -79,7 +79,10 @@
                 <a-button class="warnButton" @click="() => $router.push(`/study/examination/detail?id=${record.id}`)">
                   详情
                 </a-button>
-                <a-button class="successButton" @click="() => $router.push('/study/examination/create')">
+                <a-button
+                  class="successButton"
+                  @click="() => $router.push(`/study/examination/create?id=${record.examId}`)"
+                >
                   编辑
                 </a-button>
 

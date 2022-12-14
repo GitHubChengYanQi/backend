@@ -2,216 +2,217 @@
   <div class="create">
     <breadcrumb :titles="['考试管理','试卷管理','创建试卷']" back></breadcrumb>
 
-    <div>
-      <div class="head">
-        <div class="total">
-          <div class="box">
-            <a-icon type="form" class="icon" />
-            <div>
-              <div class="num">{{ questions.length }}</div>
-              总题数
+    <a-spin :spinning="detailLoading">
+      <div>
+        <div class="head">
+          <div class="total">
+            <div class="box">
+              <a-icon type="form" class="icon" />
+              <div>
+                <div class="num">{{ questions.length }}</div>
+                总题数
+              </div>
+            </div>
+            <div class="box">
+              <a-icon type="form" class="icon" />
+              <div>
+                <div class="num">{{ totalFen }}</div>
+                当前总分
+              </div>
             </div>
           </div>
-          <div class="box">
-            <a-icon type="form" class="icon" />
-            <div>
-              <div class="num">{{ totalFen }}</div>
-              当前总分
+          <div class="set">
+            <div :style="{width: '120px'}">每题相同分：</div>
+            <a-switch v-model="sname" @change="switchChange" />
+            <a-input-number class="input" v-model="number" @change="numberChange" />
+            分
+          </div>
+
+        </div>
+
+        <div class="content">
+          <a-form
+            class="form"
+            :form="form"
+            labelAlign="right"
+            :label-col="{ span: 2 }"
+            :wrapper-col="{ span: 10 }"
+          >
+            <div class="name">
+              <a-form-item label="试卷名称">
+                <a-input
+                  placeholder="请输入试卷名称"
+                  v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }],initialValue:'' }]"
+                />
+              </a-form-item>
             </div>
-          </div>
-        </div>
-        <div class="set">
-          <div :style="{width: '120px'}">每题相同分：</div>
-          <a-switch v-model="sname" @change="switchChange" />
-          <a-input-number class="input" v-model="number" @change="numberChange" />
-          分
-        </div>
-
-      </div>
-
-      <div class="content">
-        <a-form
-          class="form"
-          :form="form"
-          labelAlign="right"
-          :label-col="{ span: 2 }"
-          :wrapper-col="{ span: 10 }"
-        >
-          <div class="name">
-            <a-form-item label="试卷名称">
-              <a-input
-                placeholder="请输入试卷名称"
-                v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }],initialValue:'' }]"
-              />
-            </a-form-item>
-          </div>
-          <el-tree
-            class="tree"
-            :data="questions"
-            icon-class="icon"
-            node-key="index"
-            @node-drag-over="handleDragOver"
-            @node-drop="handleDrop"
-            draggable
-            :allow-drop="allowDrop"
-            :allow-drag="allowDrag">
-            <div
-              class="custom-tree-node"
-              slot-scope="{ node, data:questionItem }"
-            >
+            <el-tree
+              class="tree"
+              :data="questions"
+              icon-class="icon"
+              node-key="index"
+              @node-drag-over="handleDragOver"
+              @node-drop="handleDrop"
+              draggable
+              :allow-drop="allowDrop"
+              :allow-drag="allowDrag">
               <div
-                class="questionItem"
+                class="custom-tree-node"
+                slot-scope="{ node, data:questionItem }"
               >
-                <div class="question">
-                  <div class="questionTitle">问题{{ questionItem.index + 1 }}</div>
-                  <div class="questionContent">
-                    <a-form-item label="试卷题目">
-                      <a-input
-                        placeholder="请输入试卷名称"
-                        v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
-                      />
-                    </a-form-item>
-                    <a-form-item label="题目类型">
-                      <a-radio-group
-                        v-decorator="[`questions[${questionItem.index}].type`, { rules: [{ required: true, message: '请选择题目类型!' }],initialValue:'single' }]"
-                        name="radioGroup"
-                        @change="({target:{value}})=>updateType(value,questionItem.index)"
-                      >
-                        <a-radio value="single">
-                          单选题
-                        </a-radio>
-                        <a-radio value="multiple">
-                          多选题
-                        </a-radio>
-                        <a-radio value="judge">
-                          判断题
-                        </a-radio>
-                      </a-radio-group>
-                    </a-form-item>
-
-                    <div v-if="questionItem.type !== 'judge'">
-                      <el-tree
-                        class="tree optionTree"
-                        :data="Object.keys(questionItem.options || {'A':''}).map(item=>({option:item,key:questionItem.index}))"
-                        icon-class="icon"
-                        node-key="option"
-                        @node-drag-over="optionsHandleDragOver"
-                        @node-drop="optionsHandleDrop"
-                        draggable
-                        :allow-drop="optionsAlowDrop"
-                        :allow-drag="(node)=>optionsAllowDrag(node.data.option+questionItem.index)">
-                        <div
-                          class="custom-tree-node"
-                          slot-scope="{ node, data:{option} }"
+                <div
+                  class="questionItem"
+                >
+                  <div class="question">
+                    <div class="questionTitle">问题{{ questionItem.index + 1 }}</div>
+                    <div class="questionContent">
+                      <a-form-item label="试卷题目">
+                        <a-input
+                          placeholder="请输入试卷名称"
+                          v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
+                        />
+                      </a-form-item>
+                      <a-form-item label="题目类型">
+                        <a-radio-group
+                          v-decorator="[`questions[${questionItem.index}].type`, { rules: [{ required: true, message: '请选择题目类型!' }],initialValue:'single' }]"
+                          name="radioGroup"
+                          @change="({target:{value}})=>updateType(value,questionItem.index)"
                         >
-                          <a-form-item
-                            :label="option"
-                            :label-col="{ span: 2 }"
-                            :wrapper-col="{ span: 12 }"
+                          <a-radio value="single">
+                            单选题
+                          </a-radio>
+                          <a-radio value="multiple">
+                            多选题
+                          </a-radio>
+                          <a-radio value="judge">
+                            判断题
+                          </a-radio>
+                        </a-radio-group>
+                      </a-form-item>
+
+                      <div v-if="questionItem.type !== 'judge'">
+                        <el-tree
+                          class="tree optionTree"
+                          :data="Object.keys(questionItem.options || {'A':''}).map(item=>({option:item,key:questionItem.index}))"
+                          icon-class="icon"
+                          node-key="option"
+                          @node-drag-over="optionsHandleDragOver"
+                          @node-drop="optionsHandleDrop"
+                          draggable
+                          :allow-drop="optionsAlowDrop"
+                          :allow-drag="(node)=>optionsAllowDrag(node.data.option+questionItem.index)">
+                          <div
+                            class="custom-tree-node"
+                            slot-scope="{ node, data:{option} }"
                           >
-                            <div class="option">
-                              <a-input
-                                placeholder="请输入选项"
-                                v-decorator="[`questions[${questionItem.index}].options.${option}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
-                              />
-                              <div class="other">
-                                <div class="actions">
-                                  <a-icon
-                                    v-if="Object.keys(questionItem.options || {'A':''}).length < 6"
-                                    type="plus-square"
-                                    @click="addOption(option,questionItem.index)"
-                                  />
-                                  <a-icon
-                                    v-if="Object.keys(questionItem.options || {'A':''}).length !== 1"
-                                    type="minus-square"
-                                    @click="removeOption(option,questionItem.index)" />
-                                  <div
-                                    @mouseenter="optionMouseenter(option+questionItem.index)"
-                                    @mouseleave="optionMouseleave()"
-                                  >
-                                    <DragIcon
-                                      :width="24"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </a-form-item>
-                        </div>
-                      </el-tree>
-                    </div>
-
-
-                    <a-form-item
-                      label="正确答案"
-                      :label-col="{ span: 2 }"
-                      :wrapper-col="{ span: 12 }"
-                    >
-                      <div class="option">
-                        <a-select
-                          :mode="questionItem.type === 'multiple' ? 'multiple' : 'default'"
-                          style="width: 597px"
-                          :options="questionItem.type === 'judge' ? [{label: '正确',value:'true'},{label: '错误',value:'false'}] : Object.keys(questionItem.options).map(item=>({label:item,value:item}))"
-                          placeholder="请选择正确答案"
-                          v-decorator="[`questions[${questionItem.index}].answer`, { rules: [{ required: true, message: '请选择正确答案!' }] ,initialValue:[]}]"
-                        >
-                        </a-select>
-                        <div class="other">
-                          <div class="fen">
-                            <div :style="{width: '42px'}">分值：</div>
                             <a-form-item
+                              :label="option"
                               :label-col="{ span: 2 }"
                               :wrapper-col="{ span: 12 }"
                             >
-                              <a-input-number
-                                :disabled="sname"
-                                @change="count"
-                                class="input"
-                                v-decorator="[`questions[${questionItem.index}].fen`, { initialValue:0 }]"
-                              />
+                              <div class="option">
+                                <a-input
+                                  placeholder="请输入选项"
+                                  v-decorator="[`questions[${questionItem.index}].options.${option}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
+                                />
+                                <div class="other">
+                                  <div class="actions">
+                                    <a-icon
+                                      v-if="Object.keys(questionItem.options || {'A':''}).length < 6"
+                                      type="plus-square"
+                                      @click="addOption(option,questionItem.index)"
+                                    />
+                                    <a-icon
+                                      v-if="Object.keys(questionItem.options || {'A':''}).length !== 1"
+                                      type="minus-square"
+                                      @click="removeOption(option,questionItem.index)" />
+                                    <div
+                                      @mouseenter="optionMouseenter(option+questionItem.index)"
+                                      @mouseleave="optionMouseleave()"
+                                    >
+                                      <DragIcon
+                                        :width="24"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </a-form-item>
-                            分
+                          </div>
+                        </el-tree>
+                      </div>
+                      <a-form-item
+                        label="正确答案"
+                        :label-col="{ span: 2 }"
+                        :wrapper-col="{ span: 12 }"
+                      >
+                        <div class="option">
+                          <a-select
+                            :mode="questionItem.type === 'multiple' ? 'multiple' : 'default'"
+                            style="width: 597px"
+                            :options="questionItem.type === 'judge' ? [{label: '正确',value:'true'},{label: '错误',value:'false'}] : Object.keys(questionItem.options).map(item=>({label:item,value:item}))"
+                            placeholder="请选择正确答案"
+                            v-decorator="[`questions[${questionItem.index}].answer`, { rules: [{ required: true, message: '请选择正确答案!' }] ,initialValue:[]}]"
+                          >
+                          </a-select>
+                          <div class="other">
+                            <div class="fen">
+                              <div :style="{width: '42px'}">分值：</div>
+                              <a-form-item
+                                :label-col="{ span: 2 }"
+                                :wrapper-col="{ span: 12 }"
+                              >
+                                <a-input-number
+                                  :disabled="sname"
+                                  @change="count"
+                                  class="input"
+                                  v-decorator="[`questions[${questionItem.index}].fen`, { initialValue:0 }]"
+                                />
+                              </a-form-item>
+                              分
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </a-form-item>
+                      </a-form-item>
+                    </div>
                   </div>
-                </div>
-                <div class="actions">
-                  <a-icon v-if="questionItem.index === questions.length - 1" type="plus-square" @click="addQuestion" />
-                  <a-icon type="delete" v-if="questions.length !== 1" @click="removeQuestion(questionItem.index)" />
-                  <div
-                    @mouseenter="mouseenter(questionItem)"
-                    @mouseleave="mouseleave(questionItem)"
-                  >
-                    <DragIcon
-                      :width="24"
-                    />
-                  </div>
+                  <div class="actions">
+                    <a-icon v-if="questionItem.index === questions.length - 1" type="plus-square" @click="addQuestion" />
+                    <a-icon type="delete" v-if="questions.length !== 1" @click="removeQuestion(questionItem.index)" />
+                    <div
+                      @mouseenter="mouseenter(questionItem)"
+                      @mouseleave="mouseleave(questionItem)"
+                    >
+                      <DragIcon
+                        :width="24"
+                      />
+                    </div>
 
+                  </div>
                 </div>
               </div>
+            </el-tree>
+            <div class="submit">
+              <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
             </div>
-          </el-tree>
-          <div class="submit">
-            <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
-          </div>
-        </a-form>
+          </a-form>
+        </div>
       </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 
 <script>
 import breadcrumb from '../../../components/Breadcrumd'
 import DragIcon from '../../../components/DragIcon'
-import { learningQuestionnaireAdd } from '@/api/study/testPager'
+import { learningQuestionnaireAdd, learningQuestionnaireDetail } from '@/api/study/testPager'
 import { message } from 'ant-design-vue'
 import router from '@/router'
 
 export default {
   data () {
     return {
+      detailLoading: false,
       loading: false,
       totalFen: 0,
       dragQuestions: -1,
@@ -227,6 +228,19 @@ export default {
         }
       }]
     }
+  },
+  created () {
+    if (router.history.current.query.id) {
+      this.getDetail(router.history.current.query.id)
+    }
+  },
+  getDetail (id) {
+    this.detailLoading = true
+    learningQuestionnaireDetail({ questionnaireId: id }).then((res) => {
+      console.log(res)
+    }).finally(() => {
+      this.detailLoading = false
+    })
   },
   components: { breadcrumb, DragIcon },
   methods: {
@@ -483,21 +497,6 @@ export default {
     }
   }
 }
-
-//
-//.optionTree {
-//  /deep/ .el-tree-node {
-//    margin-bottom: 24px;
-//
-//    .el-tree-node__content {
-//      height: auto;
-//
-//      .ant-form-item {
-//        margin-bottom: 0;
-//      }
-//    }
-//  }
-//}
 
 .head {
   display: flex;

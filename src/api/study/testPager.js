@@ -15,3 +15,11 @@ export function learningQuestionnaireList (data) {
     data
   })
 }
+
+export function learningQuestionnaireDetail (data) {
+  return request({
+    url: '/learningQuestionnaire/detail',
+    method: 'post',
+    data
+  })
+}

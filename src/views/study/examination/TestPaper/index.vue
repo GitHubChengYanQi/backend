@@ -72,7 +72,10 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="successButton" @click="() => $router.push('/study/lesson/create')">
+                <a-button
+                  class="successButton"
+                  @click="() => $router.push(`/study/lesson/create?id=${record.questionnaireId}`)"
+                >
                   编辑
                 </a-button>
 

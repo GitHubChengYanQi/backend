@@ -120,10 +120,10 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.id}`)">
+                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.courseId}`)">
                   详情
                 </a-button>
-                <a-button class="successButton" @click="() => $router.push('/study/lesson/create')">
+                <a-button class="successButton" @click="() => $router.push(`/study/lesson/create?id=${record.courseId}`)">
                   编辑
                 </a-button>
 
