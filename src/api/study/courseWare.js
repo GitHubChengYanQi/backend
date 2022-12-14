@@ -8,6 +8,14 @@ export function courseWareAdd (data) {
   })
 }
 
+export function courseWarEdit (data) {
+  return request({
+    url: '/courseWare/update',
+    method: 'post',
+    data
+  })
+}
+
 export function courseWareList (data, params) {
   return request({
     url: '/courseWare/list',
@@ -23,5 +31,13 @@ export function courseWareDetail (data, params) {
     method: 'post',
     data,
     params
+  })
+}
+
+export function courseWareDelete (data) {
+  return request({
+    url: '/courseWare/delete',
+    method: 'post',
+    data
   })
 }

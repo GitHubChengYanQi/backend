@@ -76,7 +76,7 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="() => $router.push(`/study/examination/detail?id=${record.id}`)">
+                <a-button class="warnButton" @click="() => $router.push(`/study/examination/detail?id=${record.examId}`)">
                   详情
                 </a-button>
                 <a-button
@@ -90,7 +90,7 @@
                   title="是否确认删除"
                   ok-text="确认"
                   cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
+                  @confirm="deleteAttribute(record.examId)"
                 >
                   <a-button class="delButton">删除</a-button>
                 </a-popconfirm>
@@ -106,8 +106,9 @@
 <script>
 import TagName from '@/views/workContactNew/components/tagName'
 import breadcrumb from '../components/Breadcrumd/index'
-import { examList } from '@/api/study/exam'
+import { examDelete, examList } from '@/api/study/exam'
 import moment from 'moment'
+import { message } from 'ant-design-vue'
 
 export default {
   components: { TagName, breadcrumb },
@@ -200,7 +201,10 @@ export default {
   },
   methods: {
     deleteAttribute (id) {
-      console.log(id)
+      examDelete({ examId: id }).then(() => {
+        message.success('删除成功！')
+        this.getTableData()
+      })
     },
     getTableData () {
       this.loading = true

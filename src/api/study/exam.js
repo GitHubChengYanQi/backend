@@ -8,17 +8,35 @@ export function examAdd (data) {
   })
 }
 
-export function examList (data) {
+export function examEdit (data) {
+  return request({
+    url: '/exam/update',
+    method: 'post',
+    data
+  })
+}
+
+export function examList (data, params) {
   return request({
     url: '/exam/list',
     method: 'post',
-    data
+    data,
+    params
   })
 }
 
 export function examDetail (data) {
   return request({
     url: '/exam/detail',
+    method: 'post',
+    data
+  })
+}
+
+
+export function examDelete (data) {
+  return request({
+    url: '/exam/delete',
     method: 'post',
     data
   })

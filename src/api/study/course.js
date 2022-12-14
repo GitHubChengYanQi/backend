@@ -8,17 +8,34 @@ export function courseAdd (data) {
   })
 }
 
-export function courseList (data) {
+export function courseEdit (data) {
+  return request({
+    url: '/course/update',
+    method: 'post',
+    data
+  })
+}
+
+export function courseList (data, params) {
   return request({
     url: '/course/list',
     method: 'post',
-    data
+    data,
+    params
   })
 }
 
 export function courseDetail (data) {
   return request({
     url: '/course/detail',
+    method: 'post',
+    data
+  })
+}
+
+export function courseDelete (data) {
+  return request({
+    url: '/course/delete',
     method: 'post',
     data
   })

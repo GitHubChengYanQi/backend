@@ -59,7 +59,7 @@
         <el-table-column align="center" prop="action" label="关联考试" minWidth="200">
           <template slot-scope="{row}">
             <SelectExamination
-              v-model="row.examId"
+              v-model="row.exam"
               placeholder="请选择关联考试"
             />
           </template>
@@ -134,6 +134,9 @@ import ImageTextList from '../../../Courseware/components/ImageTextList/index'
 import SelectExamination from '../SelectExamination/index'
 
 export default {
+  props: {
+    value: Array
+  },
   components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination },
   data () {
     return {
@@ -145,11 +148,26 @@ export default {
       tableView: []
     }
   },
+  created () {
+    if (this.value.length <= 0) {
+      return
+    }
+    const tableView = this.value.map(item => ({
+      ...item,
+      ...(item.courseWareResult || {}),
+      exam: item.examResult
+    }))
+    this.courseWares = {
+      fileList: tableView.filter(item => item.courseWareType === 'file'),
+      videoList: tableView.filter(item => item.courseWareType === 'video'),
+      imageTextList: tableView.filter(item => item.courseWareType === 'text')
+    }
+    this.tableView = tableView
+  },
   watch: {
     tableView: {
       handler () {
-        console.log(this.tableView)
-        this.$emit('change', this.tableView)
+        this.$emit('change', this.tableView.map((item) => ({ ...item, examId: item.exam && item.exam.examId })))
       },
       deep: true
     }

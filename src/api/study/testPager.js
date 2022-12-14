@@ -8,17 +8,34 @@ export function learningQuestionnaireAdd (data) {
   })
 }
 
-export function learningQuestionnaireList (data) {
+export function learningQuestionnaireEdit (data) {
+  return request({
+    url: '/learningQuestionnaire/update',
+    method: 'post',
+    data
+  })
+}
+
+export function learningQuestionnaireList (data, params) {
   return request({
     url: '/learningQuestionnaire/list',
     method: 'post',
-    data
+    data,
+    params
   })
 }
 
 export function learningQuestionnaireDetail (data) {
   return request({
     url: '/learningQuestionnaire/detail',
+    method: 'post',
+    data
+  })
+}
+
+export function learningQuestionnaireDelete (data) {
+  return request({
+    url: '/learningQuestionnaire/delete',
     method: 'post',
     data
   })

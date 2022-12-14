@@ -19,6 +19,7 @@
         >
           <a-form-item label="课程名称">
             <a-input
+              :maxLength="20"
               placeholder="请输入课程名称"
               v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }] }]"
             />
@@ -38,9 +39,11 @@
             :wrapper-col="{ span: 19 }"
           >
             <selectCourseware
+              v-if="!detailLoading"
               placeholder="请选择课件"
               v-decorator="['wareBindParams', { rules: [{ required: true, message: '请选择课件!' }],initialValue:[] }]"
             />
+            <a-spin v-else />
           </a-form-item>
           <a-form-item label="封面图">
             <div class="my-space">
@@ -58,7 +61,7 @@
           <a-form-item label="关联考试">
             <SelectExamination
               placeholder="请选择关联考试"
-              v-decorator="['examId', { rules: [{ required: true, message: '请选择关联考试!' }],initialValue:'' }]"
+              v-decorator="['exam', { rules: [{ required: true, message: '请选择关联考试!' }],initialValue:{} }]"
             />
           </a-form-item>
           <a-form-item label="课程简介">
@@ -84,7 +87,7 @@ import Employee from '../../components/Employee/index'
 import { courseClassTreeView } from '@/api/study/lessonClass'
 import router from '@/router'
 import { message } from 'ant-design-vue'
-import { courseAdd, courseDetail } from '@/api/study/course'
+import { courseAdd, courseDetail, courseEdit } from '@/api/study/course'
 
 export default {
   components: { breadcrumb, selectCourseware, VueQuillEditor, ImgUpload, SelectExamination, Employee },
@@ -99,16 +102,66 @@ export default {
     }
   },
   created () {
+    this.getTreeData()
+  },
+  mounted () {
     if (router.history.current.query.id) {
       this.getDetail(router.history.current.query.id)
     }
-    this.getTreeData()
   },
   methods: {
+    getParentValue (value, data) {
+      if (!Array.isArray(data)) {
+        return []
+      }
+      for (let i = 0; i < data.length; i++) {
+        if (`${data[i].value}` === `${value}`) {
+          return [`${value}`]
+        }
+        if (data[i].children.length > 0) {
+          const values = this.getParentValue(value, data[i].children)
+          if (values.length > 0) {
+            return [`${data[i].value}`, ...values]
+          }
+        }
+      }
+      return []
+    },
+    getClassIds (value, dataSources) {
+      let valueArray = []
+      if ((value || value === 0) && typeof `${value}` === 'string') {
+        const $tmpValue = `${value}`
+        if ($tmpValue.indexOf(',') >= 0) {
+          const tmpValue = $tmpValue.split(',')
+          for (let i = 0; i < tmpValue.length; i++) {
+            const item = tmpValue[i]
+            if (item) {
+              valueArray.push(item)
+            }
+          }
+        } else {
+          valueArray = this.getParentValue($tmpValue, dataSources)
+        }
+      } else if (Array.isArray(value)) {
+        valueArray = value
+      } else {
+        valueArray = ''
+      }
+      return valueArray
+    },
     getDetail (id) {
       this.detailLoading = true
       courseDetail({ courseId: id }).then((res) => {
-        console.log(res)
+        const detail = res.data || {}
+        this.form.setFieldsValue({
+          name: detail.name,
+          courseClassId: this.getClassIds(detail.courseClassId, this.classTree),
+          wareBindParams: detail.courseWareBindResults,
+          coverImageUrl: detail.coverImageUrl,
+          applicableObject: detail.applicableObject === 1 ? ['all'] : [],
+          exam: detail.examResults && detail.examResults[0],
+          note: detail.note
+        })
       }).finally(() => {
         this.detailLoading = false
       })
@@ -126,19 +179,29 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.loading = true
-          courseAdd({
+          const data = {
             ...values,
-            courseClassId: values.courseClassId[0],
+            courseClassId: values.courseClassId[values.courseClassId.length - 1],
             questionnaireIds: [values.questionnaireId],
-            examIds: [values.examId],
+            examIds: [values.exam.examId],
             applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
             empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject
-          }).then(() => {
-            router.back()
-            message.success('课程创建成功！')
-          }).finally(() => {
-            this.loading = false
-          })
+          }
+          if (router.history.current.query.id) {
+            courseEdit({ ...data, courseId: router.history.current.query.id }).then(() => {
+              router.back()
+              message.success('课程修改成功！')
+            }).finally(() => {
+              this.loading = false
+            })
+          } else {
+            courseAdd(data).then(() => {
+              router.back()
+              message.success('课程创建成功！')
+            }).finally(() => {
+              this.loading = false
+            })
+          }
         }
       })
     }

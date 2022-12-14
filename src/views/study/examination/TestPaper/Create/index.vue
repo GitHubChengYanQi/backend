@@ -41,6 +41,7 @@
             <div class="name">
               <a-form-item label="试卷名称">
                 <a-input
+                  :maxLength="20"
                   placeholder="请输入试卷名称"
                   v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }],initialValue:'' }]"
                 />
@@ -177,7 +178,11 @@
                     </div>
                   </div>
                   <div class="actions">
-                    <a-icon v-if="questionItem.index === questions.length - 1" type="plus-square" @click="addQuestion" />
+                    <a-icon
+                      v-if="questionItem.index === questions.length - 1"
+                      type="plus-square"
+                      @click="addQuestion"
+                    />
                     <a-icon type="delete" v-if="questions.length !== 1" @click="removeQuestion(questionItem.index)" />
                     <div
                       @mouseenter="mouseenter(questionItem)"
@@ -205,7 +210,7 @@
 <script>
 import breadcrumb from '../../../components/Breadcrumd'
 import DragIcon from '../../../components/DragIcon'
-import { learningQuestionnaireAdd, learningQuestionnaireDetail } from '@/api/study/testPager'
+import { learningQuestionnaireAdd, learningQuestionnaireDetail, learningQuestionnaireEdit } from '@/api/study/testPager'
 import { message } from 'ant-design-vue'
 import router from '@/router'
 
@@ -229,21 +234,65 @@ export default {
       }]
     }
   },
-  created () {
+  mounted () {
     if (router.history.current.query.id) {
       this.getDetail(router.history.current.query.id)
     }
   },
-  getDetail (id) {
-    this.detailLoading = true
-    learningQuestionnaireDetail({ questionnaireId: id }).then((res) => {
-      console.log(res)
-    }).finally(() => {
-      this.detailLoading = false
-    })
-  },
   components: { breadcrumb, DragIcon },
   methods: {
+    getDetail (id) {
+      this.detailLoading = true
+      learningQuestionnaireDetail({ questionnaireId: id }).then((res) => {
+        const detail = res.data || {}
+        const questionResults = detail.questionResults || []
+        this.questions = questionResults.map((item, index) => {
+          const options = {};
+          (item.answerResults || []).forEach((optionItem, index) => {
+            options[String.fromCharCode(65 + index)] = optionItem.answerContent
+          })
+          return {
+            index,
+            type: item.questionType,
+            options
+          }
+        })
+        setTimeout(() => {
+          this.form.setFieldsValue({
+            name: detail.questionnaireName,
+            questions: questionResults.map((item, index) => {
+              let answer = []
+              const options = {};
+              (item.answerResults || []).forEach((optionItem, index) => {
+                if (optionItem.isTrue) {
+                  if (item.questionType === 'multiple') {
+                    answer.push(String.fromCharCode(65 + index))
+                  } else if (item.questionType === 'single') {
+                    answer = String.fromCharCode(65 + index)
+                  } else {
+                    answer = optionItem.answerContent
+                  }
+                }
+                if (item.questionType === 'judge') {
+                  return
+                }
+                options[String.fromCharCode(65 + index)] = optionItem.answerContent
+              })
+              return {
+                name: item.questionContent,
+                type: item.questionType,
+                fen: item.score,
+                options,
+                answer
+              }
+            })
+          })
+          this.switchChange(this.sname)
+        }, 0)
+      }).finally(() => {
+        this.detailLoading = false
+      })
+    },
     switchChange (checked) {
       setTimeout(() => {
         const questions = this.form.getFieldValue('questions')
@@ -318,18 +367,28 @@ export default {
                   return {
                     answerContent: item.options[optionItem],
                     isTrue: answer ? 1 : 0,
-                    sort: index
+                    sort: optionIndex
                   }
                 })
               }
             })
           }
-          learningQuestionnaireAdd(data).then(() => {
-            router.back()
-            message.success('创建试卷成功!')
-          }).finally(() => {
-            this.loading = false
-          })
+
+          if (router.history.current.query.id) {
+            learningQuestionnaireEdit({ ...data, questionnaireId: router.history.current.query.id }).then(() => {
+              router.back()
+              message.success('修改试卷成功!')
+            }).finally(() => {
+              this.loading = false
+            })
+          } else {
+            learningQuestionnaireAdd(data).then(() => {
+              router.back()
+              message.success('创建试卷成功!')
+            }).finally(() => {
+              this.loading = false
+            })
+          }
         }
       })
     },
@@ -390,8 +449,10 @@ export default {
         if (key === index) {
           Object.keys(options).forEach((option, optionIndex) => {
             if (optionIndex === Object.keys(options).length - 1) {
-              const newOption = String.fromCharCode(option.charCodeAt(0) - 1)
-              updateFileds[`questions[${index}].options.${newOption}`] = options[option]
+              if (char !== option) {
+                const newOption = String.fromCharCode(option.charCodeAt(0) - 1)
+                updateFileds[`questions[${index}].options.${newOption}`] = options[option]
+              }
             } else if (option.charCodeAt(0) > char.charCodeAt(0)) {
               const newOption = String.fromCharCode(option.charCodeAt(0) - 1)
               updateFileds[`questions[${index}].options.${newOption}`] = options[option]
@@ -404,7 +465,6 @@ export default {
         }
         return item
       })
-
       setTimeout(() => {
         this.form.setFieldsValue(updateFileds)
       }, 0)

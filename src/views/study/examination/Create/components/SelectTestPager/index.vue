@@ -47,36 +47,17 @@
 import TestPaper from '../../../TestPaper/index'
 
 export default {
+  props: {
+    value: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
+  },
   components: { TestPaper },
   data () {
     return {
-      columns: [
-        {
-          title: '试卷名称',
-          dataIndex: 'name',
-          align: 'center',
-          width: '200px'
-        },
-        {
-          title: '总题数',
-          width: '200px',
-          dataIndex: 'introduction',
-          align: 'center'
-        },
-        {
-          title: '总分数 ',
-          dataIndex: 'class',
-          align: 'center'
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'total',
-          align: 'center',
-          sorter: true
-        }
-      ],
-      tableData: [],
-      selectId: '',
       selectRow: {},
       name: '',
       pagination: {
@@ -90,8 +71,13 @@ export default {
       visible: false
     }
   },
-  created () {
-
+  watch: {
+    value () {
+      if (this.value) {
+        this.name = this.value.questionnaireName
+        this.selectRow = this.value
+      }
+    }
   },
   methods: {
     selectTestPager (row) {
@@ -103,7 +89,7 @@ export default {
     },
     submit () {
       this.name = this.selectRow.questionnaireName
-      this.$emit('change', this.selectRow.questionnaireId)
+      this.$emit('change', this.selectRow)
       this.visible = false
     }
   }

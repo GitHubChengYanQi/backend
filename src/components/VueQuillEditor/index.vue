@@ -20,7 +20,6 @@
       ref="myQuillEditor"
       :options="editorOption"
       @blur="onEditorBlur($event)"
-      @focus="onEditorFocus($event)"
       @change="onEditorChange($event)"></quill-editor>
   </div>
 </template>
@@ -65,6 +64,13 @@ export default {
     value: {
       type: String,
       default: ''
+    }
+  },
+  watch: {
+    value (value) {
+      if (value) {
+        this.content = value
+      }
     }
   },
   data () {

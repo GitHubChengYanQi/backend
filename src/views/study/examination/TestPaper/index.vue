@@ -74,7 +74,7 @@
               <div class="my-space">
                 <a-button
                   class="successButton"
-                  @click="() => $router.push(`/study/lesson/create?id=${record.questionnaireId}`)"
+                  @click="() => $router.push(`/study/testPaper/create?id=${record.questionnaireId}`)"
                 >
                   编辑
                 </a-button>
@@ -83,7 +83,7 @@
                   title="是否确认删除"
                   ok-text="确认"
                   cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
+                  @confirm="deleteAttribute(record.questionnaireId)"
                 >
                   <a-button class="delButton">删除</a-button>
                 </a-popconfirm>
@@ -99,8 +99,9 @@
 <script>
 import TagName from '@/views/workContactNew/components/tagName'
 import breadcrumb from '../../components/Breadcrumd/index'
-import { learningQuestionnaireList } from '@/api/study/testPager'
+import { learningQuestionnaireDelete, learningQuestionnaireList } from '@/api/study/testPager'
 import moment from 'moment'
+import { message } from 'ant-design-vue'
 
 export default {
   components: { TagName, breadcrumb },
@@ -198,6 +199,12 @@ export default {
     },
     selectChange (ids, rows) {
       this.$emit('selectRow', rows[0])
+    },
+    deleteAttribute (id) {
+      learningQuestionnaireDelete({ questionnaireId: id }).then(() => {
+        message.success('删除成功！')
+        this.getTableData()
+      })
     },
     // 群聊筛选
     // 重置

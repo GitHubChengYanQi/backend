@@ -11,7 +11,13 @@
 
         <a-form-item
           label="课程分类">
-          <a-input v-model="screenData.remark	" placeholder="请选择课程分类"></a-input>
+          <a-cascader
+            v-if="!classTreeLoading"
+            v-model="screenData.courseClassId"
+            :options="classTree"
+            placeholder="请选择课程分类"
+          />
+          <a-spin v-else />
         </a-form-item>
 
         <a-form-item
@@ -96,9 +102,9 @@
             <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  {{ text }}
+                  <div v-html="text"></div>
                 </template>
-                {{ text }}
+                <div v-html="text"></div>
               </a-tooltip>
             </div>
           </div>
@@ -123,7 +129,10 @@
                 <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.courseId}`)">
                   详情
                 </a-button>
-                <a-button class="successButton" @click="() => $router.push(`/study/lesson/create?id=${record.courseId}`)">
+                <a-button
+                  class="successButton"
+                  @click="() => $router.push(`/study/lesson/create?id=${record.courseId}`)"
+                >
                   编辑
                 </a-button>
 
@@ -131,7 +140,7 @@
                   title="是否确认删除"
                   ok-text="确认"
                   cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
+                  @confirm="deleteAttribute(record.courseId)"
                 >
                   <a-button class="delButton">删除</a-button>
                 </a-popconfirm>
@@ -159,8 +168,10 @@
 import TagName from '@/views/workContactNew/components/tagName'
 import breadcrumb from '../components/Breadcrumd/index'
 import lessonClass from './components/LessonClass'
-import { courseList } from '@/api/study/course'
+import { courseDelete, courseList } from '@/api/study/course'
 import moment from 'moment'
+import { courseClassTreeView } from '@/api/study/lessonClass'
+import { message } from 'ant-design-vue'
 
 export default {
   components: { TagName, breadcrumb, lessonClass },
@@ -168,11 +179,7 @@ export default {
     return {
       loading: false,
       lessonClassVisible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      screenData: {},
       columns: [
         {
           title: '课程名称',
@@ -257,22 +264,38 @@ export default {
         showSizeChanger: true,
         pageSizeOptions: ['10', '20', '30', '50'],
         showTotal: (total) => `共 ${total} 条数据`
-      }
+      },
+      classTreeLoading: false,
+      classTree: []
     }
   },
   created () {
     this.getTableData()
+    this.getTreeData()
   },
   methods: {
+    getTreeData () {
+      this.classTreeLoading = true
+      courseClassTreeView().then((res) => {
+        this.classTree = res.data
+      }).finally(() => {
+        this.classTreeLoading = false
+      })
+    },
     openLessonClass () {
       this.lessonClassVisible = true
     },
     deleteAttribute (id) {
-      console.log(id)
+      courseDelete({ courseId: id }).then(() => {
+        message.success('删除成功！')
+        this.getTableData()
+      })
     },
     getTableData () {
       this.loading = true
-      const data = {}
+      const data = {
+        ...this.screenData
+      }
       courseList(data, {
         limit: this.pagination.pageSize,
         page: this.pagination.current
@@ -288,17 +311,10 @@ export default {
       this.pagination.pageSize = pageSize
       this.getTableData()
     },
-    selectChange (row) {
-      console.log(row)
-    },
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }

@@ -281,7 +281,7 @@ export default {
       width: 100%;
     }
 
-    .el-tree-node__content > .el-tree-node__expand-icon {
+    .el-tree-node__expand-icon {
       padding: 0;
     }
 

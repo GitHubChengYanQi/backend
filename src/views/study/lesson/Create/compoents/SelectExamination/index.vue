@@ -48,11 +48,32 @@ import examination from '../../../../examination/index'
 
 export default {
   components: { examination },
+  props: {
+    value: {
+      type: Object,
+      default: _ => {
+      }
+    }
+  },
   data () {
     return {
       selectRow: {},
       name: '',
       visible: false
+    }
+  },
+  created () {
+    if (this.value) {
+      this.name = this.value.name
+      this.selectRow = this.value
+    }
+  },
+  watch: {
+    value (value) {
+      if (value) {
+        this.name = this.value.name
+        this.selectRow = value
+      }
     }
   },
   methods: {
@@ -65,8 +86,8 @@ export default {
     },
     submit () {
       this.name = this.selectRow.name
-      this.$emit('change', this.selectRow.examId)
-      this.$emit('input', this.selectRow.examId)
+      this.$emit('change', this.selectRow)
+      this.$emit('input', this.selectRow)
       this.visible = false
     }
   }

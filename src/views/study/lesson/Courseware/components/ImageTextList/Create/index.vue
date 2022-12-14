@@ -17,6 +17,7 @@
         >
           <a-form-item label="标题">
             <a-input
+              :maxLength="50"
               placeholder="请输入标题"
               v-decorator="['title', { rules: [{ required: true, message: '请输入标题!' }] }]"
             />
@@ -51,7 +52,7 @@
 import breadcrumb from '../../../../../components/Breadcrumd'
 import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
-import { courseWareAdd, courseWareDetail } from '@/api/study/courseWare'
+import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
 import router from '@/router'
 import { message } from 'ant-design-vue'
 
@@ -65,7 +66,7 @@ export default {
       form: this.$form.createForm(this, { name: 'coordinated' })
     }
   },
-  created () {
+  mounted () {
     if (router.history.current.query.id) {
       this.getDetail(router.history.current.query.id)
     }
@@ -74,7 +75,12 @@ export default {
     getDetail (id) {
       this.detailLoading = true
       courseWareDetail({ courseWareId: id }).then((res) => {
-        console.log(res)
+        const detail = res.data || {}
+        this.form.setFieldsValue({
+          title: detail.title,
+          coverImageUrl: detail.coverImageUrl,
+          note: detail.note
+        })
       }).finally(() => {
         this.detailLoading = false
       })
@@ -84,16 +90,26 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.loading = true
-          courseWareAdd({
+          const data = {
             courseWareType: 'text',
             suffix: 'jpg',
             ...values
-          }).then(() => {
-            router.back()
-            message.success('课件创建成功！')
-          }).finally(() => {
-            this.loading = false
-          })
+          }
+          if (router.history.current.query.id) {
+            courseWarEdit({ ...data, courseWareId: router.history.current.query.id }).then(() => {
+              router.back()
+              message.success('课件修改成功！')
+            }).finally(() => {
+              this.loading = false
+            })
+          } else {
+            courseWareAdd(data).then(() => {
+              router.back()
+              message.success('课件创建成功！')
+            }).finally(() => {
+              this.loading = false
+            })
+          }
         }
       })
     }

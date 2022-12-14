@@ -70,13 +70,12 @@
                 </a-button>
                 <a-button class="linkButton">预览</a-button>
                 <a-popconfirm
-                  disabled
                   title="是否确认删除"
                   ok-text="确认"
                   cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
+                  @confirm="deleteAttribute(record.courseWareId)"
                 >
-                  <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+                  <a-button class="delButton">删除</a-button>
                 </a-popconfirm>
               </div>
             </template>
@@ -93,7 +92,7 @@ import upload from '../upload'
 import vpload from '../vpload'
 import { message } from 'ant-design-vue'
 import moment from 'moment'
-import { courseWareList } from '@/api/study/courseWare'
+import { courseWareDelete, courseWareList } from '@/api/study/courseWare'
 
 export default {
   props: {
@@ -211,7 +210,10 @@ export default {
       console.log('ok')
     },
     deleteAttribute (id) {
-      console.log(id)
+      courseWareDelete({ courseWareId: id }).then(() => {
+        message.success('删除成功！')
+        this.getTableData()
+      })
     },
     getTableData () {
       this.loading = true

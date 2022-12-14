@@ -16,6 +16,7 @@
         >
           <a-form-item label="考试名称">
             <a-input
+              :maxLength="20"
               placeholder="请输入考试名称"
               v-decorator="['name', { rules: [{ required: true, message: '请输入考试名称!' }] ,initialValue: '' }]"
             />
@@ -38,7 +39,7 @@
           </a-form-item>
           <a-form-item label="试卷选择">
             <SelectTestPager
-              v-decorator="['questionnaireId', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: '' }]" />
+              v-decorator="['questionnaire', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: {} }]" />
           </a-form-item>
           <a-form-item label="封面图">
             <div class="my-space">
@@ -93,7 +94,7 @@ import SelectTestPager from './components/SelectTestPager'
 import router from '@/router'
 import { message } from 'ant-design-vue'
 import TimeLimit from './components/TimeLimit'
-import { examAdd, examDetail } from '@/api/study/exam'
+import { examAdd, examDetail, examEdit } from '@/api/study/exam'
 
 export default {
   components: { breadcrumb, VueQuillEditor, ImgUpload, Employee, SelectTestPager, TimeLimit },
@@ -105,16 +106,29 @@ export default {
       form: this.$form.createForm(this, { name: 'coordinated' })
     }
   },
-  created () {
+  mounted () {
     if (router.history.current.query.id) {
       this.getDetail(router.history.current.query.id)
     }
+    // this.form.setFieldsValue({
+    //   note: '<h1>123</h1>'
+    // })
   },
   methods: {
     getDetail (id) {
       this.detailLoading = true
       examDetail({ examId: id }).then((res) => {
-        console.log(res)
+        const detail = res.data || {}
+        this.form.setFieldsValue({
+          name: detail.name,
+          reexam: detail.reexam,
+          questionnaire: detail.questionnaireResults && detail.questionnaireResults[0],
+          coverImageUrl: detail.coverImageUrl,
+          timeLimit: detail.timeLimit,
+          passScore: detail.passScore,
+          applicableObject: detail.applicableObject === 1 ? ['all'] : [],
+          note: detail.note
+        })
       }).finally(() => {
         this.detailLoading = false
       })
@@ -122,25 +136,29 @@ export default {
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
-        console.log({
-          ...values,
-          questionnaireIds: [values.questionnaireId],
-          applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
-          empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject
-        })
         if (!err) {
           this.loading = true
-          examAdd({
+          const data = {
             ...values,
-            questionnaireIds: [values.questionnaireId],
+            questionnaireIds: [values.questionnaire.questionnaireId],
             applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
             empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject
-          }).then(() => {
-            router.back()
-            message.success('考试创建成功！')
-          }).finally(() => {
-            this.loading = false
-          })
+          }
+          if (router.history.current.query.id) {
+            examEdit({ ...data, examId: router.history.current.query.id }).then(() => {
+              router.back()
+              message.success('考试修改成功！')
+            }).finally(() => {
+              this.loading = false
+            })
+          } else {
+            examAdd(data).then(() => {
+              router.back()
+              message.success('考试创建成功！')
+            }).finally(() => {
+              this.loading = false
+            })
+          }
         }
       })
     }
