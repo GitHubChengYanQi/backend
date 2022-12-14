@@ -83,6 +83,7 @@
                 src="../images/edit.svg"
                 alt
                 class="icon"
+                :class="(item.type === 6) ? 'icon move disabled' : 'icon move'"
                 @click="handleEditClick(item, index)"
               />
               <img src="../images/del.svg" alt class="icon" @click="handleDelClick(index)" />
@@ -764,9 +765,6 @@ export default {
         this.chooseImage()
       } else if (singleType === 3) {
         this.chooseVideo()
-      } else if (singleType === 6) {
-        this.contentRadarObj = { ...info }
-        this.contentRadarModalShow = true
       }
       // this.isEditingItem = true
       // this.editIdx = index

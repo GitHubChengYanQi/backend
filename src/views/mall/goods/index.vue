@@ -648,6 +648,13 @@ export default {
           this.getTableData()
         }
         console.log(response)
+      }).catch((error) => {
+        console.log(error)
+        // console.log(error.message, '导入失败message')
+        // console.log(error.response.data.error, '导入失败response')
+        // console.log(error.request, '导入失败request')
+        // console.log(error.status, '导入失败status')
+        this.tableLoading = false
       })
     },
     /**
