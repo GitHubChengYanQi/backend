@@ -26,7 +26,7 @@ import stepNews from '@/components/StepNews/StepNews'
 import ExportExcel from '@/components/ExportDownload/ExportExcel'
 import preview from '@/components/Preview/index'
 import More from '@/components/More/More'
-import ElementUI from 'element-ui'
+import { Tree, Button, Table, TableColumn } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 // 引入富文本编辑器
@@ -54,7 +54,10 @@ Vue.use(VueQuillEditor)
 Vue.use(VueQuillEditor)
 Vue.use(VueViewer)
 
-Vue.use(ElementUI)
+Vue.use(Tree)
+Vue.use(Button)
+Vue.use(Table)
+Vue.use(TableColumn)
 
 Vue.use(VueAxios)
 Vue.component('SelectEmployee', selectEmployee)
