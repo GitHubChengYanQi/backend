@@ -654,7 +654,7 @@ export default {
         articleId: this.articleId
       }
       scrmRadarVisitorIndex(obj).then((res) => {
-        console.log(res)
+        console.log(res, '111111111')
         const obj = {}
         const { data } = res
         this.radarInfo.data = data.data
@@ -662,7 +662,7 @@ export default {
         this.radarInfo.data.officeAction = data.data.track.linkType.includes('0') ? '已开启' : '未开启'
         this.radarInfo.data.dynamicInform = data.data.track.linkType.includes('1') ? '已开启' : '未开启'
         this.selectArr.channel = data.ditch
-        data.today.concat(data.total).map((item, index) => {
+        data.total.concat(data.today).map((item, index) => {
           obj[index] = item
         })
         this.dataOverview.data = obj
