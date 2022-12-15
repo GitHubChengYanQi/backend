@@ -40,8 +40,8 @@
             <div :class="`content ${item.type === 4 ? 'link' : ''}`" v-else-if="item.type === 4">
               <div class="lef">
                 <span class="til">{{ item.linkTitle }}</span>
-                <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span>
+                <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
               </div>
               <img :src="item.linkPhoto" alt class="image" />
             </div>
@@ -60,8 +60,8 @@
             <div :class="`content ${item.type === 6 ? 'link' : ''}`" v-else-if="item.type === 6">
               <div class="lef">
                 <span class="til">{{ item.linkTitle }}</span>
-                <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                <!-- <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span> -->
+                <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
               </div>
               <img :src="item.linkPhoto" alt class="image" />
             </div>
@@ -83,6 +83,8 @@
                 src="../images/edit.svg"
                 alt
                 class="icon"
+                v-if="item.type !== 6"
+                :class="(item.type === 6) ? 'icon move disabled' : 'icon move'"
                 @click="handleEditClick(item, index)"
               />
               <img src="../images/del.svg" alt class="icon" @click="handleDelClick(index)" />
@@ -764,9 +766,6 @@ export default {
         this.chooseImage()
       } else if (singleType === 3) {
         this.chooseVideo()
-      } else if (singleType === 6) {
-        this.contentRadarObj = { ...info }
-        this.contentRadarModalShow = true
       }
       // this.isEditingItem = true
       // this.editIdx = index

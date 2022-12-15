@@ -89,7 +89,11 @@ const errorHandler = (error) => {
         })(i)
       }
     } else {
-      message.error(`${data.msg || 'error'}`)
+      console.log(data, '请求')
+      if (data.type === 'application/json') {
+      } else {
+        message.error(`${data.msg || 'error'}`)
+      }
     }
   } else {
     message.error(error.message || '请求出错，请稍后重试！')

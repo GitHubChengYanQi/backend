@@ -277,6 +277,7 @@ export default {
           }
         }
         const data = await getTabDetailReq(obj)
+
         if (['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(this.selectTag)) {
           const d = data.data.list
           const dataSource = []
@@ -335,7 +336,11 @@ export default {
             })
           }
           this.pagination.total = data.data.totalNum
-          this.tagsDetailArr = dataSource
+          if (data.data.totalNum === 0) {
+            this.tagsDetailArr = []
+          } else {
+            this.tagsDetailArr = dataSource
+          }
           this.tableCloumns = cloumns
         } else {
           // 一级数据中 空值为空数组，需要提前设置默认值
