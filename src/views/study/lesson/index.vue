@@ -34,7 +34,7 @@
           label="关联考试">
           <a-select
             :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender1"
+            v-model="screenData.gender"
             style="width: 200px"
             placeholder="请选择关联考试"
           ></a-select>

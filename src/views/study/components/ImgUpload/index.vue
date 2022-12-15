@@ -29,6 +29,10 @@ import storage from 'store'
 
 export default {
   props: {
+    fileSize: {
+      type: Number,
+      default: 10
+    },
     value: {
       type: String,
       default: ''
@@ -90,7 +94,7 @@ export default {
       const fileSuffix = this._getFileSuffix(file.name).toLowerCase()
       const fileType = file.type.split('/')[0]
       const file2M = file.size / 1024 / 1024 < 2
-      const file10M = file.size / 1024 / 1024 < 10
+      const fileSize = file.size / 1024 / 1024 < this.fileSize
       let ary = []
       if (this.fileType instanceof Array) {
         this.fileType.map(item => {
@@ -105,10 +109,10 @@ export default {
         return false
       }
       if (fileType === 'video') {
-        if (!file10M) {
+        if (!fileSize) {
           this.$message.error('上传文件过大')
         }
-        return flag && file10M
+        return flag && fileSize
       }
 
       if (!file2M) {

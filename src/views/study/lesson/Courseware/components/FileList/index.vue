@@ -36,6 +36,7 @@
       <div v-if="!select" class="btn">
         <a-icon type="question-circle" />
         <upload
+          :max-size="100"
           @upload="upload"
           @on-percent="onPercent"
           :default-file-type-list="['jpg','png','ppt','pptx','pdf','doc','docx']"

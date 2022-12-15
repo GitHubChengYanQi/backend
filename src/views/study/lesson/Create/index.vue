@@ -26,6 +26,7 @@
           </a-form-item>
           <a-form-item label="模板分类">
             <a-cascader
+              change-on-select
               v-if="!classTreeLoading"
               :options="classTree"
               placeholder="请选择模板分类"
@@ -61,7 +62,7 @@
           <a-form-item label="关联考试">
             <SelectExamination
               placeholder="请选择关联考试"
-              v-decorator="['exam', { rules: [{ required: true, message: '请选择关联考试!' }],initialValue:{} }]"
+              v-decorator="['exam', { initialValue:{} }]"
             />
           </a-form-item>
           <a-form-item label="课程简介">

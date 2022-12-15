@@ -28,6 +28,7 @@
           <a-form-item label="上传视频">
             <div class="my-space">
               <ImgUpload
+                :fileSize="500"
                 :fileType="3"
                 v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!'}],initialValue: '' }]"
                 @success="upload"

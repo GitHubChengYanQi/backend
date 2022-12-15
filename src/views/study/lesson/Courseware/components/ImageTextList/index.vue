@@ -5,7 +5,7 @@
 
         <a-form-item
           label="标题名称：">
-          <a-input v-model="screenData.name" placeholder="请输入标题名称" :maxLength="20"></a-input>
+          <a-input v-model="screenData.name" placeholder="请输入标题名称" :maxLength="50"></a-input>
         </a-form-item>
 
         <a-form-item

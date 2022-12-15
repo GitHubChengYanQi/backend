@@ -170,7 +170,7 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           customRender: (text) => {
-            return (text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-')
+            return (text ? moment(text).format('YYYY-MM-DD HH:mm') : '-')
           },
           align: 'center',
           sorter: true

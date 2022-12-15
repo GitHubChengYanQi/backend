@@ -68,7 +68,9 @@
                     <div class="questionTitle">问题{{ questionItem.index + 1 }}</div>
                     <div class="questionContent">
                       <a-form-item label="试卷题目">
-                        <a-input
+                        <a-textarea
+                          auto-size
+                          :max-length="100"
                           placeholder="请输入试卷名称"
                           v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
                         />
@@ -112,7 +114,9 @@
                               :wrapper-col="{ span: 12 }"
                             >
                               <div class="option">
-                                <a-input
+                                <a-textarea
+                                  auto-size
+                                  :max-length="100"
                                   placeholder="请输入选项"
                                   v-decorator="[`questions[${questionItem.index}].options.${option}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
                                 />
