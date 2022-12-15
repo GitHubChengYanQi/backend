@@ -1,21 +1,18 @@
 <template>
   <div>
     <breadcrumb v-if="!select" :titles="['考试管理']"></breadcrumb>
-    <a-card v-if="!select" :bordered="false" class="my-table-search">
+    <a-card :bordered="false" class="my-table-search" :body-style="{padding:select ? 0 : 24}">
       <a-form layout="inline">
 
-        <a-form-item
-          label="考试名称">
+        <a-form-item :label="select ? '' : '考试名称'">
           <a-input v-model="screenData.name" placeholder="请输入考试名称" :maxLength="20"></a-input>
         </a-form-item>
 
-        <a-form-item
-          label="创建时间">
+        <a-form-item :label="select ? '' : '创建时间'">
           <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
-        <a-form-item
-          label="创建人">
+        <a-form-item :label="select ? '' : '创建人'">
           <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
         </a-form-item>
 
@@ -29,7 +26,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button v-if="!select" type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -55,7 +52,7 @@
           :columns="columns"
           :data-source="tableData"
           :rowKey="record => record.examId"
-          :rowSelection="select ? {type:'radio', onChange: selectChange} : null"
+          :rowSelection="select ? {...rowSelection,selectedRowKeys} : null"
           :pagination="pagination"
           @change="handleTableChange">
           <div slot="name" slot-scope="text, record">
@@ -76,7 +73,10 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="() => $router.push(`/study/examination/detail?id=${record.examId}`)">
+                <a-button
+                  class="warnButton"
+                  @click="() => $router.push(`/study/examination/detail?id=${record.examId}`)"
+                >
                   详情
                 </a-button>
                 <a-button
@@ -113,10 +113,19 @@ import { message } from 'ant-design-vue'
 export default {
   components: { TagName, breadcrumb },
   props: {
-    select: Boolean
+    rows: {
+      type: Array,
+      default: _ => []
+    },
+    select: Boolean,
+    checkbox: Boolean
   },
   data () {
     return {
+      rowKey: 'examId',
+      selectedRowKeys: [],
+      checkedRows: [],
+      rowSelection: {},
       loading: false,
       screenData: {
         gender: 3,
@@ -188,6 +197,35 @@ export default {
     }
   },
   created () {
+    if (this.checkbox) {
+      this.rowSelection = {
+        type: 'checkbox',
+        onSelect: (record, selected) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, record])
+          } else {
+            this.onChangeRows(this.checkedRows.filter(item => item[this.rowKey] !== record[this.rowKey]))
+          }
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, ...changeRows])
+          } else {
+            const deleteIds = changeRows.map((item) => {
+              return item[this.rowKey]
+            })
+            this.onChangeRows(this.checkedRows.filter(item => !deleteIds.some(deleKey => item[this.rowKey] === deleKey)))
+          }
+        }
+      }
+    } else {
+      this.rowSelection = {
+        type: 'radio',
+        onChange: this.selectChange
+      }
+    }
+    this.checkedRows = this.rows
+    this.selectedRowKeys = this.rows.map(item => item[this.rowKey])
     if (!this.select) {
       this.columns.push({
         title: '操作',
@@ -200,6 +238,11 @@ export default {
     this.getTableData()
   },
   methods: {
+    onChangeRows (rows) {
+      this.selectedRowKeys = rows.map(item => item[this.rowKey])
+      this.checkedRows = rows
+      this.$emit('selectRows', rows)
+    },
     deleteAttribute (id) {
       examDelete({ examId: id }).then(() => {
         message.success('删除成功！')
@@ -225,6 +268,7 @@ export default {
       this.getTableData()
     },
     selectChange (ids, rows) {
+      this.selectedRowKeys = ids
       this.$emit('selectRow', rows[0])
     },
     // 群聊筛选

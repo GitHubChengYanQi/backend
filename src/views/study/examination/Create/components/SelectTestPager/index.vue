@@ -6,14 +6,14 @@
     </a-button>
     <div v-else>
       <a-badge>
-        <div slot="count">
+        <div v-if="!disabled" slot="count">
           <a-icon type="close-circle" style="cursor: pointer" @click="remove" />
         </div>
         <a-button style="width: 200px;border-radius: 8px" class="linkButton">
           {{ name }}
         </a-button>
       </a-badge>
-      <a-button type="link">
+      <a-button type="link" @click="preview = true">
         预览
       </a-button>
     </div>
@@ -40,14 +40,27 @@
         </a-button>
       </div>
     </a-modal>
+
+    <a-modal
+      :footer="null"
+      destroyOnClose
+      :width="1200"
+      :title="'试卷名称：'+name"
+      :visible="preview"
+      @cancel="preview = false"
+    >
+      <TestPaperDetail preview :questionResults="selectRow.questionResults" />
+    </a-modal>
   </div>
 </template>
 
 <script>
 import TestPaper from '../../../TestPaper/index'
+import TestPaperDetail from '../../../Detail/components/TestPaperDetail/index'
 
 export default {
   props: {
+    disabled: Boolean,
     value: {
       type: Object,
       default () {
@@ -55,9 +68,10 @@ export default {
       }
     }
   },
-  components: { TestPaper },
+  components: { TestPaper, TestPaperDetail },
   data () {
     return {
+      preview: false,
       selectRow: {},
       name: '',
       pagination: {
@@ -72,10 +86,10 @@ export default {
     }
   },
   watch: {
-    value () {
-      if (this.value) {
-        this.name = this.value.questionnaireName
-        this.selectRow = this.value
+    value (value) {
+      if (value) {
+        this.name = value.questionnaireName
+        this.selectRow = value
       }
     }
   },

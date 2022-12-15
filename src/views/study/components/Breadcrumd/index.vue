@@ -11,7 +11,7 @@
     <div
       v-if="back"
       class="back"
-      @click.stop="$router.back(-1)">
+      @click.stop="goBack">
       <span class="return_lt"></span>
       <span class="return">返回</span>
     </div>
@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import router from '@/router'
+
 export default {
   props: {
     titles: {
@@ -27,7 +29,29 @@ export default {
         return []
       }
     },
-    back: Boolean
+    back: Boolean,
+    backTip: Boolean
+  },
+  methods: {
+    goBack () {
+      if (this.backTip) {
+        this.$confirm({
+          title: '当前内容未保存，确定离开?',
+          okText: '确定',
+          okType: 'danger',
+          cancelText: '取消',
+          centered: true,
+          onOk () {
+            router.back(-1)
+          },
+          onCancel () {
+
+          }
+        })
+        return
+      }
+      router.back(-1)
+    }
   }
 }
 </script>
@@ -40,6 +64,6 @@ export default {
 .back {
   padding: 12px 0;
   display: inline-block;
-  cursor:pointer;
+  cursor: pointer;
 }
 </style>

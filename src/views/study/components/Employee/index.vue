@@ -2,6 +2,7 @@
   <div>
     <a-radio-group
       v-model="userType"
+      :disabled="disabled"
       :default-value="1"
       @change="change"
     >
@@ -13,8 +14,15 @@
       </a-radio>
     </a-radio-group>
     <div>
-      <a-button v-if="userType === 2" style="width: 200px" class="add" @click="$refs.selectEmployee.$show(selectEmployee)">
-        <a-icon type="plus" />
+      <a-button
+        :disabled="disabled"
+        v-if="userType === 2"
+        style="width: 200px"
+        class="add"
+        @click="$refs.selectEmployee.$show(selectEmployee)">
+        <a-icon
+          type="plus"
+        />
         添加
       </a-button>
     </div>
@@ -30,6 +38,7 @@
 <script>
 export default {
   props: {
+    disabled: Boolean,
     value: {
       type: Array,
       default: _ => []

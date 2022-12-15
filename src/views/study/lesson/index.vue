@@ -1,7 +1,7 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理']"></breadcrumb>
-    <a-card :bordered="false" class="my-table-search">
+    <breadcrumb v-if="!select" :titles="['课程管理']"></breadcrumb>
+    <a-card v-if="!select" :bordered="false" class="my-table-search">
       <a-form layout="inline">
 
         <a-form-item
@@ -12,6 +12,7 @@
         <a-form-item
           label="课程分类">
           <a-cascader
+            change-on-select
             v-if="!classTreeLoading"
             v-model="screenData.courseClassId"
             :options="classTree"
@@ -56,7 +57,7 @@
       </a-form>
     </a-card>
     <div class="my-table-wrapper">
-      <div class="btn">
+      <div class="btn" v-if="!select">
         <a-button
           type="primary"
           ghost
@@ -82,6 +83,7 @@
           :data-source="tableData"
           :rowKey="record => record.courseId"
           :pagination="pagination"
+          :row-selection="!select ? null : {...rowSelection,selectedRowKeys}"
           @change="handleTableChange">
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
@@ -174,9 +176,38 @@ import { courseClassTreeView } from '@/api/study/lessonClass'
 import { message } from 'ant-design-vue'
 
 export default {
+  props: {
+    rows: {
+      type: Array,
+      default: _ => []
+    },
+    select: Boolean
+  },
   components: { TagName, breadcrumb, lessonClass },
   data () {
     return {
+      rowKey: 'courseId',
+      selectedRowKeys: [],
+      checkedRows: [],
+      rowSelection: {
+        onSelect: (record, selected) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, record])
+          } else {
+            this.onChangeRows(this.checkedRows.filter(item => item[this.rowKey] !== record[this.rowKey]))
+          }
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          if (selected) {
+            this.onChangeRows([...this.checkedRows, ...changeRows])
+          } else {
+            const deleteIds = changeRows.map((item) => {
+              return item[this.rowKey]
+            })
+            this.onChangeRows(this.checkedRows.filter(item => !deleteIds.some(deleKey => item[this.rowKey] === deleKey)))
+          }
+        }
+      },
       loading: false,
       lessonClassVisible: false,
       screenData: {},
@@ -270,10 +301,49 @@ export default {
     }
   },
   created () {
+    this.checkedRows = this.rows
+    this.selectedRowKeys = this.rows.map(item => item[this.rowKey])
     this.getTableData()
     this.getTreeData()
+    if (this.select) {
+      this.columns = [
+        {
+          title: '课程名称',
+          dataIndex: 'name',
+          scopedSlots: { customRender: 'name' },
+          align: 'center',
+          width: '200px'
+        },
+        {
+          title: '课程分类',
+          dataIndex: 'courseClassResult',
+          align: 'center',
+          customRender (value) {
+            return value && value.name || '-'
+          }
+        },
+        {
+          title: '创建时间',
+          dataIndex: 'createdAt',
+          customRender: (text) => {
+            return (text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-')
+          },
+          align: 'center',
+          sorter: true
+        },
+        {
+          title: '创建人',
+          align: 'center'
+        }
+      ]
+    }
   },
   methods: {
+    onChangeRows (rows) {
+      this.selectedRowKeys = rows.map(item => item[this.rowKey])
+      this.checkedRows = rows
+      this.$emit('selectRows', rows)
+    },
     getTreeData () {
       this.classTreeLoading = true
       courseClassTreeView().then((res) => {
@@ -294,7 +364,8 @@ export default {
     getTableData () {
       this.loading = true
       const data = {
-        ...this.screenData
+        ...this.screenData,
+        courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
       }
       courseList(data, {
         limit: this.pagination.pageSize,

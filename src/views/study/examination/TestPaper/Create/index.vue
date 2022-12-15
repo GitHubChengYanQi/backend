@@ -1,6 +1,6 @@
 <template>
   <div class="create">
-    <breadcrumb :titles="['考试管理','试卷管理','创建试卷']" back></breadcrumb>
+    <breadcrumb :titles="['考试管理','试卷管理','创建试卷']" back back-tip></breadcrumb>
 
     <a-spin :spinning="detailLoading">
       <div>
@@ -23,8 +23,8 @@
           </div>
           <div class="set">
             <div :style="{width: '120px'}">每题相同分：</div>
-            <a-switch v-model="sname" @change="switchChange" />
-            <a-input-number class="input" v-model="number" @change="numberChange" />
+            <a-switch :disabled="disabled" v-model="sname" @change="switchChange" />
+            <a-input-number :disabled="disabled" class="input" v-model="number" @change="numberChange" />
             分
           </div>
 
@@ -77,6 +77,7 @@
                       </a-form-item>
                       <a-form-item label="题目类型">
                         <a-radio-group
+                          :disabled="disabled"
                           v-decorator="[`questions[${questionItem.index}].type`, { rules: [{ required: true, message: '请选择题目类型!' }],initialValue:'single' }]"
                           name="radioGroup"
                           @change="({target:{value}})=>updateType(value,questionItem.index)"
@@ -120,7 +121,7 @@
                                   placeholder="请输入选项"
                                   v-decorator="[`questions[${questionItem.index}].options.${option}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
                                 />
-                                <div class="other">
+                                <div class="other" v-if="!disabled">
                                   <div class="actions">
                                     <a-icon
                                       v-if="Object.keys(questionItem.options || {'A':''}).length < 6"
@@ -153,6 +154,7 @@
                       >
                         <div class="option">
                           <a-select
+                            :disabled="disabled"
                             :mode="questionItem.type === 'multiple' ? 'multiple' : 'default'"
                             style="width: 597px"
                             :options="questionItem.type === 'judge' ? [{label: '正确',value:'true'},{label: '错误',value:'false'}] : Object.keys(questionItem.options).map(item=>({label:item,value:item}))"
@@ -168,7 +170,7 @@
                                 :wrapper-col="{ span: 12 }"
                               >
                                 <a-input-number
-                                  :disabled="sname"
+                                  :disabled="sname || disabled"
                                   @change="count"
                                   class="input"
                                   v-decorator="[`questions[${questionItem.index}].fen`, { initialValue:0 }]"
@@ -181,7 +183,7 @@
                       </a-form-item>
                     </div>
                   </div>
-                  <div class="actions">
+                  <div class="actions" v-if="!disabled">
                     <a-icon
                       v-if="questionItem.index === questions.length - 1"
                       type="plus-square"
@@ -221,6 +223,7 @@ import router from '@/router'
 export default {
   data () {
     return {
+      disabled: false,
       detailLoading: false,
       loading: false,
       totalFen: 0,

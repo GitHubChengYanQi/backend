@@ -12,9 +12,11 @@
     :before-upload="beforeUpload"
     @change="handleChange"
   >
-    <a-button type="primary">
-      上传文件
-    </a-button>
+    <slot>
+      <a-button type="primary">
+        上传文件
+      </a-button>
+    </slot>
   </a-upload>
 </template>
 <script>

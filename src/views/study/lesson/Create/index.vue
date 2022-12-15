@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','新建课程']" back></breadcrumb>
+    <breadcrumb :titles="['课程管理','新建课程']" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
@@ -40,6 +40,7 @@
             :wrapper-col="{ span: 19 }"
           >
             <selectCourseware
+              :hiddenExam="hiddenExam"
               v-if="!detailLoading"
               placeholder="请选择课件"
               v-decorator="['wareBindParams', { rules: [{ required: true, message: '请选择课件!' }],initialValue:[] }]"
@@ -57,12 +58,14 @@
           </a-form-item>
           <a-form-item label="适用员工">
             <Employee
+              :disabled="!!this.$router.history.current.query.id"
               v-decorator="['applicableObject', { rules: [{ required: true, message: '请选择适用员工!' }],initialValue:['all'] }]"></Employee>
           </a-form-item>
           <a-form-item label="关联考试">
             <SelectExamination
               placeholder="请选择关联考试"
               v-decorator="['exam', { initialValue:{} }]"
+              @change="(exam)=> hiddenExam = !(exam && exam.examId)"
             />
           </a-form-item>
           <a-form-item label="课程简介">
@@ -94,6 +97,7 @@ export default {
   components: { breadcrumb, selectCourseware, VueQuillEditor, ImgUpload, SelectExamination, Employee },
   data () {
     return {
+      hiddenExam: true,
       detailLoading: false,
       loading: false,
       classTreeLoading: false,

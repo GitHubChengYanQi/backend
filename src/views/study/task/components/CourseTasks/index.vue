@@ -50,9 +50,7 @@
     </a-card>
     <div class="my-table-wrapper">
       <div class="btn">
-        <a-button type="primary" @click="uploadVisibleOpen">
-          创建任务
-        </a-button>
+        <SelectCourse />
       </div>
       <a-table
         class="my-table"
@@ -100,8 +98,10 @@
 <script>
 
 import { message } from 'ant-design-vue'
+import SelectCourse from './components/SelectCourse'
 
 export default {
+  components: { SelectCourse },
   data () {
     return {
       imgUrl: '',
@@ -206,31 +206,6 @@ export default {
     this.getTableData()
   },
   methods: {
-    download () {
-      if (this.checkIds.length === 0) {
-        message.warn('请选择想要下载的文件！')
-      } else {
-        console.log(this.checkIds)
-      }
-    },
-    uploadVisibleOpen () {
-      this.imgUrl = ''
-      this.imgName = ''
-      this.uploadVisible = true
-    },
-    uploadSuccess (data = []) {
-      const file = data[0] || {}
-      console.log(file)
-      this.imgUrl = file.fullPath
-      this.imgName = file.name
-    },
-    setVisible (visible) {
-      this.fileName = visible
-      this.visible = true
-    },
-    handleOk () {
-      console.log('ok')
-    },
     deleteAttribute (id) {
       console.log(id)
     },

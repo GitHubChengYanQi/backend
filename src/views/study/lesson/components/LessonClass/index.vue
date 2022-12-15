@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="lessonClass">
     <a-spin :spinning="tableLoading">
       <el-tree
         class="tree"
@@ -20,6 +20,7 @@
           slot-scope="{ node, data }"
           @mouseenter="mouseenter(node)"
           @mouseleave="mouseleave(node)"
+
         >
           <div>
             <DragIcon></DragIcon>
@@ -74,7 +75,7 @@
 
     <a-button
       icon="plus"
-      style="width: 100%;margin-top: 12px;border-radius: 4px"
+      style="width: 100%;margin-top: 12px;border-radius: 4px;position: sticky;bottom: 0"
       @click="()=>{
         className = ''
         openAddClass = true
@@ -270,15 +271,20 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.lessonClass {
+  max-height: 400px;
+  overflow: auto;
+}
+
 .tree {
   /deep/ .el-tree-node__content {
     height: auto;
     width: 100%;
-    background-color: #fff;
     align-items: normal;
 
     .custom-tree-node {
       width: 100%;
+      padding: 0 12px;
     }
 
     .el-tree-node__expand-icon {

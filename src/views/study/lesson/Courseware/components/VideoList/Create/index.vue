@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课件管理','上传视频']" back></breadcrumb>
+    <breadcrumb :titles="['课程管理','课件管理','上传视频']" back back-tip></breadcrumb>
 
     <a-spin :spinning="detailLoading">
       <div class="content">

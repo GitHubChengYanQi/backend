@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-spin :spinning="detailLoading">
-      <div class="lessonAnalysis">
+      <div v-if="!preview" class="lessonAnalysis">
         <div class="head">
           <div class="headImg" style="min-height: 190px">
             <img
@@ -36,8 +36,8 @@
         </div>
       </div>
 
-      <div class="examinationContent">
-        <div class="title">考试内容</div>
+      <div class="examinationContent" :style="{paddingTop:preview ? 0 : 24}">
+        <div class="title" v-if="!preview">考试内容</div>
 
         <div
           class="question"
@@ -93,6 +93,13 @@ import { examDetail } from '@/api/study/exam'
 import moment from 'moment'
 
 export default {
+  props: {
+    preview: Boolean,
+    questionResults: {
+      type: Array,
+      default: _ => []
+    }
+  },
   data () {
     return {
       detailLoading: false,
@@ -105,8 +112,11 @@ export default {
     }
   },
   created () {
-    if (router.history.current.query.id) {
+    if (router.history.current.query.id && !this.preview) {
       this.getDetail(router.history.current.query.id)
+    }
+    if (this.preview) {
+      this.detail.questionResults = this.questionResults
     }
   },
   methods: {

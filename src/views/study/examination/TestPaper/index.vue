@@ -39,7 +39,7 @@
         <a-button
           type="primary"
           ghost
-          @click="() => $router.push('/study/lesson/Courseware')">
+          @click="() => importTestPaper = true">
           导入试卷
         </a-button>
         <a-button
@@ -92,6 +92,48 @@
           </div>
         </a-table>
       </a-spin>
+
+      <a-modal
+        centered
+        destroyOnClose
+        v-model="importTestPaper"
+        title="导入试卷"
+        class="my-modal"
+        @ok="onImportTestPaper"
+      >
+        <div class="importTestPaper">
+          <div class="title">
+            <a-badge :offset="[-64,0]">
+              <a-icon slot="count" type="cloud-download" />
+              下载模板
+            </a-badge>
+          </div>
+          <div class="content">
+            <div>导入试卷前请下载模板，按照模板格式导入</div>
+            <a-button type="primary" style="border-radius: 8px">下载模板</a-button>
+          </div>
+          <div class="title">
+            <a-badge :offset="[-64,0]">
+              <a-icon slot="count" type="cloud-download" />
+              上传文件
+            </a-badge>
+          </div>
+          <div class="content">
+            <div> 仅支持xlsx/xls.文件最大100MB</div>
+            <upload
+              :max-size="100"
+              :default-file-type-list="['jpg','png','ppt','pptx','pdf','doc','docx']"
+              style="display: inline-block"
+              @success="uploadSuccess"
+              :file-type="1">
+              <a-button style="border-radius: 8px">选择文件</a-button>
+            </upload>
+          </div>
+          <div class="fileName">
+            {{ fileName }}
+          </div>
+        </div>
+      </a-modal>
     </div>
   </div>
 </template>
@@ -102,16 +144,18 @@ import breadcrumb from '../../components/Breadcrumd/index'
 import { learningQuestionnaireDelete, learningQuestionnaireList } from '@/api/study/testPager'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
+import upload from '../../lesson/Courseware/components/upload'
 
 export default {
-  components: { TagName, breadcrumb },
+  components: { TagName, breadcrumb, upload },
   props: {
     select: Boolean
   },
   data () {
     return {
+      fileName: '文件名',
+      importTestPaper: false,
       loading: false,
-      lessonClassVisible: false,
       screenData: {
         gender: 3,
         addWay: '全部',
@@ -179,6 +223,13 @@ export default {
     this.getTableData()
   },
   methods: {
+    onImportTestPaper () {
+
+    },
+    uploadSuccess (data = []) {
+      const file = data[0] || {}
+      this.fileName = file.name
+    },
     getTableData () {
       this.loading = true
       const data = {}
@@ -239,6 +290,31 @@ export default {
       color: #86CE76
     }
   }
+}
+
+.importTestPaper {
+  padding: 0 24px;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.content {
+  display: flex;
+  padding-bottom: 24px;
+  align-items: center;
+
+  div {
+    flex-grow: 1;
+  }
+}
+
+.fileName {
+  background-color: #F5F6FA;
+  color: #868B98;
+  padding: 14px;
+  border-radius: 8px;
 }
 
 .user-info {

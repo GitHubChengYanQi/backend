@@ -1,20 +1,17 @@
 <template>
   <div>
-    <a-card v-if="!select" :bordered="false" class="my-table-search">
+    <a-card :bordered="false" class="my-table-search" :body-style="{padding:select ? 0 : 24}">
       <a-form layout="inline">
 
-        <a-form-item
-          label="文件名称：">
+        <a-form-item :label="select ? '' : '文件名称'">
           <a-input v-model="screenData.name" placeholder="请输入文件名称" :maxLength="20"></a-input>
         </a-form-item>
 
-        <a-form-item
-          label="上传时间：">
+        <a-form-item :label="select ? '' : '上传时间'">
           <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
-        <a-form-item
-          label="上传人：">
+        <a-form-item :label="select ? '' : '上传人'">
           <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
         </a-form-item>
         <a-form-item>
@@ -27,7 +24,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button v-if="!select" type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -43,7 +40,7 @@
           style="display: inline-block"
           @success="uploadSuccess"
           :file-type="1" />
-        <a-button type="primary" ghost @click="download">
+        <a-button type="primary" ghost @click="download(checkedRows)">
           批量下载
         </a-button>
       </div>
@@ -78,9 +75,9 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="setVisible(record.name)">重命名</a-button>
+                <a-button class="warnButton" @click="setVisible(record)">重命名</a-button>
                 <a-button class="successButton">预览</a-button>
-                <a-button class="linkButton">下载</a-button>
+                <a-button class="linkButton" @click="download([record])">下载</a-button>
                 <a-popconfirm
                   title="是否确认删除"
                   ok-text="确认"
@@ -96,7 +93,14 @@
       </a-spin>
     </div>
 
-    <a-modal centered v-model="visible" title="修改名称" @ok="handleOk" class="my-modal">
+    <a-modal
+      centered
+      v-model="visible"
+      title="修改名称"
+      :okButtonProps="{props:{loading:updateLoading}}"
+      @ok="handleOk"
+      class="my-modal"
+    >
       <a-input v-model="fileName"></a-input>
     </a-modal>
 
@@ -116,7 +120,7 @@
 
 import upload from '../upload'
 import { message } from 'ant-design-vue'
-import { courseWareAdd, courseWareDelete, courseWareList } from '@/api/study/courseWare'
+import { courseWareAdd, courseWareDelete, courseWarEdit, courseWareList } from '@/api/study/courseWare'
 import moment from 'moment'
 
 export default {
@@ -158,7 +162,9 @@ export default {
       imgUrl: '',
       imgName: '',
       uploadVisible: false,
+      updateLoading: false,
       fileName: String,
+      fileId: '',
       visible: false,
       screenData: {
         gender: 3,
@@ -238,11 +244,13 @@ export default {
         this.percent = percent
       }
     },
-    download () {
-      if (this.checkIds.length === 0) {
+    download (records = []) {
+      if (records.length === 0) {
         message.warn('请选择想要下载的文件！')
       } else {
-        console.log(this.checkIds)
+        records.forEach(item => {
+          window.open(item.mediaUrl)
+        })
       }
     },
     uploadSuccess (data = []) {
@@ -265,17 +273,24 @@ export default {
       this.imgUrl = file.fullPath
       this.imgName = file.name
     },
-    setVisible (visible) {
-      this.fileName = visible
+    setVisible (record) {
+      this.fileName = record.fileName
+      this.fileId = record.courseWareId
       this.visible = true
     },
     handleOk () {
-      console.log('ok')
+      courseWarEdit({ fileName: this.fileName, courseWareId: this.fileId }).then(() => {
+        message.success('修改成功！')
+        this.getTableData()
+      })
     },
     deleteAttribute (id) {
+      this.updateLoading = true
       courseWareDelete({ courseWareId: id }).then(() => {
         message.success('删除成功！')
         this.getTableData()
+      }).finally(() => {
+        this.updateLoading = false
       })
     },
     getTableData () {

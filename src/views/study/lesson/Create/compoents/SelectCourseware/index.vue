@@ -56,7 +56,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="action" label="关联考试" minWidth="200">
+        <el-table-column v-if="!hiddenExam" align="center" prop="action" label="关联考试" minWidth="200">
           <template slot-scope="{row}">
             <SelectExamination
               v-model="row.exam"
@@ -135,7 +135,8 @@ import SelectExamination from '../SelectExamination/index'
 
 export default {
   props: {
-    value: Array
+    value: Array,
+    hiddenExam: Boolean
   },
   components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination },
   data () {

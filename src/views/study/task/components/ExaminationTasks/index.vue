@@ -45,9 +45,7 @@
     </a-card>
     <div class="my-table-wrapper">
       <div class="btn">
-        <a-button type="primary" @click="uploadVisibleOpen">
-          创建任务
-        </a-button>
+        <SelectExamination />
       </div>
       <a-table
         class="my-table"
@@ -95,8 +93,10 @@
 <script>
 
 import { message } from 'ant-design-vue'
+import SelectExamination from './components/SelectExamination'
 
 export default {
+  components: { SelectExamination },
   data () {
     return {
       imgUrl: '',

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['考试管理','新建考试']" back></breadcrumb>
+    <breadcrumb :titles="['考试管理','新建考试']" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
@@ -39,6 +39,7 @@
           </a-form-item>
           <a-form-item label="试卷选择">
             <SelectTestPager
+              :disabled="!!$router.history.current.query.id"
               v-decorator="['questionnaire', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: {} }]" />
           </a-form-item>
           <a-form-item label="封面图">
@@ -58,6 +59,7 @@
           </a-form-item>
           <a-form-item label="通过分数">
             <a-input-number
+              :disabled="!!$router.history.current.query.id"
               placeholder="请输入通过分数"
               v-decorator="['passScore', { rules: [{ required: true, message: '请输入通过分数!' }] ,initialValue: 0}]"
             />

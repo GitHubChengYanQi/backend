@@ -13,7 +13,7 @@
           {{ name }}
         </a-button>
       </a-badge>
-      <a-button type="link">
+      <a-button type="link" @click="preview = true">
         预览
       </a-button>
     </div>
@@ -40,14 +40,26 @@
         </a-button>
       </div>
     </a-modal>
+
+    <a-modal
+      :footer="null"
+      destroyOnClose
+      :width="1200"
+      :title="'试卷名称：'+questionnaire.questionnaireName"
+      :visible="preview"
+      @cancel="preview = false"
+    >
+      <TestPaperDetail preview :questionResults="questionnaire.questionResults" />
+    </a-modal>
   </div>
 </template>
 
 <script>
 import examination from '../../../../examination/index'
+import TestPaperDetail from '../../../../examination/Detail/components/TestPaperDetail/index'
 
 export default {
-  components: { examination },
+  components: { examination, TestPaperDetail },
   props: {
     value: {
       type: Object,
@@ -57,8 +69,10 @@ export default {
   },
   data () {
     return {
+      preview: false,
       selectRow: {},
       name: '',
+      questionnaire: {},
       visible: false
     }
   },
@@ -66,19 +80,26 @@ export default {
     if (this.value) {
       this.name = this.value.name
       this.selectRow = this.value
+      if (this.value.questionnaireResults) {
+        this.questionnaire = this.value.questionnaireResults[0] || {}
+      }
     }
   },
   watch: {
     value (value) {
       if (value) {
-        this.name = this.value.name
+        this.name = value.name
         this.selectRow = value
+        if (value.questionnaireResults) {
+          this.questionnaire = this.value.questionnaireResults[0] || {}
+        }
       }
     }
   },
   methods: {
     selectExamination (row) {
       this.selectRow = row
+      this.questionnaire = row.questionnaireResults[0] || {}
     },
     remove () {
       this.name = ''

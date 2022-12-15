@@ -1,20 +1,17 @@
 <template>
   <div>
-    <a-card v-if="!select" :bordered="false" class="my-table-search">
+    <a-card :bordered="false" class="my-table-search" :body-style="{padding:select ? 0 : 24}">
       <a-form layout="inline">
 
-        <a-form-item
-          label="标题名称：">
+        <a-form-item :label="select ? '' : '标题名称'">
           <a-input v-model="screenData.name" placeholder="请输入标题名称" :maxLength="50"></a-input>
         </a-form-item>
 
-        <a-form-item
-          label="上传时间：">
+        <a-form-item :label="select ? '' : '上传时间'">
           <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
-        <a-form-item
-          label="上传人：">
+        <a-form-item :label="select ? '' : '上传人'">
           <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
         </a-form-item>
         <a-form-item>
@@ -27,7 +24,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button v-if="!select" type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -66,7 +63,8 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="successButton" @click="() => $router.push(`/study/lesson/createImageText?id=${record.courseWareId}`)">编辑
+                <a-button class="successButton"
+                          @click="() => $router.push(`/study/lesson/createImageText?id=${record.courseWareId}`)">编辑
                 </a-button>
                 <a-button class="linkButton">预览</a-button>
                 <a-popconfirm
