@@ -491,17 +491,30 @@ export default {
         data: type === 'rangeDouble' ? dataName.join('.') : data,
         dataName: type === 'rangeDouble' ? dataName.join('.') : dataName
       }))
-      await saveSpecialItemReq({
-        recordId: this.modalObj.id,
-        contactId: this.$route.query.id,
-        source: 4,
-        key: this.selectTag,
-        dataList: processList
-      })
-      this.$message.success(`${this.modalObj.id ? '修改' : '添加'}成功！`)
-      this.getTabDetails(this.selectTag)
-      this.saveLoading = false
-      this.editSpecialModalCancel()
+      let flag = false
+      let name = ''
+      for (let i = 0; i < processList.length; i++) {
+        if (processList[i].data === '') {
+          flag = true
+          name = processList[i].name
+        }
+      }
+      if (flag) {
+        this.$message.error('请填写' + name)
+        this.saveLoading = false
+      } else {
+        await saveSpecialItemReq({
+          recordId: this.modalObj.id,
+          contactId: this.$route.query.id,
+          source: 4,
+          key: this.selectTag,
+          dataList: processList
+        })
+        this.$message.success(`${this.modalObj.id ? '修改' : '添加'}成功！`)
+        this.getTabDetails(this.selectTag)
+        this.saveLoading = false
+        this.editSpecialModalCancel()
+      }
     },
     editSpecialModalCancel () {
       this.modalObj = {
