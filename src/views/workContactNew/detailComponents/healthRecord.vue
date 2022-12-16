@@ -313,7 +313,10 @@ export default {
               cloumns.push({
                 title: item.name,
                 dataIndex: item.key,
-                key: item.key
+                key: item.key,
+                customRender: (txt, { scopeKey }) => (
+                  <span class={`sourceTxt-${item.scopeKey}`}>{txt}</span>
+                )
               })
             }
           }
@@ -655,6 +658,9 @@ export default {
     }
   }
   .specialListDetail {
+    .sourceTxt-1{
+      color: #ff0000;
+    }
     .sourceTxt-xyjl-0 {
       color: #009966;
     }
@@ -681,6 +687,21 @@ export default {
     }
     .sourceTxt-xtjl-3 {
       color: #efc25d;
+    }
+    .sourceTxt-nsjl-0 {
+      color: #009966;
+    }
+    .sourceTxt-nsjl-1 {
+      color: #e98850;
+    }
+    .sourceTxt-nsjl-2 {
+      color: #ff0000;
+    }
+    .sourceTxt-xzjl-0 {
+      color: #009966;
+    }
+    .sourceTxt-xzjl-1 {
+      color: #ff0000;
     }
     .handlesBox {
       display: flex;

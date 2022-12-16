@@ -549,7 +549,7 @@ export default {
         ],
         inputData: {
           title: '',
-          unitId: '',
+          unitId: 0,
           ditch: [],
           shape: '1',
           radarLink: '',
@@ -865,7 +865,7 @@ export default {
           1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
           2: ['radarPDF', 'linkTitle'],
           3: {
-            0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId'],
+            0: ['linkTitle', 'linkDigest', 'linkImg', 'materialId', 'articleLink'],
             1: ['linkTitle', 'linkImg', 'articleLink', 'linkDigest'],
             2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
           },

@@ -30,6 +30,8 @@
               v-for="(item,index) in catalog"
               @click.stop="()=>{
                 catalogIndex = item.id
+                table.pagination.current = 1
+                table.pagination.pageSize = 10
                 getTableData()
               }"
               :key="index"

@@ -155,7 +155,7 @@
           </a-checkbox-group>
         </div>
       </a-modal>
-      <a-modal :visible="archives" title="健康档案" :footer="null" :width="950" @cancel="archives = false">
+      <a-modal :visible="archives" title="健康档案" :footer="null" :width="1100" @cancel="archives = false">
         <HealthRecord :is-component="true" :contact-id="currentId" v-if="archives" />
       </a-modal>
     </a-card>

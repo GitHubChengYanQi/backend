@@ -654,7 +654,7 @@ export default {
         articleId: this.articleId
       }
       scrmRadarVisitorIndex(obj).then((res) => {
-        console.log(res)
+        console.log(res, '111111111')
         const obj = {}
         const { data } = res
         this.radarInfo.data = data.data
@@ -662,7 +662,7 @@ export default {
         this.radarInfo.data.officeAction = data.data.track.linkType.includes('0') ? '已开启' : '未开启'
         this.radarInfo.data.dynamicInform = data.data.track.linkType.includes('1') ? '已开启' : '未开启'
         this.selectArr.channel = data.ditch
-        data.today.concat(data.total).map((item, index) => {
+        data.total.concat(data.today).map((item, index) => {
           obj[index] = item
         })
         this.dataOverview.data = obj
@@ -715,34 +715,39 @@ export default {
 
       const obj = {
         articleId: this.articleId,
-        order: order.columnKey ? searchKey[order.columnKey] : '',
-        queue: order.order ? order.order == 'ascend' : '',
+        attchData: {},
         type: tab
       }
+      obj.attchData = {
+        order: order.columnKey ? searchKey[order.columnKey] : '',
+        queue: order.order ? order.order == 'ascend' : ''
+      }
       if (tableData[tab].createdAt && tableData[tab].createdAt.length > 0) {
-        obj.createdAt = tableData[tab].createdAt.map((item) => {
+        obj.attchData.createdAt = tableData[tab].createdAt.map((item) => {
           return moment(item).format('YYYY-MM-DD')
         })
       }
       if (tableData[tab].channel && tableData[tab].channel.length > 0) {
-        obj.ditchId = tableData[tab].channel.join(',')
+        obj.attchData.ditchId = tableData[tab].channel.join(',')
       }
       if (tab == 2) {
         const setArr = ['agencyId', 'outletId', 'employeeId']
         for (const key in tableData[tab]) {
           if (setArr.includes(key) && tableData[tab][key].length > 0) {
             if (key != 'employeeId') {
-              obj[key] = tableData[tab][key]
+              obj.attchData[key] = tableData[tab][key]
                 .map((item) => {
                   return item.value
                 })
                 .join(',')
             } else {
-              obj[key] = tableData[tab][key].join(',')
+              obj.attchData[key] = tableData[tab][key].join(',')
             }
           }
         }
       }
+      obj.attchData = JSON.stringify(obj.attchData)
+      console.log(obj)
       const title = ['客户数据', '渠道数据', '员工数据']
       scrmRadarVisitorExcel(obj).then((res) => {
         callDownLoadByBlob(res, title[tab])
