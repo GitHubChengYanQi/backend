@@ -155,3 +155,13 @@ export function combinList (params) {
     params
   })
 }
+/**
+ * 删除联合用药
+ */
+export function deleteCombin (params) {
+  return request({
+    url: '/drugCombination/delete',
+    method: 'delete',
+    params
+  })
+}
