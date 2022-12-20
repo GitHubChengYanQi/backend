@@ -67,7 +67,7 @@
         <el-table-column prop="action" label="操作" width="180">
           <template slot-scope="{row}">
             <div class="my-space" style="cursor: pointer">
-              <button class="linkButton">预览</button>
+              <button class="linkButton" @click="openPreview(row)">预览</button>
               <button class="delButton" @click="remove(row)">删除</button>
               <div class="my-handle">
                 <DragIcon :width="24" />
@@ -77,6 +77,18 @@
         </el-table-column>
       </el-table>
     </div>
+
+    <Preview
+      :title="previewTitle"
+      :preview="preview"
+      @close="preview = false"
+      :content="content"
+    >
+      <div>
+        <img v-if="previewType === 'text'" class="img" :src="url" alt="avatar" width="283" />
+        <video v-if="previewType === 'video'" :src="url" style="width: 100%" controls></video>
+      </div>
+    </Preview>
 
     <a-modal
       :footer="null"
@@ -141,6 +153,11 @@ export default {
   components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination },
   data () {
     return {
+      content: '',
+      url: '',
+      previewTitle: '',
+      preview: false,
+      previewType: '',
       courseWares: {},
       key: '1',
       tableData: [],
@@ -188,6 +205,13 @@ export default {
     })
   },
   methods: {
+    openPreview (record) {
+      this.previewType = record.courseWareType
+      this.preview = true
+      this.previewTitle = record.title
+      this.content = record.note
+      this.url = record.mediaUrl || record.coverImageUrl
+    },
     remove (row) {
       this.courseWares = {
         fileList: (this.courseWares.fileList || []).filter(item => item.courseWareId !== row.courseWareId),

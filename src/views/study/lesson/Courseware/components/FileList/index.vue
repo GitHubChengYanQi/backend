@@ -1,6 +1,7 @@
 <template>
   <div>
     <a-card :bordered="false" class="my-table-search" :body-style="{padding:select ? 0 : 24}">
+
       <a-form layout="inline">
 
         <a-form-item :label="select ? '' : '文件名称'">
@@ -122,6 +123,7 @@ import upload from '../upload'
 import { message } from 'ant-design-vue'
 import { courseWareAdd, courseWareDelete, courseWarEdit, courseWareList } from '@/api/study/courseWare'
 import moment from 'moment'
+import FilePreview from '../../../../components/FilePreview/index'
 
 export default {
   props: {
@@ -326,7 +328,7 @@ export default {
       }
     }
   },
-  components: { upload }
+  components: { upload, FilePreview }
 }
 </script>
 

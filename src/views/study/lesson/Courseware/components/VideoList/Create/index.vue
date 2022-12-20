@@ -7,7 +7,7 @@
         <div style="padding-bottom: 16px;display: flex">
           <div style="font-size: 16px;font-weight: bold;flex-grow: 1">创建视频</div>
           <div>
-            <a-button style="border-radius: 8px" type="primary" @click="handleSubmit">预览</a-button>
+            <a-button style="border-radius: 8px" type="primary" @click="openPreview">预览</a-button>
           </div>
         </div>
 
@@ -59,11 +59,23 @@
         </div>
       </div>
     </a-spin>
+
+    <Preview
+      :title="previewTitle"
+      :preview="preview"
+      @close="preview = false"
+      :content="content"
+    >
+      <div>
+        <video :src="url" style="width: 100%" controls></video>
+      </div>
+    </Preview>
   </div>
 </template>
 
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd'
+import Preview from '../../../../../components/Preview'
 import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
 import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
@@ -71,9 +83,13 @@ import { message } from 'ant-design-vue'
 import router from '@/router'
 
 export default {
-  components: { breadcrumb, VueQuillEditor, ImgUpload },
+  components: { breadcrumb, VueQuillEditor, ImgUpload, Preview },
   data () {
     return {
+      content: '',
+      url: '',
+      previewTitle: '',
+      preview: false,
       size: 0,
       detailLoading: false,
       loading: false,
@@ -87,6 +103,12 @@ export default {
     }
   },
   methods: {
+    openPreview () {
+      this.preview = true
+      this.previewTitle = this.form.getFieldValue('title')
+      this.content = this.form.getFieldValue('note')
+      this.url = this.form.getFieldValue('mediaUrl')
+    },
     getDetail (id) {
       this.detailLoading = true
       courseWareDetail({ courseWareId: id }).then((res) => {

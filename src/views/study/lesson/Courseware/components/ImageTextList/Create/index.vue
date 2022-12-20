@@ -1,11 +1,13 @@
 <template>
   <div>
     <breadcrumb :titles="['课程管理','课件管理','创建图文']" back back-tip></breadcrumb>
-
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
           <div style="font-size: 16px;font-weight: bold;flex-grow: 1">创建图文</div>
+          <div>
+            <a-button style="border-radius: 8px" type="primary" @click="openPreview">预览</a-button>
+          </div>
         </div>
 
         <a-form
@@ -33,10 +35,12 @@
           </a-form-item>
           <a-form-item label="课程详情">
             <VueQuillEditor
+              v-if="!detailLoading"
               :height="'auto'"
               placeholder="请输入课程详情"
-              v-decorator="['note', { rules: [{ required: true, message: '请输入课程详情!' }],initialValue:'' }]"
+              v-decorator="['note', { rules: [{ required: true, message: '请输入课程详情!' }], initialValue:detail.note }]"
             />
+            <a-spin v-else />
           </a-form-item>
         </a-form>
 
@@ -45,6 +49,17 @@
         </div>
       </div>
     </a-spin>
+
+    <Preview
+      :title="previewTitle"
+      :preview="preview"
+      @close="preview = false"
+      :content="content"
+    >
+      <div>
+        <img class="img" :src="url" alt="avatar" width="283" />
+      </div>
+    </Preview>
   </div>
 </template>
 
@@ -55,11 +70,17 @@ import ImgUpload from '../../../../../components/ImgUpload/index'
 import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
 import router from '@/router'
 import { message } from 'ant-design-vue'
+import Preview from '../../../../../components/Preview'
 
 export default {
-  components: { breadcrumb, VueQuillEditor, ImgUpload },
+  components: { breadcrumb, VueQuillEditor, ImgUpload, Preview },
   data () {
     return {
+      detail: {},
+      content: '',
+      url: '',
+      previewTitle: '',
+      preview: false,
       loading: false,
       detailLoading: false,
       data: {},
@@ -72,10 +93,17 @@ export default {
     }
   },
   methods: {
+    openPreview () {
+      this.preview = true
+      this.previewTitle = this.form.getFieldValue('title')
+      this.content = this.form.getFieldValue('note')
+      this.url = this.form.getFieldValue('coverImageUrl')
+    },
     getDetail (id) {
       this.detailLoading = true
       courseWareDetail({ courseWareId: id }).then((res) => {
         const detail = res.data || {}
+        this.detail = detail
         this.form.setFieldsValue({
           title: detail.title,
           coverImageUrl: detail.coverImageUrl,

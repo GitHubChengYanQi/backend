@@ -69,7 +69,7 @@
                 >
                   编辑
                 </a-button>
-                <a-button class="linkButton">预览</a-button>
+                <a-button class="linkButton" @click="openPreview(record)">预览</a-button>
                 <a-popconfirm
                   disabled
                   title="是否确认删除"
@@ -86,6 +86,17 @@
       </a-spin>
     </div>
 
+
+    <Preview
+      :title="previewTitle"
+      :preview="preview"
+      @close="preview = false"
+      :content="content"
+    >
+      <div>
+        <video :src="url" style="width: 100%" controls></video>
+      </div>
+    </Preview>
   </div>
 </template>
 
@@ -94,8 +105,10 @@
 import { courseWareDelete, courseWareList } from '@/api/study/courseWare'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
+import Preview from '../../../../components/Preview/index'
 
 export default {
+  components: { Preview },
   props: {
     selectRows: {
       type: Array,
@@ -107,6 +120,10 @@ export default {
   },
   data () {
     return {
+      content: '',
+      url: '',
+      previewTitle: '',
+      preview: false,
       selectedRowKeys: [],
       checkedRows: [],
       rowSelection: {
@@ -193,6 +210,12 @@ export default {
     this.getTableData()
   },
   methods: {
+    openPreview (record) {
+      this.preview = true
+      this.previewTitle = record.title
+      this.content = record.note
+      this.url = record.mediaUrl
+    },
     onChangeRows (rows) {
       this.selectedRowKeys = rows.map(item => item[this.rowKey])
       this.checkedRows = rows

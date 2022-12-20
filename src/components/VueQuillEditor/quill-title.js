@@ -22,8 +22,12 @@ const titleConfig = {
   'ql-video': '视频',
   'ql-clean': '清除字体样式'
 }
+
 export function addQuillTitle () {
   const oToolBar = document.querySelector('.ql-toolbar')
+  if (!oToolBar) {
+    return
+  }
   const aButton = oToolBar.querySelectorAll('button')
   const aSelect = oToolBar.querySelectorAll('select')
   const aSpan = oToolBar.querySelectorAll('span')

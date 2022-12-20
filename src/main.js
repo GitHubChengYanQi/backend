@@ -10,6 +10,11 @@ import { VueAxios, axios } from './utils/request'
 import ProLayout, { PageHeaderWrapper } from '@ant-design-vue/pro-layout'
 import themePluginConfig from '../config/themePluginConfig'
 import VueQuillEditor from 'vue-quill-editor'
+
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
 import loading from '@/components/loading/loading'
 import selectEmployee from '@/components/SelectEmployeeNew/Select'
 import selectEmployeeInput from '@/components/SelectEmployeeNew/Input'

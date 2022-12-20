@@ -66,13 +66,6 @@ export default {
       default: ''
     }
   },
-  watch: {
-    value (value) {
-      if (value) {
-        this.content = value
-      }
-    }
-  },
   data () {
     return {
       content: this.value,
@@ -85,10 +78,6 @@ export default {
           imageResize: {
             // 放大缩小
             displaySize: true
-          },
-          clipboard: {
-            // 粘贴版，处理粘贴时候的自带样式
-            matchers: [[Node.ELEMENT_NODE, this.HandleCustomMatcher]]
           },
           // theme:'snow',
           toolbar: {

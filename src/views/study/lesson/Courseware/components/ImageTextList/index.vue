@@ -63,10 +63,12 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="successButton"
-                          @click="() => $router.push(`/study/lesson/createImageText?id=${record.courseWareId}`)">编辑
+                <a-button
+                  class="successButton"
+                  @click="() => $router.push(`/study/lesson/createImageText?id=${record.courseWareId}`)">
+                  编辑
                 </a-button>
-                <a-button class="linkButton">预览</a-button>
+                <a-button class="linkButton" @click="openPreview(record)">预览</a-button>
                 <a-popconfirm
                   title="是否确认删除"
                   ok-text="确认"
@@ -81,6 +83,17 @@
         </a-table>
       </a-spin>
     </div>
+
+    <Preview
+      :title="previewTitle"
+      :preview="preview"
+      @close="preview = false"
+      :content="content"
+    >
+      <div>
+        <img class="img" :src="url" alt="avatar" width="283" />
+      </div>
+    </Preview>
   </div>
 </template>
 
@@ -91,6 +104,7 @@ import vpload from '../vpload'
 import { message } from 'ant-design-vue'
 import moment from 'moment'
 import { courseWareDelete, courseWareList } from '@/api/study/courseWare'
+import Preview from '../../../../components/Preview/index'
 
 export default {
   props: {
@@ -104,6 +118,10 @@ export default {
   },
   data () {
     return {
+      content: '',
+      url: '',
+      previewTitle: '',
+      preview: false,
       selectedRowKeys: [],
       checkedRows: [],
       rowSelection: {
@@ -182,6 +200,12 @@ export default {
     this.getTableData()
   },
   methods: {
+    openPreview (record) {
+      this.preview = true
+      this.previewTitle = record.title
+      this.content = record.note
+      this.url = record.coverImageUrl
+    },
     onChangeRows (rows) {
       this.selectedRowKeys = rows.map(item => item[this.rowKey])
       this.checkedRows = rows
@@ -246,7 +270,7 @@ export default {
       }
     }
   },
-  components: { upload, vpload }
+  components: { upload, vpload, Preview }
 }
 </script>
 
