@@ -9,6 +9,7 @@
           class="radarInfo"
           v-for="(item,index) in radarInfo.type"
           :key="index"
+          :style="item.type ? {width:'100%'}:{}"
         >
           <span class="title">{{ item.title }}</span>
           <span
@@ -17,7 +18,7 @@
           >
             <span
               v-if="radarInfo.data[item.key].length != 0"
-              style="display:flex;"
+              class="tabs_box"
             >
               <span
                 class="tabs"
@@ -877,14 +878,19 @@ export default {
           display: flex;
           justify-content: flex-end;
           width: 80px;
+          white-space: nowrap;
         }
         .arrData {
           display: flex;
           align-items: center;
           flex-wrap: wrap;
         }
+        .tabs_box {
+          display: flex;
+          flex-wrap: wrap;
+        }
         .tabs {
-          margin-right: 5px;
+          margin: 5px 5px;
           position: relative;
           padding: 0 10px;
           height: 20px;
