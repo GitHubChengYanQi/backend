@@ -17,7 +17,7 @@
               label="疾病分类："
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
-              <SelectDepartment :treeCheckStrictly="true" @getDept="getDept" v-model="screenData.storeIds" />
+              <disease-select placeholder="请选择疾病分类" @change="(value) => this.screenData.symptomDiseaseClassify = value" v-model="screenData.symptomDiseaseClassify" />
             </a-form-item>
           </a-col>
           <a-col :lg="8" :md="6">
@@ -25,7 +25,10 @@
               label="有无辅药："
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
-              <selectPersonnel v-model="screenData.maintainerIds" :multiple="true" :num="1" :type="'selector'" />
+              <a-select placeholder="请选择"  v-model="screenData.haveAdjuvants">
+                <a-select-option value="have">有</a-select-option>
+                <a-select-option value="no">无</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :lg="8" :md="6">
@@ -33,13 +36,7 @@
               label="主药名称："
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
-              <a-range-picker
-                style="width:300px"
-                v-model="screenData.time"
-                format="YYYY-MM-DD"
-                :placeholder="['开始日期', '结束日期']"
-                @change="onOk"
-              />
+              <a-input v-model="screenData.mainDrug" placeholder="请输入主药名称" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -80,56 +77,31 @@
             {{ text === '0' ? '启用' : '禁用' }}
           </template>
         </div>
-        <div slot="contactName" slot-scope="text, record">
-          <div class="news">
-            <img :src="record.avatar" />
-            <div class="name">
-              {{ text ? text : '-' }}
-            </div>
-          </div>
+        <div slot="name" slot-scope="text">
+          {{ text | filterNull }}
         </div>
-        <div slot="maintainerName" slot-scope="text">
-          {{ text ? text : '-' }}
+        <div slot="symptomDiseaseClassifyOneLevel" slot-scope="text">
+          {{ text | filterNull }}
         </div>
-        <div slot="maintainerDepartmentName" slot-scope="text">
-          {{ text ? text : '-' }}
+        <div slot="symptomDiseaseClassifyTwoLevel" slot-scope="text">
+          {{ text | filterNull }}
         </div>
-        <div slot="maintainerStoreName" slot-scope="text">
-          {{ text ? text : '-' }}
+        <div slot="mainDrugList" slot-scope="text">
+          <a-tag v-for="i in text" :key="i">{{ i }}</a-tag>
         </div>
-        <div slot="num" slot-scope="text">
-          {{ text ? text : '-' }}
+        <div slot="haveAdjuvants" slot-scope="text">
+          {{ text | filterNull }}
         </div>
-        <div slot="createdAt" slot-scope="text">
-          {{ text ? text : '-' }}
-        </div>
-        <div
-          slot="type"
-          slot-scope="text">
-          <template>
-            {{ text }}
-          </template>
-        </div>
-        <div
-          slot="prize"
-          slot-scope="record">
-          <template>
-            <ul>
-              <li
-                v-for="(item,index) in record"
-                :key="index">
-                {{ item.prizeLevel }}&nbsp;{{ item.completedNum }}/{{ item.prizeNum }}
-              </li>
-            </ul>
-          </template>
+        <div slot="updatedAt" slot-scope="text">
+          {{ text | filterNull }}
         </div>
         <div
           slot="action"
           class="action"
           slot-scope="text, record">
           <template>
-            <a @click="detailFn(record)" v-permission="'/mall/combined@edit'">编辑</a>
-            <a @click="detailFn(record)" v-permission="'/mall/combined@del'">删除</a>
+            <a @click="detailFn('EDIT', record)" v-permission="'/mall/combined@edit'">编辑</a>
+            <a @click="detailFn('DELETE', record)" v-permission="'/mall/combined@del'">删除</a>
           </template>
         </div>
       </a-table>
@@ -140,12 +112,18 @@
 </template>
 
 <script>
-import moment from 'moment'
-// import combinedDetail from './combinedDetail.vue'
-import { combinList } from '@/api/mall'
+// TODO: 疾病分类的联动数据来源， 支持搜索
+import { combinList, deleteCombin } from '@/api/mall'
 import { deepClone } from '@/utils/util'
+import diseaseSelect from './diseaseSelect'
 export default {
+  filters: {
+    filterNull: function (text) {
+      return text || '-'
+    }
+  },
   components: {
+    diseaseSelect
   },
   data () {
     return {
@@ -153,60 +131,60 @@ export default {
       selectedRowKeys: [], // 选中key
       selectedRows: [], // 选中row
       screenData: {},
-      curParam: {},
-      storeIds: [],
+      // curParam: {},
+      // storeIds: [],
       columns: [
         {
           title: '联合用药名称',
-          dataIndex: 'contactName',
+          dataIndex: 'name',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'contactName' }
+          scopedSlots: { customRender: 'name' }
         },
         {
           title: '疾病/症状一级分类',
-          dataIndex: 'maintainerName',
+          dataIndex: 'symptomDiseaseClassifyOneLevel',
           sort: true,
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'maintainerName' }
+          scopedSlots: { customRender: 'symptomDiseaseClassifyOneLevel' }
         },
         {
           title: '疾病/症状二级分类',
-          dataIndex: 'maintainerDepartmentName',
+          dataIndex: 'symptomDiseaseClassifyTwoLevel',
           sort: true,
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'maintainerDepartmentName' }
+          scopedSlots: { customRender: 'symptomDiseaseClassifyTwoLevel' }
         },
         {
           title: '主要用药',
-          dataIndex: 'maintainerStoreName',
+          dataIndex: 'mainDrugList',
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'maintainerStoreName' }
+          scopedSlots: { customRender: 'mainDrugList' }
         },
         {
           title: '有无辅药',
-          dataIndex: 'num',
+          dataIndex: 'haveAdjuvants',
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'num' }
+          scopedSlots: { customRender: 'haveAdjuvants' }
         },
         {
           title: '最后编辑时间',
-          dataIndex: 'createdAt',
+          dataIndex: 'updatedAt',
           sort: true,
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          scopedSlots: { customRender: 'updatedAt' }
         },
         {
           title: '编辑人',
-          dataIndex: 'createdAt',
+          dataIndex: 'updatedBy',
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'createdAt' }
+          scopedSlots: { customRender: 'updatedBy' }
         },
         {
           title: '操作',
@@ -280,11 +258,12 @@ export default {
         perPage: this.pagination.pageSize,
         ...this.screenData
       }
-      params.storeIds = this.storeIds.length !== 0 ? this.storeIds.join(',') : ''
-      params.maintainerIds = params.maintainerIds ? params.maintainerIds.join(',') : ''
+      // 是否选择了疾病分类
+      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify.join(',') : void 0;
+      // params.maintainerIds = params.maintainerIds ? params.maintainerIds.join(',') : ''
       combinList(params).then((res) => {
         this.loading = false
-        this.tableData = res.data.records
+        this.tableData = res.data.list
         this.pagination.total = res.data.total
       })
     },
@@ -295,18 +274,18 @@ export default {
       this.pagination.current = 1
       this.selectedRowKeys = []
       this.selectedRows = []
-      this.screenData.erpOrderNos = ''
+      // this.screenData.erpOrderNos = ''
       this.getTableData()
     },
     /**
      * 重置查询
      */
     resetSearch () {
-      this.storeIds = []
+      // this.storeIds = []
       this.screenData = {}
       this.selectedRowKeys = []
       this.selectedRows = []
-      this.screenData.erpOrderNos = ''
+      // this.screenData.erpOrderNos = ''
       this.search()
     },
     /**
@@ -352,20 +331,35 @@ export default {
       this.selectedRows = row
     },
     /**
-     * 日期选择
-     * @param {*} value
-     */
-    onOk (value) {
-      this.screenData.createdAtStart = moment(value[0]).format('YYYY-MM-DD')
-      this.screenData.createdAtEnd = moment(value[1]).format('YYYY-MM-DD')
-    },
-    /**
      * 编辑
      */
-    detailFn (record) {
-      this.$router.push({
-        path: '/mall/combination/edit'
-      })
+    detailFn (type, record) {
+      // 点击编辑后需要携带联合用药id跳转到编辑页面进行回显
+      if (type === 'EDIT') {
+        this.$router.push({
+          path: '/mall/combination/edit',
+          query: {
+            combinedId: record.id
+          }
+        })
+      }
+      if (type === 'DELETE') {
+        this.$confirm({
+          centered: true,
+          closable: true,
+          cancelText: '取消',
+          okType: 'danger',
+          okText: '确定',
+          title: '删除联合用药',
+          content: '是否确认删除？',
+          icon: () => null,
+          onOk: () => {
+            deleteCombin(record.id).then(() => {
+              this.getTableData()
+            })
+          }
+        })
+      }
     },
     /**
      * 新增
@@ -494,11 +488,11 @@ export default {
 .news {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    img {
-      width: 40px;
-      height: 40px;
-    }
+    //img {
+    //  width: 40px;
+    //  height: 40px;
+    //}
   }
 </style>
