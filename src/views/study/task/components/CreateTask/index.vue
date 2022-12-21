@@ -25,6 +25,7 @@
       type="primary"
       style="border-radius: 8px"
       class="add"
+      :loading="loading"
       @click="submit"
     >
       确定
@@ -37,6 +38,9 @@ import Employee from '../../../components/Employee'
 import TimeLimit from '../TimeLimit'
 
 export default {
+  props: {
+    loading: Boolean
+  },
   components: { Employee, TimeLimit },
   data () {
     return {

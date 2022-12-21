@@ -1,16 +1,14 @@
 <template>
   <div>
     <breadcrumb v-if="!select" :titles="['课程管理']"></breadcrumb>
-    <a-card v-if="!select" :bordered="false" class="my-table-search">
+    <a-card :bordered="false" class="my-table-search" :body-style="{padding:select ? 0 : 24}">
       <a-form layout="inline">
 
-        <a-form-item
-          label="课程名称">
+        <a-form-item :label="select ? '' : '课程名称'">
           <a-input v-model="screenData.name" placeholder="请输入课程名称" :maxLength="20"></a-input>
         </a-form-item>
 
-        <a-form-item
-          label="课程分类">
+        <a-form-item :label="select ? '' : '课程分类'">
           <a-cascader
             change-on-select
             v-if="!classTreeLoading"
@@ -21,17 +19,16 @@
           <a-spin v-else />
         </a-form-item>
 
-        <a-form-item
-          label="创建时间">
+        <a-form-item :label="select ? '' : '创建时间'">
           <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
-        <a-form-item
-          label="创建人">
+        <a-form-item    v-if="!select" :label="select ? '' : '创建人'">
           <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
         </a-form-item>
 
         <a-form-item
+          v-if="!select"
           label="关联考试">
           <a-select
             :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-button type="primary" style="border-radius: 8px" class="add" @click="visible = true">
+    <a-button type="primary" style="border-radius: 8px" class="add" @click="openSelect">
       创建任务
     </a-button>
     <a-modal
@@ -36,7 +36,7 @@
       :visible="createVisible"
       @cancel="cancel"
     >
-      <CreateTask @onSubmit="onSubmit" />
+      <CreateTask :loading="loading" @onSubmit="onSubmit" />
     </a-modal>
   </div>
 </template>
@@ -44,6 +44,8 @@
 <script>
 import lesson from '../../../../../lesson/index'
 import CreateTask from '../../../CreateTask/index'
+import { courseTask } from '@/api/study/task'
+import { message } from 'ant-design-vue'
 
 export default {
   props: {
@@ -57,6 +59,7 @@ export default {
   components: { lesson, CreateTask },
   data () {
     return {
+      loading: false,
       courses: [],
       selectCourses: [],
       createVisible: false,
@@ -64,6 +67,11 @@ export default {
     }
   },
   methods: {
+    openSelect () {
+      this.visible = true
+      this.courses = []
+      this.selectCourses = []
+    },
     selectRows (rows) {
       this.courses = rows
     },
@@ -73,7 +81,21 @@ export default {
       this.createVisible = true
     },
     onSubmit (values) {
-      console.log({ ...values, selectCourses: this.selectCourses })
+      const data = {
+        courseIds: this.selectCourses.map(item => item.courseId),
+        applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
+        haveTimeLimit: values.timeLimit.length > 0 ? 2 : 1,
+        empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject,
+        startTime: values.timeLimit[0],
+        endTime: values.timeLimit[1]
+      }
+      this.loading = true
+      courseTask(data).then(() => {
+        message.success('课程任务创建成功！')
+        this.createVisible = false
+      }).finally(() => {
+        this.loading = false
+      })
     },
     cancel () {
       this.createVisible = false
