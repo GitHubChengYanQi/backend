@@ -77,7 +77,7 @@
             <template>
               <div class="my-space">
                 <a-button class="warnButton" @click="setVisible(record)">重命名</a-button>
-                <a-button class="successButton">预览</a-button>
+                <a-button class="successButton" disabled>预览</a-button>
                 <a-button class="linkButton" @click="download([record])">下载</a-button>
                 <a-popconfirm
                   title="是否确认删除"

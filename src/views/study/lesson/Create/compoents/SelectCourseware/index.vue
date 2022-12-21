@@ -67,7 +67,7 @@
         <el-table-column prop="action" label="操作" width="180">
           <template slot-scope="{row}">
             <div class="my-space" style="cursor: pointer">
-              <button class="linkButton" @click="openPreview(row)">预览</button>
+              <button class="linkButton" :disabled="row.previewType === 'file'" @click="openPreview(row)">预览</button>
               <button class="delButton" @click="remove(row)">删除</button>
               <div class="my-handle">
                 <DragIcon :width="24" />
