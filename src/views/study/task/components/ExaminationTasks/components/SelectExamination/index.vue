@@ -37,7 +37,7 @@
       :visible="createVisible"
       @cancel="cancel"
     >
-      <CreateTask @onSubmit="onSubmit" />
+      <CreateTask :loading="loading" @onSubmit="onSubmit" />
     </a-modal>
   </div>
 </template>
@@ -45,6 +45,8 @@
 <script>
 import examination from '../../../../../examination/index'
 import CreateTask from '../../../CreateTask/index'
+import { courseTask } from '@/api/study/task'
+import { message } from 'ant-design-vue'
 
 export default {
   props: {
@@ -61,7 +63,8 @@ export default {
       examination: [],
       selectExamination: [],
       createVisible: false,
-      visible: false
+      visible: false,
+      loading: false
     }
   },
   methods: {
@@ -74,7 +77,21 @@ export default {
       this.createVisible = true
     },
     onSubmit (values) {
-      console.log({ ...values, selectExamination: this.selectExamination })
+      const data = {
+        examIds: this.selectExamination.map(item => item.examId),
+        applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
+        haveTimeLimit: values.timeLimit.length > 0 ? 2 : 1,
+        empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject,
+        startTime: values.timeLimit[0],
+        endTime: values.timeLimit[1]
+      }
+      this.loading = true
+      courseTask(data).then(() => {
+        message.success('考试任务创建成功！')
+        this.createVisible = false
+      }).finally(() => {
+        this.loading = false
+      })
     },
     cancel () {
       this.createVisible = false

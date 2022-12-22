@@ -7,3 +7,11 @@ export function courseTask (data) {
     data
   })
 }
+
+export function courseTaskList (data) {
+  return request({
+    url: '/courseTask/list',
+    method: 'post',
+    data
+  })
+}

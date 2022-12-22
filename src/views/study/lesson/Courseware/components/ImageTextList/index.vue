@@ -4,7 +4,7 @@
       <a-form layout="inline">
 
         <a-form-item :label="select ? '' : '标题名称'">
-          <a-input v-model="screenData.name" placeholder="请输入标题名称" :maxLength="50"></a-input>
+          <a-input v-model="screenData.title" placeholder="请输入标题名称" :maxLength="50"></a-input>
         </a-form-item>
 
         <a-form-item :label="select ? '' : '上传时间'">
@@ -12,7 +12,9 @@
         </a-form-item>
 
         <a-form-item :label="select ? '' : '上传人'">
-          <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
+          <div style="width: 200px">
+            <SelectEmployeeInput v-model="screenData.employeeId" :changeId="true" :max-count="1" />
+          </div>
         </a-form-item>
         <a-form-item>
           <div class="my-space">
@@ -147,11 +149,7 @@ export default {
       tableData: [],
       loading: false,
       visible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      screenData: {},
       columns: [
         {
           title: '标题',
@@ -171,8 +169,11 @@ export default {
         },
         {
           title: '上传人',
-          dataIndex: 'user',
-          align: 'center'
+          dataIndex: 'employee',
+          align: 'center',
+          customRender: (text) => {
+            return text && text.name
+          }
         }
       ],
       pagination: {
@@ -239,7 +240,12 @@ export default {
     },
     getTableData () {
       this.loading = true
+      const time = this.screenData.time || []
       const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
+        employeeId: this.screenData.employeeId && this.screenData.employeeId[0],
         courseWareType: 'text'
       }
       courseWareList(data, {

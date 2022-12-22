@@ -23,8 +23,13 @@
           <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
-        <a-form-item    v-if="!select" :label="select ? '' : '创建人'">
-          <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
+        <a-form-item
+          v-if="!select"
+          :label="select ? '' : '创建人'"
+        >
+          <div style="width: 200px">
+            <SelectEmployeeInput v-model="screenData.employeeId" :changeId="true" :max-count="1" />
+          </div>
         </a-form-item>
 
         <a-form-item
@@ -101,7 +106,7 @@
             <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  <div v-html="text"></div>
+                  <div class="ql-editor" v-html="text"></div>
                 </template>
                 <div v-html="text"></div>
               </a-tooltip>
@@ -360,8 +365,12 @@ export default {
     },
     getTableData () {
       this.loading = true
+      const time = this.screenData.time || []
       const data = {
         ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
+        employeeId: this.screenData.employeeId && this.screenData.employeeId[0],
         courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
       }
       courseList(data, {

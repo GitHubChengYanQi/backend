@@ -52,58 +52,72 @@
       <div class="btn">
         <SelectCourse />
       </div>
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.courseTaskId"
+          :pagination="pagination"
+          @change="handleTableChange">
+          <div slot="name" slot-scope="text, record">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <img height="50" :src="record.courseResult && record.courseResult.coverImageUrl">
+              </div>
+              <div class="nickname">
+                <a-tooltip>
+                  <template slot="title">
+                    {{ record.courseResult && record.courseResult.name }}
+                  </template>
+                  {{ record.courseResult && record.courseResult.name }}
+                </a-tooltip>
+              </div>
             </div>
-            <div class="nickname">
+          </div>
+          <div slot="note" slot-scope="text,record">
+            <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  {{ record.name }}
+                  <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
                 </template>
-                {{ record.name }}
+                <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
               </a-tooltip>
             </div>
           </div>
-        </div>
-        <div slot="action" slot-scope="text, record">
-          <template>
-            <div class="my-space">
-              <a-button class="warnButton">详情</a-button>
-              <a-popconfirm
-                disabled
-                title="是否确认删除"
-                ok-text="确认"
-                cancel-text="取消"
-                @confirm="deleteAttribute(record.id)"
-              >
-                <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-              </a-popconfirm>
-            </div>
-          </template>
-        </div>
-      </a-table>
+          <div slot="action" slot-scope="text, record">
+            <template>
+              <div class="my-space">
+                <a-button class="warnButton">详情</a-button>
+                <a-popconfirm
+                  disabled
+                  title="是否确认删除"
+                  ok-text="确认"
+                  cancel-text="取消"
+                  @confirm="deleteAttribute(record.id)"
+                >
+                  <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+                </a-popconfirm>
+              </div>
+            </template>
+          </div>
+        </a-table>
+      </a-spin>
     </div>
   </div>
 </template>
 
 <script>
 
-import { message } from 'ant-design-vue'
 import SelectCourse from './components/SelectCourse'
+import { courseTaskList } from '@/api/study/task'
+import moment from 'moment'
 
 export default {
   components: { SelectCourse },
   data () {
     return {
+      loading: false,
       imgUrl: '',
       imgName: '',
       uploadVisible: false,
@@ -123,14 +137,17 @@ export default {
         },
         {
           title: '课程简介',
-          dataIndex: 'introduction',
-          scopedSlots: { customRender: 'introduction' },
+          dataIndex: 'note',
+          scopedSlots: { customRender: 'note' },
           align: 'center'
         },
         {
           title: '课程分类',
           dataIndex: 'class',
-          align: 'center'
+          align: 'center',
+          customRender (value, record) {
+            return record.courseResult && record.courseResult.courseClassResult && record.courseResult.courseClassResult.name
+          }
         },
         {
           title: '考核员工',
@@ -139,7 +156,7 @@ export default {
         },
         {
           title: '考核总人数',
-          dataIndex: 'total',
+          dataIndex: 'allEmp',
           align: 'center',
           sorter: true
         },
@@ -163,13 +180,19 @@ export default {
         },
         {
           title: '课件数',
-          dataIndex: '4',
-          align: 'center'
+          dataIndex: 'courseWareBindResults',
+          align: 'center',
+          customRender (value, record) {
+            return record.courseResult && record.courseResult.courseWareBindResults && record.courseResult.courseWareBindResults.length
+          }
         },
         {
           title: '关联考试',
           dataIndex: '5',
-          align: 'center'
+          align: 'center',
+          customRender (value, record) {
+            return record.courseResult && record.courseResult.examResults && record.courseResult.examResults[0] && record.courseResult.examResults[0].name
+          }
         },
         {
           title: '创建人',
@@ -178,9 +201,12 @@ export default {
         },
         {
           title: '创建时间',
-          dataIndex: '7',
           align: 'center',
-          sorter: true
+          sorter: true,
+          dataIndex: 'createdAt',
+          customRender: (text) => {
+            return (text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-')
+          }
         },
         {
           title: '操作',
@@ -210,46 +236,22 @@ export default {
       console.log(id)
     },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      const data = {}
+      courseTaskList(data, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current
+      }).then(res => {
+        this.tableData = res.data
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
     handleTableChange ({ current, pageSize }) {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
-    },
-    selectChange (row) {
-      this.checkIds = row
     },
     // 群聊筛选
     // 重置
