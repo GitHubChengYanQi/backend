@@ -62,12 +62,11 @@
         </div>
       </div>
       <a-table
-        rowKey="contactId"
+        rowKey="id"
         :loading="loading"
         :columns="columns"
         :data-source="tableData"
         :pagination="pagination"
-        :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
         :scroll="{ x: 1500}"
         @change="handleTableChange">
         <div
@@ -112,7 +111,6 @@
 </template>
 
 <script>
-// TODO: 疾病分类的联动数据来源， 支持搜索
 import { combinList, deleteCombin } from '@/api/mall'
 import { deepClone } from '@/utils/util'
 import diseaseSelect from './diseaseSelect'
@@ -128,11 +126,7 @@ export default {
   data () {
     return {
       loading: false,
-      selectedRowKeys: [], // 选中key
-      selectedRows: [], // 选中row
       screenData: {},
-      // curParam: {},
-      // storeIds: [],
       columns: [
         {
           title: '联合用药名称',
@@ -144,7 +138,7 @@ export default {
         {
           title: '疾病/症状一级分类',
           dataIndex: 'symptomDiseaseClassifyOneLevel',
-          sort: true,
+          sorter: true,
           align: 'center',
           width: 150,
           scopedSlots: { customRender: 'symptomDiseaseClassifyOneLevel' }
@@ -152,7 +146,7 @@ export default {
         {
           title: '疾病/症状二级分类',
           dataIndex: 'symptomDiseaseClassifyTwoLevel',
-          sort: true,
+          sorter: true,
           align: 'center',
           width: 150,
           scopedSlots: { customRender: 'symptomDiseaseClassifyTwoLevel' }
@@ -174,7 +168,7 @@ export default {
         {
           title: '最后编辑时间',
           dataIndex: 'updatedAt',
-          sort: true,
+          sorter: true,
           align: 'center',
           width: 150,
           scopedSlots: { customRender: 'updatedAt' }
@@ -202,38 +196,6 @@ export default {
         pageSize: 10,
         showSizeChanger: true,
         pageSizeOptions: ['10', '20', '30', '50']
-      },
-      formData: {
-        name: '',
-        value: '',
-        status: 0,
-        sort: '',
-        differentiate: 'personal',
-        type: '',
-        isPull: 0,
-        interval: '1',
-        max: '200',
-        min: '70'
-      },
-      rules: {
-        name: [
-          { required: true, message: '请输入名称', trigger: 'blur' }
-        ],
-        value: [
-          { required: true, message: '请输入标识', trigger: 'blur' }
-        ],
-        sort: [
-          { required: true, message: '请输入优先级', trigger: 'blur' }
-        ],
-        interval: [
-          { required: true, message: '请输入整数位间隔', trigger: 'blur' }
-        ],
-        max: [
-          { required: true, message: '请输入整数位最大值', trigger: 'blur' }
-        ],
-        min: [
-          { required: true, message: '请输入整数位最小值', trigger: 'blur' }
-        ]
       }
     }
   },
@@ -259,12 +221,11 @@ export default {
         ...this.screenData
       }
       // 是否选择了疾病分类
-      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify.join(',') : void 0;
-      // params.maintainerIds = params.maintainerIds ? params.maintainerIds.join(',') : ''
+      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify : void 0;
       combinList(params).then((res) => {
         this.loading = false
         this.tableData = res.data.list
-        this.pagination.total = res.data.total
+        this.pagination.total = res.data.page.total
       })
     },
     /**
@@ -297,9 +258,9 @@ export default {
       const sort = {}
       if (sorter.order) {
         if (sorter.order === 'ascend') {
-          sort.sort = `${sorter.field}Asc`
+          sort.orderBySortCode = `${sorter.field}Asc`
         } else {
-          sort.sort = `${sorter.field}Desc`
+          sort.orderBySortCode = `${sorter.field}Desc`
         }
       }
       this.screenData = { ...this.screenData, ...sort }
@@ -321,14 +282,6 @@ export default {
      */
     reset () {
       this.modalVisible = false
-    },
-    /**
-     * 表格选择监听
-     * @param {*} selectedRowKeys
-     */
-    onSelectChange (selectedRowKeys, row) {
-      this.selectedRowKeys = selectedRowKeys
-      this.selectedRows = row
     },
     /**
      * 编辑
@@ -368,12 +321,6 @@ export default {
       this.$router.push({
         path: '/mall/combination/add'
       })
-    },
-    /**
-     * 部门回调
-     */
-    getDept (e) {
-      console.log(e)
     }
   }
 }

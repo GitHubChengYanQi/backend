@@ -165,3 +165,33 @@ export function deleteCombin (params) {
     params
   })
 }
+/**
+ * 新增联合用药
+ */
+export function combinAdd (data) {
+  return request({
+    url: '/drugCombination/add',
+    method: 'post',
+    data
+  })
+}
+/**
+ * 修改联合用药
+ */
+export function combinUpdate (data) {
+  return request({
+    url: '/drugCombination/update',
+    method: 'put',
+    data
+  })
+}
+/**
+ * 联合用药详情
+ */
+export function combinDetail (params) {
+  return request({
+    url: '/drugCombination/detail',
+    method: 'get',
+    params
+  })
+}

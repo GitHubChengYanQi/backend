@@ -5,27 +5,19 @@
       <a-select
         v-show="show"
         show-search
-        placeholder="Select a person"
+        placeholder="请选择药品"
         option-filter-prop="children"
-        style="width: 200px"
+        style="width: 300px"
         :filter-option="filterOption"
-        @focus="handleFocus"
-        @blur="handleBlur"
         @change="handleChange"
       >
-        <a-select-option value="jack">
-          Jack
-        </a-select-option>
-        <a-select-option value="lucy">
-          Lucy
-        </a-select-option>
-        <a-select-option value="tom">
-          Tom
+        <a-select-option v-for="(item, index) in drugList" :key="index" :value="item.id">
+          {{ item.name }}
         </a-select-option>
       </a-select>
     </p>
     <p>
-      <a-tag closable v-for="(item, index) in list" :key="index" @close="handleDelete">
+      <a-tag closable v-for="(item, index) in list" :key="item.id" @close="handleDelete(index)">
         {{ item.name }}
       </a-tag>
     </p>
@@ -36,9 +28,15 @@
 export default {
   props: {
     data: {
-      type: Object,
+      type: Array,
       default: () => {
-        return {}
+        return []
+      }
+    },
+    drug: {
+      type: Array,
+      default: () => {
+        return []
       }
     }
   },
@@ -47,29 +45,41 @@ export default {
       immediate: true,
       deep: true,
       handler (val) {
-
+        this.list = val
+      }
+    },
+    drug: {
+      immediate: true,
+      deep: true,
+      handler (val) {
+        this.drugList = val
       }
     }
   },
   data () {
     return {
       show: false,
-      list: []
+      list: [],
+      drugList: []
     }
   },
   methods: {
-    handleChange (value) {
-      console.log(`selected ${value}`)
-      this.show = false
-      this.list.push({
-        name: value
-      })
-    },
-    handleBlur () {
-      console.log('blur')
-    },
-    handleFocus () {
-      console.log('focus')
+    handleChange (value, e) {
+      const arr = this.list
+      let flag = false
+      for (let i = 0; i< arr.length; i++) {
+        if (value === arr[i].id) {
+          flag = true
+          break;
+        }
+      }
+      if (!flag) {
+        this.show = false
+        this.list.push({
+          id: value,
+          name: e.componentOptions.children[0].text
+        })
+      }
     },
     filterOption (input, option) {
       return (
@@ -80,7 +90,7 @@ export default {
       this.show = true
     },
     handleDelete (e) {
-      console.log(e)
+      this.list.splice(e, 1)
     }
   }
 }
