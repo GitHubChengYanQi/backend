@@ -57,7 +57,7 @@ export default {
         path = []
       }
       for (let i = 0, len = tree.length; i < len; i++) {
-        let tempPath = [...path]
+        const tempPath = [...path]
         tempPath.push(tree[i].id)
         if (tree[i].id === id) {
           this.data = tempPath

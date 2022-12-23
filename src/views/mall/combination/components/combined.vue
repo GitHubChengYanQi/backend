@@ -25,7 +25,7 @@
               label="有无辅药："
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
-              <a-select placeholder="请选择"  v-model="screenData.haveAdjuvants">
+              <a-select placeholder="请选择" v-model="screenData.haveAdjuvants">
                 <a-select-option value="have">有</a-select-option>
                 <a-select-option value="no">无</a-select-option>
               </a-select>
@@ -221,7 +221,7 @@ export default {
         ...this.screenData
       }
       // 是否选择了疾病分类
-      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify : void 0;
+      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify : void 0
       combinList(params).then((res) => {
         this.loading = false
         this.tableData = res.data.list

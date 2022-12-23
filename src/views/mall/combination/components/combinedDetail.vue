@@ -12,8 +12,8 @@
           <a-input
             :disabled="id.length > 0 ? true : false"
             v-model="form.name"
-            :maxLength = "15"
-            :suffix = "`${form.name.length}/15`"
+            :maxLength="15"
+            :suffix="`${form.name.length}/15`"
             @blur="
               () => {
                 $refs.name.onFieldBlur();
@@ -109,10 +109,10 @@ export default {
     deepClonev2,
     /**
      * 获取通用名列表
-     * @param {*} id 
+     * @param {*} id
      */
-     getCommonNameList (name) {
-      const param  = {
+    getCommonNameList (name) {
+      const param = {
         name
       }
       getCommonNameList(param).then(res => {
@@ -121,24 +121,24 @@ export default {
     },
     /**
      * 获取用药推荐
-     * @param {*} id 
+     * @param {*} id
      */
     searchSalesGuidance (id) {
-      const param  = {
+      const param = {
         id
       }
       searchSalesGuidance(param).then(res => {
         this.salesGuidance = res.data.salesGuidance
-      }).catch(err => {
+      }).catch(() => {
         this.salesGuidance = ''
       })
     },
     /**
      * 获取联合用药详情
-     * @param {*} id 
+     * @param {*} id
      */
     getCombined (id) {
-      const param  = {
+      const param = {
         id
       }
       combinDetail(param).then(res => {
@@ -189,7 +189,7 @@ export default {
       if (type === 'adjuvants') {
         const arr = this.form.adjuvants
         let flag = false
-        let index = undefined
+        let index
         for (let i = 0; i < arr.length; i++) {
           if (arr[i].drugs.length === 0) {
             flag = true
@@ -226,17 +226,17 @@ export default {
         adjuvants: []
       }
       // 主药Id处理
-      let mainArr = []
+      const mainArr = []
       for (let i = 0; i < mainDrug.length; i++) {
         mainArr.push(mainDrug[i].id)
       }
       data.mainDrug = mainArr.join(',')
       // 辅药Id处理
-      let viceArr = this.deepClonev2(adjuvants)
+      const viceArr = this.deepClonev2(adjuvants)
       for (let i = 0; i < viceArr.length; i++) {
-        let item = viceArr[i].drugs
-        let arr = []
-        for (let j = 0; j< item.length; j++) {
+        const item = viceArr[i].drugs
+        const arr = []
+        for (let j = 0; j < item.length; j++) {
           arr.push(item[j].id)
         }
         viceArr[i].drugsIds = arr.join(',')

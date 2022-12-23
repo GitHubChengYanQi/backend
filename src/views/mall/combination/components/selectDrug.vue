@@ -67,10 +67,10 @@ export default {
     handleChange (value, e) {
       const arr = this.list
       let flag = false
-      for (let i = 0; i< arr.length; i++) {
+      for (let i = 0; i < arr.length; i++) {
         if (value === arr[i].id) {
           flag = true
-          break;
+          break
         }
       }
       if (!flag) {
