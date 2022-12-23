@@ -36,8 +36,8 @@
           v-if="!select"
           label="关联考试">
           <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender"
+            :options="[{value:'all',label:'全部'},{value:'true',label:'是'},{value:'false',label:'否'}]"
+            v-model="screenData.haveExam"
             style="width: 200px"
             placeholder="请选择关联考试"
           ></a-select>
@@ -266,7 +266,11 @@ export default {
         },
         {
           title: '关联考试',
-          align: 'center'
+          align: 'center',
+          dataIndex: 'examResults',
+          customRender: (examResults) => {
+            return examResults && examResults.length > 0 ? '是' : '否'
+          }
         },
         {
           title: '创建人',
@@ -371,6 +375,7 @@ export default {
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
         employeeId: this.screenData.employeeId && this.screenData.employeeId[0],
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
         courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
       }
       courseList(data, {

@@ -42,13 +42,17 @@ export default {
     value: {
       type: Array,
       default: _ => []
+    },
+    employees: {
+      type: Array,
+      default: _ => []
     }
   },
   data () {
     return {
-      employeeShowData: [],
+      employeeShowData: this.employees,
       selectEmployee: [],
-      userType: 1
+      userType: this.value[0] === 'all' ? 1 : 2
     }
   },
   methods: {

@@ -10,7 +10,7 @@ export function courseWareAdd (data) {
 
 export function courseWarEdit (data) {
   return request({
-    url: '/courseWare/update',
+    url: '/courseWare/edit',
     method: 'post',
     data
   })

@@ -18,7 +18,15 @@ export function courseClassTreeView (data) {
 
 export function courseClassUpdate (data) {
   return request({
-    url: '/courseClass/update',
+    url: '/courseClass/edit',
+    method: 'post',
+    data
+  })
+}
+
+export function courseClassSort (data) {
+  return request({
+    url: '/courseClass/sort',
     method: 'post',
     data
   })

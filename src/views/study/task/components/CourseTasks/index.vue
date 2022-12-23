@@ -50,7 +50,7 @@
     </a-card>
     <div class="my-table-wrapper">
       <div class="btn">
-        <SelectCourse />
+        <SelectCourse @success="success" />
       </div>
       <a-spin :spinning="loading">
         <a-table
@@ -234,6 +234,9 @@ export default {
   methods: {
     deleteAttribute (id) {
       console.log(id)
+    },
+    success () {
+      this.getTableData()
     },
     getTableData () {
       this.loading = true

@@ -58,8 +58,12 @@
           </a-form-item>
           <a-form-item label="适用员工">
             <Employee
+              v-if="!detailLoading"
+              :employees="employees"
               :disabled="!!this.$router.history.current.query.id"
-              v-decorator="['applicableObject', { rules: [{ required: true, message: '请选择适用员工!' }],initialValue:['all'] }]"></Employee>
+              v-decorator="['applicableObject', { rules: [{ required: true, message: '请选择适用员工!' }],initialValue:['all'] }]"
+            />
+            <a-spin v-else />
           </a-form-item>
           <a-form-item label="关联考试">
             <SelectExamination
@@ -70,10 +74,12 @@
           </a-form-item>
           <a-form-item label="课程简介">
             <VueQuillEditor
+              v-if="!detailLoading"
               :height="'auto'"
               placeholder="请输入课程简介"
               v-decorator="['note', { rules: [{ required: true, message: '请输入课程简介!' }],initialValue:'' }]"
             />
+            <a-spin v-else />
           </a-form-item>
         </a-form>
       </div>
@@ -102,6 +108,7 @@ export default {
       loading: false,
       classTreeLoading: false,
       classTree: [],
+      employees: [],
       data: {},
       form: this.$form.createForm(this, { name: 'coordinated' })
     }
@@ -158,12 +165,13 @@ export default {
       this.detailLoading = true
       courseDetail({ courseId: id }).then((res) => {
         const detail = res.data || {}
+        this.employees = detail.bindEmpList ? detail.bindEmpList.map(item => item.name) : []
         this.form.setFieldsValue({
           name: detail.name,
           courseClassId: this.getClassIds(detail.courseClassId, this.classTree),
           wareBindParams: detail.courseWareBindResults,
           coverImageUrl: detail.coverImageUrl,
-          applicableObject: detail.applicableObject === 1 ? ['all'] : [],
+          applicableObject: detail.applicableObject === 1 ? ['all'] : detail.bindEmpList ? detail.bindEmpList.map(item => item.id) : [],
           exam: detail.examResults && detail.examResults[0],
           note: detail.note
         })

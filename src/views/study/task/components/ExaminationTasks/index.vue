@@ -45,81 +45,85 @@
     </a-card>
     <div class="my-table-wrapper">
       <div class="btn">
-        <SelectExamination />
+        <SelectExamination @success="success" />
       </div>
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.examTaskId"
+          :pagination="pagination"
+          @change="handleTableChange">
+          <div slot="name" slot-scope="text, record">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <img height="50" :src="record.examResult && record.examResult.coverImageUrl">
+              </div>
+              <div class="nickname">
+                <a-tooltip>
+                  <template slot="title">
+                    {{ record.examResult && record.examResult.name }}
+                  </template>
+                  {{ record.examResult && record.examResult.name }}
+                </a-tooltip>
+              </div>
             </div>
-            <div class="nickname">
+          </div>
+          <div slot="note" slot-scope="text,record">
+            <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  {{ record.name }}
+                  {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName }}
                 </template>
-                {{ record.name }}
+                {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName }}
               </a-tooltip>
             </div>
           </div>
-        </div>
-        <div slot="action" slot-scope="text, record">
-          <template>
-            <div class="my-space">
-              <a-button class="warnButton">详情</a-button>
-              <a-popconfirm
-                disabled
-                title="是否确认删除"
-                ok-text="确认"
-                cancel-text="取消"
-                @confirm="deleteAttribute(record.id)"
-              >
-                <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-              </a-popconfirm>
-            </div>
-          </template>
-        </div>
-      </a-table>
+          <div slot="action" slot-scope="text, record">
+            <template>
+              <div class="my-space">
+                <a-button class="warnButton">详情</a-button>
+                <a-popconfirm
+                  disabled
+                  title="是否确认删除"
+                  ok-text="确认"
+                  cancel-text="取消"
+                  @confirm="deleteAttribute(record.id)"
+                >
+                  <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
+                </a-popconfirm>
+              </div>
+            </template>
+          </div>
+        </a-table>
+      </a-spin>
     </div>
   </div>
 </template>
 
 <script>
 
-import { message } from 'ant-design-vue'
 import SelectExamination from './components/SelectExamination'
+import { examTaskList } from '@/api/study/task'
 
 export default {
   components: { SelectExamination },
   data () {
     return {
-      imgUrl: '',
-      imgName: '',
-      uploadVisible: false,
-      fileName: String,
-      visible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      loading: false,
+      screenData: {},
       columns: [
         {
-          title: '课程名称',
+          title: '考试名称',
           dataIndex: 'name',
           scopedSlots: { customRender: 'name' },
           align: 'center'
         },
         {
           title: '试卷名称',
-          dataIndex: 'introduction',
-          scopedSlots: { customRender: 'introduction' },
+          dataIndex: 'note',
+          scopedSlots: { customRender: 'note' },
           align: 'center'
         },
         {
@@ -208,67 +212,24 @@ export default {
     this.getTableData()
   },
   methods: {
-    download () {
-      if (this.checkIds.length === 0) {
-        message.warn('请选择想要下载的文件！')
-      } else {
-        console.log(this.checkIds)
-      }
-    },
-    uploadVisibleOpen () {
-      this.imgUrl = ''
-      this.imgName = ''
-      this.uploadVisible = true
-    },
-    uploadSuccess (data = []) {
-      const file = data[0] || {}
-      console.log(file)
-      this.imgUrl = file.fullPath
-      this.imgName = file.name
-    },
-    setVisible (visible) {
-      this.fileName = visible
-      this.visible = true
-    },
-    handleOk () {
-      console.log('ok')
-    },
     deleteAttribute (id) {
       console.log(id)
     },
+    success () {
+      this.getTableData()
+    },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      const data = {}
+      examTaskList(data, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current
+      }).then(res => {
+        this.tableData = res.data
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
     handleTableChange ({ current, pageSize }) {
       this.pagination.current = current

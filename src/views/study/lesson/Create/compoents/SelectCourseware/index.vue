@@ -67,8 +67,8 @@
         <el-table-column prop="action" label="操作" width="180">
           <template slot-scope="{row}">
             <div class="my-space" style="cursor: pointer">
-              <button class="linkButton" :disabled="row.previewType === 'file'" @click="openPreview(row)">预览</button>
-              <button class="delButton" @click="remove(row)">删除</button>
+              <a-button class="linkButton" :disabled="row.courseWareType === 'file'" @click="openPreview(row)">预览</a-button>
+              <a-button class="delButton" @click="remove(row)">删除</a-button>
               <div class="my-handle">
                 <DragIcon :width="24" />
               </div>
@@ -144,13 +144,14 @@ import FileList from '../../../Courseware/components/FileList/index'
 import VideoList from '../../../Courseware/components/VideoList/index'
 import ImageTextList from '../../../Courseware/components/ImageTextList/index'
 import SelectExamination from '../SelectExamination/index'
+import Preview from '../../../../components/Preview'
 
 export default {
   props: {
     value: Array,
     hiddenExam: Boolean
   },
-  components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination },
+  components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination, Preview },
   data () {
     return {
       content: '',

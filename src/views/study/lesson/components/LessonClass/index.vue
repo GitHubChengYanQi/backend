@@ -147,7 +147,14 @@
 
 <script>
 import DragIcon from '../../../components/DragIcon'
-import { courseClassAdd, courseClassDelete, courseClassTreeView, courseClassUpdate } from '@/api/study/lessonClass'
+import {
+  courseClassAdd,
+  courseClassDelete,
+  courseClassSort,
+  courseClassTreeView,
+  courseClassUpdate
+} from '@/api/study/lessonClass'
+import { message } from 'ant-design-vue'
 
 export default {
   data () {
@@ -252,8 +259,29 @@ export default {
     handleDragOver (draggingNode, dropNode, ev) {
 
     },
-    handleDragEnd (draggingNode, dropNode, dropType, ev) {
-
+    handleDragEnd () {
+      const newData = []
+      const formatTree = (data) => {
+        if (!Array.isArray(data)) {
+          return []
+        }
+        return data.forEach((item, index) => {
+          newData.push({
+            name: item.title,
+            courseClassId: item.key,
+            sort: index
+          })
+          formatTree(item.children)
+        })
+      }
+      formatTree(this.data)
+      this.tableLoading = true
+      courseClassSort({ params: newData }).then(() => {
+        message.success('排序成功！')
+        this.getTreeData()
+      }).finally(() => {
+        this.tableLoading = false
+      })
     },
     handleDrop (draggingNode, dropNode, dropType, ev) {
 

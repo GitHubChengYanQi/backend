@@ -45,7 +45,7 @@
 <script>
 import examination from '../../../../../examination/index'
 import CreateTask from '../../../CreateTask/index'
-import { courseTask } from '@/api/study/task'
+import { examTaskAdd } from '@/api/study/task'
 import { message } from 'ant-design-vue'
 
 export default {
@@ -86,9 +86,10 @@ export default {
         endTime: values.timeLimit[1]
       }
       this.loading = true
-      courseTask(data).then(() => {
+      examTaskAdd(data).then(() => {
         message.success('考试任务创建成功！')
         this.createVisible = false
+        this.$emit('success')
       }).finally(() => {
         this.loading = false
       })

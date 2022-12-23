@@ -282,9 +282,11 @@ export default {
       this.visible = true
     },
     handleOk () {
+      this.updateLoading = true
       courseWarEdit({ fileName: this.fileName, courseWareId: this.fileId }).then(() => {
         message.success('修改成功！')
         this.getTableData()
+        this.visible = false
       })
     },
     deleteAttribute (id) {

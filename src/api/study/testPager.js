@@ -10,7 +10,7 @@ export function learningQuestionnaireAdd (data) {
 
 export function learningQuestionnaireEdit (data) {
   return request({
-    url: '/learningQuestionnaire/update',
+    url: '/learningQuestionnaire/edit',
     method: 'post',
     data
   })
