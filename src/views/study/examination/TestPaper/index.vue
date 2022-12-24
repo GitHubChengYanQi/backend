@@ -180,7 +180,7 @@ export default {
         },
         {
           title: '总分数',
-          dataIndex: 'class',
+          dataIndex: 'score',
           align: 'center'
         },
         {

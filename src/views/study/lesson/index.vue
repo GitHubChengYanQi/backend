@@ -28,7 +28,7 @@
           :label="select ? '' : '创建人'"
         >
           <div style="width: 200px">
-            <SelectEmployeeInput v-model="screenData.employeeId" :changeId="true" :max-count="1" />
+            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
           </div>
         </a-form-item>
 
@@ -171,6 +171,7 @@
 <script>
 import TagName from '@/views/workContactNew/components/tagName'
 import breadcrumb from '../components/Breadcrumd/index'
+import SelectEmployee from '../components/SelectEmployee/index'
 import lessonClass from './components/LessonClass'
 import { courseDelete, courseList } from '@/api/study/course'
 import moment from 'moment'
@@ -185,7 +186,7 @@ export default {
     },
     select: Boolean
   },
-  components: { TagName, breadcrumb, lessonClass },
+  components: { TagName, breadcrumb, lessonClass, SelectEmployee },
   data () {
     return {
       rowKey: 'courseId',
@@ -374,7 +375,6 @@ export default {
         ...this.screenData,
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
-        employeeId: this.screenData.employeeId && this.screenData.employeeId[0],
         haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
         courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
       }

@@ -57,6 +57,7 @@ export default {
   },
   methods: {
     change ({ target: { value } }) {
+      this.employeeShowData = []
       this.$emit('change', value === 1 ? ['all'] : null)
     },
     selectEmployeeChange (e) {

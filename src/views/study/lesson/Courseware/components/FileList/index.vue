@@ -14,7 +14,7 @@
 
         <a-form-item :label="select ? '' : '上传人'">
           <div style="width: 200px">
-            <SelectEmployeeInput v-model="screenData.employeeId" :changeId="true" :max-count="1" />
+            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择上传人" />
           </div>
         </a-form-item>
         <a-form-item>
@@ -126,6 +126,7 @@ import { message } from 'ant-design-vue'
 import { courseWareAdd, courseWareDelete, courseWarEdit, courseWareList } from '@/api/study/courseWare'
 import moment from 'moment'
 import FilePreview from '../../../../components/FilePreview/index'
+import SelectEmployee from '../../../../components/SelectEmployee/index'
 
 export default {
   props: {
@@ -305,7 +306,6 @@ export default {
         ...this.screenData,
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
-        employeeId: this.screenData.employeeId && this.screenData.employeeId[0],
         courseWareType: 'file'
       }
       courseWareList(data, {
@@ -336,7 +336,7 @@ export default {
       }
     }
   },
-  components: { upload, FilePreview }
+  components: { upload, FilePreview, SelectEmployee }
 }
 </script>
 

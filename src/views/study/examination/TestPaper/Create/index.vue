@@ -294,7 +294,8 @@ export default {
               }
             })
           })
-          this.switchChange(this.sname)
+          this.count()
+          // this.switchChange(this.sname)
         }, 0)
       }).finally(() => {
         this.detailLoading = false
@@ -570,7 +571,7 @@ export default {
   align-items: center;
   padding: 24px;
   background-color: #fff;
-  margin: 24px 0;
+  margin-bottom: 24px;
   gap: 24px;
   border-radius: 8px;
 
