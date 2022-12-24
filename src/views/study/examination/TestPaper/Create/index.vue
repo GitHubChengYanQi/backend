@@ -264,6 +264,9 @@ export default {
             options
           }
         })
+        this.sname = detail.sameScore === 1
+        this.number = detail.questionScore
+
         setTimeout(() => {
           this.form.setFieldsValue({
             name: detail.questionnaireName,
@@ -348,6 +351,8 @@ export default {
           this.loading = true
           const data = {
             questionnaireName: values.name,
+            sameScore: this.sname ? 1 : 0,
+            questionScore: this.number,
             questionParams: values.questions.map((item, index) => {
               return {
                 questionContent: item.name,

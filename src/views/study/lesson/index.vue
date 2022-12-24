@@ -326,7 +326,7 @@ export default {
           dataIndex: 'courseClassResult',
           align: 'center',
           customRender (value) {
-            return value && value.name || '-'
+            return value && (value.name || '-')
           }
         },
         {

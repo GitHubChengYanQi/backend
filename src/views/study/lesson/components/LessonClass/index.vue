@@ -278,6 +278,7 @@ export default {
       this.tableLoading = true
       courseClassSort({ params: newData }).then(() => {
         message.success('排序成功！')
+      }).catch(() => {
         this.getTreeData()
       }).finally(() => {
         this.tableLoading = false
