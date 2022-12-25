@@ -50,7 +50,7 @@
     </a-card>
     <div class="my-table-wrapper">
       <div class="btn">
-        <SelectCourse @success="success" />
+        <SelectCourse v-permission="'createCourseTask'" @success="success" />
       </div>
       <a-spin :spinning="loading">
         <a-table
@@ -88,7 +88,7 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton">详情</a-button>
+                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.courseId}`)">详情</a-button>
                 <a-popconfirm
                   disabled
                   title="是否确认删除"
@@ -218,6 +218,7 @@ export default {
       ],
       tableData: [],
       checkIds: [],
+     sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -243,7 +244,11 @@ export default {
       const data = {}
       courseTaskList(data, {
         limit: this.pagination.pageSize,
-        page: this.pagination.current
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then(res => {
         this.tableData = res.data
         this.pagination.total = res.count
@@ -251,7 +256,8 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange ({ current, pageSize }) {
+      handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()

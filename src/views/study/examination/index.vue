@@ -13,7 +13,7 @@
         </a-form-item>
 
         <a-form-item :label="select ? '' : '创建人'">
-          <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
+          <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
         </a-form-item>
 
         <a-form-item>
@@ -35,12 +35,14 @@
       <div v-if="!select" class="btn">
         <a-button
           type="primary"
+          v-permission="'testPaperList'"
           ghost
           @click="() => $router.push('/study/examination/testPaper')">
           试卷管理
         </a-button>
         <a-button
           type="primary"
+          v-permission="'createExamination'"
           @click="() => $router.push('/study/examination/create')">
           新建考试
         </a-button>
@@ -81,19 +83,11 @@
                 </a-button>
                 <a-button
                   class="successButton"
-                  @click="() => $router.push(`/study/examination/create?id=${record.examId}`)"
+                  @click="edit(record.examId)"
                 >
                   编辑
                 </a-button>
-
-                <a-popconfirm
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.examId)"
-                >
-                  <a-button class="delButton">删除</a-button>
-                </a-popconfirm>
+                <a-button @click="deleteAttribute(record.examId)" class="delButton">删除</a-button>
               </div>
             </template>
           </div>
@@ -106,12 +100,14 @@
 <script>
 import TagName from '@/views/workContactNew/components/tagName'
 import breadcrumb from '../components/Breadcrumd/index'
-import { examDelete, examList } from '@/api/study/exam'
+import SelectEmployee from '../components/SelectEmployee/index'
+import { examCheckBind, examDelete, examList } from '@/api/study/exam'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
+import router from '@/router'
 
 export default {
-  components: { TagName, breadcrumb },
+  components: { TagName, breadcrumb, SelectEmployee },
   props: {
     rows: {
       type: Array,
@@ -127,11 +123,7 @@ export default {
       checkedRows: [],
       rowSelection: {},
       loading: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      screenData: {},
       columns: [
         {
           title: '课程名称',
@@ -171,9 +163,11 @@ export default {
         },
         {
           title: '创建人',
-          dataIndex: 'tag',
-          scopedSlots: { customRender: 'tag' },
-          align: 'center'
+          dataIndex: 'employeeEntity',
+          align: 'center',
+          customRender: (text) => {
+            return text && text.name
+          }
         },
         {
           title: '创建时间',
@@ -185,6 +179,7 @@ export default {
           sorter: true
         }
       ],
+      sorter:{},
       tableData: [],
       pagination: {
         total: 0,
@@ -243,18 +238,49 @@ export default {
       this.checkedRows = rows
       this.$emit('selectRows', rows)
     },
+    edit (id) {
+      examCheckBind({ examId: id, type: 'edit' }).then(() => {
+        router.push(`/study/examination/create?id=${id}`)
+      })
+    },
     deleteAttribute (id) {
-      examDelete({ examId: id }).then(() => {
-        message.success('删除成功！')
+      const getTableData = () => {
         this.getTableData()
+      }
+      examCheckBind({ examId: id, type: 'delete' }).then(() => {
+        this.$confirm({
+          title: '删除数据后不可恢复，是否确认删除?',
+          okText: '删除',
+          okType: 'danger',
+          cancelText: '取消',
+          centered: true,
+          onOk () {
+            examDelete({ examId: id }).then(() => {
+              message.success('删除成功！')
+              getTableData()
+            })
+          },
+          onCancel () {
+
+          }
+        })
       })
     },
     getTableData () {
       this.loading = true
-      const data = {}
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null
+      }
       examList(data, {
         limit: this.pagination.pageSize,
-        page: this.pagination.current
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then(res => {
         this.tableData = res.data
         this.pagination.total = res.count
@@ -262,7 +288,8 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()

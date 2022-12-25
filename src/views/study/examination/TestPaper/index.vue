@@ -6,7 +6,7 @@
 
         <a-form-item
           label="试卷名称">
-          <a-input v-model="screenData.name" placeholder="请输入试卷名称" :maxLength="20"></a-input>
+          <a-input v-model="screenData.questionnaireName" placeholder="请输入试卷名称" :maxLength="20"></a-input>
         </a-form-item>
 
         <a-form-item
@@ -16,7 +16,7 @@
 
         <a-form-item
           label="创建人">
-          <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
+          <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
         </a-form-item>
 
         <a-form-item>
@@ -37,12 +37,14 @@
     <div class="my-table-wrapper">
       <div v-if="!select" class="btn">
         <a-button
+          v-permission="'importTestPaper'"
           type="primary"
           ghost
           @click="() => importTestPaper = true">
           导入试卷
         </a-button>
         <a-button
+          v-permission="'createTestPaper'"
           type="primary"
           @click="() => $router.push('/study/testPaper/create')">
           创建试卷
@@ -79,14 +81,7 @@
                   编辑
                 </a-button>
 
-                <a-popconfirm
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.questionnaireId)"
-                >
-                  <a-button class="delButton">删除</a-button>
-                </a-popconfirm>
+                <a-button @click="deleteAttribute(record.questionnaireId)" class="delButton">删除</a-button>
               </div>
             </template>
           </div>
@@ -141,13 +136,18 @@
 <script>
 import TagName from '@/views/workContactNew/components/tagName'
 import breadcrumb from '../../components/Breadcrumd/index'
-import { learningQuestionnaireDelete, learningQuestionnaireList } from '@/api/study/testPager'
+import SelectEmployee from '../../components/SelectEmployee/index'
+import {
+  learningQuestionnaireCheckBind,
+  learningQuestionnaireDelete,
+  learningQuestionnaireList
+} from '@/api/study/testPager'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
 import upload from '../../lesson/Courseware/components/upload'
 
 export default {
-  components: { TagName, breadcrumb, upload },
+  components: { TagName, breadcrumb, upload, SelectEmployee },
   props: {
     select: Boolean
   },
@@ -156,11 +156,7 @@ export default {
       fileName: '文件名',
       importTestPaper: false,
       loading: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      screenData: {},
       columns: [
         {
           title: '试卷名称',
@@ -185,9 +181,11 @@ export default {
         },
         {
           title: '创建人',
-          dataIndex: 'tag',
-          scopedSlots: { customRender: 'tag' },
-          align: 'center'
+          dataIndex: 'employeeEntity',
+          align: 'center',
+          customRender: (text) => {
+            return text && text.name
+          }
         },
         {
           title: '创建时间',
@@ -200,6 +198,7 @@ export default {
         }
       ],
       tableData: [],
+     sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -232,10 +231,19 @@ export default {
     },
     getTableData () {
       this.loading = true
-      const data = {}
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null
+      }
       learningQuestionnaireList(data, {
         limit: this.pagination.pageSize,
-        page: this.pagination.current
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then(res => {
         this.tableData = res.data
         this.pagination.total = res.count
@@ -244,6 +252,7 @@ export default {
       })
     },
     handleTableChange ({ current, pageSize }) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
@@ -252,9 +261,26 @@ export default {
       this.$emit('selectRow', rows[0])
     },
     deleteAttribute (id) {
-      learningQuestionnaireDelete({ questionnaireId: id }).then(() => {
-        message.success('删除成功！')
+      const getTableData = () => {
         this.getTableData()
+      }
+      learningQuestionnaireCheckBind({ questionnaireId: id, type: 'delete' }).then(() => {
+        this.$confirm({
+          title: '删除数据后不可恢复，是否确认删除?',
+          okText: '删除',
+          okType: 'danger',
+          cancelText: '取消',
+          centered: true,
+          onOk () {
+            learningQuestionnaireDelete({ questionnaireId: id }).then(() => {
+              message.success('删除成功！')
+              getTableData()
+            })
+          },
+          onCancel () {
+
+          }
+        })
       })
     },
     // 群聊筛选

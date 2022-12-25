@@ -34,7 +34,7 @@
 
     <div class="my-table-wrapper">
       <div v-if="!select" class="btn">
-        <a-button type="primary" @click="() => $router.push('/study/lesson/createVideo')">
+        <a-button v-permission="'createVideo'" type="primary" @click="() => $router.push('/study/lesson/createVideo')">
           上传视频
         </a-button>
       </div>
@@ -186,6 +186,7 @@ export default {
       tableData: [],
       checkIds: [],
       upLoadRes: {},
+     sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -242,7 +243,11 @@ export default {
       }
       courseWareList(data, {
         limit: this.pagination.pageSize,
-        page: this.pagination.current
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then(res => {
         this.tableData = res.data
         this.pagination.total = res.count
@@ -250,7 +255,8 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()

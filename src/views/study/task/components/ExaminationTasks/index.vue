@@ -45,7 +45,7 @@
     </a-card>
     <div class="my-table-wrapper">
       <div class="btn">
-        <SelectExamination @success="success" />
+        <SelectExamination v-permission="'createExaminationTask'" @success="success" />
       </div>
       <a-spin :spinning="loading">
         <a-table
@@ -74,16 +74,22 @@
             <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName }}
+                  {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName
+                  }}
                 </template>
-                {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName }}
+                {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName
+                }}
               </a-tooltip>
             </div>
           </div>
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton">详情</a-button>
+                <a-button
+                  class="warnButton"
+                  @click="() => $router.push(`/study/examination/detail?id=${record.examId}`)">
+                  详情
+                </a-button>
                 <a-popconfirm
                   disabled
                   title="是否确认删除"
@@ -196,6 +202,7 @@ export default {
           scopedSlots: { customRender: 'action' }
         }
       ],
+      sorter: {},
       tableData: [],
       checkIds: [],
       pagination: {
@@ -223,7 +230,11 @@ export default {
       const data = {}
       examTaskList(data, {
         limit: this.pagination.pageSize,
-        page: this.pagination.current
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then(res => {
         this.tableData = res.data
         this.pagination.total = res.count
@@ -231,7 +242,8 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()

@@ -16,6 +16,14 @@ export function examEdit (data) {
   })
 }
 
+export function examCheckBind (data) {
+  return request({
+    url: '/exam/checkBind',
+    method: 'post',
+    data
+  })
+}
+
 export function examList (data, params) {
   return request({
     url: '/exam/list',

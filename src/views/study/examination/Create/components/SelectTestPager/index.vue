@@ -74,6 +74,7 @@ export default {
       preview: false,
       selectRow: {},
       name: '',
+      sorter: {},
       pagination: {
         total: 0,
         current: 1,

@@ -61,18 +61,21 @@
     <div class="my-table-wrapper">
       <div class="btn" v-if="!select">
         <a-button
+          v-permission="'coursewareList'"
           type="primary"
           ghost
           @click="() => $router.push('/study/lesson/Courseware')">
           课件管理
         </a-button>
         <a-button
+          v-permission="'LessonClass'"
           type="primary"
           ghost
           @click="openLessonClass">
           课程分类
         </a-button>
         <a-button
+          v-permission="'LessonCreate'"
           type="primary"
           @click="() => $router.push('/study/lesson/create')">
           新建课程
@@ -275,7 +278,11 @@ export default {
         },
         {
           title: '创建人',
-          align: 'center'
+          dataIndex: 'employeeEntity',
+          align: 'center',
+          customRender: (text) => {
+            return text && text.name
+          }
         },
         {
           title: '创建时间',
@@ -295,6 +302,7 @@ export default {
         }
       ],
       tableData: [],
+      sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -380,7 +388,11 @@ export default {
       }
       courseList(data, {
         limit: this.pagination.pageSize,
-        page: this.pagination.current
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then(res => {
         this.tableData = res.data
         this.pagination.total = res.count
@@ -388,7 +400,8 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()

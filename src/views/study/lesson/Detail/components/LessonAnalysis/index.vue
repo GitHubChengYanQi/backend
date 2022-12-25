@@ -217,6 +217,7 @@ export default {
       ],
       tableData: [],
       checkIds: [],
+     sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -271,7 +272,8 @@ export default {
       }]
       this.pagination.total = 666
     },
-    handleTableChange ({ current, pageSize }) {
+      handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()

@@ -33,6 +33,14 @@ export function learningQuestionnaireDetail (data) {
   })
 }
 
+export function learningQuestionnaireCheckBind (data) {
+  return request({
+    url: '/learningQuestionnaire/checkBind',
+    method: 'post',
+    data
+  })
+}
+
 export function learningQuestionnaireDelete (data) {
   return request({
     url: '/learningQuestionnaire/delete',

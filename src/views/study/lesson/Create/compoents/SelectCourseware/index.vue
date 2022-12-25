@@ -235,7 +235,8 @@ export default {
     selectChange (ids, rows) {
       this.selectRows = rows
     },
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()

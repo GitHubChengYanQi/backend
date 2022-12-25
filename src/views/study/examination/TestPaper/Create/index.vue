@@ -216,7 +216,12 @@
 <script>
 import breadcrumb from '../../../components/Breadcrumd'
 import DragIcon from '../../../components/DragIcon'
-import { learningQuestionnaireAdd, learningQuestionnaireDetail, learningQuestionnaireEdit } from '@/api/study/testPager'
+import {
+  learningQuestionnaireAdd,
+  learningQuestionnaireCheckBind,
+  learningQuestionnaireDetail,
+  learningQuestionnaireEdit
+} from '@/api/study/testPager'
 import { message } from 'ant-design-vue'
 import router from '@/router'
 
@@ -250,6 +255,10 @@ export default {
   methods: {
     getDetail (id) {
       this.detailLoading = true
+      learningQuestionnaireCheckBind({ questionnaireId: id, type: 'edit' }).then((res) => {
+        console.log(res.data)
+        this.disabled = res.data
+      })
       learningQuestionnaireDetail({ questionnaireId: id }).then((res) => {
         const detail = res.data || {}
         const questionResults = detail.questionResults || []
