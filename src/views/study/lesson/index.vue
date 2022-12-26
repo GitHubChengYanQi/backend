@@ -143,14 +143,7 @@
                   编辑
                 </a-button>
 
-                <a-popconfirm
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.courseId)"
-                >
-                  <a-button class="delButton">删除</a-button>
-                </a-popconfirm>
+                <a-button class="delButton" @click="deleteAttribute(record.courseId)">删除</a-button>
               </div>
             </template>
           </div>
@@ -371,9 +364,22 @@ export default {
       this.lessonClassVisible = true
     },
     deleteAttribute (id) {
-      courseDelete({ courseId: id }).then(() => {
-        message.success('删除成功！')
-        this.getTableData()
+      const thisData = this
+      this.$confirm({
+        title: '删除数据后不可恢复，是否确认删除?',
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
+        centered: true,
+        onOk () {
+          courseDelete({ courseId: id }).then(() => {
+            message.success('删除成功！')
+            thisData.getTableData()
+          })
+        },
+        onCancel () {
+
+        }
       })
     },
     getTableData () {

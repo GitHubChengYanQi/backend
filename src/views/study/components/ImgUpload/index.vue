@@ -6,7 +6,8 @@
     :headers="headers"
     method="post"
     :show-upload-list="false"
-    :action="uploadApi"
+    :data="oss"
+    :action="oss.host"
     :before-upload="beforeUpload"
     @change="handleChange"
   >
@@ -26,6 +27,7 @@
 </template>
 <script>
 import storage from 'store'
+import { mediaGetToken } from '@/api/study/courseWare'
 
 export default {
   props: {
@@ -48,6 +50,7 @@ export default {
   },
   data () {
     return {
+      oss: {},
       loading: false,
       // imageUrl: '',
       FileTypeArr: [
@@ -56,8 +59,7 @@ export default {
         ['mp3', 'amr'],
         ['mp4'],
         ['doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'txt', 'pdf', 'Xmind']
-      ],
-      uploadApi: process.env.VUE_APP_API_BASE_URL + '/common/upload'
+      ]
     }
   },
   computed: {
@@ -73,13 +75,8 @@ export default {
   },
   methods: {
     handleChange (info) {
-      if (info.file.status === 'uploading') {
-        this.loading = true
-        return
-      }
       if (info.file.status === 'done') {
-        const data = info.file.response.data
-        this.$emit('change', data.fullPath)
+        this.$emit('change', `${this.oss.host}/${this.oss.key}`)
         this.$emit('success', info.file)
         this.loading = false
       }
@@ -88,6 +85,7 @@ export default {
           const data = info.file.response
           this.$message.error(data.msg)
         }
+        this.loading = false
       }
     },
     beforeUpload (file) {
@@ -118,7 +116,19 @@ export default {
       if (!file2M) {
         this.$message.error('上传文件过大')
       }
-      return flag && file2M
+
+      if (flag && file2M) {
+        this.loading = true
+        return new Promise((resolve, reject) => {
+          mediaGetToken({ type: file.name }).then((res) => {
+            this.oss = { ...res.data, key: res.data.key }
+            resolve()
+          }).catch(() => {
+            this.loading = false
+            reject(new Error('获取ossToken失败！'))
+          })
+        })
+      }
     },
     // 获取文件后缀
     _getFileSuffix (imgName) {

@@ -71,15 +71,7 @@
               <a-button type="link" @click="setVisible(record.name)">重命名</a-button>
               <a-button type="link">下载</a-button>
               <a-button type="link">预览</a-button>
-              <a-popconfirm
-                disabled
-                title="是否确认删除"
-                ok-text="确认"
-                cancel-text="取消"
-                @confirm="deleteAttribute(record.id)"
-              >
-                <a-button type="link" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-              </a-popconfirm>
+              <a-button type="link" @click="deleteAttribute(record.id)">删除</a-button>
             </div>
           </template>
         </div>
@@ -89,6 +81,9 @@
 </template>
 
 <script>
+
+import { courseWareDelete } from '@/api/study/courseWare'
+import { message } from 'ant-design-vue'
 
 export default {
   data () {
@@ -191,6 +186,20 @@ export default {
     },
     deleteAttribute (id) {
       console.log(id)
+      const thisData = this
+      this.$confirm({
+        title: '删除数据后不可恢复，是否确认删除?',
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
+        centered: true,
+        onOk () {
+
+        },
+        onCancel () {
+
+        }
+      })
     },
     getTableData () {
       // const params = {

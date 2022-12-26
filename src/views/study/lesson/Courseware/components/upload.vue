@@ -8,7 +8,8 @@
     :file-list="fileList"
     method="post"
     :show-upload-list="false"
-    :action="uploadApi"
+    :data="oss"
+    :action="oss.host"
     :before-upload="beforeUpload"
     @change="handleChange"
   >
@@ -21,6 +22,7 @@
 </template>
 <script>
 import storage from 'store'
+import { mediaGetToken } from '@/api/study/courseWare'
 
 export default {
   props: {
@@ -49,11 +51,11 @@ export default {
   },
   data () {
     return {
+      oss: {},
       fileSize: 0,
       fileList: [],
       loading: false,
-      FileTypeArr: [],
-      uploadApi: process.env.VUE_APP_API_BASE_URL + '/common/upload'
+      FileTypeArr: []
     }
   },
   computed: {
@@ -75,15 +77,17 @@ export default {
       this.fileList = fileList.length > 0 ? [fileList[fileList.length - 1]] : []
 
       if (this.fileList.length === 0) {
-        this.$emit('success', this.fileList)
+        this.$emit('success', [])
       }
       if (file.status === 'uploading') {
         this.loading = true
         return
       }
       if (file.status === 'done') {
-        console.log(this.fileList)
-        this.$emit('success', this.fileList.map(item => ({ ...item.response.data, size: item.size })))
+        this.$emit('success', this.fileList.map(item => ({
+          ...item,
+          fullPath: `${this.oss.host || ''}/${this.oss.key || ''}`
+        })))
         this.loading = false
       }
       if (file.status === 'error') {
@@ -115,8 +119,18 @@ export default {
       const res = flag && fileMaxSize
       if (res) {
         this.$emit('upload')
+        return new Promise((resolve, reject) => {
+          mediaGetToken({ type: file.name }).then((res) => {
+            this.oss = { ...res.data, key: res.data.key }
+            resolve()
+          }).catch(() => {
+            this.loading = false
+            reject(new Error('获取ossToken失败！'))
+          })
+        })
+      } else {
+        return false
       }
-      return res
     },
     // 获取文件后缀
     _getFileSuffix (imgName) {

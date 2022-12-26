@@ -90,15 +90,7 @@
                   @click="() => $router.push(`/study/examination/detail?id=${record.examId}`)">
                   详情
                 </a-button>
-                <a-popconfirm
-                  disabled
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.id)"
-                >
-                  <a-button class="delButton" @click="$message.warning('课件已被xxx，xxx课程引用，不可删除');">删除</a-button>
-                </a-popconfirm>
+                <a-button class="delButton" @click="deleteAttribute(record.id)">删除</a-button>
               </div>
             </template>
           </div>
@@ -221,6 +213,20 @@ export default {
   methods: {
     deleteAttribute (id) {
       console.log(id)
+      const thisData = this
+      this.$confirm({
+        title: '删除数据后不可恢复，是否确认删除?',
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
+        centered: true,
+        onOk () {
+
+        },
+        onCancel () {
+
+        }
+      })
     },
     success () {
       this.getTableData()

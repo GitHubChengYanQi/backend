@@ -72,15 +72,7 @@
                   编辑
                 </a-button>
                 <a-button class="linkButton" @click="openPreview(record)">预览</a-button>
-                <a-popconfirm
-                  disabled
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.courseWareId)"
-                >
-                  <a-button class="delButton">删除</a-button>
-                </a-popconfirm>
+                <a-button @click="deleteAttribute(record.courseWareId)" class="delButton">删除</a-button>
               </div>
             </template>
           </div>
@@ -186,7 +178,7 @@ export default {
       tableData: [],
       checkIds: [],
       upLoadRes: {},
-     sorter: {},
+      sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -227,9 +219,22 @@ export default {
       this.checkIds = row
     },
     deleteAttribute (id) {
-      courseWareDelete({ courseWareId: id }).then(() => {
-        message.success('删除成功！')
-        this.getTableData()
+      const thisData = this
+      this.$confirm({
+        title: '删除数据后不可恢复，是否确认删除?',
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
+        centered: true,
+        onOk () {
+          courseWareDelete({ courseWareId: id }).then(() => {
+            message.success('删除成功！')
+            this.getTableData()
+          })
+        },
+        onCancel () {
+
+        }
       })
     },
     getTableData () {

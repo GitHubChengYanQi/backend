@@ -82,14 +82,7 @@
                 <a-button class="warnButton" @click="setVisible(record)">重命名</a-button>
                 <a-button class="successButton" disabled>预览</a-button>
                 <a-button class="linkButton" @click="download([record])">下载</a-button>
-                <a-popconfirm
-                  title="是否确认删除"
-                  ok-text="确认"
-                  cancel-text="取消"
-                  @confirm="deleteAttribute(record.courseWareId)"
-                >
-                  <a-button class="delButton">删除</a-button>
-                </a-popconfirm>
+                <a-button @click="deleteAttribute(record.courseWareId)" class="delButton">删除</a-button>
               </div>
             </template>
           </div>
@@ -210,7 +203,7 @@ export default {
       ],
       tableData: [],
       checkIds: [],
-     sorter: {},
+      sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -265,8 +258,8 @@ export default {
       courseWareAdd({
         courseWareType: 'file',
         fileName: file.name,
-        fileType: file.mimeType,
-        suffix: file.name.split('.')[file.name.split('.').length - 1],
+        fileType: file.type,
+        suffix: file.name && file.name.split('.')[file.name.split('.').length - 1],
         size: fileSize,
         mediaUrl: file.fullPath
       }).then(() => {
@@ -293,12 +286,22 @@ export default {
       })
     },
     deleteAttribute (id) {
-      this.updateLoading = true
-      courseWareDelete({ courseWareId: id }).then(() => {
-        message.success('删除成功！')
-        this.getTableData()
-      }).finally(() => {
-        this.updateLoading = false
+      const thisData = this
+      this.$confirm({
+        title: '删除数据后不可恢复，是否确认删除?',
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
+        centered: true,
+        onOk () {
+          courseWareDelete({ courseWareId: id }).then(() => {
+            message.success('删除成功！')
+            thisData.getTableData()
+          })
+        },
+        onCancel () {
+
+        }
       })
     },
     getTableData () {
@@ -324,7 +327,7 @@ export default {
         this.loading = false
       })
     },
-      handleTableChange ({ current, pageSize }, filters, sorter) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize

@@ -8,6 +8,14 @@ export function courseWareAdd (data) {
   })
 }
 
+export function mediaGetToken (params) {
+  return request({
+    url: '/oss/getToken',
+    method: 'get',
+    params
+  })
+}
+
 export function courseWarEdit (data) {
   return request({
     url: '/courseWare/edit',
