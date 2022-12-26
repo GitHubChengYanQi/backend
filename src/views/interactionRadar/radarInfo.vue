@@ -258,7 +258,7 @@ export default {
           {
             title: '发送总次数',
             key: '0',
-            hint: '当前雷达在侧边栏被员工发送的总次数（sop/朋友圈以任务完成计算次数）。'
+            hint: '当前雷达被员工发送的总次数（sop/朋友圈以任务完成计算次数）。'
           },
           {
             title: '查看总次数',
@@ -273,7 +273,7 @@ export default {
           {
             title: '今日发送总次数',
             key: '3',
-            hint: '今日当前雷达在侧边栏被员工发送的总次数（sop/朋友圈以任务完成计算次数）。'
+            hint: '今日当前雷达被员工发送的总次数（sop/朋友圈以任务完成计算次数）。'
           },
           {
             title: '今日查看总次数',
@@ -382,11 +382,13 @@ export default {
               data: [],
               smooth: true,
               stack: 'Total',
-              showSymbol: false,
+              showSymbol: true,
               symbol: 'circle',
               itemStyle: {
                 normal: {
                   color: '#0162f0',
+                  label: { show: true },
+                  data: [],
                   lineStyle: {
                     color: '#0162f0'
                   }
@@ -398,11 +400,13 @@ export default {
               type: 'line',
               smooth: true,
               data: [],
-              showSymbol: false,
+              showSymbol: true,
               symbol: 'circle',
               itemStyle: {
                 normal: {
                   color: '#31cab8',
+                  label: { show: true },
+                  data: [],
                   lineStyle: {
                     color: '#31cab8'
                   }
@@ -414,11 +418,12 @@ export default {
               type: 'line',
               smooth: true,
               data: [],
-              showSymbol: false,
+              showSymbol: true,
               symbol: 'circle',
               itemStyle: {
                 normal: {
                   color: '#FE9719',
+                  label: { show: true },
                   lineStyle: {
                     color: '#FE9719'
                   }
