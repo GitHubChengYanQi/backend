@@ -90,8 +90,6 @@ export default {
     },
     beforeUpload (file) {
       const fileSuffix = this._getFileSuffix(file.name).toLowerCase()
-      const fileType = file.type.split('/')[0]
-      const file2M = file.size / 1024 / 1024 < 2
       const fileSize = file.size / 1024 / 1024 < this.fileSize
       let ary = []
       if (this.fileType instanceof Array) {
@@ -106,19 +104,12 @@ export default {
         this.$message.error(`您只能上传以下类型： ${ary.join(',')}`)
         return false
       }
-      let res = false
-      if (fileType === 'video') {
-        if (!fileSize) {
-          this.$message.error('上传文件过大')
-        }
-        res = flag && fileSize
-      } else {
-        if (!file2M) {
-          this.$message.error('上传文件过大')
-        }
-        res = flag && file2M
+
+      if (!fileSize) {
+        this.$message.error('上传文件过大')
       }
-      if (res) {
+
+      if (flag && fileSize) {
         this.loading = true
         return new Promise((resolve, reject) => {
           mediaGetToken({ type: file.name }).then((res) => {
