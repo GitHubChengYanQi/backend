@@ -263,6 +263,7 @@ export default {
         }
         generaLinkList.push({ ...item, link: res.data.link, itemType: 'radar', channelTxt: findChannel.name })
       }
+      console.log(generaLinkList[0], 'generaLinkList')
       this.$emit('handleAddRadarOk', generaLinkList)
       // 外部判断允许关闭了外部直接关闭
       // this.$emit('setVisible', false)
