@@ -106,18 +106,19 @@ export default {
         this.$message.error(`您只能上传以下类型： ${ary.join(',')}`)
         return false
       }
+      let res = false
       if (fileType === 'video') {
         if (!fileSize) {
           this.$message.error('上传文件过大')
         }
-        return flag && fileSize
+        res = flag && fileSize
+      } else {
+        if (!file2M) {
+          this.$message.error('上传文件过大')
+        }
+        res = flag && file2M
       }
-
-      if (!file2M) {
-        this.$message.error('上传文件过大')
-      }
-
-      if (flag && file2M) {
+      if (res) {
         this.loading = true
         return new Promise((resolve, reject) => {
           mediaGetToken({ type: file.name }).then((res) => {
@@ -128,6 +129,8 @@ export default {
             reject(new Error('获取ossToken失败！'))
           })
         })
+      } else {
+        return false
       }
     },
     // 获取文件后缀
