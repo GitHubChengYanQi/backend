@@ -258,9 +258,11 @@ export default {
       const sort = {}
       if (sorter.order) {
         if (sorter.order === 'ascend') {
-          sort.orderBySortCode = `${sorter.field}Asc`
+          sort.orderBySortCode = `${sorter.field}`
+          sort.orderBySort = 'asc'
         } else {
-          sort.orderBySortCode = `${sorter.field}Desc`
+          sort.orderBySortCode = `${sorter.field}`
+          sort.orderBySort = 'desc'
         }
       }
       this.screenData = { ...this.screenData, ...sort }
