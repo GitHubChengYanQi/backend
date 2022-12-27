@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课程详情']" back></breadcrumb>
+    <breadcrumb :titles="[task ? '任务列表' : '课程管理','课程详情']" back></breadcrumb>
     <a-tabs v-model="key" class="tabs">
       <a-tab-pane key="1" tab="课程分析">
         <LessonAnalysis />
@@ -20,12 +20,17 @@ import LessonAnalysis from './components/LessonAnalysis/index'
 import CoursewareAnalysis from './components/CoursewareAnalysis/index'
 import ExaminationAnalysis from './components/ExaminationAnalysis/index'
 import breadcrumb from '../../components/Breadcrumd/index'
+import router from '@/router'
 
 export default {
   data () {
     return {
-      key: '1'
+      key: '1',
+      task: false
     }
+  },
+  created () {
+    this.task = router.history.current.query.type === 'task'
   },
   methods: {
     setKey (key) {

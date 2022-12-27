@@ -88,7 +88,7 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.courseId}`)">
+                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.courseId}&type=task`)">
                   详情
                 </a-button>
                 <a-button class="delButton" @click="deleteAttribute(record.id)">删除</a-button>

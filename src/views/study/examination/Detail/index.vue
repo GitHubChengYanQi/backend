@@ -1,14 +1,20 @@
 <template>
   <div>
-    <breadcrumb :titles="['考试管理','考试详情']" back></breadcrumb>
-    <a-tabs v-model="key" class="tabs">
-      <a-tab-pane key="1" tab="试卷详情">
-        <TestPaperDetail />
-      </a-tab-pane>
-      <a-tab-pane key="2" tab="考试分析">
-        <ExamintionDetail />
-      </a-tab-pane>
-    </a-tabs>
+    <breadcrumb :titles="[task ? '任务列表' : '考试管理','考试详情']" back></breadcrumb>
+    <div v-if="task">
+      <a-tabs v-model="key" class="tabs">
+        <a-tab-pane key="1" tab="试卷详情">
+          <TestPaperDetail />
+        </a-tab-pane>
+        <a-tab-pane key="2" tab="考试分析">
+          <ExamintionDetail />
+        </a-tab-pane>
+      </a-tabs>
+    </div>
+    <div v-else>
+      <TestPaperDetail />
+    </div>
+
   </div>
 </template>
 
@@ -16,12 +22,17 @@
 import ExamintionDetail from '../../lesson/Detail/components/ExaminationAnalysis/ExamintionDetail/index'
 import TestPaperDetail from './components/TestPaperDetail/index'
 import breadcrumb from '../../components/Breadcrumd/index'
+import router from '@/router'
 
 export default {
   data () {
     return {
-      key: '1'
+      key: '1',
+      task: false
     }
+  },
+  created () {
+    this.task = router.history.current.query.type === 'task'
   },
   methods: {
     setKey (key) {

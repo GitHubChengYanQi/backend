@@ -136,10 +136,10 @@ const vueConfig = {
         // target: 'https://devjavascrm.yifeijiankang.com/', // 开发
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.253:6007/',
-        // target: 'http://172.16.1.203:6007/',
+        target: 'http://172.16.0.207:6007/',
         // target: 'http://192.168.31.18:6007/',
         // target: 'http://192.168.50.109:6007/',
-        target: 'http://192.168.0.100:6007/',
+        // target: 'http://192.168.0.100:6007/',
         // target: 'http://localhost:6007/',
         ws: false,
         changeOrigin: true,
