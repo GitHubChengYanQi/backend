@@ -103,7 +103,7 @@ export const getMediaData = (reqType, { data = {}, mediaType, photos = [], video
     }
     return JSON.stringify({ type, files, ...link })
   } else if (reqType === 'from') {
-    const startLen = 43 // 域名长度
+    const startLen = process.env.NODE_ENV === 'development' ? 43 : 44
     const { type, files = [], ...link } = data
     let mediaType, mediaData, target
     if (type === 1) {

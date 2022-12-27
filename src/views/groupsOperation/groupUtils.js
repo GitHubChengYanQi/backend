@@ -196,10 +196,10 @@ export const getMediaData = (reqType, data) => {
     }
     return JSON.stringify({ type: t, files, ...link })
   } else if (reqType === 'from') {
-    // const startLen = 43 // 域名长度
     const { type, files, ...link } = data
     let mediaType, mediaData, path
-    const strLen = 43
+    const strLen = process.env.NODE_ENV === 'development' ? 43 : 44
+    console.log(strLen, 'strLen')
     if (typeof files[0] === 'string') {
       path = files[0].slice(strLen).split('?')[0]
     }
