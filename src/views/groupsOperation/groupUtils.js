@@ -198,8 +198,8 @@ export const getMediaData = (reqType, data) => {
   } else if (reqType === 'from') {
     const { type, files, ...link } = data
     let mediaType, mediaData, path
-    const strLen = process.env.NODE_ENV === 'development' ? 43 : 44
-    console.log(strLen, 'strLen')
+    const isDev = files[0].indexOf('https://yfscrm.oss-cn-beijing.aliyuncs.com') !== -1
+    const strLen = isDev ? 43 : 44
     if (typeof files[0] === 'string') {
       path = files[0].slice(strLen).split('?')[0]
     }
