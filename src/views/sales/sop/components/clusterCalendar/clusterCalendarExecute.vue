@@ -66,9 +66,9 @@
               </div>
               <div :class="`content ${singleContentItem.type === 4 ? 'link' : ''}`" v-else-if="singleContentItem.type === 4">
                 <div class="lef">
-                  <span class="til">{{ singleContentItem.linkTitle }}</span>
-                  <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkUrl: '' }}</span>
-                  <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkShow: '' }}</span>
+                  <span class="til">{{ singleContentItem.linkTitle ? singleContentItem.linkTitle : '' }}</span>
+                  <!-- <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkUrl: '' }}</span> -->
+                  <span class="desc">{{ singleContentItem.linkShow ? singleContentItem.linkShow : '' }}</span>
                 </div>
                 <img :src="singleContentItem.linkPhoto" alt class="image" />
               </div>
@@ -83,6 +83,14 @@
                   <img src="../../images/miniProgramIcon.svg" alt class="icon" />
                   <span class="say">小程序</span>
                 </div>
+              </div>
+              <div :class="`content ${singleContentItem.type === 6 ? 'link' : ''}`" v-else-if="singleContentItem.type === 6">
+                <div class="lef">
+                  <span class="til">{{ singleContentItem.linkTitle ? singleContentItem.linkTitle : '' }}</span>
+                  <!-- <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkUrl: '' }}</span> -->
+                  <span class="desc">{{ singleContentItem.linkShow ? singleContentItem.linkShow : '' }}</span>
+                </div>
+                <img :src="singleContentItem.linkPhoto" alt class="image" />
               </div>
             </div>
           </div>
