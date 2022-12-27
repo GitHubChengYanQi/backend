@@ -8,11 +8,11 @@
         <div class="content">
           <div
             class="row"
-            :style="item.type == 'cover'|| item.type == 'quillEditor' ? {alignItems:'flex-start'}:{}"
+            :style="item.type == 'cover'|| item.type == 'quillEditor' || item.key == 'tsLink' ? {alignItems:'flex-start'}: {}"
             v-for="(item,index) in setData.changeType"
             :key="index"
           >
-            <span class="title"><span
+            <span class="title" :style="item.key == 'tsLink' ? {transform:'translateY(8px)'}: {}"><span
               class="icon"
               v-if="item.title"
             >*</span><span class="text">{{ item.title }}</span></span>
@@ -882,6 +882,7 @@ export default {
         })
         this.setData.inputData.shape = data.shape
         this.setData.inputData.contentSource = data.entry.contentSource
+        this.setData.inputData.tsLink = data.entry.articleLink
 
         for (const key in data.entry) {
           if (inputData.shape == '3') {

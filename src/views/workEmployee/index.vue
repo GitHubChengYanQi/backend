@@ -135,7 +135,7 @@
       style="height: 100%;align-items: start"
     >
       <div
-        style="padding-right: 20px;min-width: 195px"
+        style="padding-right: 20px;min-width: 195px; overflow: auto;"
         class="card-boxs left-box"
       >
         <div
