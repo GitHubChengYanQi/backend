@@ -3,7 +3,7 @@
     <breadcrumb :titles="[task ? '任务列表' : '课程管理','课程详情']" back></breadcrumb>
     <a-tabs v-model="key" class="tabs">
       <a-tab-pane key="1" tab="课程分析">
-        <LessonAnalysis />
+        <LessonAnalysis :task="task" />
       </a-tab-pane>
       <a-tab-pane key="2" tab="课件分析">
         <CoursewareAnalysis />

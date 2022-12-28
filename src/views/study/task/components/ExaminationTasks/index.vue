@@ -74,7 +74,8 @@
             <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0] && record.examResult.questionnaireResults[0].questionnaireName
+                  {{
+                    record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0] && record.examResult.questionnaireResults[0].questionnaireName
                   }}
                 </template>
                 {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0] && record.examResult.questionnaireResults[0].questionnaireName
@@ -300,5 +301,32 @@ export default {
       color: #86CE76
     }
   }
+}
+
+.user-info {
+  text-align: center;
+  justify-content: center;
+
+  img {
+    max-height: 33px;
+    max-width: 33px;
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+  }
+}
+
+.introduction {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 </style>

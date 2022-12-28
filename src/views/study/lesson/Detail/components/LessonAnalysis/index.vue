@@ -16,6 +16,7 @@
         <div class="space">
           <div>分类：默认分类</div>
           <div>创建时间：2022.10.1</div>
+          <div v-if="task">限定时长：2022.10.1</div>
         </div>
         <div class="count">
           <div>
@@ -42,6 +43,14 @@
             <div class="number"><span class="num">73</span>人</div>
             未通过
           </div>
+          <div v-if="task">
+            <div class="number"><span class="num">73</span>人</div>
+            完成率
+          </div>
+          <div v-if="task">
+            <div class="number"><span class="num">73</span>人</div>
+            参与率
+          </div>
         </div>
         <div class="note">
           本次课程..............................
@@ -64,7 +73,9 @@
 
         <a-form-item
           label="所属门店：">
-          <a-input v-model="screenData.name" placeholder="请选择所属门店" :maxLength="20"></a-input>
+          <div style="width: 200px">
+            <SelectDepartment :treeCheckStrictly="true" v-model="screenData.storeIds" />
+          </div>
         </a-form-item>
 
         <a-form-item
@@ -114,110 +125,124 @@
     </a-card>
 
     <div class="my-table-wrapper">
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :row-selection="{ onChange: selectChange }"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
-            </div>
-            <div class="nickname">
-              <a-tooltip>
-                <template slot="title">
-                  {{ record.name }}
-                </template>
-                {{ record.name }}
-              </a-tooltip>
-            </div>
-          </div>
-        </div>
-      </a-table>
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.courseEmployeeId"
+          :pagination="pagination"
+          @change="handleTableChange"
+        />
+      </a-spin>
     </div>
   </div>
 </template>
 
 <script>
 
+import moment from 'moment'
+import { courseEmployeeBindList } from '@/api/study/course'
+import router from '@/router'
+
 export default {
+  props: {
+    task: Boolean
+  },
   data () {
     return {
-      imgUrl: '',
-      imgName: '',
-      uploadVisible: false,
-      fileName: String,
-      visible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      loading: false,
+      screenData: {},
       columns: [
         {
           title: '姓名',
-          dataIndex: 'name',
+          dataIndex: '1',
           align: 'center',
-          width: '200px'
+          width: '200px',
+          customRender (value, record) {
+            return record.employeeEntity && record.employeeEntity.name || '-'
+          }
         },
         {
           title: '所属机构',
           width: '200px',
-          dataIndex: 'size',
-          align: 'center'
+          dataIndex: '2',
+          align: 'center',
+          customRender (value, record) {
+            return record.employeeEntity && record.employeeEntity.masterDepartmentName || '-'
+          }
         },
         {
           title: '所属门店',
-          dataIndex: 'createTime',
-          align: 'center'
+          dataIndex: '3',
+          align: 'center',
+          customRender (value, record) {
+            return record.employeeEntity && record.employeeEntity.department && record.employeeEntity.department.departmentName || '-'
+          }
         },
         {
           title: '学习状态',
-          dataIndex: 'user',
-          align: 'center'
+          dataIndex: '4',
+          align: 'center',
+          customRender (value, record) {
+            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          }
         },
         {
           title: '学习进度',
-          dataIndex: '1',
+          dataIndex: '5',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value, record) {
+            return record.learningStatusResult && record.learningStatusResult.rate ? record.learningStatusResult.rate + '%' : '-'
+          }
         },
         {
           title: '累计学习时长',
-          dataIndex: '2',
+          dataIndex: '6',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value, record) {
+            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          }
         },
         {
           title: '上次学习',
-          dataIndex: '3',
+          dataIndex: '7',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value, record) {
+            return (record.learningStatusResult && record.learningStatusResult.doneTime) ? moment(record.learningStatusResult.doneTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+          }
         },
         {
           title: '完成时间',
-          dataIndex: '4',
+          dataIndex: '8',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value, record) {
+            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          }
         },
         {
           title: '总考状态',
-          dataIndex: '5',
-          align: 'center'
+          dataIndex: '9',
+          align: 'center',
+          customRender (value, record) {
+            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          }
         },
         {
           title: '考试结果',
-          dataIndex: '6',
-          align: 'center'
+          dataIndex: '10',
+          align: 'center',
+          customRender (value, record) {
+            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          }
         }
       ],
       tableData: [],
-      checkIds: [],
-     sorter: {},
+      sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -239,40 +264,27 @@ export default {
       console.log(id)
     },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        courseId: router.history.current.query.courseId
+      }
+      courseEmployeeBindList(data, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
+      }).then(res => {
+        this.tableData = res.data
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
-      handleTableChange ({ current, pageSize }, filters, sorter) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize

@@ -25,6 +25,15 @@ export function courseList (data, params) {
   })
 }
 
+export function courseEmployeeBindList (data, params) {
+  return request({
+    url: '/courseEmployeeBind/list',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function courseDetail (data) {
   return request({
     url: '/course/detail',

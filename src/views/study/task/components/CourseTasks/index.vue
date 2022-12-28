@@ -55,9 +55,10 @@
       <a-spin :spinning="loading">
         <a-table
           class="my-table"
+          :scroll="{ x: 'max-content' }"
           :columns="columns"
           :data-source="tableData"
-          :rowKey="record => record.courseTaskId"
+          :rowKey="record => record.key"
           :pagination="pagination"
           @change="handleTableChange">
           <div slot="name" slot-scope="text, record">
@@ -79,16 +80,19 @@
             <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
+                  <div v-html="record.courseResult && record.courseResult.note"></div>
                 </template>
-                <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
+                <div v-html="record.courseResult && record.courseResult.note"></div>
               </a-tooltip>
             </div>
           </div>
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.courseId}&type=task`)">
+                <a-button
+                  class="warnButton"
+                  @click="() => $router.push(`/study/lesson/detail?courseId=${record.courseId}&type=task`)"
+                >
                   详情
                 </a-button>
                 <a-button class="delButton" @click="deleteAttribute(record.id)">删除</a-button>
@@ -125,19 +129,23 @@ export default {
       columns: [
         {
           title: '课程名称',
+          fixed: 'left',
           dataIndex: 'name',
+          width: '200px',
           scopedSlots: { customRender: 'name' },
           align: 'center'
         },
         {
           title: '课程简介',
           dataIndex: 'note',
+          width: '200px',
           scopedSlots: { customRender: 'note' },
           align: 'center'
         },
         {
           title: '课程分类',
           dataIndex: 'class',
+          width: '150px',
           align: 'center',
           customRender (value, record) {
             return record.courseResult && record.courseResult.courseClassResult && record.courseResult.courseClassResult.name
@@ -145,35 +153,41 @@ export default {
         },
         {
           title: '考核员工',
+          width: '150px',
           dataIndex: 'tag',
           align: 'center'
         },
         {
           title: '考核总人数',
           dataIndex: 'allEmp',
+          width: '150px',
           align: 'center',
           sorter: true
         },
         {
           title: '完成人数',
+          width: '150px',
           dataIndex: '1',
           align: 'center',
           sorter: true
         },
         {
           title: '参与人数',
+          width: '150px',
           dataIndex: '2',
           align: 'center',
           sorter: true
         },
         {
           title: '参与率',
+          width: '150px',
           dataIndex: '3',
           align: 'center',
           sorter: true
         },
         {
           title: '课件数',
+          width: '150px',
           dataIndex: 'courseWareBindResults',
           align: 'center',
           customRender (value, record) {
@@ -182,6 +196,7 @@ export default {
         },
         {
           title: '关联考试',
+          width: '150px',
           dataIndex: '5',
           align: 'center',
           customRender (value, record) {
@@ -190,11 +205,13 @@ export default {
         },
         {
           title: '创建人',
+          width: '150px',
           dataIndex: '6',
           align: 'center'
         },
         {
           title: '创建时间',
+          width: '150px',
           align: 'center',
           sorter: true,
           dataIndex: 'createdAt',
@@ -204,7 +221,8 @@ export default {
         },
         {
           title: '操作',
-          width: 200,
+          width: 150,
+          fixed: 'right',
           align: 'center',
           dataIndex: 'action',
           scopedSlots: { customRender: 'action' }
@@ -258,7 +276,7 @@ export default {
           order: this.sorter.order
         }
       }).then(res => {
-        this.tableData = res.data
+        this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
         this.pagination.total = res.count
       }).finally(() => {
         this.loading = false
@@ -313,5 +331,32 @@ export default {
       color: #86CE76
     }
   }
+}
+
+.user-info {
+  text-align: center;
+  justify-content: center;
+
+  img {
+    max-height: 33px;
+    max-width: 33px;
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+  }
+}
+
+.introduction {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 </style>
