@@ -74,10 +74,10 @@
             <div class="introduction">
               <a-tooltip>
                 <template slot="title">
-                  {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName
+                  {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0] && record.examResult.questionnaireResults[0].questionnaireName
                   }}
                 </template>
-                {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0].questionnaireName
+                {{ record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0] && record.examResult.questionnaireResults[0].questionnaireName
                 }}
               </a-tooltip>
             </div>

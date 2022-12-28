@@ -179,7 +179,7 @@ export default {
           sorter: true
         }
       ],
-      sorter:{},
+      sorter: {},
       tableData: [],
       pagination: {
         total: 0,

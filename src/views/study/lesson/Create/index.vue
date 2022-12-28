@@ -166,6 +166,7 @@ export default {
       courseDetail({ courseId: id }).then((res) => {
         const detail = res.data || {}
         this.employees = detail.bindEmpList ? detail.bindEmpList.map(item => item.name) : []
+        this.hiddenExam = !detail.examResults
         this.form.setFieldsValue({
           name: detail.name,
           courseClassId: this.getClassIds(detail.courseClassId, this.classTree),
@@ -194,6 +195,7 @@ export default {
           this.loading = true
           const data = {
             ...values,
+            wareBindParams: values.wareBindParams.map((item, index) => ({ ...item, sort: index })),
             courseClassId: values.courseClassId[values.courseClassId.length - 1],
             questionnaireIds: [values.questionnaireId],
             examIds: [values.exam.examId],
