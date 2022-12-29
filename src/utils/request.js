@@ -25,6 +25,13 @@ const fileRequest = axios.create({
   timeout: 30000 // 请求超时时间
 })
 
+const ossRequest = axios.create({
+  // API 请求的默认前缀
+  baseURL: process.env.VUE_APP_API_UPLOAD_URL,
+  timeout: 30000 // 请求超时时间
+})
+
+
 // 异常拦截处理器
 const errorHandler = (error) => {
   if (error.response) {
@@ -161,6 +168,12 @@ fileRequest.interceptors.response.use((response) => {
   // message.success('导出成功~')
 }, errorHandler)
 
+
+ossRequest.interceptors.request.use(requestInterceptor, errorHandler)
+ossRequest.interceptors.response.use((response) => {
+  return response.data
+}, errorHandler)
+
 const installer = {
   vm: {},
   install (Vue) {
@@ -170,4 +183,4 @@ const installer = {
 
 export default request
 
-export { installer as VueAxios, request as axios, newRequest, fileRequest }
+export { installer as VueAxios, request as axios, newRequest, fileRequest, ossRequest }

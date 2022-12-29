@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request, {ossRequest} from '@/utils/request'
 
 /**
  * 字典
@@ -57,5 +57,16 @@ export function departmentList (params) {
     url: '/workDepartment/departmentIndex',
     method: 'get',
     params
+  })
+}
+
+/**
+ * oss上传
+ */
+export function ossUpload (data) {
+  return ossRequest({
+    url: '/',
+    method: 'post',
+    data
   })
 }
