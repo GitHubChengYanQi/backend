@@ -144,14 +144,6 @@ const vueConfig = {
         pathRewrite: {
           '^/api': '' // 需要rewrite的,
         }
-      },
-      '/ossApi': {
-        target: 'https://yfscrm.oss-cn-beijing.aliyuncs.com/',
-        ws: false,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/ossApi': '' // 需要rewrite的,
-        }
       }
     }
   },
