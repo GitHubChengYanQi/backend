@@ -20,7 +20,14 @@ export function getDictTree (params) {
     params
   })
 }
-
+// 获取osstoken
+export function mediaGetToken (params) {
+  return request({
+    url: '/oss/getToken',
+    method: 'get',
+    params
+  })
+}
 /**
  * 上传
  * @param {*} params
