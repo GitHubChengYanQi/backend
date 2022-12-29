@@ -8,16 +8,12 @@
               height="190"
               :src="detail.coverImageUrl"
             >
-            <div class="info">
-              <span>共13个课件</span>
-              <span style="float: right">12:23:23</span>
-            </div>
           </div>
           <div class="column">
             <div class="title">健康知识培训</div>
             <div class="space">
               <div>
-                <div>创建人：小乔</div>
+                <div>创建人：{{ detail.employeeEntity && detail.employeeEntity.name }}</div>
                 <div>
                   试卷分数：{{
                     detail.questionnaireResults && detail.questionnaireResults[0] && detail.questionnaireResults[0].score
@@ -29,7 +25,12 @@
               <div>
                 <div>创建时间：{{ detail.createTime }}</div>
                 <div>通过分数：{{ detail.passScore }}</div>
-                <div v-if="task">限定时长：{{ detail.timeLimit > -1 ? detail.timeLimit + '分钟' : '不限制时长' }}</div>
+                <div v-if="task">
+                  限定时长：
+                  {{
+                    detail.haveTimeLimit === 2 ? '不限制时长' : (moment(detail.startTime).format('YYYY-MM-DD HH:mm:ss') + '-' + (moment(detail.endTime).format('YYYY-MM-DD HH:mm:ss')))
+                  }}
+                </div>
                 <div>试卷名称：{{ detail.questionnaireResult && detail.questionnaireResult.questionnaireName }}</div>
               </div>
             </div>
@@ -108,6 +109,7 @@ export default {
   },
   data () {
     return {
+      moment,
       detailLoading: false,
       createTime: '',
       detail: {},
@@ -146,40 +148,29 @@ export default {
           return '仅允许未通过的重复考试'
       }
     },
-    getDetail (id) {
+    async getDetail (id) {
       this.detailLoading = true
+      let detail = {}
       if (this.task) {
-        examTaskDetail({ examTaskId: id }).then((res) => {
-          console.log(res)
-          const detail = res.data || {}
-          const questionnaireResult = detail.questionnaireResults ? detail.questionnaireResults[0] : {}
-          this.detail = {
-            ...detail,
-            createTime: moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-            questionnaireResult,
-            reexam: this.reexam(detail.reexam),
-            questionResults: questionnaireResult.questionResults || []
-          }
-        }).finally(() => {
-          this.detailLoading = false
-        })
+        const res = await examTaskDetail({ examTaskId: id })
+        if (res.data) {
+          detail = { ...res.data.examResult, ...res.data }
+        }
       } else {
-        examDetail({ examId: id }).then((res) => {
-          const detail = res.data || {}
-          const questionnaireResult = detail.questionnaireResults ? detail.questionnaireResults[0] : {}
-          this.detail = {
-            ...detail,
-            createTime: moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-            questionnaireResult,
-            reexam: this.reexam(detail.reexam),
-            questionResults: questionnaireResult.questionResults || []
-          }
-          console.log(res.data)
-        }).finally(() => {
-          this.detailLoading = false
-        })
+        const res = await examDetail({ examId: id })
+        if (res.data) {
+          detail = res.data || {}
+        }
       }
-
+      const questionnaireResult = detail.questionnaireResults ? detail.questionnaireResults[0] : {}
+      this.detail = {
+        ...detail,
+        createTime: detail.createdAt ? moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-',
+        questionnaireResult,
+        reexam: this.reexam(detail.reexam),
+        questionResults: questionnaireResult.questionResults || []
+      }
+      this.detailLoading = false
     }
   }
 }

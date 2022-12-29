@@ -130,7 +130,7 @@
           class="my-table"
           :columns="columns"
           :data-source="tableData"
-          :rowKey="record => record.courseEmployeeId"
+          :rowKey="record => record.key"
           :pagination="pagination"
           @change="handleTableChange"
         />
@@ -142,7 +142,7 @@
 <script>
 
 import moment from 'moment'
-import { courseEmployeeBindList } from '@/api/study/course'
+import { courseEmployeeBindList, courseTaskBindList } from '@/api/study/course'
 import router from '@/router'
 import { getTimeDifference } from '@/utils/util'
 
@@ -214,7 +214,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value) {
-            return getTimeDifference(value)
+            return value ? getTimeDifference(value) : '-'
           }
         },
         {
@@ -268,25 +268,31 @@ export default {
     this.getTableData()
   },
   methods: {
-    getTableData () {
+    async getTableData () {
       this.loading = true
       const data = {
         ...this.screenData,
         courseId: router.history.current.query.courseId
       }
-      courseEmployeeBindList(data, {
+      const params = {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
           field: this.sorter.field,
           order: this.sorter.order
         }
-      }).then(res => {
-        this.tableData = res.data
+      }
+      let res = {}
+      if (this.task) {
+        res = await courseTaskBindList(data, params)
+      } else {
+        res = await courseEmployeeBindList(data, params)
+      }
+      if (res.code === 0) {
+        this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
         this.pagination.total = res.count
-      }).finally(() => {
-        this.loading = false
-      })
+      }
+      this.loading = false
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter

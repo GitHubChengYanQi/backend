@@ -91,7 +91,7 @@
               <div class="my-space">
                 <a-button
                   class="warnButton"
-                  @click="() => $router.push(`/study/examination/detail?id=${record.examTaskId}&type=task`)">
+                  @click="() => $router.push(`/study/examination/detail?id=${record.examTaskId}&examId=${record.examId}&type=task`)">
                   详情
                 </a-button>
                 <a-button class="delButton" @click="deleteAttribute(record.id)">删除</a-button>

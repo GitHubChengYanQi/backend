@@ -59,7 +59,7 @@
               <div>
                 <a-button
                   class="successButton"
-                  @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?examId=${record.examId}&courseId=${$router.history.current.query.courseId}`)"
+                  @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?examId=${record.examId}&courseId=${$router.history.current.query.courseId}&examCount=${record.examCount}&passExamCount=${record.passExamCount}&noPassExamCount=${record.noPassExamCount}`)"
                 >
                   查看详情
                 </a-button>

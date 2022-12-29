@@ -70,7 +70,7 @@
                 >
               </div>
               <div class="nickname">
-               <a-tooltip overlayClassName="myTooltip">
+                <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ record.courseResult && record.courseResult.name }}
                   </template>
@@ -85,9 +85,29 @@
                 <template slot="title">
                   <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
                 </template>
-                <div>{{ record.courseResult && record.courseResult.note && record.courseResult.note.replace(/<.*?>/g, '') }}</div>
+                <div>
+                  {{ record.courseResult && record.courseResult.note && record.courseResult.note.replace(/<.*?>/g, '')
+                  }}
+                </div>
               </a-tooltip>
             </div>
+          </div>
+          <div slot="tag" slot-scope="text,row">
+            <template>
+              <a-popover title="试用员工" v-if="row.applicableObject === 2">
+                <template slot="content">
+                  <div class="myLabelBox">
+                    <a-tag v-for="(item, index) in row.bindEmpList" :key="index">{{ item.name }}</a-tag>
+                  </div>
+                </template>
+                <a-tag type="button">
+                  查看
+                </a-tag>
+              </a-popover>
+              <a-tag type="button" v-else>
+                全部员工
+              </a-tag>
+            </template>
           </div>
           <div slot="action" slot-scope="text, record">
             <template>
@@ -154,11 +174,12 @@ export default {
           title: '考核员工',
           width: '150px',
           dataIndex: 'tag',
-          align: 'center'
+          align: 'center',
+          scopedSlots: { customRender: 'tag' }
         },
         {
           title: '考核总人数',
-          dataIndex: 'allEmp',
+          dataIndex: 'allCount',
           width: '150px',
           align: 'center',
           sorter: true
@@ -166,23 +187,26 @@ export default {
         {
           title: '完成人数',
           width: '150px',
-          dataIndex: '1',
+          dataIndex: 'doneCount',
           align: 'center',
           sorter: true
         },
         {
           title: '参与人数',
           width: '150px',
-          dataIndex: '2',
+          dataIndex: 'participantsCount',
           align: 'center',
           sorter: true
         },
         {
           title: '参与率',
           width: '150px',
-          dataIndex: '3',
+          dataIndex: 'rate',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value) {
+            return value + '%'
+          }
         },
         {
           title: '课件数',
@@ -205,12 +229,15 @@ export default {
         {
           title: '创建人',
           width: '150px',
-          dataIndex: '6',
-          align: 'center'
+          dataIndex: 'employeeEntity',
+          align: 'center',
+          customRender (value) {
+            return value && value.name
+          }
         },
         {
           title: '创建时间',
-          width: '150px',
+          width: '200px',
           align: 'center',
           sorter: true,
           dataIndex: 'createdAt',
@@ -244,24 +271,9 @@ export default {
     this.getTableData()
   },
   methods: {
-    deleteAttribute (id) {
-      console.log(id)
-      const thisData = this
-      this.$confirm({
-        title: '删除数据后不可恢复，是否确认删除?',
-        okText: '删除',
-        okType: 'danger',
-        cancelText: '取消',
-        centered: true,
-        onOk () {
-
-        },
-        onCancel () {
-
-        }
-      })
-    },
     success () {
+      this.sorter = {}
+      this.pagination.current = 1
       this.getTableData()
     },
     getTableData () {

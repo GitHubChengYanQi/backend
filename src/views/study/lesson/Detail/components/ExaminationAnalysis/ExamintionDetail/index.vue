@@ -3,39 +3,39 @@
 
     <breadcrumb v-if="!task" :titles="['课程管理','课程详情','考试详情']" back></breadcrumb>
 
-    <div class="head">
+    <div class="head" :style="this.task ? {borderTopLeftRadius:0,borderTopRightRadius:0} : {}">
       <div class="box">
         <a-icon type="form" class="icon" />
         <div>
-          <div class="num">155</div>
+          <div class="num">{{ examCount }}</div>
           考试人数
         </div>
       </div>
       <div class="box">
         <a-icon type="form" class="icon" />
         <div>
-          <div class="num">155</div>
+          <div class="num">{{ passExamCount }}</div>
           通过人数
         </div>
       </div>
       <div class="box">
         <a-icon type="form" class="icon" />
         <div>
-          <div class="num">155</div>
+          <div class="num">{{ noPassExamCount }}</div>
           未通过人数
         </div>
       </div>
       <div class="box">
         <a-icon type="form" class="icon" />
         <div>
-          <div class="num">155</div>
+          <div class="num">{{ 0 }}</div>
           考试中人数
         </div>
       </div>
       <div class="box">
         <a-icon type="form" class="icon" />
         <div>
-          <div class="num">155</div>
+          <div class="num">{{ passingRate }}</div>
           通过率
         </div>
       </div>
@@ -101,7 +101,7 @@
           class="my-table"
           :columns="columns"
           :data-source="tableData"
-          :rowKey="record => record.id"
+          :rowKey="record => record.key"
           :pagination="pagination"
           @change="handleTableChange">
           <div slot="name" slot-scope="text, record">
@@ -138,6 +138,10 @@ export default {
   components: { breadcrumb },
   data () {
     return {
+      examCount: 0,
+      passExamCount: 0,
+      noPassExamCount: 0,
+      passingRate: 0,
       loading: false,
       screenData: {},
       columns: [
@@ -232,6 +236,10 @@ export default {
     }
   },
   created () {
+    this.examCount = router.history.current.query.examCount || 0
+    this.passExamCount = router.history.current.query.passExamCount || 0
+    this.noPassExamCount = router.history.current.query.noPassExamCount || 0
+    this.passingRate = Math.round((this.passExamCount / this.examCount) * 100) || 0
     this.getTableData()
   },
   methods: {
@@ -261,9 +269,6 @@ export default {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
-    },
-    selectChange (row) {
-      this.checkIds = row
     },
     // 群聊筛选
     // 重置
