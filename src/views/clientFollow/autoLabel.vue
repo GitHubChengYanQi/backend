@@ -16,7 +16,7 @@
       <div class="table_operation">
         <div
           class="add_rule"
-          v-if="addRulePermission.includes(permissionButtonData.addRule[table])"
+          v-permission="permissionButtonData.addRule[table]"
           @click="goAddPage"
         >添加规则</div>
         <div class="search_box">
@@ -228,13 +228,13 @@
           <template>
             <a-button
               type="link"
-              @click="particulars(record)"
+              @click="particulars('edit', record)"
               v-if="table===3 || table===4"
               v-permission="permissionButtonData.info[table]"
             >编辑</a-button>
             <a-button
               type="link"
-              @click="particulars(record)"
+              @click="particulars('info', record)"
               v-if="table!==3"
               v-permission="permissionButtonData.info[table]"
             >详情</a-button>
@@ -563,7 +563,8 @@ export default {
     }
   },
   created () {
-    this.getUrl()
+    this.setTable(this.$route.query.id || 1)
+    // this.getUrl()
   },
   methods: {
     setSpread (e, key) {
@@ -597,7 +598,6 @@ export default {
       }
       const apiArr = ['', groupAutoLabelStatusChange, timeAutoLabelStatusChange, numberAutoLabelStatusChange]
       apiArr[this.table](data).then((res) => {
-        console.log(res)
         this.getTableData()
       })
     },
@@ -606,7 +606,7 @@ export default {
         this.$refs.labelSelect.idArr = []
         this.$refs.labelSelect.inputArr = []
       }
-      this.table = e
+      this.table = Number(e)
       this.searchValue = ''
       this.inputArr = []
       this.tableData = []
@@ -623,17 +623,14 @@ export default {
         })
         labelIdGroup = labelIdGroup.toString()
       }
-      console.log(labelIdGroup)
       const obj = {
         labelIdGroup,
         name: this.searchValue,
         page: this.pagination.current,
         perPage: this.pagination.pageSize
       }
-      console.log(obj)
       const apiArr = ['', groupAutoLabelIndex, timeAutoLabelIndex, numberAutoLabelIndex, numberAutoLabelIndex]
       apiArr[this.table](obj).then((res) => {
-        console.log(res)
         this.tableData = res.data.list
         this.pagination.total = res.data.page.total
       })
@@ -657,12 +654,22 @@ export default {
       })
     },
     // 编辑
-    particulars (record) {
-      if (this.table == 3 || this.table == 4) {
-        this.$router.push(`${'/clientFollow/addRule'}?id=${this.table}&label=${record.id}`)
-        localStorage.setItem('autoLabel', JSON.stringify(record))
+    particulars (type, record) {
+      if (type === 'info') {
+        if (this.table == 4) {
+          this.$router.push(`${'/clientFollow/labelExpendInfo'}?id=${this.table}&label=${record.id}`)
+        } else {
+          this.$router.push(`${'/clientFollow/labelInfo'}?id=${this.table}&label=${record.id}`)
+        }
       } else {
-        this.$router.push(`${'/clientFollow/labelInfo'}?id=${this.table}&label=${record.id}`)
+        if (this.table == 3) {
+          this.$router.push(`${'/clientFollow/addRule'}?id=${this.table}&label=${record.id}`)
+          localStorage.setItem('autoLabel', JSON.stringify(record))
+        } 
+        if (this.table == 4) {
+          this.$router.push(`${'/clientFollow/addExpendRule'}?id=${this.table}&label=${record.id}`)
+          localStorage.setItem('autoLabel', JSON.stringify(record))
+        }
       }
     },
     setRules (e) {
@@ -677,53 +684,51 @@ export default {
       }
       this.labelState = !this.labelState
     },
-    getUrl () {
-      // autoLabelRule().then((res) => {
-      //   console.log(res)
-      // })
-      const object = {}
-      // 1.获取？后面的所有内容包括问号
-      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+    // getUrl () {
+    //   // autoLabelRule().then((res) => {
+    //   //   console.log(res)
+    //   // })
+    //   const object = {}
+    //   // 1.获取？后面的所有内容包括问号
+    //   const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
 
-      // 2.截取？后面的字符串
-      const urlData = url.substr(1)
-      const strs = urlData.split('&')
-      for (let i = 0; i < strs.length; i++) {
-        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
-      }
-      this.table = object.id || 1
-      console.log(this.table)
-      const sideMenus = store.state.permission.permissionList
-      sideMenus[0].children.map((item) => {
-        if (item.children.length > 0) {
-          item.children.map((items) => {
-            if (items.path == '/clientFollow/autoLabel') {
-              this.autoLabelData = items.meta.actionList
-            }
-          })
-        }
-      })
-      this.tabHeader.filter((item, index) => {
-        if (this.autoLabelData.includes(item.permission)) {
-          this.tabPermission.push(index)
-        }
-      })
-      this.addRulePermission = this.autoLabelData.filter((item) => {
-        return this.permissionButtonData.addRule.includes(item)
-      })
-      console.log(this.addRulePermission)
-      // if (this.tabPermission.length != 0) {
-      //   if (this.tabPermission[0] == 0) {
-      //     this.table = 1
-      //     this.setTable(1)
-      //   } else {
-      //     this.table = this.tabPermission[0]
-      //     this.setTable(this.tabPermission[0])
-      //   }
-      // }
+    //   // 2.截取？后面的字符串
+    //   const urlData = url.substr(1)
+    //   const strs = urlData.split('&')
+    //   for (let i = 0; i < strs.length; i++) {
+    //     object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+    //   }
+    //   this.table = object.id || 1
+    //   const sideMenus = store.state.permission.permissionList
+    //   sideMenus[0].children.map((item) => {
+    //     if (item.children.length > 0) {
+    //       item.children.map((items) => {
+    //         if (items.path == '/clientFollow/autoLabel') {
+    //           this.autoLabelData = items.meta.actionList
+    //         }
+    //       })
+    //     }
+    //   })
+    //   this.tabHeader.filter((item, index) => {
+    //     if (this.autoLabelData.includes(item.permission)) {
+    //       this.tabPermission.push(index)
+    //     }
+    //   })
+    //   this.addRulePermission = this.autoLabelData.filter((item) => {
+    //     return this.permissionButtonData.addRule.includes(item)
+    //   })
+    //   // if (this.tabPermission.length != 0) {
+    //   //   if (this.tabPermission[0] == 0) {
+    //   //     this.table = 1
+    //   //     this.setTable(1)
+    //   //   } else {
+    //   //     this.table = this.tabPermission[0]
+    //   //     this.setTable(this.tabPermission[0])
+    //   //   }
+    //   // }
 
-      this.getTableData()
-    },
+    //   this.getTableData()
+    // },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.filters = filters
       this.pagination.current = current
@@ -742,7 +747,11 @@ export default {
       })
     },
     goAddPage () {
-      this.$router.push(`${'/clientFollow/addRule'}?id=${this.table}`)
+      if (this.table === 4) {
+        this.$router.push(`${'/clientFollow/addExpendRule'}?id=${this.table}`)
+      } else {
+        this.$router.push(`${'/clientFollow/addRule'}?id=${this.table}`)
+      }
     }
   }
 }

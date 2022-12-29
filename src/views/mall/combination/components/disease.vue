@@ -5,7 +5,7 @@
       <!--tree-->
       <a-col :span="6">
         <div class="box">
-          <a-input-search style="margin-bottom: 8px" placeholder="Search" @change="onChange" />
+          <a-input-search style="margin-bottom: 8px" placeholder="请输入分组名称" @change="onChange" />
           <a-tree
             :expanded-keys="expandedKeys"
             :auto-expand-parent="autoExpandParent"
@@ -26,19 +26,19 @@
                     <a-icon type="setting" />
                   </a>
                   <a-menu slot="overlay">
-                    <a-menu-item>
+                    <a-menu-item v-if="(item.level === 0 || item.level === 1)">
                       <a href="javascript:;" @click="handleClick('add', item)">新建子分类</a>
                     </a-menu-item>
-                    <a-menu-item v-if="(item.leaf === '0')">
+                    <a-menu-item v-if="(item.level === 1 || item.level === 2)">
                       <a href="javascript:;" @click="handleClick('edit', item)">修改分类</a>
                     </a-menu-item>
-                    <a-menu-item v-if="(item.leaf === '0')">
+                    <a-menu-item v-if="(item.level === 1 || item.level === 2)">
                       <a href="javascript:;" @click="handleClick('del', item)">删除分类</a>
                     </a-menu-item>
-                    <a-menu-item>
+                    <a-menu-item v-if="(item.level === 1 || item.level === 2)">
                       <a href="javascript:;" @click="handleClick('up', item)">向上移动</a>
                     </a-menu-item>
-                    <a-menu-item>
+                    <a-menu-item v-if="(item.level === 1 || item.level === 2)">
                       <a href="javascript:;" @click="handleClick('down', item)">向下移动</a>
                     </a-menu-item>
                   </a-menu>
@@ -65,7 +65,8 @@
           <p>修改时间：{{ info.updateAt }}</p>
           <p class="txt">
             <span>分类药品推荐:</span>
-            <a-textarea v-model="info.salesGuidance" placeholder="Controlled autosize" :auto-size="{ minRows: 3, maxRows: 5 }" />
+            <span class="tip">{{ `${info.salesGuidance.length}/200` }}</span>
+            <a-textarea v-model="info.salesGuidance" :max-length="200" placeholder="限制200个字" :auto-size="{ minRows: 3, maxRows: 5 }" />
           </p>
           <a-button type="primary" @click="handleSave">保存</a-button>
         </div>
@@ -90,7 +91,7 @@
         :wrapper-col="wrapperCol"
       >
         <a-form-model-item ref="name" label="分类名称" prop="name">
-          <a-input v-model="form.name" :max-length="20" :suffix="`${form.name ? form.name.length : 0}/20`" />
+          <a-input v-model="form.name" :max-length="15" :suffix="`${form.name ? form.name.length : 0}/15`" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -365,9 +366,16 @@ export default {
     overflow: auto;
 
     .txt {
+      position: relative;
       span {
         display: block;
         margin-bottom: 10px;
+      }
+      .tip{
+        position: absolute;
+        bottom:-5px;
+        right:10px;
+        z-index: 99;
       }
     }
   }
@@ -381,6 +389,15 @@ export default {
   /deep/ .ant-tree-node-selected{
     .iconBox{
       display:block;
+    }
+  }
+  /deep/ .ant-tree-title{
+    display:flex;
+    span:first-child{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex:1;
     }
   }
 }

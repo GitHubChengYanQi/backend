@@ -377,7 +377,7 @@ export default {
       if (type == 'two') {
         this.$router.push('/channelCodeNew/index')
       } else if (type == 'three') {
-        this.$router.push('/workRoom/index')
+        this.$router.push('/groupsOperation/groupList/index')
       }
     },
     getLineChat () {

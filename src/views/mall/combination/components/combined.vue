@@ -14,14 +14,6 @@
           </a-col>
           <a-col :lg="8" :md="6">
             <a-form-item
-              label="疾病分类："
-              :labelCol="{lg: {span: 7} }"
-              :wrapperCol="{lg: {span: 17} }">
-              <disease-select placeholder="请选择疾病分类" @change="(value) => this.screenData.symptomDiseaseClassify = value" v-model="screenData.symptomDiseaseClassify" />
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8" :md="6">
-            <a-form-item
               label="有无辅药："
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
@@ -37,6 +29,14 @@
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
               <a-input v-model="screenData.mainDrug" placeholder="请输入主药名称" />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="20" :md="6">
+            <a-form-item
+              label="疾病分类："
+              :labelCol="{lg: {span: 2}}"
+              :wrapperCol="{lg: {span: 17}}">
+              <disease-select placeholder="请选择疾病分类" @change="(value) => this.screenData.symptomDiseaseClassify = value" v-model="this.screenData.symptomDiseaseClassify" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -86,7 +86,14 @@
           {{ text | filterNull }}
         </div>
         <div slot="mainDrugList" slot-scope="text">
-          <a-tag v-for="i in text" :key="i">{{ i }}</a-tag>
+          <a-popover title="主要用药" v-if="text.length > 0">
+            <template slot="content">
+              <div class="labelBox">
+                <a-tag v-for="(item, index) in text" :key="index">{{ item }}</a-tag>
+              </div>
+            </template>
+            <a-tag style="margin-bottom:5px;" v-for="i in text.slice(0, 2)" :key="i">{{ i }}</a-tag>
+          </a-popover>
         </div>
         <div slot="haveAdjuvants" slot-scope="text">
           {{ text | filterNull }}
@@ -126,7 +133,9 @@ export default {
   data () {
     return {
       loading: false,
-      screenData: {},
+      screenData: {
+        symptomDiseaseClassify: 0
+      },
       columns: [
         {
           title: '联合用药名称',
@@ -155,7 +164,7 @@ export default {
           title: '主要用药',
           dataIndex: 'mainDrugList',
           align: 'center',
-          width: 150,
+          width: 300,
           scopedSlots: { customRender: 'mainDrugList' }
         },
         {
@@ -221,7 +230,7 @@ export default {
         ...this.screenData
       }
       // 是否选择了疾病分类
-      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify : void 0
+      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify : ''
       combinList(params).then((res) => {
         this.loading = false
         this.tableData = res.data.list
@@ -243,7 +252,9 @@ export default {
      */
     resetSearch () {
       // this.storeIds = []
-      this.screenData = {}
+      this.screenData = {
+        symptomDiseaseClassify: NaN
+      }
       this.selectedRowKeys = []
       this.selectedRows = []
       // this.screenData.erpOrderNos = ''
@@ -341,7 +352,6 @@ export default {
   }
 }
 .table-wrapper {
-  margin-top: 20px;
   .table-head {
     height: 50px;
     & > div {
@@ -443,5 +453,11 @@ export default {
     //  width: 40px;
     //  height: 40px;
     //}
+  }
+  .labelBox{
+    width:500px;
+    span{
+      margin-bottom:8px;
+    }
   }
 </style>
