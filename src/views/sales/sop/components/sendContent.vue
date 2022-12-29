@@ -17,9 +17,11 @@
               <div v-if="item.type === 'video'" class="uploadMediaDiv">
                 <!-- v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!' }], initialValue: '' }]" -->
                 <ImgUpload
+                  @loadingMethod="loadingMethod"
                   :fileMaxSize="200"
                   :fileType="3"
                   :buttonText="`+${item.name}`"
+                  :isLoadingStatus.sync="isLoadingStatus"
                   @successUpload="successUpload"/>
               </div>
               <div v-else>
@@ -428,6 +430,9 @@ export default {
     }
   },
   methods: {
+    loadingMethod (e) {
+      this.$emit('update:isLoadingStatus', e)
+    },
     async successUpload (file) {
       console.log(file, 'successUpload上传成功的返回')
       if (file.size) {
@@ -436,7 +441,9 @@ export default {
         formData.append('time', 1)
         console.log(formData, 'formData')
         // const res = await upLoad(formData)
+        this.$emit('update:isLoadingStatus', true)
         await upLoad(formData).then(res => {
+          this.$emit('update:isLoadingStatus', false)
           const videoInfo = {
             type: 3,
             videoUrl: res.data.fullPath

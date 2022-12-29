@@ -75,6 +75,7 @@ export default {
   },
   methods: {
     dealUploadMethod (info, fileInfo) {
+      // this.$emit('update:isLoadingStatus', true)
       const tempFormData = new FormData()
       for (const i in info) {
         console.log(i, 'iii')
@@ -83,6 +84,7 @@ export default {
       tempFormData.append('file', fileInfo.file)
       ossUpload(tempFormData).then(res => {
         this.$emit('successUpload', this.oss)
+        this.$emit('loadingMethod', false)
       })
       // const headerOptions = {
       //   method: 'POST',
@@ -102,12 +104,13 @@ export default {
       // console.log(info, '选择视频完成')
       const fileSize = info.file.size / 1024 / 1024
       if (fileSize > this.fileMaxSize) {
-        this.$message.error('上传文件大小大于200M')
+        this.$message.error('上传文件大于200M')
         return false
       } else if (fileSize <= 10) {
         this.$emit('successUpload', info.file)
         return false
       } else {
+        this.$emit('loadingMethod', true)
         await mediaGetToken({ type: info.file.name }).then(res => {
           // console.log(res, '获取ossToken')
           this.oss = { ...res.data, key: res.data.key }
