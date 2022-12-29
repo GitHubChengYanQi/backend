@@ -28,7 +28,7 @@
                 <a-icon v-if="['pdf'].includes(row.suffix)" type="file-pdf" style="font-size: 24px" />
               </div>
               <div class="nickname">
-                <a-tooltip>
+               <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ row.fileName || row.title }}
                   </template>
@@ -248,12 +248,8 @@ export default {
 <style lang="less">
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   img {
-    max-height: 33px;
-    max-width: 33px;
     border-radius: 2px;
   }
 

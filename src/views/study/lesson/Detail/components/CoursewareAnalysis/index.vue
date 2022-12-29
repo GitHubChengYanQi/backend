@@ -32,134 +32,148 @@
     </a-card>
 
     <div class="my-table-wrapper">
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :row-selection="{ onChange: selectChange }"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.courseWareBindId"
+          :pagination="pagination"
+          @change="handleTableChange">
+          <div slot="name" slot-scope="text">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <img
+                  height="50"
+                  v-if="['jpg','png'].includes(text && text.suffix)"
+                  :src="(text && text.coverImageUrl || text && text.mediaUrl) +'?x-oss-process=image/resize,m_fill,h_50,w_100'"
+                >
+                <a-icon v-if="['doc','docx'].includes(text && text.suffix)" type="file-word" style="font-size: 24px" />
+                <a-icon v-if="['ppt','pptx'].includes(text && text.suffix)" type="file-ppt" style="font-size: 24px" />
+                <a-icon v-if="['pdf'].includes(text && text.suffix)" type="file-pdf" style="font-size: 24px" />
+              </div>
+              <div class="nickname">
+                <a-tooltip overlayClassName="myTooltip">
+                  <template slot="title">
+                    {{ text && text.fileName || text && text.title }}
+                  </template>
+                  {{ text && text.fileName || text && text.title }}
+                </a-tooltip>
+              </div>
             </div>
-            <div class="nickname">
-              <a-tooltip>
+          </div>
+          <div slot="introduction" slot-scope="text">
+            <div class="introduction">
+              <a-tooltip overlayClassName="myTooltip">
                 <template slot="title">
-                  {{ record.name }}
+                  {{ text }}
                 </template>
-                {{ record.name }}
+                {{ text }}
               </a-tooltip>
             </div>
           </div>
-        </div>
-        <div slot="introduction" slot-scope="text">
-          <div class="introduction">
-            <a-tooltip>
-              <template slot="title">
-                {{ text }}
-              </template>
-              {{ text }}
-            </a-tooltip>
+          <div slot="action" slot-scope="text, record">
+            <template>
+              <div>
+                <a-button type="link" @click="setVisible(record.name)">重命名</a-button>
+                <a-button type="link">下载</a-button>
+                <a-button type="link">预览</a-button>
+                <a-button type="link" @click="deleteAttribute(record.id)">删除</a-button>
+              </div>
+            </template>
           </div>
-        </div>
-        <div slot="action" slot-scope="text, record">
-          <template>
-            <div>
-              <a-button type="link" @click="setVisible(record.name)">重命名</a-button>
-              <a-button type="link">下载</a-button>
-              <a-button type="link">预览</a-button>
-              <a-button type="link" @click="deleteAttribute(record.id)">删除</a-button>
-            </div>
-          </template>
-        </div>
-      </a-table>
+        </a-table>
+      </a-spin>
     </div>
   </div>
 </template>
 
 <script>
 
-import { courseWareDelete } from '@/api/study/courseWare'
-import { message } from 'ant-design-vue'
+import router from '@/router'
+import { courseWareBindList } from '@/api/study/course'
+import { getTimeDifference } from '@/utils/util'
 
 export default {
   data () {
     return {
-      imgUrl: '',
-      imgName: '',
-      uploadVisible: false,
-      fileName: String,
-      visible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      loading: false,
+      screenData: {},
       columns: [
         {
           title: '章节',
-          dataIndex: 'name',
+          dataIndex: 'index',
           align: 'center',
-          width: '200px'
+          width: '100px',
+          customRender (value, record, index) {
+            return index + 1
+          }
         },
         {
           title: '课件',
           width: '200px',
-          dataIndex: 'size',
-          align: 'center'
+          dataIndex: 'courseWareResult',
+          align: 'center',
+          scopedSlots: { customRender: 'name' }
         },
         {
-          title: '时常',
+          title: '时长',
           dataIndex: 'createTime',
-          align: 'center'
+          align: 'center',
+          customRender (value, record) {
+            return (record.hour < 10 ? '0' + record.hour : record.hour) + ':' + (record.minute < 10 ? '0' + record.minute : record.minute) + ':' + (record.second < 10 ? '0' + record.second : record.second)
+          }
         },
         {
           title: '已学完人数',
-          dataIndex: 'user',
+          dataIndex: 'doneLearningstatusCount',
           align: 'center',
           sorter: true
         },
         {
           title: '未学人数',
-          dataIndex: '1',
+          dataIndex: 'noLearningstatusCount',
           align: 'center',
           sorter: true
         },
         {
           title: '进行中人数',
-          dataIndex: '2',
+          dataIndex: 'learningstatusCount',
           align: 'center',
           sorter: true
         },
         {
           title: '累计学习时长',
-          dataIndex: '3',
+          dataIndex: 'learningTime',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value) {
+            return getTimeDifference(value)
+          }
         },
         {
           title: '关联考试',
-          dataIndex: '4',
-          align: 'center'
+          dataIndex: 'examId',
+          align: 'center',
+          customRender (value) {
+            return value !== 0 ? '是' : '否'
+          }
         },
         {
           title: '考试人数',
-          dataIndex: '5',
+          dataIndex: 'examCount',
           align: 'center',
           sorter: true
         },
         {
           title: '通过人数',
-          dataIndex: '6',
+          dataIndex: 'passExamCount',
           align: 'center',
           sorter: true
         },
         {
           title: '未通过人数',
-          dataIndex: '7',
+          dataIndex: 'noPassExamCount',
           align: 'center',
           sorter: true
         }
@@ -181,59 +195,25 @@ export default {
     this.getTableData()
   },
   methods: {
-    handleOk () {
-      console.log('ok')
-    },
-    deleteAttribute (id) {
-      console.log(id)
-      const thisData = this
-      this.$confirm({
-        title: '删除数据后不可恢复，是否确认删除?',
-        okText: '删除',
-        okType: 'danger',
-        cancelText: '取消',
-        centered: true,
-        onOk () {
-
-        },
-        onCancel () {
-
-        }
-      })
-    },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      const data = {
+        ...this.screenData,
+        courseId: router.history.current.query.courseId
+      }
+      courseWareBindList(data, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
+      }).then(res => {
+        this.tableData = res.data
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter
@@ -247,11 +227,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }
@@ -281,6 +257,21 @@ export default {
     .weixin {
       color: #86CE76
     }
+  }
+}
+
+.user-info {
+
+  img {
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
   }
 }
 </style>

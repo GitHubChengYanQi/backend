@@ -144,6 +144,7 @@
 import moment from 'moment'
 import { courseEmployeeBindList } from '@/api/study/course'
 import router from '@/router'
+import { getTimeDifference } from '@/utils/util'
 
 export default {
   props: {
@@ -185,43 +186,53 @@ export default {
           dataIndex: '4',
           align: 'center',
           customRender (value, record) {
-            return record.learningStatusResult && record.learningStatusResult.a || '-'
+            switch (record.learningStatusResult && record.learningStatusResult.status) {
+              case 1:
+                return '学习中'
+              case 2:
+                return '已学习'
+              default:
+                return '未学习'
+            }
           }
         },
         {
           title: '学习进度',
-          dataIndex: '5',
+          dataIndex: 'doneStatusDetail',
           align: 'center',
           sorter: true,
           customRender (value, record) {
-            return record.learningStatusResult && record.learningStatusResult.rate ? record.learningStatusResult.rate + '%' : '-'
+            const doneStatusDetail = record.doneStatusDetail || 0
+            const statusDetail = record.statusDetail || 0
+            const num = Math.round((doneStatusDetail / statusDetail) * 100) || 0
+            return num + '%'
           }
         },
         {
           title: '累计学习时长',
-          dataIndex: '6',
+          dataIndex: 'learningTime',
           align: 'center',
           sorter: true,
-          customRender (value, record) {
-            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          customRender (value) {
+            return getTimeDifference(value)
           }
         },
         {
           title: '上次学习',
-          dataIndex: '7',
+          dataIndex: 'lastLearningTime',
           align: 'center',
           sorter: true,
-          customRender (value, record) {
-            return (record.learningStatusResult && record.learningStatusResult.doneTime) ? moment(record.learningStatusResult.doneTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+          customRender (value) {
+            return value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '-'
           }
         },
         {
           title: '完成时间',
-          dataIndex: '8',
+          dataIndex: 'doneTime',
           align: 'center',
           sorter: true,
-          customRender (value, record) {
-            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          customRender (value) {
+            return value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '-'
           }
         },
         {
@@ -257,15 +268,8 @@ export default {
     this.getTableData()
   },
   methods: {
-    handleOk () {
-      console.log('ok')
-    },
-    deleteAttribute (id) {
-      console.log(id)
-    },
     getTableData () {
       this.loading = true
-      const time = this.screenData.time || []
       const data = {
         ...this.screenData,
         courseId: router.history.current.query.courseId
@@ -290,17 +294,10 @@ export default {
       this.pagination.pageSize = pageSize
       this.getTableData()
     },
-    selectChange (row) {
-      this.checkIds = row
-    },
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }

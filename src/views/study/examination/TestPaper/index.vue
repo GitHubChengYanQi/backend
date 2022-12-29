@@ -59,18 +59,6 @@
           :rowSelection="select ? {type:'radio', onChange: selectChange} : null"
           :pagination="pagination"
           @change="handleTableChange">
-          <div slot="questionnaireName" slot-scope="text">
-            <div class="user-info flex">
-              <div class="nickname">
-                <a-tooltip>
-                  <template slot="title">
-                    {{ text }}
-                  </template>
-                  {{ text }}
-                </a-tooltip>
-              </div>
-            </div>
-          </div>
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
@@ -161,7 +149,6 @@ export default {
         {
           title: '试卷名称',
           dataIndex: 'questionnaireName',
-          scopedSlots: { customRender: 'questionnaireName' },
           align: 'center',
           width: '200px'
         },
@@ -198,7 +185,7 @@ export default {
         }
       ],
       tableData: [],
-     sorter: {},
+      sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -286,11 +273,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }
@@ -344,8 +327,6 @@ export default {
 }
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   .nickname {
     white-space: nowrap;

@@ -41,7 +41,6 @@ export function examDetail (data) {
   })
 }
 
-
 export function examDelete (data) {
   return request({
     url: '/exam/delete',

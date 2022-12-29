@@ -55,7 +55,7 @@
       <a-spin :spinning="loading">
         <a-table
           class="my-table"
-          :scroll="{ x: 'max-content' }"
+          :scroll="{ x: 'max-content'}"
           :columns="columns"
           :data-source="tableData"
           :rowKey="record => record.key"
@@ -64,10 +64,13 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.courseResult && record.courseResult.coverImageUrl">
+                <img
+                  height="50"
+                  :src="(record.courseResult && record.courseResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_100'"
+                >
               </div>
               <div class="nickname">
-                <a-tooltip>
+               <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ record.courseResult && record.courseResult.name }}
                   </template>
@@ -78,11 +81,11 @@
           </div>
           <div slot="note" slot-scope="text,record">
             <div class="introduction">
-              <a-tooltip>
+              <a-tooltip overlayClassName="myTooltip">
                 <template slot="title">
-                  <div v-html="record.courseResult && record.courseResult.note"></div>
+                  <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
                 </template>
-                <div v-html="record.courseResult && record.courseResult.note"></div>
+                <div>{{ record.courseResult && record.courseResult.note && record.courseResult.note.replace(/<.*?>/g, '') }}</div>
               </a-tooltip>
             </div>
           </div>
@@ -121,11 +124,7 @@ export default {
       uploadVisible: false,
       fileName: String,
       visible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      screenData: {},
       columns: [
         {
           title: '课程名称',
@@ -291,11 +290,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }
@@ -334,12 +329,8 @@ export default {
 }
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   img {
-    max-height: 33px;
-    max-width: 33px;
     border-radius: 2px;
   }
 

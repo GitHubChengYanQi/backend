@@ -36,6 +36,7 @@
 <script>
 import Employee from '../../../components/Employee'
 import TimeLimit from '../TimeLimit'
+import { message } from 'ant-design-vue'
 
 export default {
   props: {
@@ -52,6 +53,8 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.$emit('onSubmit', values)
+        } else {
+          message.warn('请检查必填项！')
         }
       })
     }

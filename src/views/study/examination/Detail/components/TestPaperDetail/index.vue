@@ -18,19 +18,23 @@
             <div class="space">
               <div>
                 <div>创建人：小乔</div>
-                <div>试卷分数：20</div>
-                <div>答卷时长：30:30:30</div>
+                <div>
+                  试卷分数：{{
+                    detail.questionnaireResults && detail.questionnaireResults[0] && detail.questionnaireResults[0].score
+                  }}
+                </div>
+                <div>答卷时长：{{ detail.timeLimit > -1 ? detail.timeLimit + '分钟' : '不限制时长' }}</div>
                 <div>重复考试：{{ detail.reexam }}</div>
               </div>
               <div>
                 <div>创建时间：{{ detail.createTime }}</div>
                 <div>通过分数：{{ detail.passScore }}</div>
-                <div>限定时长：{{ detail.timeLimit > -1 ? detail.timeLimit + '分钟' : '不限制时长' }}</div>
+                <div v-if="task">限定时长：{{ detail.timeLimit > -1 ? detail.timeLimit + '分钟' : '不限制时长' }}</div>
                 <div>试卷名称：{{ detail.questionnaireResult && detail.questionnaireResult.questionnaireName }}</div>
               </div>
             </div>
             <div class="note">
-              <div v-html="detail.note"></div>
+              <div>{{ detail.note && detail.note.replace(/<.*?>/g, '') }}</div>
             </div>
           </div>
         </div>
@@ -91,10 +95,12 @@
 import router from '@/router'
 import { examDetail } from '@/api/study/exam'
 import moment from 'moment'
+import { examTaskDetail } from '@/api/study/task'
 
 export default {
   props: {
     preview: Boolean,
+    task: Boolean,
     questionResults: {
       type: Array,
       default: _ => []
@@ -142,20 +148,38 @@ export default {
     },
     getDetail (id) {
       this.detailLoading = true
-      examDetail({ examId: id }).then((res) => {
-        const detail = res.data || {}
-        const questionnaireResult = detail.questionnaireResults ? detail.questionnaireResults[0] : {}
-        this.detail = {
-          ...detail,
-          createTime: moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-          questionnaireResult,
-          reexam: this.reexam(detail.reexam),
-          questionResults: questionnaireResult.questionResults || []
-        }
-        console.log(res.data)
-      }).finally(() => {
-        this.detailLoading = false
-      })
+      if (this.task) {
+        examTaskDetail({ examTaskId: id }).then((res) => {
+          console.log(res)
+          const detail = res.data || {}
+          const questionnaireResult = detail.questionnaireResults ? detail.questionnaireResults[0] : {}
+          this.detail = {
+            ...detail,
+            createTime: moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+            questionnaireResult,
+            reexam: this.reexam(detail.reexam),
+            questionResults: questionnaireResult.questionResults || []
+          }
+        }).finally(() => {
+          this.detailLoading = false
+        })
+      } else {
+        examDetail({ examId: id }).then((res) => {
+          const detail = res.data || {}
+          const questionnaireResult = detail.questionnaireResults ? detail.questionnaireResults[0] : {}
+          this.detail = {
+            ...detail,
+            createTime: moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+            questionnaireResult,
+            reexam: this.reexam(detail.reexam),
+            questionResults: questionnaireResult.questionResults || []
+          }
+          console.log(res.data)
+        }).finally(() => {
+          this.detailLoading = false
+        })
+      }
+
     }
   }
 }

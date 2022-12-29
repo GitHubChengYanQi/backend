@@ -75,7 +75,7 @@
                           v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
                         />
                       </a-form-item>
-                      <a-form-item label="题目类型">
+                      <a-form-item label="题目类型" style="margin-bottom: 12px">
                         <a-radio-group
                           :disabled="disabled"
                           v-decorator="[`questions[${questionItem.index}].type`, { rules: [{ required: true, message: '请选择题目类型!' }],initialValue:'single' }]"
@@ -110,6 +110,7 @@
                             slot-scope="{ node, data:{option} }"
                           >
                             <a-form-item
+                              class="optionItem"
                               :label="option"
                               :label-col="{ span: 2 }"
                               :wrapper-col="{ span: 12 }"
@@ -148,6 +149,7 @@
                         </el-tree>
                       </div>
                       <a-form-item
+                        style="margin-top: 12px"
                         label="正确答案"
                         :label-col="{ span: 2 }"
                         :wrapper-col="{ span: 12 }"
@@ -411,6 +413,8 @@ export default {
               this.loading = false
             })
           }
+        } else {
+          message.warn('请检查必填项！')
         }
       })
     },
@@ -719,6 +723,11 @@ export default {
       }
     }
   }
+}
+
+.optionItem {
+  margin: 0;
+  padding: 12px 0;
 }
 
 .submit {

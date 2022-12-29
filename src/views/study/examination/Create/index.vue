@@ -75,6 +75,7 @@
           </a-form-item>
           <a-form-item label="考试说明">
             <VueQuillEditor
+              width="400px"
               v-if="!detailLoading"
               :height="'auto'"
               placeholder="请输入考试说明"
@@ -167,6 +168,8 @@ export default {
               this.loading = false
             })
           }
+        } else {
+          message.warn('请检查必填项！')
         }
       })
     }

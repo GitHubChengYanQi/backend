@@ -60,10 +60,10 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.coverImageUrl">
+                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
               </div>
               <div class="nickname">
-                <a-tooltip>
+                <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ record.name }}
                   </template>
@@ -126,7 +126,7 @@ export default {
       screenData: {},
       columns: [
         {
-          title: '课程名称',
+          title: '考试名称',
           dataIndex: 'name',
           scopedSlots: { customRender: 'name' },
           align: 'center',
@@ -301,11 +301,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }
@@ -334,12 +330,8 @@ export default {
 }
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   img {
-    max-height: 33px;
-    max-width: 33px;
     border-radius: 2px;
   }
 

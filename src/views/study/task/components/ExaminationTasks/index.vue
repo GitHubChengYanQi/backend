@@ -58,10 +58,13 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.examResult && record.examResult.coverImageUrl">
+                <img
+                  height="50"
+                  :src="(record.examResult && record.examResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_100'"
+                >
               </div>
               <div class="nickname">
-                <a-tooltip>
+                <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ record.examResult && record.examResult.name }}
                   </template>
@@ -72,7 +75,7 @@
           </div>
           <div slot="note" slot-scope="text,record">
             <div class="introduction">
-              <a-tooltip>
+              <a-tooltip overlayClassName="myTooltip">
                 <template slot="title">
                   {{
                     record.examResult && record.examResult.questionnaireResults && record.examResult.questionnaireResults[0] && record.examResult.questionnaireResults[0].questionnaireName
@@ -88,7 +91,7 @@
               <div class="my-space">
                 <a-button
                   class="warnButton"
-                  @click="() => $router.push(`/study/examination/detail?id=${record.examId}&type=task`)">
+                  @click="() => $router.push(`/study/examination/detail?id=${record.examTaskId}&type=task`)">
                   详情
                 </a-button>
                 <a-button class="delButton" @click="deleteAttribute(record.id)">删除</a-button>
@@ -261,11 +264,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }
@@ -304,12 +303,8 @@ export default {
 }
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   img {
-    max-height: 33px;
-    max-width: 33px;
     border-radius: 2px;
   }
 

@@ -4,15 +4,15 @@
     <div v-if="task">
       <a-tabs v-model="key" class="tabs">
         <a-tab-pane key="1" tab="试卷详情">
-          <TestPaperDetail />
+          <TestPaperDetail :task="task" />
         </a-tab-pane>
         <a-tab-pane key="2" tab="考试分析">
-          <ExamintionDetail />
+          <ExamintionDetail task />
         </a-tab-pane>
       </a-tabs>
     </div>
     <div v-else>
-      <TestPaperDetail />
+      <TestPaperDetail :task="task" />
     </div>
 
   </div>

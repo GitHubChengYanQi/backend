@@ -15,7 +15,7 @@
       :data="{time:1}"></a-upload>
     <quill-editor
       class="editor"
-      :style="{height}"
+      :style="{height,width}"
       v-model="content"
       ref="myQuillEditor"
       :options="editorOption"
@@ -55,6 +55,12 @@ export default {
     quillEditor
   },
   props: {
+    width: {
+      type: [String, Number],
+      default () {
+        return ''
+      }
+    },
     height: {
       type: [String, Number],
       default () {
@@ -212,7 +218,7 @@ export default {
   height: 354px;
 
   .ql-editor {
-    min-height: 200px;
+    min-height: 800px;
   }
 
 }

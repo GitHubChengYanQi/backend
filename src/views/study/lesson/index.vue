@@ -53,7 +53,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button v-if="!select" type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -93,10 +93,10 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.coverImageUrl">
+                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
               </div>
               <div class="nickname">
-                <a-tooltip>
+                <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ record.name }}
                   </template>
@@ -107,11 +107,11 @@
           </div>
           <div slot="note" slot-scope="text">
             <div class="introduction">
-              <a-tooltip>
+              <a-tooltip overlayClassName="myTooltip">
                 <template slot="title">
                   <div class="ql-editor" v-html="text"></div>
                 </template>
-                <div v-html="text"></div>
+                <div>{{ text.replace(/<.*?>/g, '') }}</div>
               </a-tooltip>
             </div>
           </div>
@@ -133,7 +133,7 @@
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?id=${record.courseId}`)">
+                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?courseId=${record.courseId}`)">
                   详情
                 </a-button>
                 <a-button
@@ -319,7 +319,6 @@ export default {
           title: '课程名称',
           dataIndex: 'name',
           scopedSlots: { customRender: 'name' },
-          align: 'center',
           width: '200px'
         },
         {
@@ -444,12 +443,8 @@ export default {
 }
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   img {
-    max-height: 33px;
-    max-width: 33px;
     border-radius: 2px;
   }
 

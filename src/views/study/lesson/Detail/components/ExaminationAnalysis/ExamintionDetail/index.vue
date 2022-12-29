@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <breadcrumb :titles="['课程管理','课程详情','考试详情']" back></breadcrumb>
+    <breadcrumb v-if="!task" :titles="['课程管理','课程详情','考试详情']" back></breadcrumb>
 
     <div class="head">
       <div class="box">
@@ -96,105 +96,131 @@
     </a-card>
 
     <div class="my-table-wrapper">
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
-            </div>
-            <div class="nickname">
-              <a-tooltip>
-                <template slot="title">
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.id"
+          :pagination="pagination"
+          @change="handleTableChange">
+          <div slot="name" slot-scope="text, record">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <a-icon type="file-word" style="font-size: 24px" />
+              </div>
+              <div class="nickname">
+                <a-tooltip overlayClassName="myTooltip">
+                  <template slot="title">
+                    {{ record.name }}
+                  </template>
                   {{ record.name }}
-                </template>
-                {{ record.name }}
-              </a-tooltip>
+                </a-tooltip>
+              </div>
             </div>
           </div>
-        </div>
-      </a-table>
+        </a-table>
+      </a-spin>
     </div>
   </div>
 </template>
 
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd/index'
+import router from '@/router'
+import { courseExamBindExamBindPageList } from '@/api/study/course'
+import moment from 'moment'
 
 export default {
+  props: {
+    task: Boolean
+  },
   components: { breadcrumb },
   data () {
     return {
-      imgUrl: '',
-      imgName: '',
-      uploadVisible: false,
-      fileName: String,
-      visible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      loading: false,
+      screenData: {},
       columns: [
         {
           title: '姓名',
-          dataIndex: 'name',
+          dataIndex: '1',
           align: 'center',
-          width: '200px'
+          width: '200px',
+          customRender (value, record) {
+            return record.employeeEntity && record.employeeEntity.name || '-'
+          }
         },
         {
           title: '所属机构',
           width: '200px',
-          dataIndex: 'size',
-          align: 'center'
+          dataIndex: '2',
+          align: 'center',
+          customRender (value, record) {
+            return record.employeeEntity && record.employeeEntity.masterDepartmentName || '-'
+          }
         },
         {
           title: '所属门店',
-          dataIndex: 'createTime',
-          align: 'center'
+          dataIndex: '3',
+          align: 'center',
+          customRender (value, record) {
+            return record.employeeEntity && record.employeeEntity.department && record.employeeEntity.department.departmentName || '-'
+          }
         },
         {
           title: '考试状态',
-          dataIndex: 'user',
-          align: 'center'
+          dataIndex: '2',
+          align: 'center',
+          customRender (value, record) {
+            return record.doneAt ? '是' : '否'
+          }
         },
         {
           title: '考试分数',
-          dataIndex: '1',
+          dataIndex: 'score',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value, record) {
+            return record.doneAt ? value : '-'
+          }
         },
         {
           title: '考试结果',
-          dataIndex: '2',
-          align: 'center'
+          dataIndex: 'status',
+          align: 'center',
+          customRender (value, record) {
+            return record.doneAt ? (value === 1 ? '通过' : '未通过') : '-'
+          }
         },
         {
           title: '考试次数',
-          dataIndex: '3',
-          align: 'center'
+          dataIndex: 'examCount',
+          align: 'center',
+          customRender (value, record) {
+            return record.doneAt ? value : '-'
+          }
         },
         {
           title: '答卷时长',
-          dataIndex: '4',
+          dataIndex: 'resultTime',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value, record) {
+            return record.doneAt ? value : '-'
+          }
         },
         {
           title: '交卷时间',
-          dataIndex: '5',
+          dataIndex: 'doneAt',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value, record) {
+            return (record.doneAt && value) ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '-'
+          }
         }
       ],
       tableData: [],
-      checkIds: [],
-     sorter: {},
+      sorter: {},
       pagination: {
         total: 0,
         current: 1,
@@ -209,47 +235,28 @@ export default {
     this.getTableData()
   },
   methods: {
-    handleOk () {
-      console.log('ok')
-    },
-    deleteAttribute (id) {
-      console.log(id)
-    },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      const data = {
+        ...this.screenData,
+        courseId: router.history.current.query.courseId,
+        examId: router.history.current.query.examId
+      }
+      courseExamBindExamBindPageList(data, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
+      }).then(res => {
+        this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
-      handleTableChange ({ current, pageSize }, filters, sorter) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
@@ -261,11 +268,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }

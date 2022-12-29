@@ -50,10 +50,10 @@
           <div slot="titleRender" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.coverImageUrl">
+                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
               </div>
               <div class="nickname">
-                <a-tooltip>
+               <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ text }}
                   </template>
@@ -269,11 +269,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }
@@ -282,8 +278,6 @@ export default {
 <style lang="less" scoped>
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   img {
     border-radius: 2px;

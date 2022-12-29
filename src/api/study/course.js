@@ -34,6 +34,33 @@ export function courseEmployeeBindList (data, params) {
   })
 }
 
+export function examCourseBindPageList (data, params) {
+  return request({
+    url: '/exam/courseBindPageList',
+    method: 'post',
+    data,
+    params
+  })
+}
+
+export function courseExamBindExamBindPageList (data, params) {
+  return request({
+    url: '/courseExamBind/examBindPageList',
+    method: 'post',
+    data,
+    params
+  })
+}
+
+export function courseWareBindList (data, params) {
+  return request({
+    url: '/courseWareBind/list',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function courseDetail (data) {
   return request({
     url: '/course/detail',

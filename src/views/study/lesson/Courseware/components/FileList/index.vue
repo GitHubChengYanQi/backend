@@ -67,7 +67,7 @@
                 <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />
               </div>
               <div class="nickname">
-                <a-tooltip>
+               <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ text }}
                   </template>
@@ -339,11 +339,7 @@ export default {
     // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   },
   components: { upload, FilePreview, SelectEmployee }
@@ -353,8 +349,6 @@ export default {
 <style lang="less" scoped>
 
 .user-info {
-  text-align: center;
-  justify-content: center;
 
   img {
     border-radius: 2px;

@@ -17,117 +17,131 @@
         </a-form-item>
         <a-form-item>
           <div class="my-space">
+            <a-button @click="reset">重置</a-button>
             <a-button
               type="primary"
+              ghost
               @click="() => { this.pagination.current = 1; this.getTableData() }"
             >
               查询
             </a-button>
-            <a-button @click="reset">重置</a-button>
-            <a-button @click="reset">导出</a-button>
+            <a-button type="primary" @click="reset">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
     </a-card>
     <div class="my-table-wrapper">
-      <a-table
-        class="my-table"
-        :columns="columns"
-        :data-source="tableData"
-        :rowKey="record => record.id"
-        :pagination="pagination"
-        :row-selection="{ onChange: selectChange }"
-        @change="handleTableChange">
-        <div slot="name" slot-scope="text, record">
-          <div class="user-info flex">
-            <div class="avatar mr12">
-              <a-icon type="file-word" style="font-size: 24px" />
-            </div>
-            <div class="nickname">
-              <a-tooltip>
-                <template slot="title">
+      <a-spin :spinning="loading">
+        <a-table
+          class="my-table"
+          :columns="columns"
+          :data-source="tableData"
+          :rowKey="record => record.key"
+          :pagination="pagination"
+          @change="handleTableChange">
+          <div slot="name" slot-scope="text, record">
+            <div class="user-info flex">
+              <div class="avatar mr12">
+                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
+              </div>
+              <div class="nickname">
+                <a-tooltip overlayClassName="myTooltip">
+                  <template slot="title">
+                    {{ record.name }}
+                  </template>
                   {{ record.name }}
-                </template>
-                {{ record.name }}
-              </a-tooltip>
+                </a-tooltip>
+              </div>
             </div>
           </div>
-        </div>
-        <div slot="action" slot-scope="text, record">
-          <template>
-            <div>
-              <a-button
-                class="successButton"
-                @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?id=${record.id}`)"
-              >
-                查看详情
-              </a-button>
-            </div>
-          </template>
-        </div>
-      </a-table>
+          <div slot="action" slot-scope="text, record">
+            <template>
+              <div>
+                <a-button
+                  class="successButton"
+                  @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?examId=${record.examId}&courseId=${$router.history.current.query.courseId}`)"
+                >
+                  查看详情
+                </a-button>
+              </div>
+            </template>
+          </div>
+        </a-table>
+      </a-spin>
     </div>
   </div>
 </template>
 
 <script>
 
+import router from '@/router'
+import { examCourseBindPageList } from '@/api/study/course'
+
 export default {
   data () {
     return {
-      imgUrl: '',
-      imgName: '',
-      uploadVisible: false,
-      fileName: String,
-      visible: false,
-      screenData: {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      },
+      loading: false,
+      screenData: {},
       columns: [
         {
           title: '考试名称',
           dataIndex: 'name',
           align: 'center',
-          width: '200px'
+          width: '200px',
+          scopedSlots: { customRender: 'name' }
         },
         {
           title: '试卷名称',
           width: '200px',
-          dataIndex: 'size',
+          dataIndex: 'questionnaireName',
           align: 'center'
         },
         {
           title: '考试类别',
-          dataIndex: 'createTime',
-          align: 'center'
+          dataIndex: 'bindType',
+          align: 'center',
+          customRender (value) {
+            switch (value) {
+              case 1:
+                return '章节考'
+              case 2:
+                return '总考'
+              default:
+                return '定向考'
+            }
+          }
         },
         {
           title: '答卷时长',
-          dataIndex: 'user',
-          align: 'center'
+          dataIndex: 'timeLimit',
+          align: 'center',
+          customRender (value) {
+            return value + '分钟'
+          }
         },
         {
           title: '试卷总分',
-          dataIndex: '1',
-          align: 'center'
+          dataIndex: 'questionnaireResults',
+          align: 'center',
+          customRender (value) {
+            return value && value[0] && value[0].score || 0
+          }
         },
         {
           title: '考试人数',
-          dataIndex: '5',
+          dataIndex: 'examCount',
           align: 'center',
           sorter: true
         },
         {
           title: '通过人数',
-          dataIndex: '6',
+          dataIndex: 'passExamCount',
           align: 'center',
           sorter: true
         },
         {
           title: '未通过人数',
-          dataIndex: '7',
+          dataIndex: 'noPassExamCount',
           align: 'center',
           sorter: true
         },
@@ -155,45 +169,25 @@ export default {
     this.getTableData()
   },
   methods: {
-    handleOk () {
-      console.log('ok')
-    },
-    deleteAttribute (id) {
-      console.log(id)
-    },
     getTableData () {
-      // const params = {
-      //   keyWords: this.screenData.keyWords,
-      //   remark: this.screenData.remark,
-      //   fieldId: this.screenData.fieldId,
-      //   fieldType: Number(this.fieldType),
-      //   fieldValue: this.fieldTypeText ? this.screenData.fieldValue : this.optionsSelect,
-      //   gender: this.screenData.gender,
-      //   addWay: this.screenData.addWay,
-      //   roomId: this.roomIdList.join(','),
-      //   groupNum: this.groupNum,
-      //   employeeId: this.employeeIdList,
-      //   startTime: this.screenData.startTime,
-      //   endTime: this.screenData.endTime,
-      //   businessNo: this.screenData.businessNo,
-      //   page: this.pagination.current,
-      //   perPage: this.pagination.pageSize
-      // }
-      // workContactList(params).then(res => {
-      //   this.roomIdList = []
-      //   this.employeeIdList = ''
-      //   this.employees = []
-      //   this.tableData = res.data.list
-      //   this.pagination.total = res.data.page.total
-      // })
-      this.tableData = [{
-        id: '123',
-        name: '需求文档.dox',
-        size: '856.6kb',
-        createTime: '2022-12-05',
-        user: 'me'
-      }]
-      this.pagination.total = 666
+      this.loading = true
+      const data = {
+        ...this.screenData,
+        courseId: router.history.current.query.courseId
+      }
+      examCourseBindPageList(data, {
+        limit: this.pagination.pageSize,
+        page: this.pagination.current,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
+      }).then(res => {
+        this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
+        this.pagination.total = res.count
+      }).finally(() => {
+        this.loading = false
+      })
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter
@@ -201,17 +195,9 @@ export default {
       this.pagination.pageSize = pageSize
       this.getTableData()
     },
-    selectChange (row) {
-      this.checkIds = row
-    },
-    // 群聊筛选
     // 重置
     reset () {
-      this.screenData = {
-        gender: 3,
-        addWay: '全部',
-        fieldId: 0
-      }
+      this.screenData = {}
     }
   }
 }
@@ -241,6 +227,21 @@ export default {
     .weixin {
       color: #86CE76
     }
+  }
+}
+
+.user-info {
+
+  img {
+    border-radius: 2px;
+  }
+
+  .nickname {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
   }
 }
 </style>

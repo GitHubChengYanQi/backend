@@ -8,11 +8,12 @@ export function courseTaskAdd (data) {
   })
 }
 
-export function courseTaskList (data) {
+export function courseTaskList (data, params) {
   return request({
     url: '/courseTask/list',
     method: 'post',
-    data
+    data,
+    params
   })
 }
 
@@ -24,10 +25,19 @@ export function examTaskAdd (data) {
   })
 }
 
-export function examTaskList (data) {
+export function examTaskDetail (data) {
+  return request({
+    url: '/examTask/detail',
+    method: 'post',
+    data
+  })
+}
+
+export function examTaskList (data, params) {
   return request({
     url: '/examTask/list',
     method: 'post',
-    data
+    data,
+    params
   })
 }
