@@ -24,8 +24,7 @@
 </template>
 <script>
 import storage from 'store'
-import { mediaGetToken } from '@/api/common'
-import axios from 'axios'
+import { mediaGetToken, ossUpload } from '@/api/common'
 export default {
   props: {
     buttonText: {
@@ -76,37 +75,47 @@ export default {
   },
   methods: {
     dealUploadMethod (info, fileInfo) {
-      // const tempInfo = { file: fileInfo.fi le }
-      // console.log(tempInfo, '上传oss')
       const tempFormData = new FormData()
       for (const i in info) {
         console.log(i, 'iii')
         tempFormData.append(i, info[i])
       }
       tempFormData.append('file', fileInfo.file)
-      const headerOptions = {
-        method: 'POST',
-        url: `${info.host}/`,
-        headers: {
-          Accept: 'application/json',
-          Authorization: storage.get('ACCESS_TOKEN')
-        },
-        data: tempFormData
-      }
-      axios(headerOptions).then(res => {
-        console.log(res, '上传文件')
+      ossUpload(tempFormData).then(res => {
         this.$emit('successUpload', this.oss)
       })
+      // const headerOptions = {
+      //   method: 'POST',
+      //   url: `${info.host}/`,
+      //   headers: {
+      //     Accept: 'application/json',
+      //     Authorization: storage.get('ACCESS_TOKEN')
+      //   },
+      //   data: tempFormData
+      // }
+      // axios(headerOptions).then(res => {
+      //   console.log(res, '上传文件')
+      //   this.$emit('successUpload', this.oss)
+      // })
     },
     async handleChange (info) {
       // console.log(info, '选择视频完成')
-      await mediaGetToken({ type: info.file.name }).then(res => {
-        // console.log(res, '获取ossToken')
-        this.oss = { ...res.data, key: res.data.key }
-        this.dealUploadMethod(this.oss, info)
-      }).catch(() => {
-        this.$message.error('获取ossToken失败')
-      })
+      const fileSize = info.file.size / 1024 / 1024
+      if (fileSize > this.fileMaxSize) {
+        this.$message.error('上传文件大小大于200M')
+        return false
+      } else if (fileSize <= 10) {
+        this.$emit('successUpload', info.file)
+        return false
+      } else {
+        await mediaGetToken({ type: info.file.name }).then(res => {
+          // console.log(res, '获取ossToken')
+          this.oss = { ...res.data, key: res.data.key }
+          this.dealUploadMethod(this.oss, info)
+        }).catch(() => {
+          this.$message.error('获取ossToken失败')
+        })
+      }
     },
     beforeUpload (file) {
       return false
