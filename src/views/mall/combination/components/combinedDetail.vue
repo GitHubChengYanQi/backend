@@ -22,7 +22,7 @@
           />
         </a-form-model-item>
         <a-form-model-item label="选择分类" prop="symptomDiseaseClassifyId">
-          <disease-select placeholder="请选择疾病分类" v-model="form.symptomDiseaseClassifyId" @change="onChange" />
+          <disease-cascader placeholder="请选择疾病分类" @change="onChange" v-model="form.symptomDiseaseClassifyId" />
         </a-form-model-item>
 
         <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
@@ -33,11 +33,13 @@
           <a-button @click="addDrug" type="primary">添加辅助用药</a-button>
         </a-form-model-item>
 
-        <a-form-model-item class="drugItem" label="主药">
+        <a-form-model-item class="drugItem">
+          <template slot="label"><span class="formTitle"></span>主药</template>
           <selectDrug :data="form.mainDrug" :drug="drugList"></selectDrug>
         </a-form-model-item>
 
-        <a-form-model-item class="drugItem" v-for="(item,index) in form.adjuvants" :key="index" :label="`辅助用药${numMap[index+1]}`">
+        <a-form-model-item class="drugItem" v-for="(item,index) in form.adjuvants" :key="index">
+          <template slot="label"><span class="formTitle"></span>{{ `辅助用药${numMap[index+1]}` }}</template>
           <a-button class="del" type="danger" @click="delFn(index)">删除</a-button>
           <selectDrug :data="item.drugs" :drug="drugList"></selectDrug>
         </a-form-model-item>
@@ -57,13 +59,13 @@
 
 <script>
 import { combinDetail, searchSalesGuidance, getCommonNameList, combinUpdate, combinAdd } from '@/api/mall'
-import diseaseSelect from './diseaseSelect'
+import diseaseCascader from './diseaseCascader'
 import selectDrug from './selectDrug.vue'
 import { deepClonev2 } from '@/utils/util'
 export default {
   components: {
     selectDrug,
-    diseaseSelect
+    diseaseCascader
   },
   data () {
     return {
@@ -82,6 +84,9 @@ export default {
       rules: {
         name: [
           { required: true, message: '请填写联合用药名称', trigger: 'blur' }
+        ],
+        symptomDiseaseClassifyId: [
+          { required: true, message: '请选择疾病分类', trigger: 'select' }
         ]
       },
       numMap: {
@@ -165,12 +170,20 @@ export default {
       }
     },
     delFn (index) {
-      const len = this.form.adjuvants.length
-      if (len === 1) {
-        this.$message.error('至少保留一条数据！')
-      } else {
-        this.form.adjuvants.splice(index, 1)
-      }
+      this.$confirm({
+        title: '确定删除?',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          const len = this.form.adjuvants.length
+          if (len === 1) {
+            this.$message.error('至少保留一条数据！')
+          } else {
+            this.form.adjuvants.splice(index, 1)
+          }
+        }
+      })
     },
     /**
      * 重新计算序号
@@ -304,5 +317,14 @@ export default {
       background:#f9f9f9;
       padding: 10px 0 0 10px;
     }
+  }
+  .formTitle::before{
+    display: inline-block;
+    margin-right: 4px;
+    color: #f5222d;
+    font-size: 14px;
+    font-family: SimSun, sans-serif;
+    line-height: 1;
+    content: '*';
   }
 </style>

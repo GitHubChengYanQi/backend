@@ -41,7 +41,10 @@ export function setBreadcrumb (path, data) {
     2: {
       path: [
         '/clientFollow/labelInfo',
-        '/clientFollow/addRule'],
+        '/clientFollow/addRule',
+        '/clientFollow/labelExpendInfo',
+        '/clientFollow/addExpendRule'
+      ],
       returnPath: '/clientFollow/autoLabel'
     },
     3: {

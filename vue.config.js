@@ -130,8 +130,8 @@ const vueConfig = {
     },
     proxy: {
       '/api': {
-        target: 'https://apijavascrm.yifeijiankang.com/', // 测试
-        // target: 'https://devjavascrm.yifeijiankang.com/', // 开发
+        // target: 'https://apijavascrm.yifeijiankang.com/', // 测试
+        target: 'https://devjavascrm.yifeijiankang.com/', // 开发
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.253:6007/',
         // target: 'http://124.70.77.92:6007/',
@@ -143,6 +143,14 @@ const vueConfig = {
         changeOrigin: true,
         pathRewrite: {
           '^/api': '' // 需要rewrite的,
+        }
+      },
+      '/ossApi': {
+        target: 'https://yfscrm.oss-cn-beijing.aliyuncs.com/',
+        ws: false,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/ossApi': '' // 需要rewrite的,
         }
       }
     }

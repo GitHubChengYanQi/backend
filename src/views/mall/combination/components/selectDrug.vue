@@ -3,7 +3,7 @@
     <p>
       <a-button size="small" @click="handleAdd" icon="plus">添加</a-button>&nbsp;
       <a-select
-        v-show="show"
+        v-if="show"
         show-search
         placeholder="请选择药品"
         option-filter-prop="children"
@@ -17,7 +17,7 @@
       </a-select>
     </p>
     <p>
-      <a-tag closable v-for="(item, index) in list" :key="item.id" @close="handleDelete(index)">
+      <a-tag :closable="show ? false : true" v-for="(item, index) in list" :key="item.id" @close="handleDelete(index)">
         {{ item.name }}
       </a-tag>
     </p>
