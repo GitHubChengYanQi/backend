@@ -1,17 +1,29 @@
 <template>
-    <div>
-      <a-select style="width:240px" show-search @change="(e)=>{handleChange(1, e)}" :filter-option="filterOption" placeholder="请选择" v-model="val1">
-        <a-select-option v-for="(item, index) in dataList" :value="index" :key="index">
-          {{ item.name }}
-        </a-select-option>
-      </a-select>
-      -
-      <a-select style="width:240px" show-search @change="(e)=>{handleChange(2, e)}" :filter-option="filterOption" placeholder="请选择" v-model="val2">
-        <a-select-option v-for="(item, index) in dataList2" :value="index" :key="index">
-          {{ item.name }}
-        </a-select-option>
-      </a-select>
-    </div>
+  <div>
+    <a-select
+      style="width:240px"
+      show-search
+      @change="(e)=>{handleChange(1, e)}"
+      :filter-option="filterOption"
+      placeholder="请选择"
+      v-model="val1">
+      <a-select-option v-for="(item, index) in dataList" :value="index" :key="index">
+        {{ item.name }}
+      </a-select-option>
+    </a-select>
+    -
+    <a-select
+      style="width:240px"
+      show-search
+      @change="(e)=>{handleChange(2, e)}"
+      :filter-option="filterOption"
+      placeholder="请选择"
+      v-model="val2">
+      <a-select-option v-for="(item, index) in dataList2" :value="index" :key="index">
+        {{ item.name }}
+      </a-select-option>
+    </a-select>
+  </div>
 </template>
 <script>
 import { treeList } from '@/api/mall'
@@ -23,7 +35,7 @@ export default {
     },
     value: {
       type: Number,
-      default: ''
+      default: 0
     }
   },
   data () {
@@ -49,9 +61,9 @@ export default {
     /**
      * 切换回调
      * @param {*} type 1=1级 2=2级
-     * @param {*} e 
+     * @param {*} e
      */
-    handleChange(type, e) {
+    handleChange (type, e) {
       if (type === 1) {
         this.val1 = e
         this.val2 = undefined
@@ -65,13 +77,13 @@ export default {
     },
     /**
      * 搜索
-     * @param {*} input 
-     * @param {*} option 
+     * @param {*} input
+     * @param {*} option
      */
-    filterOption(input, option) {
+    filterOption (input, option) {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      );
+      )
     },
     /**
      * 拉取字典

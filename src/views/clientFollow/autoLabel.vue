@@ -268,7 +268,6 @@ import {
   timeAutoLabelDelete,
   timeAutoLabelStatusChange
 } from '@/api/clientFollow.js'
-import store from '@/store'
 
 export default {
   components: { 'label-select': LabelSelect, 'svg-icon': SvgIcon },
