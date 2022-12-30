@@ -1,4 +1,4 @@
-import request, {ossRequest} from '@/utils/request'
+import request, { ossRequest } from '@/utils/request'
 
 /**
  * 字典
