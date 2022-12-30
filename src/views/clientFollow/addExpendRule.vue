@@ -24,7 +24,7 @@
           <!-- 选择标签 -->
           <div class="item">
             <div class="label"><span>*</span> 选择标签： </div>
-            111111
+            <LabelSelect v-model="form.label" @input="inputFn" style="width:400px" />
           </div>
           <!-- end 选择标签 -->
 
@@ -56,13 +56,15 @@
               <span class="necessary">*</span> 消费属性：
               <a-tooltip placement="right">
                 <template slot="title">
-                  <span>且：多个条件需要被同时满足才会被打上标签，<br />
-                    或：多个条件只要满足其中一个条件会被打上标签。</span>
+                  <span>
+                    1.购买次数按下单次数计算<br />
+                    2.选择多个商品时，按同一类商品，计算购买次数、商品金额、商品数量和购买时间。
+                  </span>
                 </template>
                 <a-icon type="question-circle" />
               </a-tooltip>
             </div>
-            <a-radio-group v-model="goodShow" @change="onChange">
+            <a-radio-group v-model="goodShow" @change="onGoodChange">
               <a-radio :value="1">
                 不限商品
               </a-radio>
@@ -70,7 +72,7 @@
                 选择商品
               </a-radio>
             </a-radio-group>
-            <div v-if="ruleShow">
+            <div v-if="goodShow === 2">
               11111111
             </div>
           </div>
@@ -93,55 +95,33 @@
         >保存并创建跟客任务</a-button>
       </div>
     </a-card>
-    <!-- 选择标签 -->
-    <label-select
-      :state="labelShow"
-      :addState="true"
-      ref="labelSelect"
-    />
   </div>
 </template>
 
 <script>
-import LabelSelect from './components/LabelSelect'
-import SvgIcon from './components/SvgIcon.vue'
-import { getDict, ossUpload } from '@/api/common.js'
+import LabelSelect from '../../components/SelectLabel/select.vue'
+// import LabelSelect from './components/LabelSelect'
+import { getDict } from '@/api/common.js'
 
 export default {
-  components: { 'svg-icon': SvgIcon, 'label-select': LabelSelect },
+  components: { LabelSelect },
   data () {
     return {
       id: '',
-      labelShow: true,
+      labelShow: false,
       ruleShow: true,
       goodShow: 1, // 1=不限商品 2=选择商品
       form: {
-        name: ''
+        name: '',
+        label: []
       }
     }
   },
   watch: {},
   created () {
     this.id = this.$route.query.id
-    this.test()
   },
   methods: {
-    /**
-     * 上传测试
-     */
-    test () {
-      const data = {
-        OSSAccessKeyId: 'LTAIAX24MUz7rbXu',
-        policy: 'eyJleHBpcmF0aW9uIjoiMjAyMi0xMi0yOVQwODozMjowNS4yMTRaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsMTA0ODU3NjAwMF0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCJ1cGxvYWQvMTY3MjMwMjY5NTIxNDIxMzg4MC5tcDQiXV19',
-        Signature: 'qAMm18Ez4f/wOpz3lHUt5PNrJWs=',
-        key: 'upload/1672302695214213880.mp4',
-        host: 'https://yfscrm.oss-cn-beijing.aliyuncs.com',
-        expire: 1672302725
-      }
-      ossUpload(data).then(res => {
-        console.log(111, res)
-      })
-    },
     /**
      * 返回列表，判断是否有操作
      */
@@ -188,7 +168,6 @@ export default {
         dictType: e
       }
       getDict(obj).then((res) => {
-        console.log(res)
         this[key] = res.data.map((item) => {
           item.label = item.name
           item.value = item.code
@@ -207,19 +186,17 @@ export default {
       this.ruleShow = e.target.checked
     },
     /**
-     * 标签选择回调
+     * 开启商品选择
      */
-    transmitLabel (e) {
-      console.log(1111, e)
+    onGoodChange (e) {
+      console.log(111111, e.target.value)
+      this.goodShow = e.target.value
     },
     /**
-     * 标签关闭回调
-     * @param {*} e
+     * 标签选择回调
      */
-    showBox (e) {
-      if (e === -1) {
-        this.labelShow = false
-      }
+    inputFn (e) {
+      console.log(11111111, e)
     }
   }
 }
@@ -256,6 +233,7 @@ export default {
       .item{
         margin-bottom:20px;
         .label{
+          margin-bottom:10px;
           span{
             color:#ff0000;
           }
