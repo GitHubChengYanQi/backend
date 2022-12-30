@@ -28,7 +28,7 @@ const fileRequest = axios.create({
 const ossRequest = axios.create({
   // API 请求的默认前缀
   baseURL: process.env.VUE_APP_API_UPLOAD_URL,
-  timeout: 30000 // 请求超时时间
+  timeout: 300000 // 请求超时时间
 })
 
 // 异常拦截处理器

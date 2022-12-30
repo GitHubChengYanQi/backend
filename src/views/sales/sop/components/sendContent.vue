@@ -461,7 +461,7 @@ export default {
       } else {
         const videoInfo = {
           type: 3,
-          videoUrl: `${file.host}/${file.key}`
+          videoUrl: `${file.host}/${file.key}?Expires=${file.expire}&OSSAccessKeyId=${file.OSSAccessKeyId}&Signature=${file.Signature}`
         }
         if (this.submitType === 'add') {
           this.sendContentArray.push(videoInfo)
