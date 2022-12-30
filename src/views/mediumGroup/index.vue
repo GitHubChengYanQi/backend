@@ -2226,6 +2226,7 @@ export default {
         margin-right: 0px;
         padding: 0px;
         background-color: white;
+        border: 0;
         color: #1c1c1c;
         .anticon-upload {
           font-size: 14px;

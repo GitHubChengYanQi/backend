@@ -507,7 +507,7 @@
 
 <script>
 import QuillEditor from './components/QuillEditor'
-import { upLoad } from '@/api/common'
+import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
 import { materialLibraryList } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
@@ -517,6 +517,7 @@ export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
   data () {
     return {
+      oss: {},
       preview: false,
       isShow: false,
       setData: {
@@ -1052,18 +1053,51 @@ export default {
       if (e && e.target && e.target.files.length !== 0) {
         const file = e.target.files[0]
         if (file.size > 10 * 1000 * 1000) {
-          return this.$message.warn('请上传小于10MB的视频文件')
+          // return this.$message.warn('请上传小于10MB的视频文件')
+          await mediaGetToken({ type: file.name }).then(res => {
+            // console.log(res, '获取ossToken')
+            this.oss = { ...res.data, key: res.data.key }
+            this.dealUploadMethod(this.oss, file)
+          }).catch(() => {
+            this.$message.error('获取ossToken失败')
+          })
+        } else {
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('time', 1)
+          console.log(formData, 'formData')
+          const res = await upLoad(formData)
+          console.log(res)
+          this.uploadUrl = res.data.fullPath
         }
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        const res = await upLoad(formData)
-        console.log(res)
-        this.uploadUrl = res.data.fullPath
       } else {
         console.log(e)
       }
+    },
+    dealUploadMethod (info, fileInfo) {
+      // this.$emit('update:isLoadingStatus', true)
+      const tempFormData = new FormData()
+      for (const i in info) {
+        console.log(i, 'iii')
+        tempFormData.append(i, info[i])
+      }
+      tempFormData.append('file', fileInfo)
+      ossUpload(tempFormData).then(res => {
+        this.uploadUrl = `${info.host}/${info.key}`
+      })
+      // const headerOptions = {
+      //   method: 'POST',
+      //   url: `${info.host}/`,
+      //   headers: {
+      //     Accept: 'application/json',
+      //     Authorization: storage.get('ACCESS_TOKEN')
+      //   },
+      //   data: tempFormData
+      // }
+      // axios(headerOptions).then(res => {
+      //   console.log(res, '上传文件')
+      //   this.$emit('successUpload', this.oss)
+      // })
     },
     getRadio (key, row) {
       console.log(key, row)

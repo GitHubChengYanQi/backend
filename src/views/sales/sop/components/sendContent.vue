@@ -21,7 +21,7 @@
                   :fileMaxSize="200"
                   :isLoadingStatus.sync="isLoadingStatus"
                   @successUpload="successUpload">
-                  <div>{{ `+${item.name}` }}</div>
+                  <div>{{ `+ ${item.name}` }}</div>
                 </ImgUpload>
               </div>
               <div v-else>
@@ -317,7 +317,7 @@ import ImgUpload from './ImgUpload/index.vue'
 import { handleBtnArr, isUrl } from '../sopUtils'
 // import { deepClonev2 } from '@/utils/util'
 // import { userSopTaskItemSettingReq } from '@/api/salesManagement'
-import { upLoad } from '@/api/common'
+import { upLoad, companyWxUpload } from '@/api/common'
 import RadarChoose from '../../../clientFollow/components/radarToastComponent.vue'
 export default {
   name: 'SendContent',
@@ -459,18 +459,28 @@ export default {
           // this.$refs.uploadVideoRef.value = ''
         })
       } else {
+        this.$emit('update:isLoadingStatus', true)
         const videoInfo = {
           type: 3,
           videoUrl: `${file.host}/${file.key}?Expire=${file.expire}&OSSAccessKeyId=${file.OSSAccessKeyId}&Signature=${file.Signature}`
         }
-        if (this.submitType === 'add') {
-          this.sendContentArray.push(videoInfo)
-        } else {
-          this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+        const tempUploadInfo = {
+          scene: 1,
+          type: 'video',
+          url: videoInfo.videoUrl,
+          filename: file.key
         }
-        this.isSopEditStatus = true
-        this.$emit('update:isSopEdit', this.isSopEditStatus)
-        this.$emit('update:contentArray', this.sendContentArray)
+        await companyWxUpload(tempUploadInfo).then(res=> {
+          this.$emit('update:isLoadingStatus', false)
+          if (this.submitType === 'add') {
+            this.sendContentArray.push(videoInfo)
+          } else {
+            this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          }
+            this.isSopEditStatus = true
+            this.$emit('update:isSopEdit', this.isSopEditStatus)
+            this.$emit('update:contentArray', this.sendContentArray)
+          })
       }
     },
     // 选择互动雷达回调
@@ -1065,20 +1075,32 @@ export default {
           .handleBtn {
             margin-left: 5px;
             border-radius: 3px;
-            padding: 5px 15px;
             border: 1px solid #a9a9a9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0.5;
             cursor: pointer;
+            div {
+              padding: 0px 10px;
+            }
             color: rgb(28, 28, 28);
             .uploadMediaDiv {
+              padding: 0;
               /deep/.img-avatar-uploader {
-                .ant-upload {
+                // padding: 5px 0px;
+                > .ant-upload {
+                  padding: 4px 0px;
                   width: auto;
                   height: auto;
                   margin-bottom: 0px;
                   margin-right: 0px;
-                  padding: 0px;
                   background-color: white;
                   color: #1c1c1c;
+                  border: 0;
+                  span.ant-upload {
+                    padding: 0;
+                  }
                 }
               }
             }
