@@ -268,8 +268,6 @@ import {
   timeAutoLabelDelete,
   timeAutoLabelStatusChange
 } from '@/api/clientFollow.js'
-import store from '@/store'
-
 export default {
   components: { 'label-select': LabelSelect, 'svg-icon': SvgIcon },
   data () {
@@ -665,7 +663,7 @@ export default {
         if (this.table == 3) {
           this.$router.push(`${'/clientFollow/addRule'}?id=${this.table}&label=${record.id}`)
           localStorage.setItem('autoLabel', JSON.stringify(record))
-        } 
+        }
         if (this.table == 4) {
           this.$router.push(`${'/clientFollow/addExpendRule'}?id=${this.table}&label=${record.id}`)
           localStorage.setItem('autoLabel', JSON.stringify(record))

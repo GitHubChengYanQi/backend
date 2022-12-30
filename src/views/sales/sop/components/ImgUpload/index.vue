@@ -7,19 +7,7 @@
     :before-upload="beforeUpload"
     @change="handleChange"
   >
-    <div>
-      {{ buttonText }}
-      <!-- <div v-if="value && !loading" class="img-wrapper">
-        <img v-if="fileType === 1" class="img" :src="value" alt="avatar" />
-        <div v-if="fileType === 3">
-          <video :src="value" style="width: 200px" controls></video>
-          <a-button type="link">重新上传</a-button>
-        </div>
-      </div>
-      <div v-else>
-        <a-icon :type="loading ? 'loading' : 'plus'" />
-      </div> -->
-    </div>
+    <slot></slot>
   </a-upload>
 </template>
 <script>
@@ -39,9 +27,11 @@ export default {
       type: String,
       default: ''
     },
-    fileType: {
-      type: Number || Array,
-      default: 1
+    acceptFileList: {
+      type: Array,
+      default: () => {
+        return []
+      }
     },
     btnType: {
       type: Boolean,
@@ -121,6 +111,13 @@ export default {
       }
     },
     beforeUpload (file) {
+      const tempFileType = file.type.split('/')[0]
+      if (this.acceptFileList.length !== 0) {
+        // 文件限制格式列表长度不为0
+        if (this.acceptFileList.indexOf(tempFileType) === -1) {
+          this.$message.error(`上传文件格式只能为${this.acceptFileList.join(',')}`)
+        }
+      }
       return false
     },
     // 获取文件后缀

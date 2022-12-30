@@ -19,10 +19,10 @@
                 <ImgUpload
                   @loadingMethod="loadingMethod"
                   :fileMaxSize="200"
-                  :fileType="3"
-                  :buttonText="`+${item.name}`"
                   :isLoadingStatus.sync="isLoadingStatus"
-                  @successUpload="successUpload"/>
+                  @successUpload="successUpload">
+                  <div>{{ `+${item.name}` }}</div>
+                </ImgUpload>
               </div>
               <div v-else>
                 + {{ item.name }}

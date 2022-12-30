@@ -31,11 +31,11 @@
           <!-- 设置打标签规则 -->
           <div class="item">
             <div class="label">
-              <span class="necessary">*</span> 设置打标签规则： 
+              <span class="necessary">*</span> 设置打标签规则：
               <a-tooltip placement="right">
                 <template slot="title">
                   <span>且：多个条件需要被同时满足才会被打上标签，<br />
-                  或：多个条件只要满足其中一个条件会被打上标签。</span>
+                    或：多个条件只要满足其中一个条件会被打上标签。</span>
                 </template>
                 <a-icon type="question-circle" />
               </a-tooltip>
@@ -53,11 +53,11 @@
           <!-- 消费属性 -->
           <div class="item">
             <div class="label">
-              <span class="necessary">*</span> 消费属性： 
+              <span class="necessary">*</span> 消费属性：
               <a-tooltip placement="right">
                 <template slot="title">
                   <span>且：多个条件需要被同时满足才会被打上标签，<br />
-                  或：多个条件只要满足其中一个条件会被打上标签。</span>
+                    或：多个条件只要满足其中一个条件会被打上标签。</span>
                 </template>
                 <a-icon type="question-circle" />
               </a-tooltip>
@@ -106,7 +106,6 @@
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
 import { getDict, ossUpload } from '@/api/common.js'
-
 
 export default {
   components: { 'svg-icon': SvgIcon, 'label-select': LabelSelect },
@@ -168,7 +167,7 @@ export default {
     },
     /**
      * 设置且或
-     * @param {*} e 
+     * @param {*} e
      */
     setRelation (e) {
       this.relationState = e
@@ -181,8 +180,8 @@ export default {
     },
     /**
      * 拉取字典
-     * @param {*} e 
-     * @param {*} key 
+     * @param {*} e
+     * @param {*} key
      */
     getSelectData (e, key) {
       const obj = {
@@ -202,7 +201,7 @@ export default {
     },
     /**
      * 开启客户属性规则
-     * @param {*} e 
+     * @param {*} e
      */
     onChange (e) {
       this.ruleShow = e.target.checked
@@ -215,7 +214,7 @@ export default {
     },
     /**
      * 标签关闭回调
-     * @param {*} e 
+     * @param {*} e
      */
     showBox (e) {
       if (e === -1) {

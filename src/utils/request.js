@@ -31,7 +31,6 @@ const ossRequest = axios.create({
   timeout: 30000 // 请求超时时间
 })
 
-
 // 异常拦截处理器
 const errorHandler = (error) => {
   if (error.response) {
@@ -167,7 +166,6 @@ fileRequest.interceptors.response.use((response) => {
   // window.URL.revokeObjectURL(blobURL)
   // message.success('导出成功~')
 }, errorHandler)
-
 
 ossRequest.interceptors.request.use(requestInterceptor, errorHandler)
 ossRequest.interceptors.response.use((response) => {

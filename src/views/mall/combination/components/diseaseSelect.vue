@@ -55,7 +55,7 @@ export default {
       if (type === 1) {
         this.val1 = e
         this.val2 = undefined
-        this.dataList2 = this.dataList[e]?.children || []
+        this.dataList2 = this.dataList[e] ?.children || []
         this.$emit('change', this.dataList[e].id)
       }
       if (type === 2) {
