@@ -1,10 +1,12 @@
 <template>
   <div>
-    <!-- :action="action" :headers="headers" method="post" -->
     <a-upload-dragger
       name="file"
       :multiple="false"
+      :action="action"
+      :headers="headers"
       :default-file-list="defaultFileList"
+      method="post"
       @change="handleChange"
       @preview="handlePreview"
     >
@@ -24,7 +26,7 @@
 <script>
 /* eslint-disable */
 import storage from 'store'
-import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
+
 function getBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

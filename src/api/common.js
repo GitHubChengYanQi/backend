@@ -81,7 +81,7 @@ export function ossUpload (data) {
 // 企微异步上传素材库(大文件)
 export function companyWxUpload (data) {
   return request({
-    url: '/sopActivity/uploadBigFileByUrl',
+    url: '/bigFileUploadLog/uploadBigFileByUrl',
     method: 'post',
     data
   })
