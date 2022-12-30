@@ -13,8 +13,21 @@
                 'handleBtn disabled' :
                 'handleBtn'"
               :key="index"
-              @click="chooseSendType(item.type)"
-            >+ {{ item.name }}</div>
+              @click="chooseSendType(item.type)">
+              <div v-if="item.type === 'video'" class="uploadMediaDiv">
+                <!-- v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!' }], initialValue: '' }]" -->
+                <ImgUpload
+                  @loadingMethod="loadingMethod"
+                  :fileMaxSize="200"
+                  :fileType="3"
+                  :buttonText="`+${item.name}`"
+                  :isLoadingStatus.sync="isLoadingStatus"
+                  @successUpload="successUpload"/>
+              </div>
+              <div v-else>
+                + {{ item.name }}
+              </div>
+            </div>
             <div
               class="disabledBox"
               v-if="isDisableEdit === true"
@@ -299,6 +312,7 @@
   </div>
 </template>
 <script>
+import ImgUpload from './ImgUpload/index.vue'
 // transformTaskItemEntry, transformTaskDate,
 import { handleBtnArr, isUrl } from '../sopUtils'
 // import { deepClonev2 } from '@/utils/util'
@@ -309,6 +323,7 @@ export default {
   name: 'SendContent',
   data () {
     return {
+      oss: {},
       contentRadarObj: {}, // 互动雷达对象
       contentRadarModalShow: false, // 修改互动雷达弹框
       radarVisible: false, // 互动雷达弹框
@@ -338,10 +353,15 @@ export default {
     }
   },
   components: {
+    ImgUpload,
     RadarChoose,
     'MediumGroup': () => import('@/views/mediumGroup/index.vue')
   },
   props: {
+    isLoadingStatus: {
+      type: Boolean,
+      default: false
+    },
     isDisableEdit: {
       type: Boolean,
       default: false
@@ -410,6 +430,49 @@ export default {
     }
   },
   methods: {
+    loadingMethod (e) {
+      this.$emit('update:isLoadingStatus', e)
+    },
+    async successUpload (file) {
+      console.log(file, 'successUpload上传成功的返回')
+      if (file.size) {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('time', 1)
+        console.log(formData, 'formData')
+        // const res = await upLoad(formData)
+        this.$emit('update:isLoadingStatus', true)
+        await upLoad(formData).then(res => {
+          this.$emit('update:isLoadingStatus', false)
+          const videoInfo = {
+            type: 3,
+            videoUrl: res.data.fullPath
+          }
+          if (this.submitType === 'add') {
+            this.sendContentArray.push(videoInfo)
+          } else {
+            this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          }
+          this.isSopEditStatus = true
+          this.$emit('update:isSopEdit', this.isSopEditStatus)
+          this.$emit('update:contentArray', this.sendContentArray)
+          // this.$refs.uploadVideoRef.value = ''
+        })
+      } else {
+        const videoInfo = {
+          type: 3,
+          videoUrl: `${file.host}/${file.key}`
+        }
+        if (this.submitType === 'add') {
+          this.sendContentArray.push(videoInfo)
+        } else {
+          this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+        }
+        this.isSopEditStatus = true
+        this.$emit('update:isSopEdit', this.isSopEditStatus)
+        this.$emit('update:contentArray', this.sendContentArray)
+      }
+    },
     // 选择互动雷达回调
     handleAddRadarOk (e) {
       console.log(e, '选择互动雷达回调')
@@ -476,7 +539,7 @@ export default {
           this.chooseImage()
           break
         case 'video':
-          this.chooseVideo()
+          // this.chooseVideo()
           break
         case 'link':
           this.contentLinkModalShow = true
@@ -856,25 +919,28 @@ export default {
         const file = e.target.files[0]
         if (file.size > 10 * 1000 * 1000) {
           return this.$message.warn('请上传小于10MB的视频文件')
-        }
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        const res = await upLoad(formData)
-        const videoInfo = {
-          type: 3,
-          videoUrl: res.data.fullPath
-        }
-        if (this.submitType === 'add') {
-          this.sendContentArray.push(videoInfo)
         } else {
-          this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('time', 1)
+          console.log(formData, 'formData')
+          // const res = await upLoad(formData)
+          await upLoad(formData).then(res => {
+            const videoInfo = {
+              type: 3,
+              videoUrl: res.data.fullPath
+            }
+            if (this.submitType === 'add') {
+              this.sendContentArray.push(videoInfo)
+            } else {
+              this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+            }
+            this.isSopEditStatus = true
+            this.$emit('update:isSopEdit', this.isSopEditStatus)
+            this.$emit('update:contentArray', this.sendContentArray)
+            this.$refs.uploadVideoRef.value = ''
+          })
         }
-        this.isSopEditStatus = true
-        this.$emit('update:isSopEdit', this.isSopEditStatus)
-        this.$emit('update:contentArray', this.sendContentArray)
-        this.$refs.uploadVideoRef.value = ''
       } else {
         console.log(e)
       }
@@ -1003,6 +1069,19 @@ export default {
             border: 1px solid #a9a9a9;
             cursor: pointer;
             color: rgb(28, 28, 28);
+            .uploadMediaDiv {
+              /deep/.img-avatar-uploader {
+                .ant-upload {
+                  width: auto;
+                  height: auto;
+                  margin-bottom: 0px;
+                  margin-right: 0px;
+                  padding: 0px;
+                  background-color: white;
+                  color: #1c1c1c;
+                }
+              }
+            }
           }
           .handleBtn:first-child {
             margin-left: 0;
