@@ -6,7 +6,7 @@
         <LessonAnalysis :task="task" />
       </a-tab-pane>
       <a-tab-pane key="2" tab="课件分析">
-        <CoursewareAnalysis />
+        <CoursewareAnalysis :task="task" />
       </a-tab-pane>
       <a-tab-pane key="3" tab="考试分析">
         <ExaminationAnalysis />

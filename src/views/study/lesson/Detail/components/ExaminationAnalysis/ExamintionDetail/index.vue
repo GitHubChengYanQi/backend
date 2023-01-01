@@ -28,7 +28,7 @@
       <div class="box">
         <a-icon type="form" class="icon" />
         <div>
-          <div class="num">{{ 0 }}</div>
+          <div class="num">{{ inExamCount }}</div>
           考试中人数
         </div>
       </div>
@@ -128,7 +128,7 @@
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd/index'
 import router from '@/router'
-import { courseExamBindExamBindPageList } from '@/api/study/course'
+import { courseExamBindExamBindPageList, examTaskBindList } from '@/api/study/course'
 import moment from 'moment'
 
 export default {
@@ -142,6 +142,7 @@ export default {
       passExamCount: 0,
       noPassExamCount: 0,
       passingRate: 0,
+      inExamCount: 0,
       loading: false,
       screenData: {},
       columns: [
@@ -173,10 +174,10 @@ export default {
         },
         {
           title: '考试状态',
-          dataIndex: '2',
+          dataIndex: '4',
           align: 'center',
           customRender (value, record) {
-            return record.doneAt ? '是' : '否'
+            return record.examCount > 0 ? '是' : '否'
           }
         },
         {
@@ -185,7 +186,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
-            return record.doneAt ? value : '-'
+            return record.examCount > 0 ? value : '-'
           }
         },
         {
@@ -193,7 +194,7 @@ export default {
           dataIndex: 'status',
           align: 'center',
           customRender (value, record) {
-            return record.doneAt ? (value === 1 ? '通过' : '未通过') : '-'
+            return record.examCount > 0 ? (value === 1 ? '通过' : '未通过') : '-'
           }
         },
         {
@@ -201,7 +202,7 @@ export default {
           dataIndex: 'examCount',
           align: 'center',
           customRender (value, record) {
-            return record.doneAt ? value : '-'
+            return record.examCount > 0 ? value : '-'
           }
         },
         {
@@ -210,7 +211,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
-            return record.doneAt ? value : '-'
+            return record.examCount > 0 ? value : '-'
           }
         },
         {
@@ -219,7 +220,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
-            return (record.doneAt && value) ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '-'
+            return (record.examCount > 0 && value) ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '-'
           }
         }
       ],
@@ -240,29 +241,39 @@ export default {
     this.passExamCount = router.history.current.query.passExamCount || 0
     this.noPassExamCount = router.history.current.query.noPassExamCount || 0
     this.passingRate = Math.round((this.passExamCount / this.examCount) * 100) || 0
+    this.inExamCount = router.history.current.query.inExamCount || 0
     this.getTableData()
   },
   methods: {
-    getTableData () {
+    async getTableData () {
       this.loading = true
       const data = {
-        ...this.screenData,
-        courseId: router.history.current.query.courseId,
-        examId: router.history.current.query.examId
+        ...this.screenData
       }
-      courseExamBindExamBindPageList(data, {
+      const params = {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
           field: this.sorter.field,
           order: this.sorter.order
         }
-      }).then(res => {
-        this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
-        this.pagination.total = res.count
-      }).finally(() => {
-        this.loading = false
-      })
+      }
+      let res = {}
+      if (this.task) {
+        res = await examTaskBindList({
+          ...data,
+          examTaskId: router.history.current.query.id
+        }, params)
+      } else {
+        res = await courseExamBindExamBindPageList({
+          ...data,
+          courseId: router.history.current.query.courseId,
+          examId: router.history.current.query.examId
+        }, params)
+      }
+      this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
+      this.pagination.total = res.count
+      this.loading = false
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter

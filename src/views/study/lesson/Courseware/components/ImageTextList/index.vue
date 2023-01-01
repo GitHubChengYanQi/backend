@@ -240,7 +240,7 @@ export default {
         cancelText: '取消',
         centered: true,
         onOk () {
-          courseWareDelete({ courseWareId: id }).then(() => {
+          return courseWareDelete({ courseWareId: id }).then(() => {
             message.success('删除成功！')
             thisData.getTableData()
           })

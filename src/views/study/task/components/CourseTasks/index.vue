@@ -10,7 +10,14 @@
 
         <a-form-item
           label="课程分类">
-          <a-input v-model="screenData.remark	" placeholder="请选择课程分类"></a-input>
+          <a-cascader
+            change-on-select
+            v-if="!classTreeLoading"
+            v-model="screenData.courseClassId"
+            :options="classTree"
+            placeholder="请选择课程分类"
+          />
+          <a-spin v-else />
         </a-form-item>
 
         <a-form-item
@@ -20,14 +27,16 @@
 
         <a-form-item
           label="创建人">
-          <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
+          <div style="width: 200px">
+            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
+          </div>
         </a-form-item>
 
         <a-form-item
           label="关联考试">
           <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender1"
+            :options="[{value:'all',label:'全部'},{value:'true',label:'是'},{value:'false',label:'否'}]"
+            v-model="screenData.haveExam"
             style="width: 200px"
             placeholder="请选择关联考试"
           ></a-select>
@@ -58,7 +67,7 @@
           :scroll="{ x: 'max-content'}"
           :columns="columns"
           :data-source="tableData"
-          :rowKey="record => record.key"
+          :rowKey="record => record.courseTaskId"
           :pagination="pagination"
           @change="handleTableChange">
           <div slot="name" slot-scope="text, record">
@@ -114,11 +123,11 @@
               <div class="my-space">
                 <a-button
                   class="warnButton"
-                  @click="() => $router.push(`/study/lesson/detail?courseId=${record.courseId}&type=task`)"
+                  @click="() => $router.push(`/study/lesson/detail?courseTaskId=${record.courseTaskId}&courseId=${record.courseId}&type=task`)"
                 >
                   详情
                 </a-button>
-                <a-button class="delButton" @click="deleteAttribute(record.id)">删除</a-button>
+                <a-button class="delButton" @click="deleteAttribute(record.courseTaskId)">删除</a-button>
               </div>
             </template>
           </div>
@@ -131,11 +140,14 @@
 <script>
 
 import SelectCourse from './components/SelectCourse'
-import { courseTaskList } from '@/api/study/task'
+import { courseTaskDelete, courseTaskList } from '@/api/study/task'
 import moment from 'moment'
+import { message } from 'ant-design-vue'
+import { courseClassTreeView } from '@/api/study/lessonClass'
+import SelectEmployee from '../../../components/SelectEmployee/index'
 
 export default {
-  components: { SelectCourse },
+  components: { SelectCourse, SelectEmployee },
   data () {
     return {
       loading: false,
@@ -145,6 +157,8 @@ export default {
       fileName: String,
       visible: false,
       screenData: {},
+      classTreeLoading: false,
+      classTree: [],
       columns: [
         {
           title: '课程名称',
@@ -269,8 +283,36 @@ export default {
   },
   created () {
     this.getTableData()
+    this.getTreeData()
   },
   methods: {
+    getTreeData () {
+      this.classTreeLoading = true
+      courseClassTreeView().then((res) => {
+        this.classTree = res.data
+      }).finally(() => {
+        this.classTreeLoading = false
+      })
+    },
+    deleteAttribute (id) {
+      const thisData = this
+      this.$confirm({
+        title: '删除数据后不可恢复，是否确认删除?',
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
+        centered: true,
+        onOk () {
+          return courseTaskDelete({ courseTaskId: id }).then(() => {
+            message.success('删除成功！')
+            thisData.getTableData()
+          })
+        },
+        onCancel () {
+
+        }
+      })
+    },
     success () {
       this.sorter = {}
       this.pagination.current = 1
@@ -278,7 +320,14 @@ export default {
     },
     getTableData () {
       this.loading = true
-      const data = {}
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
+        courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
+      }
       courseTaskList(data, {
         limit: this.pagination.pageSize,
         page: this.pagination.current,

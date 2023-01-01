@@ -61,9 +61,27 @@ export function courseExamBindExamBindPageList (data, params) {
   })
 }
 
+export function examTaskBindList (data, params) {
+  return request({
+    url: '/examTaskBind/list',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function courseWareBindList (data, params) {
   return request({
     url: '/courseWareBind/list',
+    method: 'post',
+    data,
+    params
+  })
+}
+
+export function courseTaskBindDetailList (data, params) {
+  return request({
+    url: '/courseTaskBindDetail/list',
     method: 'post',
     data,
     params

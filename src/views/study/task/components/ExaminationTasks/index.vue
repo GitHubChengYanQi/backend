@@ -15,14 +15,16 @@
 
         <a-form-item
           label="创建人">
-          <a-input v-model="screenData.user" style="width: 200px" placeholder="请输入创建人名称" :maxLength="10"></a-input>
+          <div style="width: 200px">
+            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
+          </div>
         </a-form-item>
 
         <a-form-item
           label="考试类别">
           <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender1"
+            :options="[{value:'all',label:'全部'},{value:0,label:'定向考'},{value:1,label:'章节考'},{value:2,label:'总考'}]"
+            v-model="screenData.bindType"
             style="width: 200px"
             placeholder="请选择关联考试"
           ></a-select>
@@ -49,6 +51,7 @@
       </div>
       <a-spin :spinning="loading">
         <a-table
+          :scroll="{ x: 'max-content'}"
           class="my-table"
           :columns="columns"
           :data-source="tableData"
@@ -86,15 +89,33 @@
               </a-tooltip>
             </div>
           </div>
+          <div slot="tag" slot-scope="text,row">
+            <template>
+              <a-popover title="试用员工" v-if="row.applicableObject === 2">
+                <template slot="content">
+                  <div class="myLabelBox">
+                    <a-tag v-for="(item, index) in row.bindEmpList" :key="index">{{ item.name }}</a-tag>
+                  </div>
+                </template>
+                <a-tag type="button">
+                  查看
+                </a-tag>
+              </a-popover>
+              <a-tag type="button" v-else>
+                全部员工
+              </a-tag>
+            </template>
+          </div>
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
                 <a-button
                   class="warnButton"
-                  @click="() => $router.push(`/study/examination/detail?id=${record.examTaskId}&examId=${record.examId}&type=task`)">
+                  @click="() => $router.push(`/study/examination/detail?id=${record.examTaskId}&examId=${record.examId}&type=task&examCount=${record.examCount || 0}&passExamCount=${record.passExamCount || 0}&noPassExamCount=${record.noPassExamCount || 0}&inExamCount=${record.inExamCount || 0}`)"
+                >
                   详情
                 </a-button>
-                <a-button class="delButton" @click="deleteAttribute(record.id)">删除</a-button>
+                <a-button class="delButton" @click="deleteAttribute(record.examTaskId)">删除</a-button>
               </div>
             </template>
           </div>
@@ -107,16 +128,20 @@
 <script>
 
 import SelectExamination from './components/SelectExamination'
-import { examTaskList } from '@/api/study/task'
+import { examTaskDelete, examTaskList } from '@/api/study/task'
+import moment from 'moment'
+import { message } from 'ant-design-vue'
+import SelectEmployee from '../../../components/SelectEmployee/index'
 
 export default {
-  components: { SelectExamination },
+  components: { SelectExamination, SelectEmployee },
   data () {
     return {
       loading: false,
       screenData: {},
       columns: [
         {
+          fixed: 'left',
           title: '考试名称',
           dataIndex: 'name',
           scopedSlots: { customRender: 'name' },
@@ -130,8 +155,11 @@ export default {
         },
         {
           title: '答卷时长',
-          dataIndex: 'class',
-          align: 'center'
+          dataIndex: 'examResult',
+          align: 'center',
+          customRender (value) {
+            return ((value && value.timeLimit) || 0) + '分钟'
+          }
         },
         {
           title: '考核员工',
@@ -141,56 +169,65 @@ export default {
         },
         {
           title: '考试类别',
-          dataIndex: 'ta1g',
-          scopedSlots: { customRender: 'tag' },
-          align: 'center'
+          dataIndex: 'bindType',
+          align: 'center',
+          customRender (value, record) {
+            switch (record.examResult && record.examResult.bindType) {
+              case 1:
+                return '章节考'
+              case 2:
+                return '总考'
+              default:
+                return '定向考'
+            }
+          }
         },
         {
           title: '考核总人数',
-          dataIndex: 'total',
+          dataIndex: 'examCount',
           align: 'center',
           sorter: true
         },
         {
           title: '未通过人数',
-          dataIndex: '1',
+          dataIndex: 'noPassExamCount',
           align: 'center',
           sorter: true
         },
         {
           title: '通过人数',
-          dataIndex: '2',
+          dataIndex: 'passExamCount',
           align: 'center',
           sorter: true
         },
         {
           title: '通过率',
-          dataIndex: '3',
+          dataIndex: 'rate',
           align: 'center',
-          sorter: true
-        },
-        {
-          title: '参与人数',
-          dataIndex: '4',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '参与率',
-          dataIndex: '5',
-          align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value) {
+            return (value || 0) + '%'
+          }
         },
         {
           title: '创建人',
-          align: 'center'
+          align: 'center',
+          dataIndex: 'employeeEntity',
+          customRender: (value) => {
+            return value ? value.name : '-'
+          }
         },
         {
           title: '创建时间',
           align: 'center',
-          sorter: true
+          dataIndex: 'createdAt',
+          sorter: true,
+          customRender: (text) => {
+            return (text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '-')
+          }
         },
         {
+          fixed: 'right',
           title: '操作',
           width: 200,
           align: 'center',
@@ -216,7 +253,6 @@ export default {
   },
   methods: {
     deleteAttribute (id) {
-      console.log(id)
       const thisData = this
       this.$confirm({
         title: '删除数据后不可恢复，是否确认删除?',
@@ -225,7 +261,10 @@ export default {
         cancelText: '取消',
         centered: true,
         onOk () {
-
+          return examTaskDelete({ examTaskId: id }).then(() => {
+            message.success('删除成功！')
+            thisData.getTableData()
+          })
         },
         onCancel () {
 
@@ -237,7 +276,13 @@ export default {
     },
     getTableData () {
       this.loading = true
-      const data = {}
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
+        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType
+      }
       examTaskList(data, {
         limit: this.pagination.pageSize,
         page: this.pagination.current,

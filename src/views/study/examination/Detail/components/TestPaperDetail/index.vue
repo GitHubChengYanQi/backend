@@ -28,7 +28,7 @@
                 <div v-if="task">
                   限定时长：
                   {{
-                    detail.haveTimeLimit === 2 ? '不限制时长' : (moment(detail.startTime).format('YYYY-MM-DD HH:mm:ss') + '-' + (moment(detail.endTime).format('YYYY-MM-DD HH:mm:ss')))
+                    detail.haveTimeLimit === 1 ? '不限制时长' : (moment(detail.startTime).format('YYYY-MM-DD') + ' - ' + (moment(detail.endTime).format('YYYY-MM-DD')))
                   }}
                 </div>
                 <div>试卷名称：{{ detail.questionnaireResult && detail.questionnaireResult.questionnaireName }}</div>

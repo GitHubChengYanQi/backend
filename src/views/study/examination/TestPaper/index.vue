@@ -259,7 +259,7 @@ export default {
           cancelText: '取消',
           centered: true,
           onOk () {
-            learningQuestionnaireDelete({ questionnaireId: id }).then(() => {
+            return learningQuestionnaireDelete({ questionnaireId: id }).then(() => {
               message.success('删除成功！')
               getTableData()
             })

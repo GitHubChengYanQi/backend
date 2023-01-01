@@ -91,10 +91,13 @@
 <script>
 
 import router from '@/router'
-import { courseWareBindList } from '@/api/study/course'
+import { courseTaskBindDetailList, courseWareBindList } from '@/api/study/course'
 import { getTimeDifference } from '@/utils/util'
 
 export default {
+  props: {
+    task: Boolean
+  },
   data () {
     return {
       loading: false,
@@ -121,7 +124,7 @@ export default {
           dataIndex: 'createTime',
           align: 'center',
           customRender (value, record) {
-            return (record.hour < 10 ? '0' + record.hour : record.hour) + ':' + (record.minute < 10 ? '0' + record.minute : record.minute) + ':' + (record.second < 10 ? '0' + record.second : record.second)
+            return (record.hour < 10 ? '0' + record.hour || 0 : record.hour || 0) + ':' + (record.minute < 10 ? '0' + record.minute || 0 : record.minute || 0) + ':' + (record.second < 10 ? '0' + record.second || 0 : record.second || 0)
           }
         },
         {
@@ -148,7 +151,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value) {
-            return getTimeDifference(value)
+            return value ? getTimeDifference(value) : '-'
           }
         },
         {
@@ -195,25 +198,29 @@ export default {
     this.getTableData()
   },
   methods: {
-    getTableData () {
+    async getTableData () {
       this.loading = true
       const data = {
         ...this.screenData,
         courseId: router.history.current.query.courseId
       }
-      courseWareBindList(data, {
+      const params = {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
           field: this.sorter.field,
           order: this.sorter.order
         }
-      }).then(res => {
-        this.tableData = res.data
-        this.pagination.total = res.count
-      }).finally(() => {
-        this.loading = false
-      })
+      }
+      let res = {}
+      if (this.task) {
+        res = await courseTaskBindDetailList(data, params)
+      } else {
+        res = await courseWareBindList(data, params)
+      }
+      this.tableData = res.data
+      this.pagination.total = res.count
+      this.loading = false
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter

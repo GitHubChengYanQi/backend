@@ -255,7 +255,7 @@ export default {
           cancelText: '取消',
           centered: true,
           onOk () {
-            examDelete({ examId: id }).then(() => {
+            return examDelete({ examId: id }).then(() => {
               message.success('删除成功！')
               getTableData()
             })
