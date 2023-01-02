@@ -209,7 +209,6 @@ export default {
   methods: {
     async excel () {
       this.excelLoading = true
-      const time = this.screenData.time || []
       const data = {
         ...this.screenData,
         haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,

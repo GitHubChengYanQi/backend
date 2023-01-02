@@ -6,7 +6,7 @@
           <div class="headImg" style="min-height: 190px">
             <img
               height="190"
-              :src="detail.coverImageUrl"
+              :src="detail.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_190,w_270'"
             >
           </div>
           <div class="column">
