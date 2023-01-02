@@ -120,8 +120,8 @@ export default {
     }
   },
   created () {
-    if (router.history.current.query.id && !this.preview) {
-      this.getDetail(router.history.current.query.id)
+    if (!this.preview) {
+      this.getDetail()
     }
     if (this.preview) {
       this.detail.questionResults = this.questionResults
@@ -148,16 +148,16 @@ export default {
           return '仅允许未通过的重复考试'
       }
     },
-    async getDetail (id) {
+    async getDetail () {
       this.detailLoading = true
       let detail = {}
       if (this.task) {
-        const res = await examTaskDetail({ examTaskId: id })
+        const res = await examTaskDetail({ examTaskId: router.history.current.query.id })
         if (res.data) {
           detail = { ...res.data.examResult, ...res.data }
         }
       } else {
-        const res = await examDetail({ examId: id })
+        const res = await examDetail({ examId: router.history.current.query.examId })
         if (res.data) {
           detail = res.data || {}
         }

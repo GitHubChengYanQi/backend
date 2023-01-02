@@ -77,7 +77,7 @@
               <div class="my-space">
                 <a-button
                   class="warnButton"
-                  @click="() => $router.push(`/study/examination/detail?id=${record.examId}`)"
+                  @click="() => $router.push(`/study/examination/detail?examId=${record.examId}`)"
                 >
                   详情
                 </a-button>
@@ -150,7 +150,7 @@ export default {
           title: '重复考试',
           dataIndex: 'reexam',
           align: 'center',
-          customRender (value, record) {
+          customRender (value) {
             switch (value) {
               case 1:
                 return '允许重复考试'

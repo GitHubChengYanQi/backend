@@ -196,10 +196,13 @@ export default {
           this.loading = true
           const data = {
             ...values,
-            wareBindParams: values.wareBindParams.map((item, index) => ({ ...item, sort: index })),
-            courseClassId: values.courseClassId[values.courseClassId.length - 1],
+            wareBindParams: values.wareBindParams ? values.wareBindParams.map((item, index) => ({
+              ...item,
+              sort: index
+            })) : [],
+            courseClassId: values.courseClassId ? values.courseClassId[values.courseClassId.length - 1] : null,
             questionnaireIds: [values.questionnaireId],
-            examIds: [values.exam.examId],
+            examIds: values.exam ? [values.exam.examId] : [],
             applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
             empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject
           }

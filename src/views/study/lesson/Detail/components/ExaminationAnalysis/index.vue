@@ -9,8 +9,8 @@
         <a-form-item
           label="考试类别：">
           <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender1"
+            :options="[{value:'all',label:'全部'},{value:0,label:'定向考'},{value:1,label:'章节考'},{value:2,label:'总考'}]"
+            v-model="screenData.bindType"
             style="width: 200px"
             placeholder="请选择考试类别"
           ></a-select>
@@ -173,6 +173,7 @@ export default {
       this.loading = true
       const data = {
         ...this.screenData,
+        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType,
         courseId: router.history.current.query.courseId
       }
       examCourseBindPageList(data, {

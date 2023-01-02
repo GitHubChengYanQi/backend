@@ -24,6 +24,14 @@ export function courseWarEdit (data) {
   })
 }
 
+export function courseWareCheckBind (data) {
+  return request({
+    url: '/courseWare/checkBind',
+    method: 'post',
+    data
+  })
+}
+
 export function courseWareList (data, params) {
   return request({
     url: '/courseWare/list',

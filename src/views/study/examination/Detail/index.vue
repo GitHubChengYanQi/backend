@@ -7,7 +7,7 @@
           <TestPaperDetail :task="task" />
         </a-tab-pane>
         <a-tab-pane key="2" tab="考试分析">
-          <ExamintionDetail task />
+          <ExamintionDetail :task="task" />
         </a-tab-pane>
       </a-tabs>
     </div>

@@ -78,7 +78,7 @@
         <a-form-item
           label="所属机构：">
           <div style="width: 200px">
-            <SelectDepartment :treeCheckStrictly="true" v-model="screenData.storeIds" />
+            <SelectDepartment :treeCheckStrictly="true" v-model="screenData.deptIds" />
           </div>
         </a-form-item>
 
@@ -254,18 +254,18 @@ export default {
         },
         {
           title: '总考状态',
-          dataIndex: '9',
+          dataIndex: 'haveCourseExam',
           align: 'center',
-          customRender (value, record) {
-            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          customRender (value) {
+            return value !== 0 ? '是' : '否'
           }
         },
         {
           title: '考试结果',
-          dataIndex: '10',
+          dataIndex: 'courseExamStatus',
           align: 'center',
-          customRender (value, record) {
-            return record.learningStatusResult && record.learningStatusResult.a || '-'
+          customRender (value) {
+            return value !== 0 ? '通过' : '未通过'
           }
         }
       ],
@@ -321,7 +321,9 @@ export default {
       this.loading = true
       const data = {
         ...this.screenData,
-        courseId: router.history.current.query.courseId
+        courseId: router.history.current.query.courseId,
+        deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
+        storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
       const params = {
         limit: this.pagination.pageSize,

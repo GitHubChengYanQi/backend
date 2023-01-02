@@ -53,7 +53,7 @@
                 <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
               </div>
               <div class="nickname">
-               <a-tooltip overlayClassName="myTooltip">
+                <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ text }}
                   </template>
@@ -67,7 +67,7 @@
               <div class="my-space">
                 <a-button
                   class="successButton"
-                  @click="() => $router.push(`/study/lesson/createVideo?id=${record.courseWareId}`)"
+                  @click="() => edit(record.courseWareId)"
                 >
                   编辑
                 </a-button>
@@ -95,11 +95,12 @@
 
 <script>
 
-import { courseWareDelete, courseWareList } from '@/api/study/courseWare'
+import { courseWareCheckBind, courseWareDelete, courseWareList } from '@/api/study/courseWare'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
 import Preview from '../../../../components/Preview/index'
 import SelectEmployee from '../../../../components/SelectEmployee/index'
+import router from '@/router'
 
 export default {
   components: { Preview, SelectEmployee },
@@ -204,6 +205,11 @@ export default {
     this.getTableData()
   },
   methods: {
+    edit (id) {
+      courseWareCheckBind({ courseWareId: id, type: 'edit' }).then(() => {
+        router.push(`/study/lesson/createVideo?id=${id}`)
+      })
+    },
     openPreview (record) {
       this.preview = true
       this.previewTitle = record.title
@@ -220,21 +226,23 @@ export default {
     },
     deleteAttribute (id) {
       const thisData = this
-      this.$confirm({
-        title: '删除数据后不可恢复，是否确认删除?',
-        okText: '删除',
-        okType: 'danger',
-        cancelText: '取消',
-        centered: true,
-        onOk () {
-          return courseWareDelete({ courseWareId: id }).then(() => {
-            message.success('删除成功！')
-            this.getTableData()
-          })
-        },
-        onCancel () {
+      courseWareCheckBind({ courseWareId: id, type: 'delete' }).then(() => {
+        this.$confirm({
+          title: '删除数据后不可恢复，是否确认删除?',
+          okText: '删除',
+          okType: 'danger',
+          cancelText: '取消',
+          centered: true,
+          onOk () {
+            return courseWareDelete({ courseWareId: id }).then(() => {
+              message.success('删除成功！')
+              thisData.getTableData()
+            })
+          },
+          onCancel () {
 
-        }
+          }
+        })
       })
     },
     getTableData () {

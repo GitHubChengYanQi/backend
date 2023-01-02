@@ -117,23 +117,28 @@
           </div>
           <div slot="tag" slot-scope="text,row">
             <template>
-              <a-popover title="添加的标签" v-if="row.tag && row.tag.length > 0">
+              <a-popover title="试用员工" v-if="row.applicableObject === 2">
                 <template slot="content">
-                  <div class="labelBox">
-                    <a-tag v-for="(item, index) in row.tag" :key="index">{{ item }}</a-tag>
+                  <div class="myLabelBox">
+                    <a-tag v-for="(item, index) in row.bindEmpList" :key="index">{{ item.name }}</a-tag>
                   </div>
                 </template>
                 <a-tag type="button">
                   查看
                 </a-tag>
               </a-popover>
-              <span class="nolabel" style="align-items:center;" v-else>无标签</span>
+              <a-tag type="button" v-else>
+                全部员工
+              </a-tag>
             </template>
           </div>
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
-                <a-button class="warnButton" @click="() => $router.push(`/study/lesson/detail?courseId=${record.courseId}`)">
+                <a-button
+                  class="warnButton"
+                  @click="() => $router.push(`/study/lesson/detail?courseId=${record.courseId}`)"
+                >
                   详情
                 </a-button>
                 <a-button
@@ -241,25 +246,29 @@ export default {
         },
         {
           title: '试用总人数',
-          dataIndex: 'total',
+          dataIndex: 'allCount',
           align: 'center',
           sorter: true
         },
         {
           title: '完成人数',
-          dataIndex: 'employeeName',
+          dataIndex: 'doneNumber',
           align: 'center',
           sorter: true
         },
         {
           title: '参与人数',
-          dataIndex: 'createTime',
+          dataIndex: 'participantsNumber',
           align: 'center',
           sorter: true
         },
         {
           title: '课件数',
-          align: 'center'
+          dataIndex: 'courseWareBindResults',
+          align: 'center',
+          customRender (value) {
+            return value && value.length
+          }
         },
         {
           title: '关联考试',

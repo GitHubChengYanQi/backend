@@ -9,8 +9,8 @@
         <a-form-item
           label="关联考试：">
           <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender1"
+            :options="[{value:'all',label:'全部'},{value:'true',label:'是'},{value:'false',label:'否'}]"
+            v-model="screenData.haveExam"
             style="width: 200px"
             placeholder="请选择考试状态"
           ></a-select>
@@ -159,7 +159,7 @@ export default {
           dataIndex: 'examId',
           align: 'center',
           customRender (value) {
-            return value !== 0 ? '是' : '否'
+            return value ? '是' : '否'
           }
         },
         {
@@ -202,6 +202,7 @@ export default {
       this.loading = true
       const data = {
         ...this.screenData,
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
         courseId: router.history.current.query.courseId
       }
       const params = {

@@ -46,24 +46,28 @@
 
         <a-form-item
           label="员工姓名：">
-          <a-input v-model="screenData.name" placeholder="请输入员工姓名" :maxLength="20"></a-input>
+          <SelectEmployee v-model="screenData.employeeId" placeholder="请选择员工" />
         </a-form-item>
 
         <a-form-item
           label="所属机构：">
-          <a-input v-model="screenData.name" placeholder="请选择所属机构" :maxLength="20"></a-input>
+          <div style="width: 200px">
+            <SelectDepartment :treeCheckStrictly="true" v-model="screenData.deptIds" />
+          </div>
         </a-form-item>
 
         <a-form-item
           label="所属门店：">
-          <a-input v-model="screenData.name" placeholder="请选择所属门店" :maxLength="20"></a-input>
+          <div style="width: 200px">
+            <SelectDepartment :treeCheckStrictly="true" v-model="screenData.storeIds" />
+          </div>
         </a-form-item>
 
         <a-form-item
           label="考试状态：">
           <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
-            v-model="screenData.gender1"
+            :options="[{value:'all',label:'全部'},{value:1,label:'是'},{value:2,label:'否'}]"
+            v-model="screenData.examStatus"
             style="width: 200px"
             placeholder="请选择考试状态"
           ></a-select>
@@ -72,8 +76,8 @@
         <a-form-item
           label="考试结果：">
           <a-select
-            :options="[{value:0,label:'全部'},{value:1,label:'通过'},{value:2,label:'未通过'},{value:3,label:'未考试'}]"
-            v-model="screenData.gender1"
+            :options="[{value:'all',label:'全部'},{value:1,label:'通过'},{value:2,label:'未通过'},{value:3,label:'未考试'}]"
+            v-model="screenData.examIsPass"
             style="width: 200px"
             placeholder="请选择考试结果"
           ></a-select>
@@ -130,12 +134,13 @@ import breadcrumb from '../../../../../components/Breadcrumd/index'
 import router from '@/router'
 import { courseExamBindExamBindPageList, examTaskBindList } from '@/api/study/course'
 import moment from 'moment'
+import SelectEmployee from '../../../../../components/SelectEmployee/index'
 
 export default {
   props: {
     task: Boolean
   },
-  components: { breadcrumb },
+  components: { breadcrumb, SelectEmployee },
   data () {
     return {
       examCount: 0,
@@ -248,7 +253,11 @@ export default {
     async getTableData () {
       this.loading = true
       const data = {
-        ...this.screenData
+        ...this.screenData,
+        examStatus: this.screenData.examStatus === 'all' ? null : this.screenData.examStatus,
+        examIsPass: this.screenData.examIsPass === 'all' ? null : this.screenData.examIsPass,
+        deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
+        storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
       const params = {
         limit: this.pagination.pageSize,
@@ -259,18 +268,18 @@ export default {
         }
       }
       let res = {}
-      if (this.task) {
-        res = await examTaskBindList({
-          ...data,
-          examTaskId: router.history.current.query.id
-        }, params)
-      } else {
-        res = await courseExamBindExamBindPageList({
-          ...data,
-          courseId: router.history.current.query.courseId,
-          examId: router.history.current.query.examId
-        }, params)
-      }
+      // if (this.task) {
+      //   res = await examTaskBindList({
+      //     ...data,
+      //     examTaskId: router.history.current.query.id
+      //   }, params)
+      // } else {
+      res = await courseExamBindExamBindPageList({
+        ...data,
+        courseId: router.history.current.query.courseId,
+        examId: router.history.current.query.examId
+      }, params)
+      // }
       this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
       this.pagination.total = res.count
       this.loading = false

@@ -67,7 +67,7 @@
                 <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />
               </div>
               <div class="nickname">
-               <a-tooltip overlayClassName="myTooltip">
+                <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ text }}
                   </template>
@@ -117,7 +117,13 @@
 
 import upload from '../upload'
 import { message } from 'ant-design-vue'
-import { courseWareAdd, courseWareDelete, courseWarEdit, courseWareList } from '@/api/study/courseWare'
+import {
+  courseWareAdd,
+  courseWareCheckBind,
+  courseWareDelete,
+  courseWarEdit,
+  courseWareList
+} from '@/api/study/courseWare'
 import moment from 'moment'
 import FilePreview from '../../../../components/FilePreview/index'
 import SelectEmployee from '../../../../components/SelectEmployee/index'
@@ -287,21 +293,23 @@ export default {
     },
     deleteAttribute (id) {
       const thisData = this
-      this.$confirm({
-        title: '删除数据后不可恢复，是否确认删除?',
-        okText: '删除',
-        okType: 'danger',
-        cancelText: '取消',
-        centered: true,
-        onOk () {
-          return courseWareDelete({ courseWareId: id }).then(() => {
-            message.success('删除成功！')
-            thisData.getTableData()
-          })
-        },
-        onCancel () {
+      courseWareCheckBind({ courseWareId: id, type: 'delete' }).then(() => {
+        this.$confirm({
+          title: '删除数据后不可恢复，是否确认删除?',
+          okText: '删除',
+          okType: 'danger',
+          cancelText: '取消',
+          centered: true,
+          onOk () {
+            return courseWareDelete({ courseWareId: id }).then(() => {
+              message.success('删除成功！')
+              thisData.getTableData()
+            })
+          },
+          onCancel () {
 
-        }
+          }
+        })
       })
     },
     getTableData () {
