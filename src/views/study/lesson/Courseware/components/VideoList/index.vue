@@ -26,7 +26,7 @@
             >
               查询
             </a-button>
-            <a-button v-if="!select" type="primary" @click="reset">导出</a-button>
+            <a-button v-if="!select" type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -101,6 +101,8 @@ import { message } from 'ant-design-vue'
 import Preview from '../../../../components/Preview/index'
 import SelectEmployee from '../../../../components/SelectEmployee/index'
 import router from '@/router'
+import { courseExcelExport } from '@/api/study/course'
+import { excelExport } from '@/utils/downloadUtil'
 
 export default {
   components: { Preview, SelectEmployee },
@@ -116,6 +118,7 @@ export default {
   data () {
     return {
       content: '',
+      excelLoading: false,
       url: '',
       previewTitle: '',
       preview: false,
@@ -205,6 +208,26 @@ export default {
     this.getTableData()
   },
   methods: {
+    async excel () {
+      this.excelLoading = true
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
+        courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
+      }
+     courseExcelExport(data, {
+        limit: 6500,
+        page: 1
+      }).then((res) => {
+        excelExport(res, '客户列表数据导出.xlsx')
+        message.success('导出成功!')
+      }).finally(() => {
+        this.excelLoading = false
+      })
+    },
     edit (id) {
       courseWareCheckBind({ courseWareId: id, type: 'edit' }).then(() => {
         router.push(`/study/lesson/createVideo?id=${id}`)

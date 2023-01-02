@@ -25,7 +25,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -75,12 +75,16 @@
 <script>
 
 import router from '@/router'
-import { examCourseBindPageList } from '@/api/study/course'
+import { courseExcelExport, examCourseBindPageExcelExport, examCourseBindPageList } from '@/api/study/course'
+import moment from 'moment'
+import { excelExport } from '@/utils/downloadUtil'
+import { message } from 'ant-design-vue'
 
 export default {
   data () {
     return {
       loading: false,
+      excelLoading: false,
       screenData: {},
       columns: [
         {
@@ -169,6 +173,23 @@ export default {
     this.getTableData()
   },
   methods: {
+    async excel () {
+      this.excelLoading = true
+      const data = {
+        ...this.screenData,
+        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType,
+        courseId: router.history.current.query.courseId
+      }
+      examCourseBindPageExcelExport(data, {
+        limit: 6500,
+        page: 1
+      }).then((res) => {
+        excelExport(res, '考试分析数据导出.xlsx')
+        message.success('导出成功!')
+      }).finally(() => {
+        this.excelLoading = false
+      })
+    },
     getTableData () {
       this.loading = true
       const data = {

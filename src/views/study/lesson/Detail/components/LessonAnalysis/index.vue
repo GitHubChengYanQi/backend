@@ -129,7 +129,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -153,11 +153,18 @@
 <script>
 
 import moment from 'moment'
-import { courseDetail, courseEmployeeBindList, courseTaskBindList } from '@/api/study/course'
+import {
+  courseDetail,
+  courseEmployeeBindExcelExport,
+  courseEmployeeBindList, courseTaskBindExcelExport,
+  courseTaskBindList
+} from '@/api/study/course'
 import router from '@/router'
 import { getTimeDifference } from '@/utils/util'
 import { courseTaskDetail } from '@/api/study/task'
 import SelectEmployee from '../../../../components/SelectEmployee/index'
+import { excelExport } from '@/utils/downloadUtil'
+import { message } from 'ant-design-vue'
 
 export default {
   components: { SelectEmployee },
@@ -168,6 +175,7 @@ export default {
     return {
       moment,
       loading: false,
+      excelLoading: false,
       detail: {},
       detailLoading: false,
       screenData: {},
@@ -286,6 +294,36 @@ export default {
     this.getCourseDetail()
   },
   methods: {
+    async excel () {
+      this.excelLoading = true
+      const data = {
+        ...this.screenData,
+        courseId: router.history.current.query.courseId,
+        deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
+        storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
+      }
+      if (this.task) {
+        courseTaskBindExcelExport(data, {
+          limit: 6500,
+          page: 1
+        }).then((res) => {
+          excelExport(res, '课程分析数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      } else {
+        courseEmployeeBindExcelExport(data, {
+          limit: 6500,
+          page: 1
+        }).then((res) => {
+          excelExport(res, '课程分析数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      }
+    },
     async getCourseDetail () {
       this.detailLoading = true
       let detail = {}

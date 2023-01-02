@@ -40,7 +40,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -128,16 +128,18 @@
 <script>
 
 import SelectExamination from './components/SelectExamination'
-import { examTaskDelete, examTaskList } from '@/api/study/task'
+import { examTaskDelete, examTaskExcelExport, examTaskList } from '@/api/study/task'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
 import SelectEmployee from '../../../components/SelectEmployee/index'
+import { excelExport } from '@/utils/downloadUtil'
 
 export default {
   components: { SelectExamination, SelectEmployee },
   data () {
     return {
       loading: false,
+      excelLoading: false,
       screenData: {},
       columns: [
         {
@@ -252,6 +254,25 @@ export default {
     this.getTableData()
   },
   methods: {
+    async excel () {
+      this.excelLoading = true
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
+        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType
+      }
+      examTaskExcelExport(data, {
+        limit: 6500,
+        page: 1
+      }).then((res) => {
+        excelExport(res, '考试任务列表数据导出.xlsx')
+        message.success('导出成功!')
+      }).finally(() => {
+        this.excelLoading = false
+      })
+    },
     deleteAttribute (id) {
       const thisData = this
       this.$confirm({

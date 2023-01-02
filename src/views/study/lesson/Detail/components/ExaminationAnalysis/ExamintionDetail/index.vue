@@ -93,7 +93,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -132,9 +132,16 @@
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd/index'
 import router from '@/router'
-import { courseExamBindExamBindPageList, examTaskBindList } from '@/api/study/course'
+import {
+  courseExamBindExamBindPageExcelExport,
+  courseExamBindExamBindPageList,
+  courseExcelExport,
+  examTaskBindList
+} from '@/api/study/course'
 import moment from 'moment'
 import SelectEmployee from '../../../../../components/SelectEmployee/index'
+import { excelExport } from '@/utils/downloadUtil'
+import { message } from 'ant-design-vue'
 
 export default {
   props: {
@@ -150,6 +157,7 @@ export default {
       inExamCount: 0,
       loading: false,
       screenData: {},
+      excelLoading: false,
       columns: [
         {
           title: '姓名',
@@ -250,6 +258,27 @@ export default {
     this.getTableData()
   },
   methods: {
+    async excel () {
+      this.excelLoading = true
+      const data = {
+        ...this.screenData,
+        examStatus: this.screenData.examStatus === 'all' ? null : this.screenData.examStatus,
+        examIsPass: this.screenData.examIsPass === 'all' ? null : this.screenData.examIsPass,
+        deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
+        storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null,
+        courseId: router.history.current.query.courseId,
+        examId: router.history.current.query.examId
+      }
+      courseExamBindExamBindPageExcelExport(data, {
+        limit: 6500,
+        page: 1
+      }).then((res) => {
+        excelExport(res, '考试详情数据导出.xlsx')
+        message.success('导出成功!')
+      }).finally(() => {
+        this.excelLoading = false
+      })
+    },
     async getTableData () {
       this.loading = true
       const data = {

@@ -53,7 +53,7 @@
             >
               查询
             </a-button>
-            <a-button v-if="!select" type="primary" @click="reset">导出</a-button>
+            <a-button v-if="!select" type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -174,10 +174,11 @@ import TagName from '@/views/workContactNew/components/tagName'
 import breadcrumb from '../components/Breadcrumd/index'
 import SelectEmployee from '../components/SelectEmployee/index'
 import lessonClass from './components/LessonClass'
-import { courseDelete, courseList } from '@/api/study/course'
+import { courseDelete, courseExcelExport, courseList } from '@/api/study/course'
 import moment from 'moment'
 import { courseClassTreeView } from '@/api/study/lessonClass'
 import { message } from 'ant-design-vue'
+import { excelExport } from '@/utils/downloadUtil'
 
 export default {
   props: {
@@ -314,7 +315,8 @@ export default {
         showTotal: (total) => `共 ${total} 条数据`
       },
       classTreeLoading: false,
-      classTree: []
+      classTree: [],
+      excelLoading: false
     }
   },
   created () {
@@ -355,6 +357,26 @@ export default {
     }
   },
   methods: {
+    async excel () {
+      this.excelLoading = true
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
+        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
+        courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
+      }
+      courseExcelExport(data, {
+        limit: 6500,
+        page: 1
+      }).then((res) => {
+        excelExport(res, '课程列表数据导出.xlsx')
+        message.success('导出成功!')
+      }).finally(() => {
+        this.excelLoading = false
+      })
+    },
     onChangeRows (rows) {
       this.selectedRowKeys = rows.map(item => item[this.rowKey])
       this.checkedRows = rows

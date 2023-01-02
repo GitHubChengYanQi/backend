@@ -25,7 +25,7 @@
             >
               查询
             </a-button>
-            <a-button type="primary" @click="reset">导出</a-button>
+            <a-button type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -91,8 +91,16 @@
 <script>
 
 import router from '@/router'
-import { courseTaskBindDetailList, courseWareBindList } from '@/api/study/course'
+import {
+  courseExcelExport, courseTaskBindDetailExcelExport,
+  courseTaskBindDetailList,
+  courseWareBindExcelExport,
+  courseWareBindList
+} from '@/api/study/course'
 import { getTimeDifference } from '@/utils/util'
+import moment from 'moment'
+import { excelExport } from '@/utils/downloadUtil'
+import { message } from 'ant-design-vue'
 
 export default {
   props: {
@@ -184,6 +192,7 @@ export default {
       tableData: [],
       checkIds: [],
       sorter: {},
+      excelLoading: false,
       pagination: {
         total: 0,
         current: 1,
@@ -198,6 +207,36 @@ export default {
     this.getTableData()
   },
   methods: {
+    async excel () {
+      this.excelLoading = true
+      const time = this.screenData.time || []
+      const data = {
+        ...this.screenData,
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
+        courseId: router.history.current.query.courseId
+      }
+      if (this.task) {
+        courseTaskBindDetailExcelExport(data, {
+          limit: 6500,
+          page: 1
+        }).then((res) => {
+          excelExport(res, '课件分析数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      } else {
+        courseWareBindExcelExport(data, {
+          limit: 6500,
+          page: 1
+        }).then((res) => {
+          excelExport(res, '课件分析数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      }
+    },
     async getTableData () {
       this.loading = true
       const data = {

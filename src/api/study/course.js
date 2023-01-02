@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request, { fileRequest } from '@/utils/request'
 
 export function courseAdd (data) {
   return request({
@@ -25,9 +25,29 @@ export function courseList (data, params) {
   })
 }
 
+export function courseExcelExport (data, params) {
+  return fileRequest({
+    url: '/course/excelExport',
+    method: 'post',
+    responseType: 'blob',
+    data,
+    params
+  })
+}
+
 export function courseEmployeeBindList (data, params) {
   return request({
     url: '/courseEmployeeBind/list',
+    method: 'post',
+    data,
+    params
+  })
+}
+
+export function courseEmployeeBindExcelExport (data, params) {
+  return fileRequest({
+    url: '/courseEmployeeBind/excelExport',
+    responseType: 'blob',
     method: 'post',
     data,
     params
@@ -43,6 +63,16 @@ export function courseTaskBindList (data, params) {
   })
 }
 
+export function courseTaskBindExcelExport (data, params) {
+  return fileRequest({
+    url: '/courseTaskBind/excelExport',
+    responseType: 'blob',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function examCourseBindPageList (data, params) {
   return request({
     url: '/exam/courseBindPageList',
@@ -52,9 +82,29 @@ export function examCourseBindPageList (data, params) {
   })
 }
 
+export function examCourseBindPageExcelExport (data, params) {
+  return fileRequest({
+    url: '/exam/excelExport',
+    responseType: 'blob',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function courseExamBindExamBindPageList (data, params) {
   return request({
     url: '/courseExamBind/examBindPageList',
+    method: 'post',
+    data,
+    params
+  })
+}
+
+export function courseExamBindExamBindPageExcelExport (data, params) {
+  return fileRequest({
+    url: '/courseExamBind/excelExport',
+    responseType: 'blob',
     method: 'post',
     data,
     params
@@ -79,9 +129,29 @@ export function courseWareBindList (data, params) {
   })
 }
 
+export function courseWareBindExcelExport (data, params) {
+  return fileRequest({
+    url: '/courseWareBind/excelExport',
+    responseType: 'blob',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function courseTaskBindDetailList (data, params) {
   return request({
     url: '/courseTaskBindDetail/list',
+    method: 'post',
+    data,
+    params
+  })
+}
+
+export function courseTaskBindDetailExcelExport (data, params) {
+  return fileRequest({
+    url: '/courseTaskBindDetail/excelExport',
+    responseType: 'blob',
     method: 'post',
     data,
     params
