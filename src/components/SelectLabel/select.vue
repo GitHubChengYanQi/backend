@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="select" @click="openLabel">
-      <span>请选择</span>
-      <a-tag closable @close="handleDelete" v-for="(item, index) in data" :key="index">
+      <span v-if="data.length === 0">请选择</span>
+      <a-tag v-else closable @close="handleDelete" v-for="(item, index) in data" :key="index">
         {{ item.name }}
       </a-tag>
     </div>
@@ -42,7 +42,8 @@ export default {
   watch: {
     value: {
       handler (val, oldval) {
-        this.data = val.value
+        console.log(222222, val)
+        this.data = val
       },
       deep: true
     }
@@ -53,21 +54,19 @@ export default {
      */
     openLabel () {
       this.visible = true
-      console.log(11111111111, this.visible)
     },
     /**
      * 删除
      * @param {*} e
      */
     handleDelete (e) {
-      console.log(1111, e)
+      console.log('删除', e)
     },
     /**
      * 选择回调
      * @param {*} e
      */
     inputFn (e) {
-      console.log(333333333, e)
       this.visible = false
       this.$emit('input', e)
     }
@@ -81,7 +80,7 @@ export default {
   background-color: #fff;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
-  color: rgba(0, 0, 0, 0.65);
+  color: #333;
   font-size: 14px;
   padding: 6px 11px;
   line-height: 1.5;

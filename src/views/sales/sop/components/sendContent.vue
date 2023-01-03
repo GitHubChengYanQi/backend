@@ -473,6 +473,7 @@ export default {
           filename: file.key
         }
         await companyWxUpload(tempUploadInfo).then(res => {
+          this.$emit('update:isLoadingStatus', false)
           if (this.submitType === 'add') {
             this.sendContentArray.push(videoInfo)
           } else {

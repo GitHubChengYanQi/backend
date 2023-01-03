@@ -93,7 +93,7 @@
 
     <a-modal
       v-model="modalObj.visible"
-      :title="`${modalObj.id ? '修改' : '新增'}${modalObj.modalType === 'xyjl' ? '血压' : '血糖'}记录`"
+      :title="`${modalObj.id ? '修改' : '新增'}${typeMap[modalObj.modalType]}记录`"
       id="healthRecord-Component-editSpecialModal-Container"
       :confirm-loading="saveLoading"
       @ok="editSpecialModalOK"
@@ -143,6 +143,13 @@
             ></a-select>
             <span class="dot">.</span>
             <a-select
+              v-if="modalObj.modalType === 'xzjl'"
+              style="width: 45%"
+              v-model="item.dataName[1]"
+              :options="Array(100).fill(null).map((it, index) => ({ value: index < 10 ? '0' + index : index, label: index < 10 ? '0' + index : index }))"
+            ></a-select>
+            <a-select
+              v-else
               style="width: 45%"
               v-model="item.dataName[1]"
               :options="Array(10).fill(null).map((it, index) => ({ value: index, label: index }))"
@@ -180,12 +187,19 @@ const getSource = (t) => {
   if (t === '1') {
     return '企业微信'
   } else if (t === '2') {
-    return '公众号'
+    return '用户上传'
   } else if (t === '3') {
     return '设备'
   } else if (t === '4') {
     return '管理后台'
   } else return t
+}
+
+const typeMap = {
+  'xyjl': '血压',
+  'xtjl': '血糖',
+  'xzjl': '血脂',
+  'nsjl': '尿酸'
 }
 
 // const defaultItemObj = {
@@ -216,6 +230,7 @@ export default {
   },
   data () {
     return {
+      typeMap,
       saveLoading: false,
       isEdit: false,
       selectTag: '',
@@ -256,6 +271,13 @@ export default {
   beforeMount () { },
   mounted () { },
   methods: {
+    // /**
+    //  * 生成选项
+    //  */
+    // makeOption () {
+    //   console.log(11111)
+    //   Array(100).fill(null).map((it, index) => ({ value: index, label: index }))
+    // },
     async getTabs () {
       const { data } = await getTabsArrReq({})
       this.tags = data.records
@@ -280,6 +302,7 @@ export default {
 
         if (['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(this.selectTag)) {
           const d = data.data.list
+          console.log(1111111111111, data.data.list)
           const dataSource = []
           for (const item of d) {
             dataSource.push({
@@ -330,12 +353,14 @@ export default {
               title: '操作',
               dataIndex: 'id',
               align: 'center',
-              customRender: (id) => (
-                <div class="handlesBox">
-                  <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
-                  <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span>
-                </div>
-              )
+              customRender: (id, row) => {
+                if (row.source === '1' || row.source === '4') {
+                  return (<div class="handlesBox">
+                    <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
+                    <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span>
+                  </div>)
+                }
+              }
             })
           }
           this.pagination.total = data.data.totalNum

@@ -341,7 +341,7 @@ export default {
       }
       modifySalesGuidance(param).then(res => {
         if (res.code === 200) {
-          this.$message('保存成功')
+          this.$message.success('保存成功')
         }
       })
     }
