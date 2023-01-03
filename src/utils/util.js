@@ -10,6 +10,7 @@ export function isIE () {
   const ie11 = (() => 'ActiveXObject' in window)()
   return compare('MSIE') || ie11
 }
+
 export const createValidate = (callback, value, message) => {
   if (!value) {
     return callback(new Error(message))
@@ -167,4 +168,22 @@ export const toChinesNum = (num) => {
   let noWan = num % 10000
   if (noWan.toString().length < 4) noWan = '0' + noWan
   return overWan ? getWan(overWan) + '万' + getWan(noWan) : getWan(num)
+}
+
+/**
+ * 通过时间戳计算时分秒
+ */
+export const getTimeDifference = (timeDifference) => {
+  // 获取时间戳
+  var hour = 60 * 60 * 1000
+  // 一小时等于的毫秒数
+  var min = 60 * 1000
+  // 一秒等于的毫秒数
+  var h = parseInt(timeDifference / hour)
+  // 获取小时部分
+  var m = parseInt(timeDifference % hour / min)
+  // 获取分钟部分
+  var s = parseInt(timeDifference % min / 1000)
+  // 获取秒数
+  return `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`
 }
