@@ -94,7 +94,7 @@
 
 <script>
 import breadcrumb from '../../components/Breadcrumd'
-import VueQuillEditor from '@/components/VueQuillEditor'
+import VueQuillEditor from '../../components/VueQuillEditor'
 import ImgUpload from '../../components/ImgUpload/index'
 import Employee from '../../components/Employee/index'
 import SelectTestPager from './components/SelectTestPager'

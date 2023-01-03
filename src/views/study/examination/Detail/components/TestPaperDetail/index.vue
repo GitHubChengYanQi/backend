@@ -16,7 +16,8 @@
               <div>
                 <div>创建人：{{ detail.employeeEntity && detail.employeeEntity.name }}</div>
                 <div>
-                  试卷分数：{{
+                  试卷分数：
+                  {{
                     detail.questionnaireResults && detail.questionnaireResults[0] && detail.questionnaireResults[0].score
                   }}
                 </div>

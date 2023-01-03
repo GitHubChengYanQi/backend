@@ -66,7 +66,7 @@
 
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd'
-import VueQuillEditor from '@/components/VueQuillEditor'
+import VueQuillEditor from '../../../../../components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
 import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
 import router from '@/router'
