@@ -302,6 +302,7 @@ export default {
 
         if (['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(this.selectTag)) {
           const d = data.data.list
+          console.log(1111111111111, data.data.list)
           const dataSource = []
           for (const item of d) {
             dataSource.push({
@@ -348,32 +349,19 @@ export default {
             align: 'center'
           })
           if (!this.isComponent) {
-            if (d[0].source === '2' || d[0].source === '3') {
-              console.log('公众号信息不让编辑')
-              cloumns.push({
-                title: '操作',
-                dataIndex: 'id',
-                align: 'center',
-                customRender: () => (
-                  <div class="handlesBox">
-                    {/* <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
-                    <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span> */}
-                  </div>
-                )
-              })
-            } else {
-              cloumns.push({
-                title: '操作',
-                dataIndex: 'id',
-                align: 'center',
-                customRender: (id) => (
-                  <div class="handlesBox">
+            cloumns.push({
+              title: '操作',
+              dataIndex: 'id',
+              align: 'center',
+              customRender: (id, row) => {
+                if (row.source === '1' || row.source === '4') {
+                  return (<div class="handlesBox">
                     <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
                     <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span>
-                  </div>
-                )
-              })
-            }
+                  </div>)
+                }
+              }
+            })
           }
           this.pagination.total = data.data.totalNum
           if (data.data.totalNum === 0) {
