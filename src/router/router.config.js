@@ -31,7 +31,7 @@ export function dealPermissionData (data) {
           if (second.children) {
             second.children.forEach(third => {
               const { name, icon, linkUrl, linkType } = third
-              if (linkType == 1) {
+              if (linkType === 1) {
                 if (routeList[linkUrl] && (!routeList[linkUrl].hidden || whiteList.includes(linkUrl))) {
                   routeList[linkUrl].meta = {
                     title: name
@@ -69,7 +69,7 @@ export function dealPermissionData (data) {
                   if (routeList[linkUrl]) {
                     const meta = routeList[linkUrl].meta
                     Object.assign(meta, {
-                      title: name,
+                      title: meta.hidden ? meta.title : name,
                       icon: icon || 'menu',
                       actionList: []
                     })

@@ -901,5 +901,119 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/interactionRadar/radarInfo'),
     meta: { title: '互动雷达详情' }
+  },
+  '/study/lesson/index': {
+    path: '/study/lesson/index',
+    name: '课程管理',
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson'),
+    meta: { title: '课程管理' }
+  },
+  '/study/lesson/Courseware': {
+    path: '/study/lesson/Courseware',
+    name: '课件管理',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Courseware/index'),
+    meta: { title: '课程管理' }
+  },
+  '/study/lesson/create': {
+    path: '/study/lesson/create',
+    name: '新建课程',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Create/index'),
+    meta: { title: '新建课程' }
+  },
+  '/study/lesson/detail': {
+    path: '/study/lesson/detail',
+    name: '课程详情',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Detail/index'),
+    meta: { title: '课程详情' }
+  },
+  '/study/lesson/createVideo': {
+    path: '/study/lesson/createVideo',
+    name: '上传视频',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Courseware/components/VideoList/Create/index'),
+    meta: { title: '上传视频' }
+  },
+  '/study/lesson/createImageText': {
+    path: '/study/lesson/createImageText',
+    name: '课件管理',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Courseware/components/ImageTextList/Create/index'),
+    meta: { title: '上传视频' }
+  },
+  '/study/examinationAnalysis/examintionDetail': {
+    path: '/study/examinationAnalysis/examintionDetail',
+    name: '考试分析详情',
+    hiddenBreadcrumb: true,
+    hidden: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/lesson/Detail/components/ExaminationAnalysis/ExamintionDetail'),
+    meta: { title: '考试分析' }
+  },
+  '/study/examination': {
+    path: '/study/examination',
+    name: '考试管理',
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination'),
+    meta: { title: '考试管理' }
+  },
+  '/study/examination/create': {
+    path: '/study/examination/create',
+    name: '新建考试',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/Create/index'),
+    meta: { title: '新建考试' }
+  },
+  '/study/examination/detail': {
+    path: '/study/examination/detail',
+    name: '考试详情',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/Detail/index'),
+    meta: { title: '考试详情' }
+  },
+  '/study/examination/testPaper': {
+    path: '/study/examination/testPaper',
+    name: '试卷管理',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/TestPaper/index'),
+    meta: { title: '试卷管理' }
+  },
+  '/study/testPaper/create': {
+    path: '/study/testPaper/create',
+    name: '创建试卷',
+    hidden: true,
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/examination/TestPaper/Create/index'),
+    meta: { title: '创建试卷' }
+  },
+  '/study/task': {
+    path: '/study/task',
+    name: '任务列表',
+    hiddenBreadcrumb: true,
+    // hideChildrenInMenu: true,
+    component: () => import('@/views/study/task'),
+    meta: { title: '任务列表' }
   }
 }
