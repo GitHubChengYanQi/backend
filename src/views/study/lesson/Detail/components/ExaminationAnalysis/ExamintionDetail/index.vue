@@ -5,35 +5,35 @@
 
     <div class="head" :style="this.task ? {borderTopLeftRadius:0,borderTopRightRadius:0} : {}">
       <div class="box">
-        <a-icon type="form" class="icon" />
+        <img :src="require('@/assets/study/examDetail01.png')">
         <div>
           <div class="num">{{ examCount }}</div>
           考试人数
         </div>
       </div>
       <div class="box">
-        <a-icon type="form" class="icon" />
+        <img :src="require('@/assets/study/examDetail02.png')">
         <div>
           <div class="num">{{ passExamCount }}</div>
           通过人数
         </div>
       </div>
       <div class="box">
-        <a-icon type="form" class="icon" />
+        <img :src="require('@/assets/study/examDetail03.png')">
         <div>
           <div class="num">{{ noPassExamCount }}</div>
           未通过人数
         </div>
       </div>
       <div class="box">
-        <a-icon type="form" class="icon" />
+        <img :src="require('@/assets/study/examDetail04.png')">
         <div>
           <div class="num">{{ inExamCount }}</div>
           考试中人数
         </div>
       </div>
       <div class="box">
-        <a-icon type="form" class="icon" />
+        <img :src="require('@/assets/study/examDetail05.png')">
         <div>
           <div class="num">{{ passingRate }}</div>
           通过率
@@ -134,9 +134,7 @@ import breadcrumb from '../../../../../components/Breadcrumd/index'
 import router from '@/router'
 import {
   courseExamBindExamBindPageExcelExport,
-  courseExamBindExamBindPageList,
-  courseExcelExport,
-  examTaskBindList
+  courseExamBindExamBindPageList
 } from '@/api/study/course'
 import moment from 'moment'
 import SelectEmployee from '../../../../../components/SelectEmployee/index'
@@ -341,17 +339,20 @@ export default {
   .box {
     border-radius: 8px;
     flex-grow: 1;
-    padding: 24px;
+    padding: 12px;
     background-color: #fbfbfe;
-    gap: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     justify-items: center;
 
-    .icon {
-      font-size: 56px;
-      box-shadow: 0 0 5px 0 #02020275;
+    img {
+      width: 80px;
+      height: 80px;
+    }
+
+    > div {
+      padding-bottom: 16px;
     }
 
     .num {

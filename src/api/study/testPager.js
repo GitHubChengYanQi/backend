@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request, { fileRequest } from '@/utils/request'
 
 export function learningQuestionnaireAdd (data) {
   return request({
@@ -11,6 +11,23 @@ export function learningQuestionnaireAdd (data) {
 export function learningQuestionnaireEdit (data) {
   return request({
     url: '/learningQuestionnaire/edit',
+    method: 'post',
+    data
+  })
+}
+
+export function learningQuestionnaireDownloadTemplate (data) {
+  return request({
+    url: '/learningQuestionnaire/downloadTemplate',
+    responseType: 'blob',
+    method: 'post',
+    data
+  })
+}
+
+export function learningQuestionnaireImportQuestionnaire (data) {
+  return request({
+    url: '/learningQuestionnaire/ImportQuestionnaire',
     method: 'post',
     data
   })

@@ -5,6 +5,7 @@
         <div class="head">
           <div class="headImg" style="min-height: 190px">
             <img
+              v-if="!detailLoading"
               height="190"
               :src="detail.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_190,w_270'"
             >

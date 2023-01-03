@@ -14,7 +14,7 @@
     @change="handleChange"
   >
     <slot>
-      <a-button type="primary">
+      <a-button :loading="loading" type="primary">
         上传文件
       </a-button>
     </slot>
@@ -79,10 +79,6 @@ export default {
       if (this.fileList.length === 0) {
         this.$emit('success', [])
       }
-      if (file.status === 'uploading') {
-        this.loading = true
-        return
-      }
       if (file.status === 'done') {
         this.$emit('success', this.fileList.map(item => ({
           ...item,
@@ -95,6 +91,7 @@ export default {
           const data = file.response
           this.$message.error(data.msg)
         }
+        this.loading = false
       }
     },
     beforeUpload (file) {
@@ -118,7 +115,8 @@ export default {
       }
       const res = flag && fileMaxSize
       if (res) {
-        this.$emit('upload')
+        this.loading = true
+        this.$emit('upload', file)
         return new Promise((resolve, reject) => {
           mediaGetToken({ type: file.name }).then((res) => {
             this.oss = { ...res.data, key: res.data.key }

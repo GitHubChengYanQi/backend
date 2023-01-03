@@ -29,7 +29,6 @@
             >
               查询
             </a-button>
-            <a-button type="primary" :loading="excelLoading" @click="excel">导出</a-button>
           </div>
         </a-form-item>
       </a-form>
@@ -40,7 +39,7 @@
           v-permission="'importTestPaper'"
           type="primary"
           ghost
-          @click="() => importTestPaper = true">
+          @click="importTestPaperClick">
           导入试卷
         </a-button>
         <a-button
@@ -82,6 +81,7 @@
         v-model="importTestPaper"
         title="导入试卷"
         class="my-modal"
+        :okButtonProps="{props:{loading:importLoading,disabled:!uploadTemplateSuccess}}"
         @ok="onImportTestPaper"
       >
         <div class="importTestPaper">
@@ -93,7 +93,14 @@
           </div>
           <div class="content">
             <div>导入试卷前请下载模板，按照模板格式导入</div>
-            <a-button type="primary" style="border-radius: 8px">下载模板</a-button>
+            <a-button
+              :loading="downloadTemplateLoading"
+              type="primary"
+              style="border-radius: 8px"
+              @click="downloadTemplate"
+            >
+              下载模板
+            </a-button>
           </div>
           <div class="title">
             <a-badge :offset="[-64,0]">
@@ -102,12 +109,13 @@
             </a-badge>
           </div>
           <div class="content">
-            <div> 仅支持xlsx/xls.文件最大100MB</div>
+            <div>仅支持xlsx/xls.文件最大100MB</div>
             <upload
               :max-size="100"
-              :default-file-type-list="['jpg','png','ppt','pptx','pdf','doc','docx']"
+              :default-file-type-list="['xlsx','xls']"
               style="display: inline-block"
               @success="uploadSuccess"
+              @upload="upload"
               :file-type="1">
               <a-button style="border-radius: 8px">选择文件</a-button>
             </upload>
@@ -127,13 +135,12 @@ import breadcrumb from '../../components/Breadcrumd/index'
 import SelectEmployee from '../../components/SelectEmployee/index'
 import {
   learningQuestionnaireCheckBind,
-  learningQuestionnaireDelete,
+  learningQuestionnaireDelete, learningQuestionnaireDownloadTemplate, learningQuestionnaireImportQuestionnaire,
   learningQuestionnaireList
 } from '@/api/study/testPager'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
 import upload from '../../lesson/Courseware/components/upload'
-import { courseExcelExport } from '@/api/study/course'
 import { excelExport } from '@/utils/downloadUtil'
 
 export default {
@@ -145,7 +152,9 @@ export default {
     return {
       fileName: '文件名',
       importTestPaper: false,
+      uploadTemplateSuccess: false,
       loading: false,
+      importLoading: false,
       screenData: {},
       columns: [
         {
@@ -188,6 +197,7 @@ export default {
       ],
       tableData: [],
       sorter: {},
+      file: {},
       pagination: {
         total: 0,
         current: 1,
@@ -196,7 +206,7 @@ export default {
         pageSizeOptions: ['10', '20', '30', '50'],
         showTotal: (total) => `共 ${total} 条数据`
       },
-      excelLoading: false
+      downloadTemplateLoading: false
     }
   },
   created () {
@@ -211,32 +221,42 @@ export default {
     }
     this.getTableData()
   },
-  methods: {async excel () {
-      this.excelLoading = true
-      const time = this.screenData.time || []
-      const data = {
-        ...this.screenData,
-        startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
-        endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
-        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
-        courseClassId: Array.isArray(this.screenData.courseClassId) && this.screenData.courseClassId.length > 0 ? this.screenData.courseClassId[this.screenData.courseClassId.length - 1] : null
-      }
-     courseExcelExport(data, {
-        limit: 6500,
-        page: 1
-      }).then((res) => {
-        excelExport(res, '客户列表数据导出.xlsx')
+  methods: {
+    importTestPaperClick () {
+      console.log(1)
+      this.importTestPaper = true
+      this.uploadTemplateSuccess = false
+    },
+    downloadTemplate () {
+      this.downloadTemplateLoading = true
+      learningQuestionnaireDownloadTemplate().then((res) => {
+        console.log(res)
+        excelExport(res, '试卷模板.xlsx')
         message.success('导出成功!')
       }).finally(() => {
-        this.excelLoading = false
+        this.downloadTemplateLoading = false
       })
     },
     onImportTestPaper () {
-
+      this.importLoading = true
+      const formData = new FormData()
+      formData.append('file', this.file)
+      learningQuestionnaireImportQuestionnaire(formData).then(() => {
+        this.importTestPaper = false
+        this.uploadTemplateSuccess = false
+        this.getTableData()
+        message.success('导入成功!')
+      }).finally(() => {
+        this.importLoading = false
+      })
+    },
+    upload (file) {
+      this.file = file
     },
     uploadSuccess (data = []) {
       const file = data[0] || {}
       this.fileName = file.name
+      this.uploadTemplateSuccess = true
     },
     getTableData () {
       this.loading = true
@@ -260,7 +280,7 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize

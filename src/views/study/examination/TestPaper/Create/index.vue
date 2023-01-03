@@ -7,14 +7,14 @@
         <div class="head">
           <div class="total">
             <div class="box">
-              <a-icon type="form" class="icon" />
+              <img :src="require('@/assets/study/createTestPager01.png')">
               <div>
                 <div class="num">{{ questions.length }}</div>
                 总题数
               </div>
             </div>
             <div class="box">
-              <a-icon type="form" class="icon" />
+              <img :src="require('@/assets/study/createTestPager02.png')">
               <div>
                 <div class="num">{{ totalFen }}</div>
                 当前总分
@@ -601,7 +601,7 @@ export default {
     .box {
       border-radius: 8px;
       flex-grow: 1;
-      padding: 24px;
+      padding: 12px;
       background-color: #fbfbfe;
       gap: 12px;
       display: flex;
@@ -609,9 +609,13 @@ export default {
       justify-content: center;
       justify-items: center;
 
-      .icon {
-        font-size: 56px;
-        box-shadow: 0 0 5px 0 #02020275;
+      img {
+        width: 80px;
+        height: 80px;
+      }
+
+      > div {
+        padding-bottom: 16px;
       }
 
       .num {
