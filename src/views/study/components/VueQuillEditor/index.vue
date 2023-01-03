@@ -217,7 +217,7 @@ export default {
   line-height: normal !important;
   height: 354px;
 
-  .ql-editor {
+  .ql-container {
     min-height: 800px;
   }
 

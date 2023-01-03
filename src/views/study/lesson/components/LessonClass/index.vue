@@ -22,9 +22,9 @@
           @mouseleave="mouseleave(node)"
 
         >
-          <div>
+          <div class="classRow">
             <DragIcon></DragIcon>
-            <span>{{ data.title }}</span>
+            <span class="className">{{ data.title }}</span>
           </div>
           <div class="my-space">
             <div v-if="visible === node.key" style="padding-right: 8px">
@@ -468,4 +468,18 @@ export default {
   padding: 8px 12px 8px 0;
   height: 40px
 }
+
+.classRow {
+  display: flex;
+  align-items: center;
+
+  .className {
+    display: inline-block;
+    white-space: nowrap;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 </style>
