@@ -74,7 +74,7 @@
               :default-file-list="getFileList(item)"
               @upload="uploadItem"
               :accept="['mp4', 'avi', 'mov']"
-              :file-size="200"
+              :file-size="10"
               icon="video-camera"
               tip="单击或拖动视频到该区域进行上传"
             />
@@ -681,28 +681,14 @@ export default {
     },
     // 上传文件回调
     uploadItem: function (ossFile) {
-      console.log(ossFile, '上传文件回调')
-      // debugger
-      if (ossFile.size) {
-        // 临时访问URL 没啥用
-        this.$set(this.item, 'attachmentUrl', ossFile.fullPath)
-        // oss路径 查看附件时需要用此值换取临时URL
-        this.$set(this.item, 'attachmentKey', ossFile.path)
-        // 文件名
-        this.$set(this.item, 'attachmentName', ossFile.name)
-        // 文件扩展名
-        this.$set(this.item, 'attachmentExt', ossFile.name.substring(ossFile.name.lastIndexOf('.') + 1))
-      } else {
-        // 临时访问URL 没啥用
-        this.$set(this.item, 'attachmentUrl', `${ossFile.host}/${ossFile.key}`)
-        // oss路径 查看附件时需要用此值换取临时URL
-        this.$set(this.item, 'attachmentKey', ossFile.key)
-        // 文件名
-        this.$set(this.item, 'attachmentName', ossFile.fileName)
-        // 文件扩展名
-        this.$set(this.item, 'attachmentExt', ossFile.fileName.substring(ossFile.fileName.lastIndexOf('.') + 1))
-      }
-      
+      // 临时访问URL 没啥用
+      this.$set(this.item, 'attachmentUrl', ossFile.fullPath)
+      // oss路径 查看附件时需要用此值换取临时URL
+      this.$set(this.item, 'attachmentKey', ossFile.path)
+      // 文件名
+      this.$set(this.item, 'attachmentName', ossFile.name)
+      // 文件扩展名
+      this.$set(this.item, 'attachmentExt', ossFile.name.substring(ossFile.name.lastIndexOf('.') + 1))
     },
     // 修改上传文件回调
     editUploadItem: function (ossFile) {

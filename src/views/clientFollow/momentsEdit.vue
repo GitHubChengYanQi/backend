@@ -259,7 +259,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import moment from 'moment'
-import { departmentEmp, upLoad, mediaGetToken, ossUpload } from '@/api/common'
+import { departmentEmp, upLoad } from '@/api/common'
 import LabelSelect from './components/LabelSelect.vue'
 import { defaultLinkObj, defaultLibraryObj, isUrl, getLibraryMediaType, disabledBeforeDate, getMediaData, returnLabelJSONData } from './components/momentsUtils'
 import { addMomentsItemReq, getMomentsItemInfoReq, setMomentsItemInfoReq, getMomentsItemExpectedNumReq } from '@/api/momentsOperation'
@@ -272,7 +272,6 @@ export default {
   },
   data () {
     return {
-      oss: {},
       isDone: false,
       isDisabled: false,
       sendBol: true,
@@ -564,49 +563,26 @@ export default {
     },
     // 上传视频
     async uploadVideo (e) {
-      if (e && e.target && e.target.files.length !== 0) {
-        const file = e.target.files[0]
-        if (file.size > 10 * 1024 * 1024) {
-          await mediaGetToken({ type: file.name }).then(res => {
-            // console.log(res, '获取ossToken')
-            this.oss = { ...res.data, key: res.data.key }
-            this.dealUploadMethod(this.oss, file)
-          }).catch(() => {
-            this.$message.error('获取ossToken失败')
-          })
-          this.mediaType = 'video'
+      const file = e.target.files[0]
+      if (file.size > 10 * 1000 * 1000) {
+        return this.$message.warn('请上传小于10MB的视频文件')
+      }
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('time', 1)
+        const res = await upLoad(formData)
+        const bol = await this.checkImageSize(res.data.fullPath, res.data.name, 'video')
+        if (!bol) {
           e.target.value = ''
-        } else {
-          const formData = new FormData()
-          formData.append('file', file)
-          formData.append('time', 1)
-          const res = await upLoad(formData)
-          const bol = await this.checkImageSize(res.data.fullPath, res.data.name, 'video')
-          if (!bol) {
-            e.target.value = ''
-            return
-          }
-          this.videoUrl = { url: res.data.fullPath, path: res.data.path }
-          this.mediaType = 'video'
-          e.target.value = ''
+          return
         }
+        this.videoUrl = { url: res.data.fullPath, path: res.data.path }
+        this.mediaType = 'video'
+      } catch (e) {
+        console.log(e, 'upload video err')
       }
-      // if (file.size > 10 * 1000 * 1000) {
-      //   return this.$message.warn('请上传小于10MB的视频文件')
-      // }
-    },
-    dealUploadMethod (info, fileInfo) {
-      // this.$emit('update:isLoadingStatus', true)
-      const tempFormData = new FormData()
-      for (const i in info) {
-        console.log(i, 'iii')
-        tempFormData.append(i, info[i])
-      }
-      tempFormData.append('file', fileInfo)
-      ossUpload(tempFormData).then(res => {
-        // this.uploadUrl = `${info.host}/${info.key}`
-        this.videoUrl = { url: `${info.host}/${info.key}`, path: info.key }
-      })
+      e.target.value = ''
     },
     handleEditVideo () {
       if (this.mediaFormLibrary) {
@@ -804,8 +780,7 @@ export default {
       }
       const target = list[0]
       const content = target.entry
-      const isDev = content.linkImg.indexOf('https://yfscrm.oss-cn-beijing.aliyuncs.com') !== -1
-      const startLen = isDev ? 43 : 44
+      const startLen = process.env.NODE_ENV === 'development' ? 43 : 44
       this.modalLinkObj = {
         title: content.linkTitle,
         url: target.link,

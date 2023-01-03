@@ -1,6 +1,5 @@
 <template>
   <div class="material-library">
-
     <a-row>
       <a-col>
         <a-modal
@@ -928,122 +927,111 @@
             :visible="pictureModal"
             :title="allTitle"
             @cancel="pictureModalClose">
-            <a-spin :spinning="isLoadingStatus">
-              <a-form-model
-                ref="addAudioForm"
-                :model="FormData"
-                :rules="addPhotoForm"
-                v-if="modalType === 4"
-                :label-col="{ span: 5 }"
-                :wrapper-col="{ span: 15 }">
-                <a-form-item label="选择分组：">
-                  <a-tree-select
-                    v-model="materialGroupId"
-                    style="width: 100%"
-                    :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
-                    placeholder="请选择分组"
-                    allow-clear
-                    tree-default-expand-all
-                    :replaceFields="{
-                      children:'children',
-                      title:'name',
-                      key:'id',
-                      value: 'id'
-                    }"
-                    :treeData="treeData">
-                  </a-tree-select>
-                </a-form-item>
-                <a-form-model-item label="标题名称：" prop="title">
-                  <a-input v-model="FormData.title" :maxLength="15" />
-                </a-form-model-item>
-                <a-form-item label="上传音频：">
-                  <vpload
-                    @successDefine="uploadSuccessV"
-                    :file-type="2"></vpload>
-                  <div>(音频上传大小不超过2MB，播放长度不超过60s,仅支持AMR格式。)</div>
-                  <div v-if="uploadDefine" style="color: red">上传成功</div>
-                </a-form-item>
-              </a-form-model>
-              <a-form-model
-                ref="addVedioForm"
-                :model="FormData"
-                :rules="addPhotoForm"
-                v-if="modalType === 5"
-                :label-col="{ span: 5 }"
-                :wrapper-col="{ span: 15 }">
-                <a-form-item label="选择分组：">
-                  <a-tree-select
-                    v-model="materialGroupId"
-                    style="width: 100%"
-                    :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
-                    placeholder="请选择分组"
-                    allow-clear
-                    tree-default-expand-all
-                    :replaceFields="{
-                      children:'children',
-                      title:'name',
-                      key:'id',
-                      value: 'id'
-                    }"
-                    :treeData="treeData">
-                  </a-tree-select>
-                </a-form-item>
-                <a-form-model-item label="标题名称：" prop="title">
-                  <a-input v-model="FormData.title" :maxLength="15" />
-                </a-form-model-item>
-                <a-form-item label="上传视频：">
-                  <!-- <vpload
+            <a-form-model
+              ref="addAudioForm"
+              :model="FormData"
+              :rules="addPhotoForm"
+              v-if="modalType === 4"
+              :label-col="{ span: 5 }"
+              :wrapper-col="{ span: 15 }">
+              <a-form-item label="选择分组：">
+                <a-tree-select
+                  v-model="materialGroupId"
+                  style="width: 100%"
+                  :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
+                  placeholder="请选择分组"
+                  allow-clear
+                  tree-default-expand-all
+                  :replaceFields="{
+                    children:'children',
+                    title:'name',
+                    key:'id',
+                    value: 'id'
+                  }"
+                  :treeData="treeData">
+                </a-tree-select>
+              </a-form-item>
+              <a-form-model-item label="标题名称：" prop="title">
+                <a-input v-model="FormData.title" :maxLength="15" />
+              </a-form-model-item>
+              <a-form-item label="上传音频：">
+                <vpload
                   @successDefine="uploadSuccessV"
-                  :file-type="3"></vpload> -->
-                  <div class="uploadMediaDiv">
-                    <ImgUpload
-                      :fileMaxSize="fileMaxSize"
-                      :fileMinSize="fileMinSize"
-                      @loadingMethod="loadingMethod"
-                      @successUpload="successUpload">
-                      <a-button><a-icon type="upload" /> 上传 </a-button>
-                    </ImgUpload>
-                  </div>
-                  <div>{{ `(视频上传大小不超过${fileMaxSize}M,支持MP4格式)` }}</div>
-                  <div v-if="uploadDefine" style="color: red">上传成功</div>
-                </a-form-item>
-              </a-form-model>
-              <a-form-model
-                ref="addFileForm"
-                :model="FormData"
-                :rules="addPhotoForm"
-                v-if="modalType === 7"
-                :label-col="{ span: 5 }"
-                :wrapper-col="{ span: 15 }">
-                <a-form-item label="选择分组：">
-                  <a-tree-select
-                    v-model="materialGroupId"
-                    style="width: 100%"
-                    :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
-                    placeholder="请选择分组"
-                    allow-clear
-                    tree-default-expand-all
-                    :replaceFields="{
-                      children:'children',
-                      title:'name',
-                      key:'id',
-                      value: 'id'
-                    }"
-                    :treeData="treeData">
-                  </a-tree-select>
-                </a-form-item>
-                <a-form-model-item label="标题名称：" prop="title">
-                  <a-input v-model="FormData.title" :maxLength="15" />
-                </a-form-model-item>
-                <a-form-item label="上传文件：">
-                  <vpload
-                    @successDefine="uploadSuccessV"
-                    :file-type="4"></vpload>
-                  <div v-if="uploadDefine" style="color: red">上传成功</div>
-                  <div>(上传文件大小不超过20MB，支持DOC、DOCX、XLS、XLSX、CSV、PPT、PPTX、TXT、PDF及Xmind格式。)</div>
-                </a-form-item>
-              </a-form-model>
-            </a-spin>
+                  :file-type="2"></vpload>
+                <div>(音频上传大小不超过2MB，播放长度不超过60s,仅支持AMR格式。)</div>
+                <div v-if="uploadDefine" style="color: red">上传成功</div>
+              </a-form-item>
+            </a-form-model>
+            <a-form-model
+              ref="addVedioForm"
+              :model="FormData"
+              :rules="addPhotoForm"
+              v-if="modalType === 5"
+              :label-col="{ span: 5 }"
+              :wrapper-col="{ span: 15 }">
+              <a-form-item label="选择分组：">
+                <a-tree-select
+                  v-model="materialGroupId"
+                  style="width: 100%"
+                  :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
+                  placeholder="请选择分组"
+                  allow-clear
+                  tree-default-expand-all
+                  :replaceFields="{
+                    children:'children',
+                    title:'name',
+                    key:'id',
+                    value: 'id'
+                  }"
+                  :treeData="treeData">
+                </a-tree-select>
+              </a-form-item>
+              <a-form-model-item label="标题名称：" prop="title">
+                <a-input v-model="FormData.title" :maxLength="15" />
+              </a-form-model-item>
+              <a-form-item label="上传视频：">
+                <vpload
+                  @successDefine="uploadSuccessV"
+                  :file-type="3"></vpload>
+                <div>(视频上传大小不超过10M，支持MP4格式)</div>
+                <div v-if="uploadDefine" style="color: red">上传成功</div>
+              </a-form-item>
+            </a-form-model>
+            <a-form-model
+              ref="addFileForm"
+              :model="FormData"
+              :rules="addPhotoForm"
+              v-if="modalType === 7"
+              :label-col="{ span: 5 }"
+              :wrapper-col="{ span: 15 }">
+              <a-form-item label="选择分组：">
+                <a-tree-select
+                  v-model="materialGroupId"
+                  style="width: 100%"
+                  :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
+                  placeholder="请选择分组"
+                  allow-clear
+                  tree-default-expand-all
+                  :replaceFields="{
+                    children:'children',
+                    title:'name',
+                    key:'id',
+                    value: 'id'
+                  }"
+                  :treeData="treeData">
+                </a-tree-select>
+              </a-form-item>
+              <a-form-model-item label="标题名称：" prop="title">
+                <a-input v-model="FormData.title" :maxLength="15" />
+              </a-form-model-item>
+              <a-form-item label="上传文件：">
+                <vpload
+                  @successDefine="uploadSuccessV"
+                  :file-type="4"></vpload>
+                <div v-if="uploadDefine" style="color: red">上传成功</div>
+                <div>(上传文件大小不超过20MB，支持DOC、DOCX、XLS、XLSX、CSV、PPT、PPTX、TXT、PDF及Xmind格式。)</div>
+              </a-form-item>
+            </a-form-model>
             <template slot="footer">
               <a-button @click="pictureModalClose">取消</a-button>
               <a-button type="primary" @click="defineModelType">确定</a-button>
@@ -1228,15 +1216,12 @@ import storage from 'store'
 import { materialLibraryList, mediumGroup, addMediumGroup, editMediumGroup, delMediumGroup, delMaterialLibrary, addMaterialLibrary, moveGroup, getMaterialLibrary, editMaterialLibrary } from '@/api/mediumGroup'
 import upload from './components/upload'
 import vpload from './components/vpload'
-import ImgUpload from '../sales/sop/components/ImgUpload/index.vue'
 import mtextarea from './components/mtextarea'
-import { upLoad } from '@/api/common'
 export default {
   components: {
     upload,
     vpload,
-    mtextarea,
-    ImgUpload
+    mtextarea
   },
   props: {
     isComponent: {
@@ -1246,9 +1231,6 @@ export default {
   },
   data () {
     return {
-      fileMaxSize: Number(process.env.VUE_APP_API_UPLOAD_MAX_SIZE),
-      fileMinSize: Number(process.env.VUE_APP_API_UPLOAD_MIN_SIZE),
-      isLoadingStatus: false,
       deleteGroupId: '',
       deleteGroupModel: false,
       editGroupPid: '',
@@ -1467,59 +1449,6 @@ export default {
     }
   },
   methods: {
-    loadingMethod (e) {
-      this.isLoadingStatus = e
-    },
-    async successUpload (file) {
-      console.log(file, 'successUpload上传成功的返回')
-      if (file.size) {
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        // const res = await upLoad(formData)
-        // this.$emit('update:isLoadingStatus', true)
-        this.isLoadingStatus = true
-        await upLoad(formData).then(res => {
-          const videoPath = res.data.path
-          this.upLoadRes.videoPath = videoPath
-          this.upLoadRes.videoName = file.name
-          this.uploadDefine = true
-          this.isLoadingStatus = false
-          // this.$emit('update:isLoadingStatus', false)
-          // const videoInfo = {
-          //   type: 3,
-          //   videoUrl: res.data.fullPath
-          // }
-          // if (this.submitType === 'add') {
-          //   this.sendContentArray.push(videoInfo)
-          // } else {
-          //   this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
-          // }
-          // this.isSopEditStatus = true
-          // this.$emit('update:isSopEdit', this.isSopEditStatus)
-          // this.$emit('update:contentArray', this.sendContentArray)
-          // this.$refs.uploadVideoRef.value = ''
-        })
-      } else {
-        // const videoPath = `${file.host}/${file.key}`
-        this.upLoadRes.videoPath = file.key
-        this.upLoadRes.videoName = file.key
-        this.uploadDefine = true
-        // const videoInfo = {
-        //   type: 3,
-        //   videoUrl: `${file.host}/${file.key}`
-        // }
-        // if (this.submitType === 'add') {
-        //   this.sendContentArray.push(videoInfo)
-        // } else {
-        //   this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
-        // }
-        // this.isSopEditStatus = true
-        // this.$emit('update:isSopEdit', this.isSopEditStatus)
-        // this.$emit('update:contentArray', this.sendContentArray)
-      }
-    },
     flatTree (data, childName = 'children') {
       const clone = JSON.parse(JSON.stringify(data))
       if (!Array.isArray(clone)) {
@@ -2058,44 +1987,41 @@ export default {
     },
     // 确认添加
     defineModelType () {
-      if (!this.isLoadingStatus) {
-        let form = null
-        console.log(Number(this.tabsNumber))
-        if (Number(this.tabsNumber) === 4) {
-          form = this.$refs.addAudioForm
-        } else if (Number(this.tabsNumber) === 5) {
-          form = this.$refs.addVedioForm
-        } else if (Number(this.tabsNumber) === 7) {
-          form = this.$refs.addFileForm
-        }
-        form.validate(valid => {
-          if (valid) {
-            if (Object.keys(this.upLoadRes).length === 2) {
-              const content = {
-                ...this.upLoadRes,
-                title: this.FormData.title
-              }
-              addMaterialLibrary({
-                type: Number(this.tabsNumber),
-                content: content,
-                mediumGroupId: this.materialGroupId
-              }).then(res => {
-                this.upLoadRes = {}
-                this.pictureModal = false
-                this.getTableData()
-                this.imgUrl = ''
-                this.uploadDefine = false
-                this.materialGroupId = 0
-                this.title = ''
-                this.FormData = {}
-              })
-            } else {
-              this.$message.error('请上传')
-            }
-          }
-        })
+      let form = null
+      console.log(Number(this.tabsNumber))
+      if (Number(this.tabsNumber) === 4) {
+        form = this.$refs.addAudioForm
+      } else if (Number(this.tabsNumber) === 5) {
+        form = this.$refs.addVedioForm
+      } else if (Number(this.tabsNumber) === 7) {
+        form = this.$refs.addFileForm
       }
-      
+      form.validate(valid => {
+        if (valid) {
+          if (Object.keys(this.upLoadRes).length === 2) {
+            const content = {
+              ...this.upLoadRes,
+              title: this.FormData.title
+            }
+            addMaterialLibrary({
+              type: Number(this.tabsNumber),
+              content: content,
+              mediumGroupId: this.materialGroupId
+            }).then(res => {
+              this.upLoadRes = {}
+              this.pictureModal = false
+              this.getTableData()
+              this.imgUrl = ''
+              this.uploadDefine = false
+              this.materialGroupId = 0
+              this.title = ''
+              this.FormData = {}
+            })
+          } else {
+            this.$message.error('请上传')
+          }
+        }
+      })
     },
     // 添加图片
     addPhoto () {
@@ -2209,20 +2135,18 @@ export default {
       this.onSearch()
     },
     pictureModalClose () {
-      if (!this.isLoadingStatus) {
-        this.pictureModal = false
-        this.materialGroupId = 0
-        this.uploadDefine = false
-        this.FormData = {}
-        if (this.$refs.addAudioForm) {
-          this.$refs.addAudioForm.resetFields()
-        }
-        if (this.$refs.addVedioForm) {
-          this.$refs.addVedioForm.resetFields()
-        }
-        if (this.$refs.addFileForm) {
-          this.$refs.addFileForm.resetFields()
-        }
+      this.pictureModal = false
+      this.materialGroupId = 0
+      this.uploadDefine = false
+      this.FormData = {}
+      if (this.$refs.addAudioForm) {
+        this.$refs.addAudioForm.resetFields()
+      }
+      if (this.$refs.addVedioForm) {
+        this.$refs.addVedioForm.resetFields()
+      }
+      if (this.$refs.addFileForm) {
+        this.$refs.addFileForm.resetFields()
       }
     },
     addGroupModelShow () {
@@ -2233,31 +2157,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.uploadMediaDiv {
-    /deep/.img-avatar-uploader {
-      .ant-upload {
-        width: auto;
-        height: auto;
-        margin-bottom: 0px;
-        margin-right: 0px;
-        padding: 0px;
-        background-color: white;
-        border: 0;
-        color: #1c1c1c;
-        .anticon-upload {
-          font-size: 14px;
-          color: #1c1c1c;
-        }
-      }
-      // width: auto;
-      // height: auto;
-      // margin-bottom: 0px;
-      // margin-right: 0px;
-      // padding: 0px;
-      // background-color: white;
-      // color: #1c1c1c;
-    }
-}
 .material-library {
     height: 100%;
     .left {
