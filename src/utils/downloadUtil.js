@@ -38,3 +38,23 @@ export function callDownLoadByBlob (blob, fileName) {
   URL.revokeObjectURL(eLink.href)
   document.body.removeChild(eLink)
 }
+
+export function excelExport (res, name) {
+  const blob = new Blob([res])// response.data为后端传的流文件
+  const downloadFilename = name// 设置导出的文件名  用moment时间插件对文件命名防止每次都是一样的文件名
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    // 兼容ie浏览器
+    window.navigator.msSaveOrOpenBlob(blob, downloadFilename)
+  } else {
+    // 谷歌,火狐等浏览器
+    const url = window.URL.createObjectURL(blob)
+    const downloadElement = document.createElement('a')
+    downloadElement.style.display = 'none'
+    downloadElement.href = url
+    downloadElement.download = downloadFilename
+    document.body.appendChild(downloadElement)
+    downloadElement.click()
+    document.body.removeChild(downloadElement)
+    window.URL.revokeObjectURL(url)
+  }
+}

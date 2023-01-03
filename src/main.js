@@ -10,6 +10,11 @@ import { VueAxios, axios } from './utils/request'
 import ProLayout, { PageHeaderWrapper } from '@ant-design-vue/pro-layout'
 import themePluginConfig from '../config/themePluginConfig'
 import VueQuillEditor from 'vue-quill-editor'
+
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
 import loading from '@/components/loading/loading'
 import selectEmployee from '@/components/SelectEmployeeNew/Select'
 import selectEmployeeInput from '@/components/SelectEmployeeNew/Input'
@@ -26,6 +31,8 @@ import stepNews from '@/components/StepNews/StepNews'
 import ExportExcel from '@/components/ExportDownload/ExportExcel'
 import preview from '@/components/Preview/index'
 import More from '@/components/More/More'
+import { Tree, Button, Table, TableColumn } from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 
 // 引入富文本编辑器
 import '@/assets/css/quill.core.css'
@@ -51,6 +58,11 @@ Vue.config.productionTip = false
 Vue.use(VueQuillEditor)
 Vue.use(VueQuillEditor)
 Vue.use(VueViewer)
+
+Vue.use(Tree)
+Vue.use(Button)
+Vue.use(Table)
+Vue.use(TableColumn)
 
 Vue.use(VueAxios)
 Vue.component('SelectEmployee', selectEmployee)

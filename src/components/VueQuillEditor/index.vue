@@ -193,9 +193,9 @@ export default {
   }
 }
 </script>
-  //汉化样式
+//汉化样式
 
-  <style>
+<style>
 .editor {
   line-height: normal !important;
   height: 354px;
