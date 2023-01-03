@@ -18,7 +18,8 @@
                 <!-- v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!' }], initialValue: '' }]" -->
                 <ImgUpload
                   @loadingMethod="loadingMethod"
-                  :fileMaxSize="200"
+                  :fileMaxSize="fileMaxSize"
+                  :fileMinSize="fileMinSize"
                   :isLoadingStatus.sync="isLoadingStatus"
                   @successUpload="successUpload">
                   <div>{{ `+ ${item.name}` }}</div>
@@ -323,6 +324,8 @@ export default {
   name: 'SendContent',
   data () {
     return {
+      fileMaxSize: Number(process.env.VUE_APP_API_UPLOAD_MAX_SIZE),
+      fileMinSize: Number(process.env.VUE_APP_API_UPLOAD_MIN_SIZE),
       oss: {},
       contentRadarObj: {}, // 互动雷达对象
       contentRadarModalShow: false, // 修改互动雷达弹框
@@ -431,8 +434,8 @@ export default {
   },
   methods: {
     loadingMethod (e) {
-      // this.$emit('update:isLoadingStatus', e)
-      console.log(e, '监听是否加载')
+      this.$emit('update:isLoadingStatus', e)
+      // console.log(e, '监听是否加载')
     },
     async successUpload (file) {
       console.log(file, 'successUpload上传成功的返回')
