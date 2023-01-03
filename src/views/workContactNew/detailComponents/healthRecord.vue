@@ -326,17 +326,26 @@ export default {
             align: 'center'
           })
           if (!this.isComponent) {
-            cloumns.push({
-              title: '操作',
-              dataIndex: 'id',
-              align: 'center',
-              customRender: (id) => (
-                <div class="handlesBox">
-                  <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
-                  <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span>
-                </div>
-              )
-            })
+            if (d[0].source === '2') {
+              console.log('公众号信息不让编辑')
+              cloumns.push({
+                title: '操作',
+                dataIndex: 'id',
+                align: 'center'
+              })
+            } else {
+              cloumns.push({
+                title: '操作',
+                dataIndex: 'id',
+                align: 'center',
+                customRender: (id) => (
+                  <div class="handlesBox">
+                    <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
+                    <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span>
+                  </div>
+                )
+              })
+            }
           }
           this.pagination.total = data.data.totalNum
           if (data.data.totalNum === 0) {

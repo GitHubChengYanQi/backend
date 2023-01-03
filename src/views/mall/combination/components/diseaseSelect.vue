@@ -51,6 +51,7 @@ export default {
       if (!nVal) {
         this.val1 = undefined
         this.val2 = undefined
+        this.dataList2 = []
       }
     }
   },

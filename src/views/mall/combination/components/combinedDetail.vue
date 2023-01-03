@@ -176,12 +176,13 @@ export default {
         okType: 'danger',
         cancelText: '取消',
         onOk: async () => {
-          const len = this.form.adjuvants.length
-          if (len === 1) {
-            this.$message.error('至少保留一条数据！')
-          } else {
-            this.form.adjuvants.splice(index, 1)
-          }
+          this.form.adjuvants.splice(index, 1)
+          // const len = this.form.adjuvants.length
+          // if (len === 1) {
+          //   this.$message.error('至少保留一条数据！')
+          // } else {
+          //   this.form.adjuvants.splice(index, 1)
+          // }
         }
       })
     },

@@ -46,8 +46,23 @@ export default {
       // 过滤下children为空的字段
       treeList().then((res) => {
         this.dataList = res.data.children
+        // console.log(111111, this.dataList)
+        this.formatData(this.dataList)
         this.getPathById(this.dataList, this.val)
       })
+    },
+    /**
+     * 过滤数据
+     */
+    formatData (arr) {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].children && arr[i].children.length === 0) {
+          delete arr[i].children
+        }
+        if (arr[i].children) {
+          this.formatData(arr[i].children)
+        }
+      }
     },
     /**
      * 获取路径
