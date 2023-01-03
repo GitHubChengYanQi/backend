@@ -326,12 +326,18 @@ export default {
             align: 'center'
           })
           if (!this.isComponent) {
-            if (d[0].source === '2') {
+            if (d[0].source === '2' || d[0].source === '3') {
               console.log('公众号信息不让编辑')
               cloumns.push({
                 title: '操作',
                 dataIndex: 'id',
-                align: 'center'
+                align: 'center',
+                customRender: () => (
+                  <div class="handlesBox">
+                    {/* <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
+                    <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span> */}
+                  </div>
+                )
               })
             } else {
               cloumns.push({

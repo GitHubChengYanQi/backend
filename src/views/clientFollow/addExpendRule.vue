@@ -196,8 +196,7 @@ export default {
      * 标签选择回调
      */
     inputFn (e) {
-      console.log(11111111, e)
-      this.form.label = e
+      // this.form.label = e
     }
   }
 }
