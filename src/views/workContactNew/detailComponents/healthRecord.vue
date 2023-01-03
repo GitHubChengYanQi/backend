@@ -93,7 +93,7 @@
 
     <a-modal
       v-model="modalObj.visible"
-      :title="`${modalObj.id ? '修改' : '新增'}${modalObj.modalType === 'xyjl' ? '血压' : '血糖'}记录`"
+      :title="`${modalObj.id ? '修改' : '新增'}${typeMap[modalObj.modalType]}记录`"
       id="healthRecord-Component-editSpecialModal-Container"
       :confirm-loading="saveLoading"
       @ok="editSpecialModalOK"
@@ -143,6 +143,13 @@
             ></a-select>
             <span class="dot">.</span>
             <a-select
+              v-if = "modalObj.modalType === 'xzjl'"
+              style="width: 45%"
+              v-model="item.dataName[1]"
+              :options="Array(100).fill(null).map((it, index) => ({ value: index < 10 ? '0' + index : index, label: index < 10 ? '0' + index : index }))"
+            ></a-select>
+            <a-select
+              v-else
               style="width: 45%"
               v-model="item.dataName[1]"
               :options="Array(10).fill(null).map((it, index) => ({ value: index, label: index }))"
@@ -188,6 +195,13 @@ const getSource = (t) => {
   } else return t
 }
 
+const typeMap = {
+  'xyjl': '血压',
+  'xtjl': '血糖',
+  'xzjl': '血脂',
+  'nsjl': '尿酸'
+}
+
 // const defaultItemObj = {
 //   data: '',
 //   dataName: '',
@@ -216,6 +230,7 @@ export default {
   },
   data () {
     return {
+      typeMap,
       saveLoading: false,
       isEdit: false,
       selectTag: '',
@@ -256,6 +271,13 @@ export default {
   beforeMount () { },
   mounted () { },
   methods: {
+    // /**
+    //  * 生成选项
+    //  */
+    // makeOption () {
+    //   console.log(11111)
+    //   Array(100).fill(null).map((it, index) => ({ value: index, label: index }))
+    // },
     async getTabs () {
       const { data } = await getTabsArrReq({})
       this.tags = data.records
