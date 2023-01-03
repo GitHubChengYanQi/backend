@@ -431,7 +431,8 @@ export default {
   },
   methods: {
     loadingMethod (e) {
-      this.$emit('update:isLoadingStatus', e)
+      // this.$emit('update:isLoadingStatus', e)
+      console.log(e, '监听是否加载')
     },
     async successUpload (file) {
       console.log(file, 'successUpload上传成功的返回')
@@ -443,7 +444,7 @@ export default {
         // const res = await upLoad(formData)
         this.$emit('update:isLoadingStatus', true)
         await upLoad(formData).then(res => {
-          this.$emit('update:isLoadingStatus', false)
+          // this.$emit('update:isLoadingStatus', false)
           const videoInfo = {
             type: 3,
             videoUrl: res.data.fullPath
@@ -456,6 +457,7 @@ export default {
           this.isSopEditStatus = true
           this.$emit('update:isSopEdit', this.isSopEditStatus)
           this.$emit('update:contentArray', this.sendContentArray)
+          this.$emit('update:isLoadingStatus', false)
           // this.$refs.uploadVideoRef.value = ''
         })
       } else {
@@ -470,17 +472,17 @@ export default {
           url: videoInfo.videoUrl,
           filename: file.key
         }
-        await companyWxUpload(tempUploadInfo).then(res=> {
-          this.$emit('update:isLoadingStatus', false)
+        await companyWxUpload(tempUploadInfo).then(res => {
           if (this.submitType === 'add') {
             this.sendContentArray.push(videoInfo)
           } else {
             this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
           }
-            this.isSopEditStatus = true
-            this.$emit('update:isSopEdit', this.isSopEditStatus)
-            this.$emit('update:contentArray', this.sendContentArray)
-          })
+          this.isSopEditStatus = true
+          this.$emit('update:isSopEdit', this.isSopEditStatus)
+          this.$emit('update:contentArray', this.sendContentArray)
+          this.$emit('update:isLoadingStatus', false)
+        })
       }
     },
     // 选择互动雷达回调
@@ -1083,6 +1085,7 @@ export default {
             cursor: pointer;
             div {
               padding: 0px 10px;
+              color: #1c1c1c;
             }
             color: rgb(28, 28, 28);
             .uploadMediaDiv {
