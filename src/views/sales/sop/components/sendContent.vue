@@ -18,7 +18,8 @@
                 <!-- v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!' }], initialValue: '' }]" -->
                 <ImgUpload
                   @loadingMethod="loadingMethod"
-                  :fileMaxSize="200"
+                  :fileMaxSize="fileMaxSize"
+                  :fileMinSize="fileMinSize"
                   :isLoadingStatus.sync="isLoadingStatus"
                   @successUpload="successUpload">
                   <div>{{ `+ ${item.name}` }}</div>
@@ -323,6 +324,8 @@ export default {
   name: 'SendContent',
   data () {
     return {
+      fileMaxSize: Number(process.env.VUE_APP_API_UPLOAD_MAX_SIZE),
+      fileMinSize: Number(process.env.VUE_APP_API_UPLOAD_MIN_SIZE),
       oss: {},
       contentRadarObj: {}, // 互动雷达对象
       contentRadarModalShow: false, // 修改互动雷达弹框
@@ -432,6 +435,7 @@ export default {
   methods: {
     loadingMethod (e) {
       this.$emit('update:isLoadingStatus', e)
+      // console.log(e, '监听是否加载')
     },
     async successUpload (file) {
       console.log(file, 'successUpload上传成功的返回')
@@ -443,7 +447,7 @@ export default {
         // const res = await upLoad(formData)
         this.$emit('update:isLoadingStatus', true)
         await upLoad(formData).then(res => {
-          this.$emit('update:isLoadingStatus', false)
+          // this.$emit('update:isLoadingStatus', false)
           const videoInfo = {
             type: 3,
             videoUrl: res.data.fullPath
@@ -456,6 +460,7 @@ export default {
           this.isSopEditStatus = true
           this.$emit('update:isSopEdit', this.isSopEditStatus)
           this.$emit('update:contentArray', this.sendContentArray)
+          this.$emit('update:isLoadingStatus', false)
           // this.$refs.uploadVideoRef.value = ''
         })
       } else {
@@ -480,6 +485,7 @@ export default {
           this.isSopEditStatus = true
           this.$emit('update:isSopEdit', this.isSopEditStatus)
           this.$emit('update:contentArray', this.sendContentArray)
+          this.$emit('update:isLoadingStatus', false)
         })
       }
     },
@@ -1083,6 +1089,7 @@ export default {
             cursor: pointer;
             div {
               padding: 0px 10px;
+              color: #1c1c1c;
             }
             color: rgb(28, 28, 28);
             .uploadMediaDiv {

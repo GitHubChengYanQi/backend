@@ -153,8 +153,7 @@ export function setBreadcrumb (path, data) {
     path: '/clientFollow/addRule', // 需要改变面包屑的地址
     title: '编辑规则', // 改变的名称
     key: 'label'// 根据参数
-  },
-  {
+  }, {
     path: '/riskEarlyWarning/creatingWarningRule', // 需要改变面包屑的地址
     title: '编辑预警策略', // 改变的名称
     key: 'id'// 根据参数

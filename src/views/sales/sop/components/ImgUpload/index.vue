@@ -91,7 +91,15 @@ export default {
       // })
     },
     async handleChange (info) {
-      // console.log(info, '选择视频完成')
+      console.log(info, '选择视频完成')
+      const tempFileType = info.file.type.split('/')[1]
+      if (this.acceptFileList.length !== 0) {
+        // 文件限制格式列表长度不为0
+        if (this.acceptFileList.indexOf(tempFileType) === -1) {
+          this.$message.error(`上传文件格式只能为${this.acceptFileList.join(',')}`)
+          return false
+        }
+      }
       const fileSize = info.file.size / 1024 / 1024
       if (fileSize > this.fileMaxSize) {
         this.$message.error('上传文件大于200M')
@@ -111,13 +119,6 @@ export default {
       }
     },
     beforeUpload (file) {
-      const tempFileType = file.type.split('/')[0]
-      if (this.acceptFileList.length !== 0) {
-        // 文件限制格式列表长度不为0
-        if (this.acceptFileList.indexOf(tempFileType) === -1) {
-          this.$message.error(`上传文件格式只能为${this.acceptFileList.join(',')}`)
-        }
-      }
       return false
     },
     // 获取文件后缀

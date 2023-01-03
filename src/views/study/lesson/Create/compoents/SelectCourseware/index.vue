@@ -28,7 +28,7 @@
                 <a-icon v-if="['pdf'].includes(row.suffix)" type="file-pdf" style="font-size: 24px" />
               </div>
               <div class="nickname">
-               <a-tooltip overlayClassName="myTooltip">
+                <a-tooltip overlayClassName="myTooltip">
                   <template slot="title">
                     {{ row.fileName || row.title }}
                   </template>
