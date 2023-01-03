@@ -197,6 +197,7 @@ export default {
      */
     inputFn (e) {
       console.log(11111111, e)
+      this.form.label = e
     }
   }
 }

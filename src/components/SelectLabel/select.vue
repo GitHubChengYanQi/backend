@@ -60,14 +60,13 @@ export default {
      * @param {*} e
      */
     handleDelete (e) {
-      console.log(1111, e)
+      console.log('删除', e)
     },
     /**
      * 选择回调
      * @param {*} e
      */
     inputFn (e) {
-      console.log(333333333, e)
       this.visible = false
       this.$emit('input', e)
     }

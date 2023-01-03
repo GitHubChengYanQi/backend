@@ -180,7 +180,7 @@ const getSource = (t) => {
   if (t === '1') {
     return '企业微信'
   } else if (t === '2') {
-    return '公众号'
+    return '用户上传'
   } else if (t === '3') {
     return '设备'
   } else if (t === '4') {

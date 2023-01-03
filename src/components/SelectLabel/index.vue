@@ -140,7 +140,6 @@ export default {
   watch: {
     state: {
       handler (val, oldval) {
-        console.log(22222222222222, val)
         this.visible = true
         this.getLabelData()
       },
