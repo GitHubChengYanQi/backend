@@ -1,110 +1,138 @@
+<!--
+  名称 = 选择标签组件
+  输入 = ids[Array]
+  输出 = ids[Array]
+  调用方法 = <LabelSelect v-model="form.label" :addState="true" />
+-->
 <template>
-  <div
-    class="labelSelect_box"
-    @mousewheel="mousewheel"
-    v-if="visible">
-    <div
-      class="label_content"
-      @mousewheel="previewMouse">
-      <div class="label_header">
-        <span class="label_title">选择标签</span>
-        <span
-          class="close"
-          @click="close">+</span>
-      </div>
-      <a-input-search
-        v-model="search"
-        placeholder="请输入标签"
-        @search="onSearch"
-        style="height:36px;"></a-input-search>
-      <div
-        class="label_date_box"
-        @mousewheel="previewMouse">
-        <div
-          class="data_content"
-          v-for="(item,index) in labelDate"
-          :key="index">
-          <div class="data_title">{{ item.groupName }}</div>
-          <div class="data_main_box">
-            <div
-              class="data_add_box"
-              v-if="addState"
-              @click="setInput(index)">
-              <a-icon type="plus" />&nbsp;添加
-            </div>
-            <span
-              class="data_input_box"
-              v-if="isInput == index">
-              <a-input
-                v-model="addRule"
-                placeholder="输入后回车"
-                @blur="setInput(-1)"
-                @keyup.enter.native="searchAllCompany(index)" />
-            </span>
-            <span
-              class="data_main"
-              @click="setArr(items.id,index)"
-              :style="{borderColor: idArr.includes(items.id) ? '#1890ff':'',pointerEvents:excludeId.includes(items.id) ? 'none':'',color:excludeId.includes(items.id) ? '#ccc':''}"
-              v-for="(items,indexs) in item.tags"
-              :key="indexs">{{ items.name }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="label_btn">
-        <span
-          class="add_ruleGroup"
-          @click="setModal(-1)"
-          v-if="addState">
-          <a-icon type="plus" />&nbsp;新建标签组
-        </span>
-        <a-button @click="close">取消</a-button>
-        <a-button
-          type="primary"
-          style="margin-left:10px;"
-          @click="getDate">确定</a-button>
+  <div>
+    <!-- head -->
+    <div class="select" @click="openLabel">
+      <span v-if="idArr.length === 0">请选择</span>
+      <div class="box" v-else>
+        <a-tag closable @close="handleDelete(index)" v-for="(item, index) in (inputArr.slice(0, num))" :key="index">
+          {{ item.name }}
+        </a-tag>
+        <a-tag v-if="inputArr.length > num">...</a-tag>
       </div>
     </div>
-    <a-modal
-      :visible="isModal"
-      title="新建标签组"
-      ok-text="确认"
-      cancel-text="取消"
-      @ok="addGroup()"
-      @cancel="setModal(-1)">
-      <div class="add_tigs">
-        <a-icon type="exclamation-circle" />
-        管理员可根据不同部门选择展示不同的标签组，部门管理员可创建部门可见的标签
+    <!-- end head -->
+    <!-- list -->
+    <div
+      class="labelSelect_box"
+      @mousewheel="mousewheel"
+      v-if="visible">
+      <div
+        class="label_content"
+        @mousewheel="previewMouse">
+        <div class="label_header">
+          <span class="label_title">选择标签</span>
+          <span
+            class="close"
+            @click="close">+</span>
+        </div>
+        <a-input-search
+          v-model="search"
+          placeholder="请输入标签"
+          @search="onSearch"
+          style="height:36px;"></a-input-search>
+        <div
+          class="label_date_box"
+          @mousewheel="previewMouse">
+          <div
+            class="data_content"
+            v-for="(item,index) in labelDate"
+            :key="index">
+            <div class="data_title">{{ item.groupName }}</div>
+            <div class="data_main_box">
+              <div
+                class="data_add_box"
+                v-if="addState"
+                @click="setInput(index)">
+                <a-icon type="plus" />&nbsp;添加
+              </div>
+              <span
+                class="data_input_box"
+                v-if="isInput == index">
+                <a-input
+                  v-model="addRule"
+                  placeholder="输入后回车"
+                  @blur="setInput(-1)"
+                  @keyup.enter.native="searchAllCompany(index)" />
+              </span>
+              <span
+                class="data_main"
+                @click="setArr(items.id,index)"
+                :style="{borderColor: idArr.includes(items.id) ? '#1890ff':'',pointerEvents:excludeId.includes(items.id) ? 'none':'',color:excludeId.includes(items.id) ? '#ccc':''}"
+                v-for="(items,indexs) in item.tags"
+                :key="indexs">{{ items.name }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="label_btn">
+          <span
+            class="add_ruleGroup"
+            @click="setModal(-1)"
+            v-if="addState">
+            <a-icon type="plus" />&nbsp;新建标签组
+          </span>
+          <a-button @click="close">取消</a-button>
+          <a-button
+            type="primary"
+            style="margin-left:10px;"
+            @click="handleOk">确定</a-button>
+        </div>
       </div>
-      <div class="input_box">
-        <span
-          class="input_title"
-          style="width:100px;">
-          标签组名称：
-        </span>
-        <a-input
-          style="width:354px;height:36px;"
-          v-model="tigs"
-          placeholder="请输入标签组名称" />
-      </div>
-      <div class="input_box">
-        <span
-          class="input_title"
-          style="width:100px;">
-          标签名：
-        </span>
-        <a-input
-          style="width:354px;height:36px"
-          v-model="ruleName"
-          placeholder="请输入标签组名称" />
-      </div>
-    </a-modal>
+      <a-modal
+        :visible="isModal"
+        title="新建标签组"
+        ok-text="确认"
+        cancel-text="取消"
+        @ok="addGroup()"
+        @cancel="setModal(-1)">
+        <div class="add_tigs">
+          <a-icon type="exclamation-circle" />
+          管理员可根据不同部门选择展示不同的标签组，部门管理员可创建部门可见的标签
+        </div>
+        <div class="input_box">
+          <span
+            class="input_title"
+            style="width:100px;">
+            标签组名称：
+          </span>
+          <a-input
+            style="width:354px;height:36px;"
+            v-model="tigs"
+            placeholder="请输入标签组名称" />
+        </div>
+        <div class="input_box">
+          <span
+            class="input_title"
+            style="width:100px;">
+            标签名：
+          </span>
+          <a-input
+            style="width:354px;height:36px"
+            v-model="ruleName"
+            placeholder="请输入标签组名称" />
+        </div>
+      </a-modal>
+    </div>
+    <!-- end list -->
   </div>
 </template>
 
 <script>
 import { getContactTagGroup, addContactTagGroup, addContactTag } from '@/api/workContactTag'
+import { deepClonev2 } from '@/utils/util'
 export default {
   props: {
+    value: {
+      type: Array,
+      default: () => {
+        return []
+      }
+    },
     state: {
       type: Boolean,
       default: false
@@ -122,6 +150,7 @@ export default {
   },
   data () {
     return {
+      num: 2, // 默认显示3个标签
       visible: false,
       labelDate: [],
       search: '',
@@ -131,7 +160,8 @@ export default {
       isInput: -1,
       isModal: false,
       tigs: '',
-      ruleName: ''
+      ruleName: '',
+      record: [] // 原始数据
     }
   },
   created () {
@@ -144,9 +174,15 @@ export default {
         this.getLabelData()
       },
       deep: true
+    },
+    value (val, oldval) {
+      this.record = this.deepClonev2(val)
+      this.getIds(val)
+      this.inputArr = val
     }
   },
   methods: {
+    deepClonev2,
     getLabelData (e) {
       if (e == -1) {
         getContactTagGroup().then((res) => {
@@ -185,14 +221,6 @@ export default {
         this.ruleName = ''
         this.setModal(-1)
       })
-    },
-    close () {
-      this.inputArr = []
-      this.idArr = []
-      this.isInput = -1
-      this.search = ''
-      // this.$emit('close', -1)
-      this.visible = false
     },
     searchAllCompany (e) {
       const data = {
@@ -247,9 +275,46 @@ export default {
     previewMouse (e) {
       e.stopPropagation()
     },
-    getDate () {
+    /**
+     * 获取id
+     */
+    getIds (data) {
+      const arr = []
+      for (let i = 0; i < data.length; i++) {
+        arr.push(data[i].id)
+      }
+      this.idArr = arr
+    },
+    /**
+     * 关闭
+     */
+    close () {
+      this.isInput = -1
+      this.search = ''
+      this.visible = false
+      this.$emit('input', this.record)
+    },
+    /**
+     * 确定
+     */
+    handleOk () {
+      this.isInput = -1
+      this.search = ''
+      this.visible = false
       this.$emit('input', this.inputArr)
-      this.close()
+    },
+    /**
+     * 打开select
+     */
+    openLabel () {
+      this.visible = true
+    },
+    /**
+     * 删除
+     * @param {*} e
+     */
+    handleDelete (e) {
+      this.inputArr.splice(e, 1)
     }
   }
 }
@@ -455,5 +520,20 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+}
+.select{
+  width:100%;
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 6px 11px;
+  line-height: 1.5;
+  .box{
+    margin-top:4px;
+    span{
+      margin-bottom:4px;
+    }
+  }
 }
 </style>
