@@ -470,17 +470,17 @@ export default {
           url: videoInfo.videoUrl,
           filename: file.key
         }
-        await companyWxUpload(tempUploadInfo).then(res=> {
+        await companyWxUpload(tempUploadInfo).then(res => {
           this.$emit('update:isLoadingStatus', false)
           if (this.submitType === 'add') {
             this.sendContentArray.push(videoInfo)
           } else {
             this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
           }
-            this.isSopEditStatus = true
-            this.$emit('update:isSopEdit', this.isSopEditStatus)
-            this.$emit('update:contentArray', this.sendContentArray)
-          })
+          this.isSopEditStatus = true
+          this.$emit('update:isSopEdit', this.isSopEditStatus)
+          this.$emit('update:contentArray', this.sendContentArray)
+        })
       }
     },
     // 选择互动雷达回调

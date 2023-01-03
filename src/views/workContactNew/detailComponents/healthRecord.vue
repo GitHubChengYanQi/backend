@@ -143,7 +143,7 @@
             ></a-select>
             <span class="dot">.</span>
             <a-select
-              v-if = "modalObj.modalType === 'xzjl'"
+              v-if="modalObj.modalType === 'xzjl'"
               style="width: 45%"
               v-model="item.dataName[1]"
               :options="Array(100).fill(null).map((it, index) => ({ value: index < 10 ? '0' + index : index, label: index < 10 ? '0' + index : index }))"
