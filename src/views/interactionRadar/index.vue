@@ -2,7 +2,12 @@
   <div class="interactionRadar_page">
     <a-card class="interactionRadar_card">
       <div class="interactionRadar_content">
-        <div class="interactionRadar_catalog">
+        <div
+          class="interactionRadar_catalog"
+          @click="()=>{
+            catalogIndex = -1
+            getTableData()
+          }">
           <div class="header">
             <div class="title">
               分组名称
@@ -21,15 +26,18 @@
           <div class="catalog_box">
             <div
               class="catalog"
-              :style="catalogIndex == index ? {backgroundColor:'rgba(129, 211, 248, 1)'}:{}"
+              :style="catalogIndex == item.id ? {backgroundColor:'rgba(129, 211, 248, 1)'}:{}"
               v-for="(item,index) in catalog"
-              @click="()=>{
-                catalogIndex = index
+              @click.stop="()=>{
+                catalogIndex = item.id
+                table.pagination.current = 1
+                table.pagination.pageSize = 10
+                getTableData()
               }"
               :key="index"
             >
-              <span class="title">{{ item }}</span>
-              <span v-if="catalogIndex == index && index != 0">
+              <span class="title">{{ item.name }}</span>
+              <span v-if="catalogIndex == item.id && index != 0">
                 <a-dropdown
                   :trigger="['click']"
                   placement="bottomLeft"
@@ -44,13 +52,13 @@
                       <a-menu-item>
                         <div
                           class="down_select"
-                          @click="setGroup(1,index)"
+                          @click="setGroup(1,item)"
                         >修改分组</div>
                       </a-menu-item>
                       <a-menu-item>
                         <div
                           class="down_select"
-                          @click="setGroup(2,index)"
+                          @click="setGroup(2,item)"
                         >删除分组</div>
                       </a-menu-item>
                     </a-menu>
@@ -114,7 +122,7 @@
           </div>
           <div class="content">
             <div class="header">
-              <span class="txt">共{{ 4 }}个雷达链接</span>
+              <span class="txt">共{{ table.pagination.total }}个雷达链接</span>
               <span class="button_box">
                 <a-popover
                   title="选择分组"
@@ -128,11 +136,11 @@
                         <a-select
                           class="input"
                           placeholder="请选择"
-                          v-model="searchData.data.group"
+                          v-model="unitId"
                         >
                           <a-select-option
-                            v-for="(items,indexs) in selectArr.type"
-                            :value="items.code"
+                            v-for="(items,indexs) in catalog"
+                            :value="items.id"
                             :key="indexs"
                           >{{ items.name }}</a-select-option>
                         </a-select>
@@ -208,60 +216,12 @@
                   slot-scope="text,record"
                 >
                   <template>
-                    <div class="example">
+                    <div class="example" v-if="record.entry">
                       <div
-                        v-if="record.type == 1"
-                        class="example_box"
-                      >
-                        <div class="left">
-                          <div class="title">{{ record.example.title }}</div>
-                          <div class="content">{{ record.example.text }}</div>
-                        </div>
-                        <div class="right">
-                          <img
-                            class="img"
-                            :src="record.example.imgUrl"
-                            alt=""
-                          >
-                        </div>
-                      </div>
-                      <div
-                        v-else-if="record.type == 2"
-                        class="example_box"
-                      >
-                        <div class="left">
-                          <div class="title">{{ record.example.title }}</div>
-                          <div class="content">{{ record.example.text }}</div>
-                        </div>
-                        <div class="right">
-                          <img
-                            class="img"
-                            :src="record.example.imgUrl"
-                            alt=""
-                          >
-                        </div>
-                      </div>
-                      <div
-                        v-else-if="record.type == 3"
-                        class="example_box"
-                      >
-                        <div class="left">
-                          <div class="title">{{ record.example.title }}</div>
-                          <div class="content">{{ record.example.text }}</div>
-                        </div>
-                        <div class="right">
-                          <video
-                            class="img"
-                            :src="record.example.imgUrl"
-                            alt=""
-                          />
-                        </div>
-                      </div>
-                      <div
-                        v-else
+                        v-if="record.type == 2"
                         class="pdf"
                       >
-                        <div class="title">{{ record.example.title + '.pdf' }}</div>
+                        <div class="title">{{ record.entry.linkTitle }}</div>
                         <div class="icon_box">
                           <img
                             class="icon"
@@ -270,6 +230,23 @@
                           >
                         </div>
                       </div>
+                      <div
+                        v-else
+                        class="example_box"
+                      >
+                        <div class="left">
+                          <div class="title">{{ record.entry.linkTitle }}</div>
+                          <div class="content">{{ record.entry.linkDigest }}</div>
+                        </div>
+                        <div class="right">
+                          <img
+                            class="img"
+                            :src="record.entry.linkImg"
+                            alt=""
+                          />
+                        </div>
+                      </div>
+
                     </div>
                   </template>
                 </div>
@@ -280,14 +257,14 @@
                   <template>
                     <a-popover
                       title="标签"
-                      v-if="record.radarTab && record.radarTab.length > 0"
+                      v-if="record.track && record.track.linkState && record.track.linkState.length > 0"
                     >
                       <template slot="content">
                         <div class="labelBox">
                           <a-tag
-                            v-for="(item, index) in record.radarTab"
+                            v-for="(item, index) in record.track.linkState"
                             :key="index"
-                          >{{ item }}</a-tag>
+                          >{{ item.name }}</a-tag>
                         </div>
                       </template>
                       <a-tag type="button">
@@ -342,8 +319,8 @@
           v-model="copylinkName"
         >
           <a-select-option
-            v-for="(items,indexs) in selectArr.type"
-            :value="items.code"
+            v-for="(items,indexs) in channel"
+            :value="items.id"
             :key="indexs"
           >{{ items.name }}</a-select-option>
         </a-select>
@@ -355,13 +332,15 @@
 <script>
 import { getDict } from '@/api/common.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import { scrmRadarLabelFind, scrmRadarLabelSave, scrmRadarLabelDrop, scrmRadarArticleFind, scrmRadarArticleDrop, scrmRadarArticleAway, scrmRadarArticleMove, scrmRadarArticleDown, scrmRadarShiftSend } from '@/api/setRadar.js'
+import moment from 'moment'
 
 export default {
-
   data () {
     return {
-      catalog: ['默认分组', '123'],
+      catalog: [],
       catalogIndex: -1,
+      unitId: 0,
       modalTitle: '新建分组',
       modalState: false,
       catalogName: '',
@@ -371,13 +350,13 @@ export default {
           {
             title: '创建时间：',
             type: 'date',
-            key: 'date'
+            key: 'createdAt'
           },
           {
             title: '类型：',
             type: 'select',
             selectKey: 'type',
-            key: 'type'
+            key: 'shape'
           },
           {
             title: '链接标题：',
@@ -387,8 +366,8 @@ export default {
           }
         ],
         data: {
-          date: [],
-          type: '0',
+          createdAt: [],
+          shape: '0',
           title: ''
         }
       },
@@ -396,29 +375,18 @@ export default {
         type: []
       },
       table: {
-        data: [
-          {
-            id: 0,
-            radarTab: ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
-            example: {
-              title: '12', // 标题 在pdf类型是名称
-              text: '12312', // 摘要
-              imgUrl: '' // 封面图片地址
-            },
-            type: 1
-          }
-        ],
+        data: [],
         columns: [
           {
             align: 'center',
-            title: '链接标题',
-            dataIndex: 'linkTitle',
+            title: '雷达标题',
+            dataIndex: 'title',
             width: 150
           },
           {
             align: 'center',
             title: '所属分组',
-            dataIndex: 'owningGroup',
+            dataIndex: 'unitName',
             width: 150
           },
           {
@@ -438,20 +406,19 @@ export default {
           {
             align: 'center',
             title: '点击人数',
-            dataIndex: 'hitsNumber',
+            dataIndex: 'clickNum',
             width: 150
           },
           {
             align: 'center',
             title: '创建时间',
-            dataIndex: 'creationTime',
+            dataIndex: 'createdAt',
             width: 150
           },
           {
             align: 'center',
             title: '类型',
-            dataIndex: 'type',
-            width: 150
+            dataIndex: 'shape'
           },
           {
             align: 'center',
@@ -475,16 +442,29 @@ export default {
       },
       clicked: false,
       copylinkState: false,
-      copylinkName: '0'
+      copyId: -1,
+      copylinkName: -1,
+      channel: []
     }
   },
   created () {
     this.getSelect('radar_type', 'type')
+    this.getGroup()
+    this.getTableData()
   },
   methods: {
     handleClickChange () {
       if (this.table.rowSelection.length == 0) return this.$message.error('至少选择一条链接')
       this.clicked = !this.clicked
+    },
+    getGroup () {
+      const obj = {
+        left: 1
+      }
+      scrmRadarLabelFind(obj).then((res) => {
+        console.log(res)
+        this.catalog = res.data.group
+      })
     },
     remove (e) {
       this.$confirm({
@@ -492,11 +472,28 @@ export default {
         content: '是否确定删除规则？',
         okText: '确认',
         cancelText: '取消',
-        onOk: () => {},
+        onOk: () => {
+          const obj = {
+            id: e.id
+          }
+          console.log(obj)
+          scrmRadarArticleDrop(obj).then(res => {
+            console.log(res)
+            this.getTableData()
+          })
+        },
         onCancel () {}
       })
     },
     batchesAmend () {
+      const obj = {
+        kagi: this.table.rowSelection,
+        unitId: this.unitId
+      }
+      scrmRadarArticleMove(obj).then(res => {
+        console.log(res)
+        this.getTableData()
+      })
       this.clicked = !this.clicked
     },
     batchesDel () {
@@ -506,24 +503,41 @@ export default {
         content: '是否确认删除当前雷达？该操作不可撤销，请谨慎操作。',
         okText: '确认',
         cancelText: '取消',
-        onOk: () => {},
+        onOk: () => {
+          const obj = { kagi: this.table.rowSelection }
+          scrmRadarArticleAway(obj).then(res => {
+            console.log(res)
+            this.getTableData()
+          })
+        },
         onCancel () {}
       })
     },
     copylink (e) {
       console.log(e)
+      this.copyId = e.id
+      this.copylinkName = e.ditch[0].id
+      this.channel = e.ditch
       this.copylinkState = true
     },
     copy () {
-      const inputNode = document.createElement('input') // 创建input
-      inputNode.value = '222222222' // 赋值给 input 值
-      document.body.appendChild(inputNode) // 插入进去
-      inputNode.select() // 选择对象
-      document.execCommand('Copy') // 原生调用执行浏览器复制命令
-      inputNode.className = 'oInput'
-      inputNode.style.display = 'none' // 隐藏
-      this.copylinkState = false
-      this.$message.success('复制成功')
+      const obj = {
+        articleId: this.copyId,
+        ditchId: this.copylinkName,
+        remark: '从互动雷达列表页发送'
+      }
+      scrmRadarShiftSend(obj).then(res => {
+        console.log(res)
+        const inputNode = document.createElement('input') // 创建input
+        inputNode.value = res.data.link // 赋值给 input 值
+        document.body.appendChild(inputNode) // 插入进去
+        inputNode.select() // 选择对象
+        document.execCommand('Copy') // 原生调用执行浏览器复制命令
+        inputNode.className = 'oInput'
+        inputNode.style.display = 'none' // 隐藏
+        this.copylinkState = false
+        this.$message.success('复制成功')
+      })
     },
     handleTableChange ({ current, pageSize }) {
       console.log(current, pageSize)
@@ -538,36 +552,63 @@ export default {
     goPage (e, item = {}) {
       console.log(e, item)
       if (e != 3) {
-        this.$router.push(`/interactionRadar/setRadar${e == 0 ? '' : '?id=' + item.id }`)
+        this.$router.push(`/interactionRadar/setRadar${e == 0 ? '' : '?id=' + item.id}`)
+      } else {
+        this.$router.push(`/interactionRadar/radarInfo?id=${item.id}`)
       }
     },
-    getSearch () {},
+    getSearch () {
+      this.getTableData()
+    },
     reset () {
       this.searchData.data = {
-        date: [],
-        type: '0',
+        createdAt: [],
+        shape: '0',
         title: ''
       }
       this.table.pagination.current = 1
       this.table.pagination.pageSize = 10
+      this.getTableData()
     },
     exportsElxe () {
-      callDownLoadByBlob()
+      const { data } = this.searchData
+
+      const obj = {}
+      for (const key in data) {
+        if (key != 'createdAt') {
+          obj[key] = data[key]
+        }
+      }
+      if (data.createdAt.length > 0) {
+        obj.createdAt = data.createdAt.map(item => {
+          return moment(item).format('YYYY-MM-DD')
+        })
+      }
+      if (this.table.rowSelection.length != 0) {
+        obj.kagi = this.table.rowSelection
+        obj.current = 1
+      }
+      if (this.catalogIndex != -1) {
+        obj.unitId = this.catalogIndex
+      }
+      scrmRadarArticleDown(obj).then(res => {
+        callDownLoadByBlob(res, '互动雷达')
+      })
     },
     setCatalog () {
       console.log(this.catalogName)
-      if (this.amendId != -1) {
-        this.catalog = this.catalog.map((item, index) => {
-          if (index == this.amendId) {
-            item = this.catalogName
-          }
-          return item
-        })
-      } else {
-        this.catalog = [...this.catalog, this.catalogName]
+      const obj = {
+        name: this.catalogName
       }
-      this.modalState = false
-      this.catalogName = ''
+      if (this.amendId != -1) {
+        obj.id = this.amendId
+      }
+      scrmRadarLabelSave(obj).then((res) => {
+        console.log(res)
+        this.modalState = false
+        this.catalogName = ''
+        this.getGroup()
+      })
     },
     getSelect (e, key) {
       const obj = {
@@ -583,18 +624,59 @@ export default {
       if (e == 1) {
         this.modalTitle = '修改分组'
         this.modalState = true
-        this.catalogName = this.catalog[item]
-        this.amendId = item
+        this.catalogName = item.name
+        this.amendId = item.id
       } else {
         this.$confirm({
           title: '提示',
           content: '是否确认删除当前分组？删除后该分组下素材移动到默认分组中，该操作不可撤销，请谨慎操作。',
           okText: '确认',
           cancelText: '取消',
-          onOk: () => {},
+          onOk: () => {
+            const obj = {
+              id: item.id
+            }
+            scrmRadarLabelDrop(obj).then(res => {
+              console.log(res)
+              this.getGroup()
+            })
+          },
           onCancel () {}
         })
       }
+    },
+    getTableData () {
+      const { current, pageSize } = this.table.pagination
+      const { data } = this.searchData
+      const obj = {
+        current,
+        size: pageSize
+      }
+      for (const key in data) {
+        if (key != 'createdAt') {
+          obj[key] = data[key]
+        }
+      }
+      if (data.createdAt.length > 0) {
+        obj.createdAt = data.createdAt.map(item => {
+          return moment(item).format('YYYY-MM-DD')
+        })
+      }
+      if (this.catalogIndex != -1) {
+        obj.unitId = this.catalogIndex
+      }
+      console.log(obj)
+      scrmRadarArticleFind(obj).then(res => {
+        console.log(res)
+        this.table.data = res.data.datas.map(item => {
+          const typeArr = this.selectArr.type.filter(items => {
+            return items.name == item.shape
+          })
+          item.type = typeArr.length == 0 ? 3 : typeArr[0].code
+          return item
+        })
+        this.table.pagination.total = res.data.total
+      })
     }
   }
 }
@@ -661,6 +743,12 @@ export default {
             .icon {
               width: 20px;
               transform: rotate(90deg);
+            }
+            .title {
+              white-space: nowrap;
+              width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           }
         }

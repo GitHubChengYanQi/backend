@@ -25,6 +25,7 @@ import { ImageDrop } from 'quill-image-drop-module'
 import ImageResize from 'quill-image-resize-module'
 
 import { addQuillTitle } from './quill-title.js'
+
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线
   ['blockquote'], // 引用  代码块, 'code-block'
@@ -68,7 +69,7 @@ export default {
           },
           clipboard: {
             // 粘贴版，处理粘贴时候的自带样式
-            matchers: [[Node.ELEMENT_NODE, this.HandleCustomMatcher]]
+            // matchers: [[Node.ELEMENT_NODE, this.HandleCustomMatcher]]
           },
           // theme:'snow',
           toolbar: {
@@ -106,26 +107,26 @@ export default {
       console.log(e)
       this.$emit('setMedium', e, true)
     },
-    HandleCustomMatcher (node, Delta) {
-      const ops = []
+    // HandleCustomMatcher (node, Delta) {
+    //   const ops = []
 
-      Delta.ops.forEach((op) => {
-        if (op.insert && typeof op.insert === 'string') {
-          ops.push({
-            insert: op.insert
-          })
-        } else {
-          ops.push({
-            insert: op.insert
-          })
-          console.log(op.insert)
-        }
-      })
+    //   Delta.ops.forEach((op) => {
+    //     if (op.insert && typeof op.insert === 'string') {
+    //       ops.push({
+    //         insert: op.insert
+    //       })
+    //     } else {
+    //       ops.push({
+    //         insert: op.insert
+    //       })
+    //       console.log(op.insert)
+    //     }
+    //   })
 
-      Delta.ops = ops
+    //   Delta.ops = ops
 
-      return Delta
-    },
+    //   return Delta
+    // },
     getEditorData (type, http) {
       const quill = this.$refs.myQuillEditor.quill
       const length = quill.selection.savedRange.index
@@ -225,5 +226,9 @@ ql-snow .ql-picker.ql-header .ql-picker-label[data-value='4']::before,
 .ql-snow .ql-picker.ql-font .ql-picker-label[data-value='monospace']::before,
 .ql-snow .ql-picker.ql-font .ql-picker-item[data-value='monospace']::before {
   content: '等宽字体';
+}
+.ql-editor .ql-video {
+  width: 300px;
+  height: 150px;
 }
 </style>

@@ -13,8 +13,21 @@
                 'handleBtn disabled' :
                 'handleBtn'"
               :key="index"
-              @click="chooseSendType(item.type)"
-            >+ {{ item.name }}</div>
+              @click="chooseSendType(item.type)">
+              <div v-if="item.type === 'video'" class="uploadMediaDiv">
+                <!-- v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!' }], initialValue: '' }]" -->
+                <ImgUpload
+                  @loadingMethod="loadingMethod"
+                  :fileMaxSize="200"
+                  :isLoadingStatus.sync="isLoadingStatus"
+                  @successUpload="successUpload">
+                  <div>{{ `+ ${item.name}` }}</div>
+                </ImgUpload>
+              </div>
+              <div v-else>
+                + {{ item.name }}
+              </div>
+            </div>
             <div
               class="disabledBox"
               v-if="isDisableEdit === true"
@@ -40,8 +53,8 @@
             <div :class="`content ${item.type === 4 ? 'link' : ''}`" v-else-if="item.type === 4">
               <div class="lef">
                 <span class="til">{{ item.linkTitle }}</span>
-                <span class="desc">{{ item.content ? item.content.linkUrl: '' }}</span>
-                <span class="desc">{{ item.content ? item.content.linkShow: '' }}</span>
+                <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span>
+                <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
               </div>
               <img :src="item.linkPhoto" alt class="image" />
             </div>
@@ -56,6 +69,14 @@
                 <img src="../images/miniProgramIcon.svg" alt class="icon" />
                 <span class="say">小程序</span>
               </div>
+            </div>
+            <div :class="`content ${item.type === 6 ? 'link' : ''}`" v-else-if="item.type === 6">
+              <div class="lef">
+                <span class="til">{{ item.linkTitle }}</span>
+                <!-- <span class="desc">{{ item.linkUrl ? item.linkUrl: '' }}</span> -->
+                <span class="desc">{{ item.linkShow ? item.linkShow: '' }}</span>
+              </div>
+              <img :src="item.linkPhoto" alt class="image" />
             </div>
             <div class="handlesBox" v-if="sendContentArray && sendContentArray[selectSopItemIdx] && isDisableEdit === false">
               <img
@@ -75,6 +96,8 @@
                 src="../images/edit.svg"
                 alt
                 class="icon"
+                v-if="item.type !== 6"
+                :class="(item.type === 6) ? 'icon move disabled' : 'icon move'"
                 @click="handleEditClick(item, index)"
               />
               <img src="../images/del.svg" alt class="icon" @click="handleDelClick(index)" />
@@ -227,6 +250,55 @@
         <a-button type="primary" @click="confirmContentMini">确定</a-button>
       </template>
     </a-modal>
+    <a-modal
+      title="新增互动雷达"
+      :maskClosable="false"
+      :width="600"
+      :visible="contentRadarModalShow"
+      @cancel="closeLinkModal()"
+      :getContainer="() => $refs['send_content_container']"
+    >
+      <div class="contentLinkModal">
+        <div class="formBox">
+          <div class="line">
+            <a-input v-model="contentRadarObj.radarDitchName" placeholder="请输入雷达渠道（必填）" disabled/>
+            <span class="len">{{ (contentRadarObj.radarDitchName && contentRadarObj.radarDitchName.length) ? contentRadarObj.radarDitchName.length : '0' }}/200</span>
+          </div>
+          <div class="line">
+            <a-input v-model="contentRadarObj.linkTitle" placeholder="请输入链接标题（必填）" />
+            <span class="len">{{ (contentRadarObj.linkTitle && contentRadarObj.linkTitle.length) ? contentRadarObj.linkTitle.length : '0' }}/200</span>
+          </div>
+          <div class="line">
+            <a-input v-model="contentRadarObj.linkUrl" placeholder="输入http或https开头的链接地址（必填）" />
+            <span class="len">{{ (contentRadarObj.linkUrl && contentRadarObj.linkUrl.length) ? contentRadarObj.linkUrl.length : '0' }}/500</span>
+          </div>
+          <div class="line textarea">
+            <a-textarea v-model="contentRadarObj.linkShow" autoSize placeholder="请输入内容简介（选填）" />
+            <span class="len">{{ (contentRadarObj.linkShow && contentRadarObj.linkShow.length) ? contentRadarObj.linkShow.length : '0' }}/170</span>
+          </div>
+        </div>
+        <div class="pic">
+          <div
+            class="addPic image"
+            v-if="!contentRadarObj.linkPhoto"
+            @click="openSelectPhoto('addRadarPhoto')"
+          >+</div>
+          <img
+            class="image"
+            v-else
+            :src="contentRadarObj.linkPhoto"
+            @click="openSelectPhoto('addRadarPhoto')"
+          />
+          <span class="tip">图片限制在2MB以内</span>
+        </div>
+      </div>
+      <template slot="footer">
+        <a-button
+          @click="closeRadarModal()"
+        >取消</a-button>
+        <a-button type="primary" @click="confirmContentRadar">确定</a-button>
+      </template>
+    </a-modal>
     <!-- 添加素材库弹窗 -->
     <a-modal v-model="contentLibraryModalShow" centered @ok="handleAddLibraryOk" width="95%">
       <MediumGroup
@@ -235,18 +307,26 @@
         @materialSelect="librarySelectChange"
       />
     </a-modal>
+    <!-- 雷达选择toast -->
+    <RadarChoose v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk" />
   </div>
 </template>
 <script>
+import ImgUpload from './ImgUpload/index.vue'
 // transformTaskItemEntry, transformTaskDate,
 import { handleBtnArr, isUrl } from '../sopUtils'
 // import { deepClonev2 } from '@/utils/util'
 // import { userSopTaskItemSettingReq } from '@/api/salesManagement'
-import { upLoad } from '@/api/common'
+import { upLoad, companyWxUpload } from '@/api/common'
+import RadarChoose from '../../../clientFollow/components/radarToastComponent.vue'
 export default {
   name: 'SendContent',
   data () {
     return {
+      oss: {},
+      contentRadarObj: {}, // 互动雷达对象
+      contentRadarModalShow: false, // 修改互动雷达弹框
+      radarVisible: false, // 互动雷达弹框
       isSopEditStatus: false,
       chooseEditIndex: '', // 当前选择编辑的下标
       submitType: '', // 提交状态,新增与修改
@@ -273,9 +353,15 @@ export default {
     }
   },
   components: {
+    ImgUpload,
+    RadarChoose,
     'MediumGroup': () => import('@/views/mediumGroup/index.vue')
   },
   props: {
+    isLoadingStatus: {
+      type: Boolean,
+      default: false
+    },
     isDisableEdit: {
       type: Boolean,
       default: false
@@ -344,6 +430,89 @@ export default {
     }
   },
   methods: {
+    loadingMethod (e) {
+      this.$emit('update:isLoadingStatus', e)
+    },
+    async successUpload (file) {
+      console.log(file, 'successUpload上传成功的返回')
+      if (file.size) {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('time', 1)
+        console.log(formData, 'formData')
+        // const res = await upLoad(formData)
+        this.$emit('update:isLoadingStatus', true)
+        await upLoad(formData).then(res => {
+          this.$emit('update:isLoadingStatus', false)
+          const videoInfo = {
+            type: 3,
+            videoUrl: res.data.fullPath
+          }
+          if (this.submitType === 'add') {
+            this.sendContentArray.push(videoInfo)
+          } else {
+            this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          }
+          this.isSopEditStatus = true
+          this.$emit('update:isSopEdit', this.isSopEditStatus)
+          this.$emit('update:contentArray', this.sendContentArray)
+          // this.$refs.uploadVideoRef.value = ''
+        })
+      } else {
+        this.$emit('update:isLoadingStatus', true)
+        const videoInfo = {
+          type: 3,
+          videoUrl: `${file.host}/${file.key}?Expire=${file.expire}&OSSAccessKeyId=${file.OSSAccessKeyId}&Signature=${file.Signature}`
+        }
+        const tempUploadInfo = {
+          scene: 1,
+          type: 'video',
+          url: videoInfo.videoUrl,
+          filename: file.key
+        }
+        await companyWxUpload(tempUploadInfo).then(res => {
+          this.$emit('update:isLoadingStatus', false)
+          if (this.submitType === 'add') {
+            this.sendContentArray.push(videoInfo)
+          } else {
+            this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          }
+          this.isSopEditStatus = true
+          this.$emit('update:isSopEdit', this.isSopEditStatus)
+          this.$emit('update:contentArray', this.sendContentArray)
+        })
+      }
+    },
+    // 选择互动雷达回调
+    handleAddRadarOk (e) {
+      console.log(e, '选择互动雷达回调')
+      if ((this.sendContentArray.length + e.length) > 10) {
+        this.$message.warning('发送条数不能超过十条！')
+        return
+      }
+      this.isSopEditStatus = true
+      for (const item of e) {
+        const singleInfo = { type: 6 }
+        singleInfo.linkTitle = item.entry.linkTitle
+        singleInfo.linkUrl = item.link
+        singleInfo.linkPhoto = item.entry.linkImg
+        singleInfo.linkShow = item.entry.linkDigest
+        singleInfo.radarPDF = item.entry.radarPDF
+        singleInfo.radarArticleId = item.id
+        singleInfo.radarDitchId = item.selectChannel
+        singleInfo.radarDitchName = item.channelTxt
+        this.sendContentArray.push(singleInfo)
+        // title: content.linkTitle,
+        // url: target.link,
+        // pic: { url: content.linkImg, path: content.linkImgPath || content.linkImg.slice(43, content.linkImg.indexOf('?')) },
+        // desc: content.linkDigest,
+        // radarLink: '1',
+        // radarName: target.channelTxt
+      }
+      this.radarVisible = false
+      this.$emit('update:isSopEdit', this.isSopEditStatus)
+      this.$emit('update:contentArray', this.sendContentArray)
+    },
     returnErrorText (url) {
       return '暂不支持显示 .avi 格式的视频'
     },
@@ -380,7 +549,7 @@ export default {
           this.chooseImage()
           break
         case 'video':
-          this.chooseVideo()
+          // this.chooseVideo()
           break
         case 'link':
           this.contentLinkModalShow = true
@@ -390,6 +559,9 @@ export default {
           break
         case 'embed':
           this.contentMiniModalShow = true
+          break
+        case 'radar':
+          this.radarVisible = true
           break
       }
     },
@@ -480,6 +652,38 @@ export default {
       this.contentLinkObj = {}
       this.submitType = ''
       this.uploadPhotoType = ''
+    },
+    // 关闭互动雷达修改弹框
+    closeRadarModal () {
+      this.contentRadarModalShow = false
+      this.contenRadarObj = {}
+      this.submitType = ''
+      this.uploadPhotoType = ''
+    },
+    // 提交互动雷达
+    confirmContentRadar () {
+      if (!this.contenRadarObj.linkTitle) {
+        return this.$message.warn('请输入链接标题！')
+      } else if (!this.contenRadarObj.linkUrl) {
+        return this.$message.warn('请输入链接地址！')
+      } else if (!this.contenRadarObj.linkUrl) {
+        return this.$message.warn('请输入正确的链接地址！')
+      } else if (!this.contenRadarObj.linkPhoto) {
+        return this.$message.warn('请上传封面图片！')
+      }
+      this.$set(this.contenRadarObj, 'type', 6)
+      if (this.submitType === 'add') {
+        this.sendContentArray.push(this.contenRadarObj)
+      } else {
+        this.sendContentArray.splice(this.chooseEditIndex, 1, this.contenRadarObj)
+      }
+      this.isSopEditStatus = true
+      this.$emit('update:isSopEdit', this.isSopEditStatus)
+      this.contentRadarModalShow = false
+      this.submitType = ''
+      this.uploadPhotoType = ''
+      this.$emit('update:contentArray', this.sendContentArray)
+      this.contentRadarObj = {}
     },
     // 提交小程序
     confirmContentMini () {
@@ -725,25 +929,28 @@ export default {
         const file = e.target.files[0]
         if (file.size > 10 * 1000 * 1000) {
           return this.$message.warn('请上传小于10MB的视频文件')
-        }
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        const res = await upLoad(formData)
-        const videoInfo = {
-          type: 3,
-          videoUrl: res.data.fullPath
-        }
-        if (this.submitType === 'add') {
-          this.sendContentArray.push(videoInfo)
         } else {
-          this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('time', 1)
+          console.log(formData, 'formData')
+          // const res = await upLoad(formData)
+          await upLoad(formData).then(res => {
+            const videoInfo = {
+              type: 3,
+              videoUrl: res.data.fullPath
+            }
+            if (this.submitType === 'add') {
+              this.sendContentArray.push(videoInfo)
+            } else {
+              this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+            }
+            this.isSopEditStatus = true
+            this.$emit('update:isSopEdit', this.isSopEditStatus)
+            this.$emit('update:contentArray', this.sendContentArray)
+            this.$refs.uploadVideoRef.value = ''
+          })
         }
-        this.isSopEditStatus = true
-        this.$emit('update:isSopEdit', this.isSopEditStatus)
-        this.$emit('update:contentArray', this.sendContentArray)
-        this.$refs.uploadVideoRef.value = ''
       } else {
         console.log(e)
       }
@@ -868,10 +1075,35 @@ export default {
           .handleBtn {
             margin-left: 5px;
             border-radius: 3px;
-            padding: 5px 15px;
             border: 1px solid #a9a9a9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0.5;
             cursor: pointer;
+            div {
+              padding: 0px 10px;
+            }
             color: rgb(28, 28, 28);
+            .uploadMediaDiv {
+              padding: 0;
+              /deep/.img-avatar-uploader {
+                // padding: 5px 0px;
+                > .ant-upload {
+                  padding: 4px 0px;
+                  width: auto;
+                  height: auto;
+                  margin-bottom: 0px;
+                  margin-right: 0px;
+                  background-color: white;
+                  color: #1c1c1c;
+                  border: 0;
+                  span.ant-upload {
+                    padding: 0;
+                  }
+                }
+              }
+            }
           }
           .handleBtn:first-child {
             margin-left: 0;

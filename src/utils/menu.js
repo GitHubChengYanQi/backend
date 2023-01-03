@@ -42,7 +42,10 @@ export function setBreadcrumb (path, data) {
     2: {
       path: [
         '/clientFollow/labelInfo',
-        '/clientFollow/addRule'],
+        '/clientFollow/addRule',
+        '/clientFollow/labelExpendInfo',
+        '/clientFollow/addExpendRule'
+      ],
       returnPath: '/clientFollow/autoLabel'
     },
     3: {
@@ -135,7 +138,7 @@ export function setBreadcrumb (path, data) {
       returnPath: '/groupsOperation/joinGroupSaying/index'
     },
     21: {
-      path: ['/interactionRadar/setRadar'],
+      path: ['/interactionRadar/setRadar', '/interactionRadar/radarInfo'],
       returnPath: '/interactionRadar/index'
     }
   }
@@ -146,6 +149,24 @@ export function setBreadcrumb (path, data) {
     returnBtnPath.push(...value.path)
   }
 
+  const setBranch = [{
+    path: '/clientFollow/addRule', // 需要改变面包屑的地址
+    title: '编辑规则', // 改变的名称
+    key: 'label'// 根据参数
+  }, {
+    path: '/riskEarlyWarning/creatingWarningRule', // 需要改变面包屑的地址
+    title: '编辑预警策略', // 改变的名称
+    key: 'id'// 根据参数
+  }, {
+    path: '/riskEarlyWarning/creatingScoringTemplate', // 需要改变面包屑的地址
+    title: '编辑评分模型', // 改变的名称
+    key: 'id'// 根据参数
+  }, {
+    path: '/interactionRadar/setRadar', // 需要改变面包屑的地址
+    title: '修改互动雷达', // 改变的名称
+    key: 'id'// 根据参数
+  }]
+
   // 无需匹配地址  直接获取上一个全路径自动back
   const backList = ['/healthManage/patientDetails', '/healthManage/patientDetails1', '/workContact/contactFieldPivot', '/contactTransfer/resignAllotRecord', '/contactTransfer/workAllotRecord']
   sideMenus.find((item) => {
@@ -154,19 +175,15 @@ export function setBreadcrumb (path, data) {
       if (inner.path == path) {
         firstTitle = returnBtnPath.includes(inner.path) ? true : title
         secondTitle = inner.meta.title
+        setBranch.map(item => {
+          if (inner.path == item.path && data[item.key]) {
+            secondTitle = item.title
+          }
+        })
         if (inner.hiddenBreadcrumb) {
           firstTitle = 'hiddenBreadcrumb'
           secondTitle = 'hiddenBreadcrumb'
           return
-        }
-        if (inner.path == '/clientFollow/addRule' && data.label) {
-          secondTitle = '编辑规则'
-        }
-        if (inner.path == '/riskEarlyWarning/creatingWarningRule' && data.id) {
-          secondTitle = '编辑预警策略'
-        }
-        if (inner.path == '/riskEarlyWarning/creatingScoringTemplate' && data.id) {
-          secondTitle = '编辑评分模型'
         }
         if (inner.path == '/groupMess/setGroup' && data.type != 0) {
           secondTitle = data.type == 1 ? '编辑群群发' : '复制群群发'

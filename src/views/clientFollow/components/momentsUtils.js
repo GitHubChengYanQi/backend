@@ -96,11 +96,16 @@ export const getMediaData = (reqType, { data = {}, mediaType, photos = [], video
         web_title: linkObj.title,
         web_text: linkObj.desc
       }
+      if (linkObj.radarLink === '1') {
+        link.web_is_radar = '1'
+        link.radar_channel_txt = linkObj.radarName
+      }
     }
     return JSON.stringify({ type, files, ...link })
   } else if (reqType === 'from') {
-    const startLen = 43 // 域名长度
     const { type, files = [], ...link } = data
+    const isDev = files[0].indexOf('https://yfscrm.oss-cn-beijing.aliyuncs.com') !== -1
+    const startLen = isDev ? 43 : 44
     let mediaType, mediaData, target
     if (type === 1) {
       mediaType = 'photo'
@@ -129,6 +134,10 @@ export const getMediaData = (reqType, { data = {}, mediaType, photos = [], video
           url: item,
           path: item.slice(startLen, item.indexOf('?'))
         }
+      }
+      if (link.web_is_radar === '1') {
+        mediaData.radarLink = '1'
+        mediaData.radarName = link.radar_channel_txt
       }
     }
     return { mediaType, mediaData, target }

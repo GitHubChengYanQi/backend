@@ -1,5 +1,13 @@
 import request, { fileRequest } from '@/utils/request'
 
+// 获取字典
+export function getDictData (params) {
+  return request({
+    url: '/dictData/getListByType',
+    method: 'get',
+    params
+  })
+}
 // 列表
 export function erpGoods (params) {
   return request({
@@ -8,13 +16,12 @@ export function erpGoods (params) {
     params
   })
 }
-
-// 同步
-export function erpGoodsSync (params) {
+// 状态变更
+export function erpStatusChange (data) {
   return request({
-    url: '/erpGoods/sync',
-    method: 'get',
-    params
+    url: '/erpGoods/status',
+    method: 'put',
+    data
   })
 }
 
@@ -29,15 +36,47 @@ export function erpGoodsExport (params) {
 }
 
 // 导入
-export function erpGoodsImport (params) {
+export function erpGoodsImport (data) {
   return fileRequest({
-    url: '/erpGoods/import',
-    method: 'get',
+    url: '/erpGoods/importExcel',
+    method: 'post',
     responseType: 'blob',
-    params
+    data
   })
 }
 
+// 查询详情
+export function getErpGoodsDetail (params) {
+  return request({
+    url: '/erpGoods/detailAll',
+    method: 'get',
+    params
+  })
+}
+// 查询药品信息
+export function getErpDrugInformation (params) {
+  return request({
+    url: '/erpGoods/detail',
+    method: 'get',
+    params
+  })
+}
+// 修改药品信息
+export function editErpGoodsDetail (data) {
+  return request({
+    url: '/erpGoods/update',
+    method: 'put',
+    data
+  })
+}
+// 查询通用名列表
+export function getCommonNameList (params) {
+  return request({
+    url: '/commonName/listNames',
+    method: 'get',
+    params
+  })
+}
 /**
  * 症状疾病分类
  */
@@ -103,5 +142,56 @@ export function moveDown (data) {
     url: '/symptomDiseaseClassify/moveDown',
     method: 'put',
     data
+  })
+}
+
+/**
+ * 联合用药
+ */
+export function combinList (params) {
+  return request({
+    url: '/drugCombination/list',
+    method: 'get',
+    params
+  })
+}
+/**
+ * 删除联合用药
+ */
+export function deleteCombin (params) {
+  return request({
+    url: '/drugCombination/delete',
+    method: 'delete',
+    params
+  })
+}
+/**
+ * 新增联合用药
+ */
+export function combinAdd (data) {
+  return request({
+    url: '/drugCombination/add',
+    method: 'post',
+    data
+  })
+}
+/**
+ * 修改联合用药
+ */
+export function combinUpdate (data) {
+  return request({
+    url: '/drugCombination/update',
+    method: 'put',
+    data
+  })
+}
+/**
+ * 联合用药详情
+ */
+export function combinDetail (params) {
+  return request({
+    url: '/drugCombination/detail',
+    method: 'get',
+    params
   })
 }

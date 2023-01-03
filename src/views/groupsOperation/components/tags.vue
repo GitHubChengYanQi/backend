@@ -8,7 +8,8 @@
         :selectedKeys="selectKey"
         :expandedKeys="expandedKeys"
         :defaultExpandAll="true"
-        @select="getGroups">
+        @select="getGroups"
+      >
         <template slot="custom" slot-scope="item">
           <div class="tree-view-item">
             <span
@@ -23,7 +24,7 @@
       </a-tree>
     </div>
     <div class="groupTag_right_box">
-      <div class="groupTag_content_box" v-if="selectKey.length > 0 && selectKey[0] != '0'">
+      <div class="groupTag_content_box" v-if="selectKey.length > 0">
         <div class="groupTag_content">
           <span
             v-for="(item, index) in tabArr"
@@ -68,6 +69,7 @@ export default {
   },
   created () {
     this.getTree()
+    this.getGroups(['0'])
   },
   mounted () {
     document.addEventListener('click', this.setselectdiv)
@@ -91,10 +93,6 @@ export default {
       workRoomLabelTree(obj).then((res) => {
         console.log(res)
         this.groupData = [res.data.root]
-        const path = e.map((item) => {
-          return item.id.toString()
-        })
-        this.expandedKeys = e.length > 0 ? [...path] : ['0']
         console.log(this.expandedKeys)
       })
     },
@@ -149,8 +147,8 @@ export default {
     },
     getGroups (id) {
       this.selectKey = id
-      if (this.selectKey[0] == '0' || this.selectKey.length == 0) return
-      this.titleData = []
+      if (this.selectKey.length == 0) return
+      // this.titleData = []
       this.getTag()
     },
     getTag () {

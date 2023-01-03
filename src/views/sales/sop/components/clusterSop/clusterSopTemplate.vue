@@ -64,6 +64,7 @@
 import { getSopTemplateListMethod, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
 // import { getTempSopList, deleteSopTemplateMethod, bindSopTemplateMethod } from '@/api/cluster'
 import GroupChatList from '../groupChat.vue'
+// import moment from 'moment'
 export default {
   name: 'ClusterSopTemplate',
   components: {
@@ -71,6 +72,7 @@ export default {
   },
   data () {
     return {
+      sorter: '',
       bindGroupChatInfo: {}, // 群SOP模板绑定群聊对象
       selectArrayString: '',
       searchInfo: {}, // 查询列表对象
@@ -84,6 +86,10 @@ export default {
       employeeIds: [],
       // 模糊搜索
       searchValue: '',
+      // defaultSortOrder: 'descend',
+      //     sorter: (a, b) => {
+      //       return moment(a.createdAt).isBefore(b.createdAt) ? 1 : -1
+      //     },
       tableColumns: [
         {
           title: 'SOP名称',
@@ -95,6 +101,8 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
+          sortDirections: ['descend', 'ascend'],
+          sorter: true,
           width: 200
         },
         {
@@ -143,9 +151,10 @@ export default {
         sopName: this.searchInfo.sopName,
         idsStr: this.searchInfo.employeeIds.join(','),
         page: this.pagination.current,
-        perPage: this.pagination.pageSize
+        perPage: this.pagination.pageSize,
+        sort: this.sorter
       }
-      console.log(params, '查询数据提交接口的对象')
+      // console.log(params, '查询数据提交接口的对象')
       await getSopTemplateListMethod(params).then(response => {
         this.tableLoading = false
         console.log(response, '获取群SOP模板信息')
@@ -169,9 +178,19 @@ export default {
       // this.tableData = getTempSopList()
     },
     // 群SOP模板切换页码
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
+      console.log(sorter, 'sorter')
+      if (sorter.order) {
+        if (sorter.order === 'ascend') {
+          this.sorter = 'asc'
+        } else {
+          this.sorter = 'desc'
+        }
+      } else {
+        this.sorter = ''
+      }
       this.getTableData()
     },
     // 搜索
@@ -205,7 +224,12 @@ export default {
         if (response.code === 200) {
           this.$message.success('绑定成功')
           this.getTableData()
+        } else {
+          this.tableLoading = false
         }
+      }).catch(() => {
+        this.tableLoading = false
+        // this.getTableData()
       })
     },
     // 创建sop模板

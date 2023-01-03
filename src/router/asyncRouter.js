@@ -466,6 +466,20 @@ export const routeList = {
     component: () => import('@/views/clientFollow/addRule'),
     meta: { title: '添加规则' }
   },
+  '/clientFollow/labelExpendInfo': {
+    path: '/clientFollow/labelExpendInfo',
+    name: 'labelExpendInfo',
+    hidden: true,
+    component: () => import('@/views/clientFollow/labelExpendInfo'),
+    meta: { title: '规则详情' }
+  },
+  '/clientFollow/addExpendRule': {
+    path: '/clientFollow/addExpendRule',
+    name: 'addExpendRule',
+    hidden: true,
+    component: () => import('@/views/clientFollow/addExpendRule'),
+    meta: { title: '添加规则' }
+  },
   '/clientFollow/momentsOperation': {
     path: '/clientFollow/momentsOperation',
     name: 'momentsOperation',
@@ -880,6 +894,13 @@ export const routeList = {
     hidden: true,
     component: () => import('@/views/interactionRadar/setRadar'),
     meta: { title: '新建互动雷达' }
+  },
+  '/interactionRadar/radarInfo': {
+    path: '/interactionRadar/radarInfo',
+    name: '互动雷达详情',
+    hidden: true,
+    component: () => import('@/views/interactionRadar/radarInfo'),
+    meta: { title: '互动雷达详情' }
   },
   '/study/lesson/index': {
     path: '/study/lesson/index',

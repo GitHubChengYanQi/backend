@@ -74,7 +74,7 @@ export default {
           },
           clipboard: {
             // 粘贴版，处理粘贴时候的自带样式
-            matchers: [[Node.ELEMENT_NODE, this.HandleCustomMatcher]]
+            // matchers: [[Node.ELEMENT_NODE, this.HandleCustomMatcher]]
           },
           // theme:'snow',
           toolbar: {

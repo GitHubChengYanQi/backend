@@ -45,7 +45,7 @@
     </div>
     <div class="rightContainer">
       <div class="rightTitleDiv">推送内容</div>
-      <div class="sendContentList">
+      <div class="sendContentList" v-if="(sendArray.length !== 0)">
         <div class="singleSendContent" v-for="(item, index) in sendArray" :key="item.id">
           <div class="singleSendTitle">
             <span style="font-weight: Bolder">第{{ index + 1 }}条:</span>
@@ -67,8 +67,8 @@
               <div :class="`content ${singleContentItem.type === 4 ? 'link' : ''}`" v-else-if="singleContentItem.type === 4">
                 <div class="lef">
                   <span class="til">{{ singleContentItem.linkTitle }}</span>
-                  <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkUrl: '' }}</span>
-                  <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkShow: '' }}</span>
+                  <!-- <span class="desc">{{ singleContentItem.linkUrl ? singleContentItem.linkUrl: '' }}</span> -->
+                  <span class="desc">{{ singleContentItem.linkShow ? singleContentItem.linkShow: '' }}</span>
                 </div>
                 <img :src="singleContentItem.linkPhoto" alt class="image" />
               </div>
@@ -83,6 +83,14 @@
                   <img src="../../images/miniProgramIcon.svg" alt class="icon" />
                   <span class="say">小程序</span>
                 </div>
+              </div>
+              <div :class="`content ${singleContentItem.type === 6 ? 'link' : ''}`" v-else-if="singleContentItem.type === 6">
+                <div class="lef">
+                  <span class="til">{{ singleContentItem.linkTitle ? singleContentItem.linkTitle : '' }}</span>
+                  <!-- <span class="desc">{{ singleContentItem.content ? singleContentItem.content.linkUrl: '' }}</span> -->
+                  <span class="desc">{{ singleContentItem.linkShow ? singleContentItem.linkShow: '' }}</span>
+                </div>
+                <img :src="singleContentItem.linkPhoto" alt class="image" />
               </div>
             </div>
           </div>
@@ -99,6 +107,7 @@ export default {
   name: 'ClusterSopExecute',
   data () {
     return {
+      sorter: '',
       currentRow: {},
       selectedList: [],
       sendArray: [
@@ -123,7 +132,9 @@ export default {
           title: '创建时间',
           dataIndex: 'createdAt',
           align: 'center',
-          width: 100
+          width: 100,
+          sorter: true,
+          sortDirections: ['descend', 'ascend']
         },
         {
           title: '操作',
@@ -196,15 +207,18 @@ export default {
         sopName: this.searchInfo.sopName,
         clusterName: this.searchInfo.clusterName,
         page: this.pagination.current,
-        perPage: this.pagination.pageSize
+        perPage: this.pagination.pageSize,
+        sort: this.sorter
       }
       console.log(params, '查询数据提交接口的对象')
       await getExecutingSopListMethod(params).then(response => {
         this.tableLoading = false
         console.log(response, '获取字典列表数据')
         this.tableData = response.data.list
-        // 设置默认选中的数据
-        this.setDefaultSelect()
+        if (this.tableData.length !== 0) {
+          // 设置默认选中的数据
+          this.setDefaultSelect()
+        }
         this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
           // 列表中没有数据
@@ -215,6 +229,8 @@ export default {
             this.getTableData()
           } else {
             // 是真没有数据
+            this.$set(this.pagination, 'current', 1)
+            this.sendArray = []
           }
         }
       }).catch(() => {
@@ -234,10 +250,19 @@ export default {
       }
     },
     // 群SOP模板切换页码
-    handleTableChange ({ current, pageSize }) {
+    handleTableChange ({ current, pageSize }, filters, sorter) {
       this.selectedList = []
       this.pagination.current = current
       this.pagination.pageSize = pageSize
+      if (sorter.order) {
+        if (sorter.order === 'ascend') {
+          this.sorter = 'asc'
+        } else {
+          this.sorter = 'desc'
+        }
+      } else {
+        this.sorter = ''
+      }
       this.getTableData()
     },
     // 搜索

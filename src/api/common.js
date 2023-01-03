@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request, { ossRequest } from '@/utils/request'
 
 /**
  * 字典
@@ -20,7 +20,14 @@ export function getDictTree (params) {
     params
   })
 }
-
+// 获取osstoken
+export function mediaGetToken (params) {
+  return request({
+    url: '/oss/getToken',
+    method: 'get',
+    params
+  })
+}
 /**
  * 上传
  * @param {*} params
@@ -57,5 +64,25 @@ export function departmentList (params) {
     url: '/workDepartment/departmentIndex',
     method: 'get',
     params
+  })
+}
+
+/**
+ * oss上传
+ */
+export function ossUpload (data) {
+  return ossRequest({
+    url: '/',
+    method: 'post',
+    data
+  })
+}
+
+// 企微异步上传素材库(大文件)
+export function companyWxUpload (data) {
+  return request({
+    url: '/bigFileUploadLog/uploadBigFileByUrl',
+    method: 'post',
+    data
   })
 }

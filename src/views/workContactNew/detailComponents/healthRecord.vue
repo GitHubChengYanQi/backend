@@ -93,7 +93,7 @@
 
     <a-modal
       v-model="modalObj.visible"
-      :title="`${modalObj.id ? '修改' : '新增'}${modalObj.modalType === 'xyjl' ? '血压' : '血糖'}记录`"
+      :title="`${modalObj.id ? '修改' : '新增'}${typeMap[modalObj.modalType]}记录`"
       id="healthRecord-Component-editSpecialModal-Container"
       :confirm-loading="saveLoading"
       @ok="editSpecialModalOK"
@@ -143,6 +143,13 @@
             ></a-select>
             <span class="dot">.</span>
             <a-select
+              v-if="modalObj.modalType === 'xzjl'"
+              style="width: 45%"
+              v-model="item.dataName[1]"
+              :options="Array(100).fill(null).map((it, index) => ({ value: index < 10 ? '0' + index : index, label: index < 10 ? '0' + index : index }))"
+            ></a-select>
+            <a-select
+              v-else
               style="width: 45%"
               v-model="item.dataName[1]"
               :options="Array(10).fill(null).map((it, index) => ({ value: index, label: index }))"
@@ -180,12 +187,19 @@ const getSource = (t) => {
   if (t === '1') {
     return '企业微信'
   } else if (t === '2') {
-    return '公众号'
+    return '用户上传'
   } else if (t === '3') {
     return '设备'
   } else if (t === '4') {
     return '管理后台'
   } else return t
+}
+
+const typeMap = {
+  'xyjl': '血压',
+  'xtjl': '血糖',
+  'xzjl': '血脂',
+  'nsjl': '尿酸'
 }
 
 // const defaultItemObj = {
@@ -216,6 +230,7 @@ export default {
   },
   data () {
     return {
+      typeMap,
       saveLoading: false,
       isEdit: false,
       selectTag: '',
@@ -256,6 +271,13 @@ export default {
   beforeMount () { },
   mounted () { },
   methods: {
+    // /**
+    //  * 生成选项
+    //  */
+    // makeOption () {
+    //   console.log(11111)
+    //   Array(100).fill(null).map((it, index) => ({ value: index, label: index }))
+    // },
     async getTabs () {
       const { data } = await getTabsArrReq({})
       this.tags = data.records
@@ -277,8 +299,10 @@ export default {
           }
         }
         const data = await getTabDetailReq(obj)
+
         if (['xyjl', 'xtjl', 'xzjl', 'nsjl'].includes(this.selectTag)) {
           const d = data.data.list
+          console.log(1111111111111, data.data.list)
           const dataSource = []
           for (const item of d) {
             dataSource.push({
@@ -312,7 +336,10 @@ export default {
               cloumns.push({
                 title: item.name,
                 dataIndex: item.key,
-                key: item.key
+                key: item.key,
+                customRender: (txt, { scopeKey }) => (
+                  <span class={`sourceTxt-${item.scopeKey}`}>{txt}</span>
+                )
               })
             }
           }
@@ -326,16 +353,22 @@ export default {
               title: '操作',
               dataIndex: 'id',
               align: 'center',
-              customRender: (id) => (
-                <div class="handlesBox">
-                  <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
-                  <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span>
-                </div>
-              )
+              customRender: (id, row) => {
+                if (row.source === '1' || row.source === '4') {
+                  return (<div class="handlesBox">
+                    <span class="btn" onClick={() => this.handleBtnClick('edit', id)}>编辑</span>
+                    <span class="btn del" onClick={() => this.handleBtnClick('delete', id)}>删除</span>
+                  </div>)
+                }
+              }
             })
           }
           this.pagination.total = data.data.totalNum
-          this.tagsDetailArr = dataSource
+          if (data.data.totalNum === 0) {
+            this.tagsDetailArr = []
+          } else {
+            this.tagsDetailArr = dataSource
+          }
           this.tableCloumns = cloumns
         } else {
           // 一级数据中 空值为空数组，需要提前设置默认值
@@ -483,17 +516,30 @@ export default {
         data: type === 'rangeDouble' ? dataName.join('.') : data,
         dataName: type === 'rangeDouble' ? dataName.join('.') : dataName
       }))
-      await saveSpecialItemReq({
-        recordId: this.modalObj.id,
-        contactId: this.$route.query.id,
-        source: 4,
-        key: this.selectTag,
-        dataList: processList
-      })
-      this.$message.success(`${this.modalObj.id ? '修改' : '添加'}成功！`)
-      this.getTabDetails(this.selectTag)
-      this.saveLoading = false
-      this.editSpecialModalCancel()
+      let flag = false
+      let name = ''
+      for (let i = 0; i < processList.length; i++) {
+        if (processList[i].data === '') {
+          flag = true
+          name = processList[i].name
+        }
+      }
+      if (flag) {
+        this.$message.error('请填写' + name)
+        this.saveLoading = false
+      } else {
+        await saveSpecialItemReq({
+          recordId: this.modalObj.id,
+          contactId: this.$route.query.id,
+          source: 4,
+          key: this.selectTag,
+          dataList: processList
+        })
+        this.$message.success(`${this.modalObj.id ? '修改' : '添加'}成功！`)
+        this.getTabDetails(this.selectTag)
+        this.saveLoading = false
+        this.editSpecialModalCancel()
+      }
     },
     editSpecialModalCancel () {
       this.modalObj = {
@@ -650,6 +696,9 @@ export default {
     }
   }
   .specialListDetail {
+    .sourceTxt-1{
+      color: #ff0000;
+    }
     .sourceTxt-xyjl-0 {
       color: #009966;
     }
@@ -676,6 +725,21 @@ export default {
     }
     .sourceTxt-xtjl-3 {
       color: #efc25d;
+    }
+    .sourceTxt-nsjl-0 {
+      color: #009966;
+    }
+    .sourceTxt-nsjl-1 {
+      color: #e98850;
+    }
+    .sourceTxt-nsjl-2 {
+      color: #ff0000;
+    }
+    .sourceTxt-xzjl-0 {
+      color: #009966;
+    }
+    .sourceTxt-xzjl-1 {
+      color: #ff0000;
     }
     .handlesBox {
       display: flex;

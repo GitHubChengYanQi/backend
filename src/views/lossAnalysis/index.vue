@@ -751,7 +751,7 @@ export default {
         leftChart: {
           options: {
             center: ['50%', '50%'],
-            color: ['#1890ff', '#1890ffe3', '#1890ffb2', '#1890ff2a'],
+            color: ['#1890ff', '#5bD0A0', '#EF8E18', '#cccccc'],
             tooltip: {
               trigger: 'item',
               formatter: '{a} <br/>{b}: {c} ({d}%)'
@@ -775,7 +775,7 @@ export default {
         rightChart: {
           options: {
             center: ['50%', '50%'],
-            color: ['#1890ff', '#1890ffe3', '#1890ffb2', '#1890ff2a'],
+            color: ['#1890ff', '#5bD0A0', '#EF8E18', '#cccccc'],
             tooltip: {
               trigger: 'item',
               formatter: '{a} <br/>{b}: {c} ({d}%)'

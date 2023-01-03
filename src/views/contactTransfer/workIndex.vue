@@ -56,7 +56,7 @@
             name="分配客户"
             :multiple="false"
             :transferTip="true"
-            :fieldNames="{ children: 'children', title: 'title', key: 'key' }"
+            :fieldNames="{ children: 'children', title: 'title', key: 'wxUserId' }"
             v-permission="'/contactTransfer/workIndex@allocation'" />
           <!--          wxUserId-->
           <a-button type="primary" ghost @click="$router.push('/contactTransfer/workAllotRecord')" v-permission="'/contactTransfer/workIndex@workAllotRecord'">分配记录</a-button>

@@ -102,6 +102,10 @@ export const handleBtnArr = [
   {
     name: '素材库',
     type: 'library'
+  },
+  {
+    name: '互动雷达',
+    type: 'radar'
   }
 ]
 

@@ -749,7 +749,7 @@
                     :btnType="false"
                     :file-type="1"></upload>
                 </div>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-model-item>
               <a-form-model-item label="填写标题：" prop="title">
                 <a-input v-model="imageTextData.title" />
@@ -805,7 +805,7 @@
                   @success="uploadSuccess"
                   :btnType="false"
                   :file-type="1"></upload>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-item>
               <a-form-item label="填写标题：">
                 <a-input v-model="materialDetail.content.title" />
@@ -861,7 +861,7 @@
                   @success="uploadSuccess"
                   :btnType="false"
                   :file-type="1"></upload>
-                <span>图片大小不超过2M，支持JPG、JPEG及PNG格式</span>
+                <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
               </a-form-item>
             </a-form>
             <template slot="footer">
@@ -991,9 +991,17 @@
                 <a-input v-model="FormData.title" :maxLength="15" />
               </a-form-model-item>
               <a-form-item label="上传视频：">
-                <vpload
+                <!-- <vpload
                   @successDefine="uploadSuccessV"
-                  :file-type="3"></vpload>
+                  :file-type="3"></vpload> -->
+                <div class="uploadMediaDiv">
+                  <ImgUpload
+                    :fileMaxSize="200"
+                    :isLoadingStatus.sync="isLoadingStatus"
+                    @successUpload="successUpload">
+                    <a-button><a-icon type="upload" /> 上传 </a-button>
+                  </ImgUpload>
+                </div>
                 <div>(视频上传大小不超过10M，支持MP4格式)</div>
                 <div v-if="uploadDefine" style="color: red">上传成功</div>
               </a-form-item>
@@ -1081,7 +1089,7 @@
                       <a-input v-model="appletsData.title" />
                     </a-form-model-item>
                     <a-form-model-item label="卡片图片：">
-                      <p>上传图片不超过1M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
+                      <p>上传图片不超过10M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
                       <upload
                         v-if="imgUrl === ''"
                         :imageUrl="imgUrl"
@@ -1150,7 +1158,7 @@
                       <a-input v-model="materialDetail.content.title" />
                     </a-form-item>
                     <a-form-item label="卡片图片：">
-                      <p>上传图片不超过1M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
+                      <p>上传图片不超过10M，尺寸必须为1080*864像素，支持jpg/jpeg/png格式</p>
                       <div>
                         <img
                           style="height:80px; width: 80px;"
@@ -1217,12 +1225,15 @@ import storage from 'store'
 import { materialLibraryList, mediumGroup, addMediumGroup, editMediumGroup, delMediumGroup, delMaterialLibrary, addMaterialLibrary, moveGroup, getMaterialLibrary, editMaterialLibrary } from '@/api/mediumGroup'
 import upload from './components/upload'
 import vpload from './components/vpload'
+import ImgUpload from '../sales/sop/components/ImgUpload/index.vue'
 import mtextarea from './components/mtextarea'
+import { upLoad } from '@/api/common'
 export default {
   components: {
     upload,
     vpload,
-    mtextarea
+    mtextarea,
+    ImgUpload
   },
   props: {
     isComponent: {
@@ -1232,6 +1243,7 @@ export default {
   },
   data () {
     return {
+      isLoadingStatus: false,
       deleteGroupId: '',
       deleteGroupModel: false,
       editGroupPid: '',
@@ -1450,6 +1462,54 @@ export default {
     }
   },
   methods: {
+    async successUpload (file) {
+      console.log(file, 'successUpload上传成功的返回')
+      if (file.size) {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('time', 1)
+        console.log(formData, 'formData')
+        // const res = await upLoad(formData)
+        this.$emit('update:isLoadingStatus', true)
+        await upLoad(formData).then(res => {
+          const videoPath = res.data.path
+          this.upLoadRes.videoPath = videoPath
+          this.upLoadRes.videoName = file.name
+          this.uploadDefine = true
+          // this.$emit('update:isLoadingStatus', false)
+          // const videoInfo = {
+          //   type: 3,
+          //   videoUrl: res.data.fullPath
+          // }
+          // if (this.submitType === 'add') {
+          //   this.sendContentArray.push(videoInfo)
+          // } else {
+          //   this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          // }
+          // this.isSopEditStatus = true
+          // this.$emit('update:isSopEdit', this.isSopEditStatus)
+          // this.$emit('update:contentArray', this.sendContentArray)
+          // this.$refs.uploadVideoRef.value = ''
+        })
+      } else {
+        // const videoPath = `${file.host}/${file.key}`
+        this.upLoadRes.videoPath = file.key
+        this.upLoadRes.videoName = file.key
+        this.uploadDefine = true
+        // const videoInfo = {
+        //   type: 3,
+        //   videoUrl: `${file.host}/${file.key}`
+        // }
+        // if (this.submitType === 'add') {
+        //   this.sendContentArray.push(videoInfo)
+        // } else {
+        //   this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+        // }
+        // this.isSopEditStatus = true
+        // this.$emit('update:isSopEdit', this.isSopEditStatus)
+        // this.$emit('update:contentArray', this.sendContentArray)
+      }
+    },
     flatTree (data, childName = 'children') {
       const clone = JSON.parse(JSON.stringify(data))
       if (!Array.isArray(clone)) {
@@ -2158,6 +2218,31 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.uploadMediaDiv {
+    /deep/.img-avatar-uploader {
+      .ant-upload {
+        width: auto;
+        height: auto;
+        margin-bottom: 0px;
+        margin-right: 0px;
+        padding: 0px;
+        background-color: white;
+        border: 0;
+        color: #1c1c1c;
+        .anticon-upload {
+          font-size: 14px;
+          color: #1c1c1c;
+        }
+      }
+      // width: auto;
+      // height: auto;
+      // margin-bottom: 0px;
+      // margin-right: 0px;
+      // padding: 0px;
+      // background-color: white;
+      // color: #1c1c1c;
+    }
+}
 .material-library {
     height: 100%;
     .left {

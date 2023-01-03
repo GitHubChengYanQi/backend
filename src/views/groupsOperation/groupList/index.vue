@@ -144,8 +144,8 @@
       </div>
     </a-modal>
     <!-- <GroupTags :state="chooseUserTagsModalShow" :addState="false" ref="labelSelect" /> -->
-    <a-modal v-model="groupTagsModalShow" centered @ok="handleAddGroupTagsOk" width="60%">
-      <GroupTags v-model="groupTagsSelectList" />
+    <a-modal v-model="groupTagsModalShow" centered @ok="handleAddGroupTagsOk" @cancel="handleAddGroupTagsCancel" width="60%">
+      <GroupTags v-if="groupTagsModalShow" v-model="groupTagsSelectList" />
     </a-modal>
   </div>
 </template>
@@ -458,6 +458,9 @@ export default {
       this.selectedTableRowKeys = []
       this.groupTagsSelectList = []
       this.groupTagsModalShow = false
+    },
+    handleAddGroupTagsCancel () {
+      this.groupTagsSelectList = []
     }
   }
 }

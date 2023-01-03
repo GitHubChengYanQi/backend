@@ -266,38 +266,46 @@ export default {
           0: [
             {
               title: '员工',
+              align: 'center',
               dataIndex: 'name'
             },
             {
               title: '预计送达客户群数',
+              align: 'center',
               dataIndex: 'data$0'
             }
           ],
           1: [
             {
               title: '员工',
+              align: 'center',
               dataIndex: 'name'
             },
             {
               title: '预计送达客户群数',
+              align: 'center',
               dataIndex: 'data$0'
             },
             {
               title: '实际送达客户群数',
+              align: 'center',
               dataIndex: 'data$1'
             },
             {
               title: '送达时间',
+              align: 'center',
               dataIndex: 'time'
             }
           ],
           2: [
             {
               title: '员工',
+              align: 'center',
               dataIndex: 'name'
             },
             {
               title: '无法执行客户群数',
+              align: 'center',
               dataIndex: 'data$0'
             }
           ]
@@ -377,6 +385,7 @@ export default {
     },
     setTab (e) {
       this.table.tab = e
+      this.table.tableData = []
       this.table.rowSelection = []
       this.table.pagination.current = 1
       this.table.pagination.pageSize = 10
