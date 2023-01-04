@@ -12,7 +12,8 @@ function resolve (dir) {
 function getGitHash () {
   try {
     return GitRevision.version()
-  } catch (e) { }
+  } catch (e) {
+  }
   return 'unknown'
 }
 

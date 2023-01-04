@@ -150,7 +150,6 @@
             </div>
           </div>
           <SendContent
-            :isLoadingStatus.sync="loadingStatus"
             :contentArray.sync="contentArray"
             :isSopEdit.sync="isSopEdit"
             :isDisableEdit="addInfo.listTaskInfo && addInfo.listTaskInfo[selectTimeIndex] && (addInfo.listTaskInfo[selectTimeIndex].invalidState === 2)"/>

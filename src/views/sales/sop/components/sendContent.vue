@@ -14,20 +14,7 @@
                 'handleBtn'"
               :key="index"
               @click="chooseSendType(item.type)">
-              <div v-if="item.type === 'video'" class="uploadMediaDiv">
-                <!-- v-decorator="['mediaUrl', { rules: [{ required: true, message: '请上传视频!' }], initialValue: '' }]" -->
-                <ImgUpload
-                  @loadingMethod="loadingMethod"
-                  :fileMaxSize="fileMaxSize"
-                  :fileMinSize="fileMinSize"
-                  :isLoadingStatus.sync="isLoadingStatus"
-                  @successUpload="successUpload">
-                  <div>{{ `+ ${item.name}` }}</div>
-                </ImgUpload>
-              </div>
-              <div v-else>
-                + {{ item.name }}
-              </div>
+              + {{ item.name }}
             </div>
             <div
               class="disabledBox"
@@ -313,20 +300,16 @@
   </div>
 </template>
 <script>
-import ImgUpload from './ImgUpload/index.vue'
 // transformTaskItemEntry, transformTaskDate,
 import { handleBtnArr, isUrl } from '../sopUtils'
 // import { deepClonev2 } from '@/utils/util'
 // import { userSopTaskItemSettingReq } from '@/api/salesManagement'
-import { upLoad, companyWxUpload } from '@/api/common'
+import { upLoad } from '@/api/common'
 import RadarChoose from '../../../clientFollow/components/radarToastComponent.vue'
 export default {
   name: 'SendContent',
   data () {
     return {
-      fileMaxSize: Number(process.env.VUE_APP_API_UPLOAD_MAX_SIZE),
-      fileMinSize: Number(process.env.VUE_APP_API_UPLOAD_MIN_SIZE),
-      oss: {},
       contentRadarObj: {}, // 互动雷达对象
       contentRadarModalShow: false, // 修改互动雷达弹框
       radarVisible: false, // 互动雷达弹框
@@ -356,7 +339,6 @@ export default {
     }
   },
   components: {
-    ImgUpload,
     RadarChoose,
     'MediumGroup': () => import('@/views/mediumGroup/index.vue')
   },
@@ -433,62 +415,6 @@ export default {
     }
   },
   methods: {
-    loadingMethod (e) {
-      this.$emit('update:isLoadingStatus', e)
-      // console.log(e, '监听是否加载')
-    },
-    async successUpload (file) {
-      console.log(file, 'successUpload上传成功的返回')
-      if (file.size) {
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        // const res = await upLoad(formData)
-        this.$emit('update:isLoadingStatus', true)
-        await upLoad(formData).then(res => {
-          // this.$emit('update:isLoadingStatus', false)
-          const videoInfo = {
-            type: 3,
-            videoUrl: res.data.fullPath
-          }
-          if (this.submitType === 'add') {
-            this.sendContentArray.push(videoInfo)
-          } else {
-            this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
-          }
-          this.isSopEditStatus = true
-          this.$emit('update:isSopEdit', this.isSopEditStatus)
-          this.$emit('update:contentArray', this.sendContentArray)
-          this.$emit('update:isLoadingStatus', false)
-          // this.$refs.uploadVideoRef.value = ''
-        })
-      } else {
-        this.$emit('update:isLoadingStatus', true)
-        const videoInfo = {
-          type: 3,
-          videoUrl: `${file.host}/${file.key}?Expire=${file.expire}&OSSAccessKeyId=${file.OSSAccessKeyId}&Signature=${file.Signature}`
-        }
-        const tempUploadInfo = {
-          scene: 1,
-          type: 'video',
-          url: videoInfo.videoUrl,
-          filename: file.key
-        }
-        await companyWxUpload(tempUploadInfo).then(res => {
-          this.$emit('update:isLoadingStatus', false)
-          if (this.submitType === 'add') {
-            this.sendContentArray.push(videoInfo)
-          } else {
-            this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
-          }
-          this.isSopEditStatus = true
-          this.$emit('update:isSopEdit', this.isSopEditStatus)
-          this.$emit('update:contentArray', this.sendContentArray)
-          this.$emit('update:isLoadingStatus', false)
-        })
-      }
-    },
     // 选择互动雷达回调
     handleAddRadarOk (e) {
       console.log(e, '选择互动雷达回调')
@@ -555,7 +481,7 @@ export default {
           this.chooseImage()
           break
         case 'video':
-          // this.chooseVideo()
+          this.chooseVideo()
           break
         case 'link':
           this.contentLinkModalShow = true
@@ -1081,36 +1007,10 @@ export default {
           .handleBtn {
             margin-left: 5px;
             border-radius: 3px;
+            padding: 5px 15px;
             border: 1px solid #a9a9a9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 0.5;
             cursor: pointer;
-            div {
-              padding: 0px 10px;
-              color: #1c1c1c;
-            }
             color: rgb(28, 28, 28);
-            .uploadMediaDiv {
-              padding: 0;
-              /deep/.img-avatar-uploader {
-                // padding: 5px 0px;
-                > .ant-upload {
-                  padding: 4px 0px;
-                  width: auto;
-                  height: auto;
-                  margin-bottom: 0px;
-                  margin-right: 0px;
-                  background-color: white;
-                  color: #1c1c1c;
-                  border: 0;
-                  span.ant-upload {
-                    padding: 0;
-                  }
-                }
-              }
-            }
           }
           .handleBtn:first-child {
             margin-left: 0;
@@ -1272,4 +1172,6 @@ export default {
   width: 1px;
   height: 1px;
 }
+
+
 </style>

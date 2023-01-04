@@ -180,7 +180,6 @@
             </div>
           </div>
           <SendContent
-            :isLoadingStatus.sync="loadingStatus"
             :contentArray.sync="contentArray"
             :isSopEdit.sync="isSopEdit"
             :isDisableEdit="false"/>
