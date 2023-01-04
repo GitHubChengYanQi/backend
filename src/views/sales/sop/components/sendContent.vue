@@ -1173,5 +1173,4 @@ export default {
   height: 1px;
 }
 
-
 </style>
