@@ -98,6 +98,7 @@
     <a-modal
       title="规则验证"
       class="modalBox"
+      @cancel="handleCancel"
       :footer="null"
       :visible="visible"
     >
@@ -136,7 +137,7 @@
         </p>
       </div>
       <div class="handle">
-        <a-button type="primary">点击验证</a-button>
+        <a-button type="primary" @click="handleOk">点击验证</a-button>
       </div>
     </a-modal>
     <!--end modal-->
@@ -149,6 +150,7 @@ import GoodsSelect from '../../components/SelectGoods/index.vue'
 import clientAttr from './expendComponents/clientAttr'
 import goodsAttr from './expendComponents/goodsAttr'
 import { getDict } from '@/api/common.js'
+import { isObjectValueEqual } from '@/utils/util'
 
 export default {
   components: { LabelSelect, clientAttr, GoodsSelect, goodsAttr },
@@ -181,17 +183,18 @@ export default {
     this.id = this.$route.query.id
   },
   methods: {
+    isObjectValueEqual,
     /**
      * 返回列表，判断是否有操作
      */
     returnPage () {
       try {
         let state = true
-        if (this.input.length > 0 || this.dateRule.length > 0) {
-          state = false
-        }
+        // if () {
+        //   state = false
+        // }
         if (state) {
-          this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.table}`)
+          this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
         } else {
           this.$confirm({
             title: '提示',
@@ -199,7 +202,7 @@ export default {
             okText: '确认',
             cancelText: '取消',
             onOk: () => {
-              this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.table}`)
+              this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
             },
             onCancel () {}
           })
@@ -260,6 +263,12 @@ export default {
      * 验证
      */
     handleOk () {
+      this.visible = false
+    },
+    /**
+     * 关闭验证
+     */
+    handleCancel () {
       this.visible = false
     }
   }

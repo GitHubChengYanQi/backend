@@ -147,7 +147,7 @@ export default {
         {
           title: '疾病/症状一级分类',
           dataIndex: 'symptomDiseaseClassifyOneLevel',
-          sorter: true,
+          // sorter: true,
           align: 'center',
           width: 150,
           scopedSlots: { customRender: 'symptomDiseaseClassifyOneLevel' }
@@ -155,7 +155,7 @@ export default {
         {
           title: '疾病/症状二级分类',
           dataIndex: 'symptomDiseaseClassifyTwoLevel',
-          sorter: true,
+          // sorter: true,
           align: 'center',
           width: 150,
           scopedSlots: { customRender: 'symptomDiseaseClassifyTwoLevel' }
