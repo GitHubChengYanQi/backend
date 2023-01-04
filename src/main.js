@@ -32,7 +32,7 @@ import ExportExcel from '@/components/ExportDownload/ExportExcel'
 import preview from '@/components/Preview/index'
 import More from '@/components/More/More'
 import { Tree, Button, Table, TableColumn } from 'element-ui'
-// import 'element-ui/lib/theme-chalk/index.css'
+import 'element-ui/lib/theme-chalk/index.css'
 
 // 引入富文本编辑器
 import '@/assets/css/quill.core.css'

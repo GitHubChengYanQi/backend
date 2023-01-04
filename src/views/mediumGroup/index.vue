@@ -2095,7 +2095,6 @@ export default {
           }
         })
       }
-      
     },
     // 添加图片
     addPhoto () {
