@@ -164,7 +164,7 @@ export default {
           detail = res.data || {}
         }
       }
-      const questionnaireResult = detail.questionnaireResults ? detail.questionnaireResults[0] : {}
+      const questionnaireResult = (detail.questionnaireResults ? detail.questionnaireResults[0] : {}) || {}
       this.detail = {
         ...detail,
         createTime: detail.createdAt ? moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-',

@@ -87,11 +87,13 @@
                         <div v-if="questionItem.type !== 'judge'">
                           <Options
                             :form="form"
-                            :options="Object.keys(questionItem.options)"
+                            :item-index="index"
+                            :options="questionItem.options"
                             :question-item-index="questionItem.index"
                             :disabled="disabled"
                             @addOption="addOption"
                             @removeOption="removeOption"
+                            @updateQuestions="updateQuestions"
                           />
                         </div>
                         <a-form-item
@@ -105,7 +107,7 @@
                               :disabled="disabled"
                               :mode="questionItem.type === 'multiple' ? 'multiple' : 'default'"
                               style="width: 597px"
-                              :options="questionItem.type === 'judge' ? [{label: '正确',value:'true'},{label: '错误',value:'false'}] : Object.keys(questionItem.options).map(item=>({label:item,value:item}))"
+                              :options="questionItem.type === 'judge' ? [{label: '正确',value:'true'},{label: '错误',value:'false'}] : questionItem.options.map((item,index)=>({label:String.fromCharCode(65 + index),value:String.fromCharCode(65 + index)}))"
                               placeholder="请选择正确答案"
                               v-decorator="[`questions[${questionItem.index}].answer`, { rules: [{ required: true, message: '请选择正确答案!' }] ,initialValue:[]}]"
                             >
@@ -192,9 +194,12 @@ export default {
       questions: [{
         index: 0,
         type: 'single',
-        options: {
-          'A': ''
-        }
+        options: [
+          {
+            label: 'A',
+            value: 0
+          }
+        ]
       }]
     }
   },
@@ -219,16 +224,18 @@ export default {
     getDetail (id) {
       this.detailLoading = true
       learningQuestionnaireCheckBind({ questionnaireId: id, type: 'edit' }).then((res) => {
-        console.log(res.data)
         this.disabled = res.data
       })
       learningQuestionnaireDetail({ questionnaireId: id }).then((res) => {
         const detail = res.data || {}
         const questionResults = detail.questionResults || []
         this.questions = questionResults.map((item, index) => {
-          const options = {};
+          const options = [];
           (item.answerResults || []).forEach((optionItem, index) => {
-            options[String.fromCharCode(65 + index)] = optionItem.answerContent
+            options.push({
+              label: String.fromCharCode(65 + index),
+              value: index
+            })
           })
           return {
             index,
@@ -320,13 +327,17 @@ export default {
     handleSubmit () {
       this.form.validateFields((err, values) => {
         console.log(values)
+        const questions = []
+        this.questions.forEach(item => {
+          questions.push(values.questions[item.index])
+        })
         if (!err) {
           this.loading = true
           const data = {
             questionnaireName: values.name,
             sameScore: this.sname ? 1 : 0,
             questionScore: this.number,
-            questionParams: values.questions.map((item, index) => {
+            questionParams: questions.map((item, index) => {
               return {
                 questionContent: item.name,
                 questionType: item.type,
@@ -340,18 +351,18 @@ export default {
                   answerContent: 'false',
                   isTrue: item.answer === 'false' ? 1 : 0,
                   sort: 1
-                }] : Object.keys(item.options).map((optionItem, optionIndex) => {
+                }] : this.questions[index].options.map((optionItem, optionIndex) => {
                   let answer = false
                   switch (item.type) {
                     case 'single':
-                      answer = item.answer === optionItem
+                      answer = item.answer === String.fromCharCode(65 + optionIndex)
                       break
                     case 'multiple':
-                      answer = item.answer.find(answer => answer === optionItem)
+                      answer = item.answer.find(answer => answer === String.fromCharCode(65 + optionIndex))
                       break
                   }
                   return {
-                    answerContent: item.options[optionItem],
+                    answerContent: item.options[optionItem.label],
                     isTrue: answer ? 1 : 0,
                     sort: optionIndex
                   }
@@ -359,7 +370,6 @@ export default {
               }
             })
           }
-
           if (router.history.current.query.id) {
             learningQuestionnaireEdit({ ...data, questionnaireId: router.history.current.query.id }).then(() => {
               router.back()
@@ -381,8 +391,8 @@ export default {
       })
     },
     updateType (value, key) {
-      this.questions = this.questions.map((item, index) => {
-        if (index === key) {
+      this.questions = this.questions.map((item) => {
+        if (item.index === key) {
           return { ...item, type: value }
         }
         return item
@@ -393,9 +403,12 @@ export default {
       this.questions.push({
         index: this.questions.length,
         type: 'single',
-        options: {
-          'A': ''
-        }
+        options: [
+          {
+            label: 'A',
+            value: 0
+          }
+        ]
       })
       this.switchChange(this.sname)
     },
@@ -412,55 +425,82 @@ export default {
         this.count()
       }, 0)
     },
-    addOption (char = '', key) {
+    addOption (value, key) {
       const updateFileds = {}
-      const newOption = String.fromCharCode(char.charCodeAt(0) + 1)
       const question = this.form.getFieldValue(`questions[${key}]`)
-      const newOptions = { ...question.options }
-      this.questions = this.questions.map(item => {
+      this.questions = this.questions.map((item, index) => {
         if (key === item.index) {
           Object.keys(question.options).forEach(option => {
-            if (option.charCodeAt(0) > char.charCodeAt(0)) {
+            if (option.charCodeAt(0) > (65 + value)) {
               const newOption = String.fromCharCode(option.charCodeAt(0) + 1)
-              newOptions[newOption] = ''
               updateFileds[`questions[${item.index}].options.${newOption}`] = question.options[option]
             }
           })
-          return { ...item, options: { ...newOptions, [newOption]: '' } }
+          const newOptions = item.options.map(item => {
+            if (item.value > value) {
+              return { label: String.fromCharCode(item.label.charCodeAt(0) + 1), value: item.value + 1 }
+            }
+            return item
+          })
+          newOptions.splice(value + 1, 0, {
+            label: String.fromCharCode(65 + value + 1),
+            value: value + 1
+          })
+          return {
+            ...item,
+            options: newOptions
+          }
         }
         return item
       })
       setTimeout(() => {
-        this.form.setFieldsValue({ ...updateFileds, [`questions[${key}].options.${newOption}`]: '' })
+        this.form.setFieldsValue({
+          ...updateFileds,
+          [`questions[${key}].options.${String.fromCharCode(65 + value + 1)}`]: '',
+          [`questions[${key}].answer`]: []
+        })
       }, 0)
     },
-    removeOption (char = '', key) {
+    removeOption (value, key, optionValue) {
       const updateFileds = {}
       const options = this.form.getFieldValue(`questions[${key}].options`)
-      const newOptions = {}
-      this.questions = this.questions.map(item => {
+      this.questions = this.questions.map((item) => {
         if (key === item.index) {
-          Object.keys(options).forEach((option, optionIndex) => {
-            if (optionIndex === Object.keys(options).length - 1) {
-              if (char !== option) {
-                const newOption = String.fromCharCode(option.charCodeAt(0) - 1)
-                updateFileds[`questions[${item.index}].options.${newOption}`] = options[option]
+          item.options.forEach((option, index) => {
+            if (index > value || index < value) {
+              const newValue = options[option.label]
+              if (option.value > optionValue) {
+                const newOption = String.fromCharCode(option.label.charCodeAt(0) - 1)
+                updateFileds[`questions[${item.index}].options.${newOption}`] = newValue
+              } else {
+                updateFileds[`questions[${item.index}].options.${option.label}`] = newValue
               }
-            } else if (option.charCodeAt(0) > char.charCodeAt(0)) {
-              const newOption = String.fromCharCode(option.charCodeAt(0) - 1)
-              updateFileds[`questions[${item.index}].options.${newOption}`] = options[option]
-              newOptions[option] = ''
-            } else {
-              newOptions[option] = options[option]
             }
           })
-          return { ...item, options: newOptions }
+          const newOptions = item.options.filter(item => item.value !== optionValue)
+          return {
+            ...item,
+            options: newOptions.map(item => {
+              if (item.value > optionValue) {
+                return { label: String.fromCharCode(item.label.charCodeAt(0) - 1), value: item.value - 1 }
+              }
+              return item
+            })
+          }
         }
         return item
       })
-      setTimeout(() => {
-        this.form.setFieldsValue(updateFileds)
-      }, 0)
+      this.form.setFieldsValue({ ...updateFileds, [`questions[${key}].answer`]: [] })
+    },
+    updateQuestions (questionItemIndex, newIndex, oldIndex) {
+      let questionsIndex = 0
+      this.questions.forEach((item, index) => {
+        if (item.index === questionItemIndex) {
+          questionsIndex = index
+        }
+      })
+      const append = this.questions[questionsIndex].options.splice(oldIndex, 1)[0]
+      this.questions[questionsIndex].options.splice(newIndex, 0, append)
     }
   }
 }

@@ -2,7 +2,7 @@
   <div :class="'option'+questionItemIndex">
     <div
       v-for="(option,index) in array"
-      :key="option"
+      :key="option.value"
     >
       <div
         class="custom-tree-node"
@@ -18,19 +18,19 @@
               auto-size
               :max-length="100"
               placeholder="请输入选项"
-              v-decorator="[`questions[${questionItemIndex}].options.${String.fromCharCode(65 +index)}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
+              v-decorator="[`questions[${questionItemIndex}].options.${option.label}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
             />
             <div class="other" v-if="!disabled">
               <div class="actions">
                 <a-icon
                   v-if="options.length < 6"
                   type="plus-square"
-                  @click="$emit('addOption',String.fromCharCode(65 +index),questionItemIndex)"
+                  @click="$emit('addOption',index,questionItemIndex,itemIndex)"
                 />
                 <a-icon
                   v-if="options.length !== 1"
                   type="minus-square"
-                  @click="$emit('removeOption',String.fromCharCode(65 +index),questionItemIndex)"
+                  @click="$emit('removeOption',index,questionItemIndex,option.value)"
                 />
                 <DragIcon
                   class="my-handle"
@@ -51,7 +51,7 @@ import Sortable from 'sortablejs'
 
 export default {
   components: { DragIcon },
-  props: ['questionItemIndex', 'options', 'disabled', 'form'],
+  props: ['questionItemIndex', 'options', 'disabled', 'form', 'itemIndex'],
   data () {
     return {
       array: []
@@ -62,6 +62,7 @@ export default {
   },
   watch: {
     options (value) {
+      console.log(value.map(item => item.label))
       this.array = value
     }
   },
@@ -73,17 +74,7 @@ export default {
       handle: '.my-handle',
       animation: 300, // 拖拽延时，效果更好看
       onEnd: async (evt) => {
-        const startOption = this.form.getFieldValue(`questions[${this.questionItemIndex}].options.${this.array[evt.oldIndex]}`)
-        const endOption = this.form.getFieldValue(`questions[${this.questionItemIndex}].options.${this.array[evt.newIndex]}`)
-
-        setTimeout(() => {
-          this.form.setFieldsValue({
-            [`questions[${this.questionItemIndex}].options.${this.array[evt.newIndex]}`]: endOption,
-            [`questions[${this.questionItemIndex}].options.${this.array[evt.oldIndex]}`]: startOption
-          })
-        }, 0)
-
-        this.array.splice(evt.newIndex, 0, this.array.splice(evt.oldIndex, 1)[0])
+        this.$emit('updateQuestions', this.questionItemIndex, evt.newIndex, evt.oldIndex)
       }
     })
   }
