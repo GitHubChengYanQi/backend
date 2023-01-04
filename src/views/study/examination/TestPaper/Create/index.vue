@@ -47,166 +47,114 @@
                 />
               </a-form-item>
             </div>
-            <el-tree
-              class="tree"
-              :data="questions"
-              icon-class="icon"
-              node-key="index"
-              @node-drag-over="handleDragOver"
-              @node-drop="handleDrop"
-              draggable
-              :allow-drop="allowDrop"
-              :allow-drag="allowDrag">
-              <div
-                class="custom-tree-node"
-                slot-scope="{ node, data:questionItem }"
-              >
+            <div class="questions">
+              <div v-for="(questionItem,index) in questions" :key="questionItem.index">
                 <div
-                  class="questionItem"
+                  class="custom-tree-node"
                 >
-                  <div class="question">
-                    <div class="questionTitle">问题{{ questionItem.index + 1 }}</div>
-                    <div class="questionContent">
-                      <a-form-item label="试卷题目">
-                        <a-textarea
-                          auto-size
-                          :max-length="100"
-                          placeholder="请输入试卷名称"
-                          v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
-                        />
-                      </a-form-item>
-                      <a-form-item label="题目类型" style="margin-bottom: 12px">
-                        <a-radio-group
-                          :disabled="disabled"
-                          v-decorator="[`questions[${questionItem.index}].type`, { rules: [{ required: true, message: '请选择题目类型!' }],initialValue:'single' }]"
-                          name="radioGroup"
-                          @change="({target:{value}})=>updateType(value,questionItem.index)"
-                        >
-                          <a-radio value="single">
-                            单选题
-                          </a-radio>
-                          <a-radio value="multiple">
-                            多选题
-                          </a-radio>
-                          <a-radio value="judge">
-                            判断题
-                          </a-radio>
-                        </a-radio-group>
-                      </a-form-item>
-
-                      <div v-if="questionItem.type !== 'judge'">
-                        <el-tree
-                          class="tree optionTree"
-                          :data="Object.keys(questionItem.options || {'A':''}).map(item=>({option:item,key:questionItem.index}))"
-                          icon-class="icon"
-                          node-key="option"
-                          @node-drag-over="optionsHandleDragOver"
-                          @node-drop="optionsHandleDrop"
-                          draggable
-                          :allow-drop="optionsAlowDrop"
-                          :allow-drag="(node)=>optionsAllowDrag(node.data.option+questionItem.index)">
-                          <div
-                            class="custom-tree-node"
-                            slot-scope="{ node, data:{option} }"
-                          >
-                            <a-form-item
-                              class="optionItem"
-                              :label="option"
-                              :label-col="{ span: 2 }"
-                              :wrapper-col="{ span: 12 }"
-                            >
-                              <div class="option">
-                                <a-textarea
-                                  auto-size
-                                  :max-length="100"
-                                  placeholder="请输入选项"
-                                  v-decorator="[`questions[${questionItem.index}].options.${option}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
-                                />
-                                <div class="other" v-if="!disabled">
-                                  <div class="actions">
-                                    <a-icon
-                                      v-if="Object.keys(questionItem.options || {'A':''}).length < 6"
-                                      type="plus-square"
-                                      @click="addOption(option,questionItem.index)"
-                                    />
-                                    <a-icon
-                                      v-if="Object.keys(questionItem.options || {'A':''}).length !== 1"
-                                      type="minus-square"
-                                      @click="removeOption(option,questionItem.index)" />
-                                    <div
-                                      @mouseenter="optionMouseenter(option+questionItem.index)"
-                                      @mouseleave="optionMouseleave()"
-                                    >
-                                      <DragIcon
-                                        :width="24"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </a-form-item>
-                          </div>
-                        </el-tree>
-                      </div>
-                      <a-form-item
-                        style="margin-top: 12px"
-                        label="正确答案"
-                        :label-col="{ span: 2 }"
-                        :wrapper-col="{ span: 12 }"
-                      >
-                        <div class="option">
-                          <a-select
+                  <div
+                    class="questionItem"
+                  >
+                    <div class="question">
+                      <div class="questionTitle">问题{{ index + 1 }}</div>
+                      <div class="questionContent">
+                        <a-form-item label="试卷题目">
+                          <a-textarea
+                            auto-size
+                            :max-length="100"
+                            placeholder="请输入试卷名称"
+                            v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
+                          />
+                        </a-form-item>
+                        <a-form-item label="题目类型" style="margin-bottom: 12px">
+                          <a-radio-group
                             :disabled="disabled"
-                            :mode="questionItem.type === 'multiple' ? 'multiple' : 'default'"
-                            style="width: 597px"
-                            :options="questionItem.type === 'judge' ? [{label: '正确',value:'true'},{label: '错误',value:'false'}] : Object.keys(questionItem.options).map(item=>({label:item,value:item}))"
-                            placeholder="请选择正确答案"
-                            v-decorator="[`questions[${questionItem.index}].answer`, { rules: [{ required: true, message: '请选择正确答案!' }] ,initialValue:[]}]"
+                            v-decorator="[`questions[${questionItem.index}].type`, { rules: [{ required: true, message: '请选择题目类型!' }],initialValue:'single' }]"
+                            name="radioGroup"
+                            @change="({target:{value}})=>updateType(value,questionItem.index)"
                           >
-                          </a-select>
-                          <div class="other">
-                            <div class="fen">
-                              <div :style="{width: '42px'}">分值：</div>
-                              <a-form-item
-                                :label-col="{ span: 2 }"
-                                :wrapper-col="{ span: 12 }"
-                              >
-                                <a-input-number
-                                  :disabled="sname || disabled"
-                                  @change="count"
-                                  class="input"
-                                  v-decorator="[`questions[${questionItem.index}].fen`, { initialValue:0 }]"
-                                />
-                              </a-form-item>
-                              分
+                            <a-radio value="single">
+                              单选题
+                            </a-radio>
+                            <a-radio value="multiple">
+                              多选题
+                            </a-radio>
+                            <a-radio value="judge">
+                              判断题
+                            </a-radio>
+                          </a-radio-group>
+                        </a-form-item>
+                        <div v-if="questionItem.type !== 'judge'">
+                          <Options
+                            :form="form"
+                            :options="Object.keys(questionItem.options)"
+                            :question-item-index="questionItem.index"
+                            :disabled="disabled"
+                            @addOption="addOption"
+                            @removeOption="removeOption"
+                          />
+                        </div>
+                        <a-form-item
+                          style="margin-top: 12px"
+                          label="正确答案"
+                          :label-col="{ span: 2 }"
+                          :wrapper-col="{ span: 12 }"
+                        >
+                          <div class="option">
+                            <a-select
+                              :disabled="disabled"
+                              :mode="questionItem.type === 'multiple' ? 'multiple' : 'default'"
+                              style="width: 597px"
+                              :options="questionItem.type === 'judge' ? [{label: '正确',value:'true'},{label: '错误',value:'false'}] : Object.keys(questionItem.options).map(item=>({label:item,value:item}))"
+                              placeholder="请选择正确答案"
+                              v-decorator="[`questions[${questionItem.index}].answer`, { rules: [{ required: true, message: '请选择正确答案!' }] ,initialValue:[]}]"
+                            >
+                            </a-select>
+                            <div class="other">
+                              <div class="fen">
+                                <div :style="{width: '42px'}">分值：</div>
+                                <a-form-item
+                                  :label-col="{ span: 2 }"
+                                  :wrapper-col="{ span: 12 }"
+                                >
+                                  <a-input-number
+                                    :disabled="sname || disabled"
+                                    @change="count"
+                                    class="input"
+                                    v-decorator="[`questions[${questionItem.index}].fen`, { initialValue:0 }]"
+                                  />
+                                </a-form-item>
+                                分
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </a-form-item>
+                        </a-form-item>
+                      </div>
                     </div>
-                  </div>
-                  <div class="actions" v-if="!disabled">
-                    <a-icon
-                      v-if="questionItem.index === questions.length - 1"
-                      type="plus-square"
-                      @click="addQuestion"
-                    />
-                    <a-icon type="delete" v-if="questions.length !== 1" @click="removeQuestion(questionItem.index)" />
-                    <div
-                      @mouseenter="mouseenter(questionItem)"
-                      @mouseleave="mouseleave(questionItem)"
-                    >
+                    <div class="actions" v-if="!disabled">
+                      <a-icon
+                        v-if="index === questions.length - 1"
+                        type="plus-square"
+                        @click="addQuestion"
+                      />
+                      <a-icon
+                        type="delete"
+                        v-if="questions.length !== 1"
+                        @click="removeQuestion(questionItem.index)"
+                      />
                       <DragIcon
+                        class="my-handle"
                         :width="24"
                       />
-                    </div>
 
+                    </div>
                   </div>
                 </div>
               </div>
-            </el-tree>
+            </div>
             <div class="submit">
-              <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
+              <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存
+              </a-button>
             </div>
           </a-form>
         </div>
@@ -226,6 +174,8 @@ import {
 } from '@/api/study/testPager'
 import { message } from 'ant-design-vue'
 import router from '@/router'
+import Sortable from 'sortablejs'
+import Options from './components/Options/index'
 
 export default {
   data () {
@@ -252,8 +202,19 @@ export default {
     if (router.history.current.query.id) {
       this.getDetail(router.history.current.query.id)
     }
+    const questions = document.querySelector('.questions')
+    // 拖拽排序
+    Sortable.create(questions, {
+      delay: 0,
+      handle: '.my-handle',
+      animation: 300, // 拖拽延时，效果更好看
+      onEnd: async (evt) => {
+        this.questions.splice(evt.newIndex, 0, this.questions.splice(evt.oldIndex, 1)[0])
+        // this.handleDrop(evt.newIndex, evt.oldIndex)
+      }
+    })
   },
-  components: { breadcrumb, DragIcon },
+  components: { breadcrumb, DragIcon, Options },
   methods: {
     getDetail (id) {
       this.detailLoading = true
@@ -358,6 +319,7 @@ export default {
     },
     handleSubmit () {
       this.form.validateFields((err, values) => {
+        console.log(values)
         if (!err) {
           this.loading = true
           const data = {
@@ -439,7 +401,12 @@ export default {
     },
     removeQuestion (key) {
       const question = this.form.getFieldValue('questions')
-      this.questions = this.questions.filter((item, index) => index !== key).map((item, index) => ({ ...item, index }))
+      this.questions = this.questions.filter(item => item.index !== key).map(item => {
+        if (key < item.index) {
+          return { ...item, index: item.index - 1 }
+        }
+        return item
+      })
       setTimeout(() => {
         this.form.setFieldsValue({ questions: question.filter((item, index) => index !== key) })
         this.count()
@@ -450,13 +417,13 @@ export default {
       const newOption = String.fromCharCode(char.charCodeAt(0) + 1)
       const question = this.form.getFieldValue(`questions[${key}]`)
       const newOptions = { ...question.options }
-      this.questions = this.questions.map((item, index) => {
-        if (key === index) {
+      this.questions = this.questions.map(item => {
+        if (key === item.index) {
           Object.keys(question.options).forEach(option => {
             if (option.charCodeAt(0) > char.charCodeAt(0)) {
               const newOption = String.fromCharCode(option.charCodeAt(0) + 1)
               newOptions[newOption] = ''
-              updateFileds[`questions[${index}].options.${newOption}`] = question.options[option]
+              updateFileds[`questions[${item.index}].options.${newOption}`] = question.options[option]
             }
           })
           return { ...item, options: { ...newOptions, [newOption]: '' } }
@@ -471,17 +438,17 @@ export default {
       const updateFileds = {}
       const options = this.form.getFieldValue(`questions[${key}].options`)
       const newOptions = {}
-      this.questions = this.questions.map((item, index) => {
-        if (key === index) {
+      this.questions = this.questions.map(item => {
+        if (key === item.index) {
           Object.keys(options).forEach((option, optionIndex) => {
             if (optionIndex === Object.keys(options).length - 1) {
               if (char !== option) {
                 const newOption = String.fromCharCode(option.charCodeAt(0) - 1)
-                updateFileds[`questions[${index}].options.${newOption}`] = options[option]
+                updateFileds[`questions[${item.index}].options.${newOption}`] = options[option]
               }
             } else if (option.charCodeAt(0) > char.charCodeAt(0)) {
               const newOption = String.fromCharCode(option.charCodeAt(0) - 1)
-              updateFileds[`questions[${index}].options.${newOption}`] = options[option]
+              updateFileds[`questions[${item.index}].options.${newOption}`] = options[option]
               newOptions[option] = ''
             } else {
               newOptions[option] = options[option]
@@ -494,67 +461,6 @@ export default {
       setTimeout(() => {
         this.form.setFieldsValue(updateFileds)
       }, 0)
-    },
-    mouseenter (node) {
-      this.dragQuestions = node.index
-    },
-    mouseleave () {
-      this.dragQuestions = -1
-    },
-    optionMouseenter (key) {
-      this.dragOptions = key
-    },
-    optionMouseleave () {
-      this.dragOptions = -1
-    },
-    handleDragOver (draggingNode, dropNode, ev) {
-
-    },
-    handleDrop (draggingNode, dropNode, dropType, ev) {
-      this.questions = this.questions.map((item, index) => {
-        return { ...item, index }
-      })
-
-      const startQuestion = this.form.getFieldValue(`questions[${draggingNode.data.index}]`)
-      const endQuestion = this.form.getFieldValue(`questions[${dropNode.data.index}]`)
-
-      setTimeout(() => {
-        this.form.setFieldsValue({
-          [`questions[${draggingNode.data.index}]`]: endQuestion,
-          [`questions[${dropNode.data.index}]`]: startQuestion
-        })
-      }, 0)
-    },
-    allowDrop (draggingNode, dropNode, type) {
-      return type !== 'inner'
-    },
-    allowDrag (draggingNode) {
-      return draggingNode.data.index === this.dragQuestions
-    },
-
-    optionsHandleDragOver (draggingNode, dropNode, ev) {
-
-    },
-    optionsHandleDrop (draggingNode, dropNode, dropType, ev) {
-      this.questions = this.questions.map((item) => {
-        return item
-      })
-
-      const startOption = this.form.getFieldValue(`questions[${draggingNode.data.key}].options.${draggingNode.data.option}`)
-      const endOption = this.form.getFieldValue(`questions[${dropNode.data.key}].options.${dropNode.data.option}`)
-
-      setTimeout(() => {
-        this.form.setFieldsValue({
-          [`questions[${draggingNode.data.key}].options.${draggingNode.data.option}`]: endOption,
-          [`questions[${dropNode.data.key}].options.${dropNode.data.option}`]: startOption
-        })
-      }, 0)
-    },
-    optionsAlowDrop (draggingNode, dropNode, type) {
-      return type !== 'inner'
-    },
-    optionsAllowDrag (key) {
-      return key === this.dragOptions
     }
   }
 }

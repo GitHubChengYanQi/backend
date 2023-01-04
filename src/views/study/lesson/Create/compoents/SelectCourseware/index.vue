@@ -6,76 +6,100 @@
     </a-button>
 
     <div class="table" :hidden="tableView.length === 0">
-      <el-table
-        :data="tableView"
-        row-key="courseWareId"
-        style="width: 100%"
-        border
-        header-row-class-name="header"
+      <a-table
+        bordered
+        :pagination="false"
+        class="my-table"
+        :columns="[{
+          dataIndex: 'index',
+          align: 'center',
+          scopedSlots: { customRender: 'index' },
+        },{
+          title: '标题',
+          dataIndex: 'sortNo',
+          align: 'center',
+          scopedSlots: { customRender: 'sortNo' },
+        },{
+          title: '学习时长',
+          dataIndex: 'date',
+          align: 'center',
+          scopedSlots: { customRender: 'date' },
+        },{
+          title: '操作',
+          dataIndex: 'actions',
+          align: 'center',
+          scopedSlots: { customRender: 'actions' },
+        },]"
+        :data-source="tableView"
+        :rowKey="record => record.courseWareId"
       >
-        <el-table-column prop="index" width="70">
-          <template slot-scope="{ row, column, $index}">
-            目录{{ $index + 1 }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="sortNo" label="标题" minWidth="200">
-          <template slot-scope="{ row}">
-            <div class="user-info flex">
-              <div class="avatar mr12">
-                <img height="50" v-if="['jpg','png'].includes(row.suffix)" :src="row.coverImageUrl || row.mediaUrl">
-                <a-icon v-if="['doc','docx'].includes(row.suffix)" type="file-word" style="font-size: 24px" />
-                <a-icon v-if="['ppt','pptx'].includes(row.suffix)" type="file-ppt" style="font-size: 24px" />
-                <a-icon v-if="['pdf'].includes(row.suffix)" type="file-pdf" style="font-size: 24px" />
-              </div>
-              <div class="nickname">
-               <a-tooltip overlayClassName="myTooltip">
-                  <template slot="title">
-                    {{ row.fileName || row.title }}
-                  </template>
-                  {{ row.fileName || row.title }}
-                </a-tooltip>
-              </div>
+        <div slot="index" slot-scope="text, record, index">
+          目录{{ index + 1 }}
+        </div>
+        <div slot="sortNo" slot-scope="text,record">
+          <div class="user-info flex">
+            <div class="avatar mr12">
+              <img
+                height="50"
+                v-if="['jpg','png'].includes(record.suffix)"
+                :src="record.coverImageUrl || record.mediaUrl"
+              >
+              <a-icon v-if="['doc','docx'].includes(record.suffix)" type="file-word" style="font-size: 24px" />
+              <a-icon v-if="['ppt','pptx'].includes(record.suffix)" type="file-ppt" style="font-size: 24px" />
+              <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="date" label="学习时长" width="418">
-          <template slot-scope="{row}">
+            <div class="nickname">
+              <a-tooltip overlayClassName="myTooltip">
+                <template slot="title">
+                  {{ record.fileName || record.title }}
+                </template>
+                {{ record.fileName || record.title }}
+              </a-tooltip>
+            </div>
+          </div>
+        </div>
+        <div slot="date" slot-scope="text, record">
+          <div style="display: inline-block">
             <div class="my-space">
               <div class="time" style="gap: 0">
-                <a-input-number v-model="row.hour" id="inputNumber" />
+                <a-input-number v-model="record.hour" id="inputNumber" />
                 <span class="unit">时</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number v-model="row.minute" id="inputNumber" />
+                <a-input-number v-model="record.minute" id="inputNumber" />
                 <span class="unit">分</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number v-model="row.second" id="inputNumber" />
+                <a-input-number v-model="record.second" id="inputNumber" />
                 <span class="unit">秒</span>
               </div>
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column v-if="!hiddenExam" align="center" prop="action" label="关联考试" minWidth="200">
-          <template slot-scope="{row}">
-            <SelectExamination
-              v-model="row.exam"
-              placeholder="请选择关联考试"
-            />
-          </template>
-        </el-table-column>
-        <el-table-column prop="action" label="操作" width="180">
-          <template slot-scope="{row}">
+          </div>
+        </div>
+        <div slot="actions" slot-scope="text, record">
+          <div style="display: inline-block">
             <div class="my-space" style="cursor: pointer">
-              <a-button class="linkButton" :disabled="row.courseWareType === 'file'" @click="openPreview(row)">预览</a-button>
-              <a-button class="delButton" @click="remove(row)">删除</a-button>
+              <a-button class="linkButton" :disabled="record.courseWareType === 'file'" @click="openPreview(row)">
+                预览
+              </a-button>
+              <a-button class="delButton" @click="remove(record)">删除</a-button>
+              <SelectExamination
+                v-if="!hiddenExam"
+                v-model="record.exam"
+                placeholder="请选择关联考试"
+                showStyle="successButton"
+              >
+                <a-button class="successButton">
+                  关联考试
+                </a-button>
+              </SelectExamination>
               <div class="my-handle">
                 <DragIcon :width="24" />
               </div>
             </div>
-          </template>
-        </el-table-column>
-      </el-table>
+          </div>
+        </div>
+      </a-table>
     </div>
 
     <Preview
@@ -193,7 +217,7 @@ export default {
   },
   mounted () {
     // 获取 tbody 节点
-    const tbody = document.querySelector('.el-table__body-wrapper tbody')
+    const tbody = document.querySelector('.ant-table-body tbody')
     // 拖拽排序
     Sortable.create(tbody, {
       delay: 0,
@@ -201,7 +225,6 @@ export default {
       animation: 300, // 拖拽延时，效果更好看
       onEnd: async (evt) => {
         this.tableView.splice(evt.newIndex, 0, this.tableView.splice(evt.oldIndex, 1)[0])
-        // 接口(param).then((res) => {})
       }
     })
   },

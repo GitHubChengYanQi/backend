@@ -167,7 +167,7 @@ export default {
       courseDetail({ courseId: id }).then((res) => {
         const detail = res.data || {}
         this.employees = detail.bindEmpList ? detail.bindEmpList.map(item => item.name) : []
-        this.hiddenExam = !detail.examResults
+        this.hiddenExam = !(detail.examResults && detail.examResults[0])
         this.form.setFieldsValue({
           name: detail.name,
           courseClassId: this.getClassIds(detail.courseClassId, this.classTree),
@@ -198,7 +198,8 @@ export default {
             ...values,
             wareBindParams: values.wareBindParams ? values.wareBindParams.map((item, index) => ({
               ...item,
-              sort: index
+              sort: index,
+              examId: values.exam ? item.examId : null
             })) : [],
             courseClassId: values.courseClassId ? values.courseClassId[values.courseClassId.length - 1] : null,
             questionnaireIds: [values.questionnaireId],
@@ -363,6 +364,7 @@ export default {
     }
   }
 }
+
 .content {
   border-radius: 8px;
   padding: 24px;
