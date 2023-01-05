@@ -135,7 +135,7 @@ export default {
      * @param {*} e
      * @param {*} key
      */
-     getDict (e) {
+    getDict (e) {
       const obj = {
         dictType: e
       }

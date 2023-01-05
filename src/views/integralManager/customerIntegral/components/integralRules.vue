@@ -516,7 +516,7 @@ export default {
 }
 .friendCircleModalClass {
   .formDivContent {
-    .singleFormDiv {
+    /deep/.singleFormDiv {
       .selectPersonnelCom {
         width: 90%;
         .ant-btn {
