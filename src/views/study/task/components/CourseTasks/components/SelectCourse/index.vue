@@ -21,6 +21,7 @@
           type="primary"
           style="border-radius: 8px"
           class="add"
+          :disabled="courses.length === 0"
           @click="submit"
         >
           确定

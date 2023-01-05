@@ -22,6 +22,7 @@
           type="primary"
           style="border-radius: 8px"
           class="add"
+          :disabled="examination.length === 0"
           @click="submit"
         >
           确定

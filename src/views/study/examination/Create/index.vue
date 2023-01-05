@@ -17,6 +17,7 @@
           <a-form-item label="考试名称">
             <a-input
               :maxLength="20"
+              :suffix="`${form.getFieldValue('name') ? form.getFieldValue('name').length : 0} / 20`"
               placeholder="请输入考试名称"
               v-decorator="['name', { rules: [{ required: true, message: '请输入考试名称!' }] ,initialValue: '' }]"
             />
@@ -32,7 +33,7 @@
                   <template slot="title">
                     在有效时间段内员工可一直重复考试
                   </template>
-                  <a-icon type="question-circle"/>
+                  <a-icon type="question-circle" />
                 </a-tooltip>
               </a-radio>
               <a-radio :value="2">
@@ -41,7 +42,7 @@
                   <template slot="title">
                     员工只能参加一次考试
                   </template>
-                  <a-icon type="question-circle"/>
+                  <a-icon type="question-circle" />
                 </a-tooltip>
               </a-radio>
               <a-radio :value="3">
@@ -50,7 +51,7 @@
                   <template slot="title">
                     在有效时间内考试分数未达到通过分数时，需继续考试直至考试通过，通过后不可再考试
                   </template>
-                  <a-icon type="question-circle"/>
+                  <a-icon type="question-circle" />
                 </a-tooltip>
               </a-radio>
             </a-radio-group>
@@ -65,14 +66,14 @@
             <div class="my-space">
               <ImgUpload
                 placeholder="请选择封面图"
-                v-decorator="['coverImageUrl', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
+                v-decorator="['coverImageUrl', {initialValue: '' }]"
               />
               建议尺寸：750 × 1448
             </div>
           </a-form-item>
           <a-form-item label="答卷时长">
             <TimeLimit
-              v-decorator="['timeLimit', { rules: [{ required: true, message: '请选择答卷时长!' }],initialValue: 0 }]"
+              v-decorator="['timeLimit', { rules: [{ required: true, message: '请选择答卷时长!' }],initialValue: -1 }]"
             >
             </TimeLimit>
           </a-form-item>
@@ -93,12 +94,19 @@
             <a-spin v-else />
           </a-form-item>
           <a-form-item label="考试说明">
-            <a-textarea
-              :auto-size="{ minRows: 6 }"
-              :max-length="100"
-              placeholder="请输入考试说明"
-              v-decorator="['note', { initialValue:'' }]"
-            />
+            <div class="myTextArea">
+              <a-textarea
+                :auto-size="{ minRows: 6 }"
+                :max-length="100"
+                placeholder="请输入考试说明"
+                v-decorator="['note', { initialValue:'' }]"
+              />
+              <div class="suffix">
+                {{
+                  `${form.getFieldValue('note') ? form.getFieldValue('note').length : 0} / 100`
+                }}
+              </div>
+            </div>
           </a-form-item>
           <div style="text-align: center">
             <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
@@ -332,5 +340,20 @@ export default {
   border-radius: 8px;
   padding: 24px;
   background-color: #fff;
+}
+
+.myTextArea {
+  position: relative;
+  flex-grow: 1;
+
+  .suffix {
+    position: absolute;
+    bottom: 0;
+    right: 12px;
+  }
+
+  /deep/ textarea {
+    padding-right: 70px;
+  }
 }
 </style>

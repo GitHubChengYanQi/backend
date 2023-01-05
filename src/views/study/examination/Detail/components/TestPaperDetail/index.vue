@@ -5,13 +5,13 @@
         <div class="head">
           <div class="headImg" style="min-height: 190px">
             <img
-              v-if="!detailLoading"
+              v-if="!detailLoading && detail.coverImageUrl"
               height="190"
               :src="detail.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_190,w_270'"
             >
           </div>
           <div class="column">
-            <div class="title">健康知识培训</div>
+            <div class="title">{{ detail.name }}</div>
             <div class="space">
               <div>
                 <div>创建人：{{ detail.employeeEntity && detail.employeeEntity.name }}</div>
@@ -311,6 +311,7 @@ export default {
     }
   }
 }
+
 .lessonAnalysis {
 
   .title {
