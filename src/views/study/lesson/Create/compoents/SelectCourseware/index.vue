@@ -79,7 +79,7 @@
         <div slot="actions" slot-scope="text, record">
           <div style="display: inline-block">
             <div class="my-space" style="cursor: pointer">
-              <a-button class="linkButton" :disabled="record.courseWareType === 'file'" @click="openPreview(row)">
+              <a-button class="linkButton" :disabled="record.courseWareType === 'file'" @click="openPreview(record)">
                 预览
               </a-button>
               <a-button class="delButton" @click="remove(record)">删除</a-button>
