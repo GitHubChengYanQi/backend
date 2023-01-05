@@ -10,28 +10,41 @@
       <div class="add_rule_box">
         <div class="title">{{ id.length == 0 ?'新建':'编辑' }}消费属性打标签</div>
         <div class="content">
-          <!-- 规则名称 -->
-          <div class="item">
-            <span class="label"><span>*</span> 规则名称： </span>
-            <a-input
-              style="width: 400px; height: 36px"
-              placeholder="请填写规则名称，仅内部可见"
-              v-model="form.name"
-            ></a-input>
-          </div>
-          <!-- end 规则名称 -->
+          <a-form-model
+            ref="name"
+            :model="form"
+            :rules="formRules"
+          >
+            <!-- 规则名称 -->
+            <a-form-model-item label="规则名称" prop="name">
+              <a-input
+                style="width: 400px; height: 36px"
+                placeholder="请填写规则名称，仅内部可见"
+                v-model="form.name"
+                :maxLength="30"
+                :suffix="`${form.name.length}/30`"
+              ></a-input>
+            </a-form-model-item>
+            <!-- end 规则名称 -->
+            <!-- 选择标签 -->
+            <a-form-model-item label="选择标签" prop="labelIdGroup">
+              <!-- <input v-model="form.labelIdGroup" /> -->
+              <LabelSelect v-model="form.labelIdGroup" :addState="true" style="width:400px" />
+            </a-form-model-item>
+            <!-- end 选择标签 -->
+          </a-form-model>
 
           <!-- 选择标签 -->
-          <div class="item">
+          <!-- <div class="item">
             <div class="label"><span>*</span> 选择标签： </div>
-            <LabelSelect v-model="form.label" :addState="true" style="width:400px" />
-          </div>
+            <LabelSelect v-model="form.labelIdGroup" :addState="true" style="width:400px" />
+          </div> -->
           <!-- end 选择标签 -->
 
           <!-- 设置打标签规则 -->
           <div class="item">
             <div class="label">
-              <span class="necessary">*</span> 设置打标签规则：
+              设置打标签规则：
               <a-tooltip placement="right">
                 <template slot="title">
                   <span>且：多个条件需要被同时满足才会被打上标签，<br />
@@ -41,17 +54,17 @@
               </a-tooltip>
             </div>
             <div class="tip">注：客户属性与消费属性同时勾选时，客户需要同时满足客户属性条件与消费属性条件才会被打上标签。</div>
-            <a-checkbox @change="onChange" :checked="ruleShow">
+            <a-checkbox @change="onChange" :checked="form.customerAttributeSelect === '1' ? true : false">
               客户属性
             </a-checkbox>
-            <clientAttr v-model="form.clientAttr" v-if="ruleShow" />
+            <clientAttr v-model="form.customerRule" v-if="form.customerAttributeSelect === '1'" @relation="(e) => {getRelation(e, 'client')}" />
           </div>
           <!-- end 设置打标签规则 -->
 
           <!-- 消费属性 -->
           <div class="item">
             <div class="label">
-              <span class="necessary">*</span> 消费属性：
+              消费属性：
               <a-tooltip placement="right">
                 <template slot="title">
                   <span>
@@ -62,18 +75,15 @@
                 <a-icon type="question-circle" />
               </a-tooltip>
             </div>
-            <a-radio-group v-model="goodShow" @change="onGoodChange">
-              <a-radio :value="1">
-                不限商品
-              </a-radio>
-              <a-radio :value="2">
-                选择商品
+            <a-radio-group v-model="form.goodBounds" @change="onGoodChange">
+              <a-radio :value="item.code" v-for="item in goodBounds" :key="item.code">
+                {{ item.name }}
               </a-radio>
             </a-radio-group>
-            <div v-if="goodShow === 2">
-              <GoodsSelect v-model="form.goods" />
+            <div v-if="form.goodBounds === '1'">
+              <GoodsSelect v-model="form.erpGoodIds" />
             </div>
-            <goodsAttr v-model="form.expendAttr" />
+            <goodsAttr v-model="form.consumeRule" @relation="(e) => {getRelation(e, 'goods')}" />
           </div>
           <!-- end 消费属性 -->
 
@@ -81,15 +91,17 @@
       </div>
       <div class="handle">
         <a-button
-          type="primary"
-          @click="addRule()"
+          :loading="loading"
+          @click="openValid()"
         >验证</a-button>
         <a-button
           type="primary"
+          :loading="loading"
           @click="addRule()"
         >保存</a-button>
         <a-button
           type="primary"
+          :loading="loading"
           @click="addRule()"
         >保存并创建跟客任务</a-button>
       </div>
@@ -106,28 +118,27 @@
       <div class="content">
         <a-form-model
           ref="ruleForm"
-          :model="form"
+          :model="valiForm"
           :rules="rules"
           :label-col="labelCol"
           :wrapper-col="wrapperCol"
         >
-          <a-form-model-item label="购买时间" required prop="date1">
+          <a-form-model-item label="购买时间" prop="">
             <a-date-picker
-              v-model="form.date"
-              show-time
+              v-model="valiForm.purchase_time"
               type="date"
-              placeholder="Pick a date"
+              placeholder="请选择"
               style="width: 100%;"
             />
           </a-form-model-item>
-          <a-form-model-item label="购买次数" prop="name">
-            <a-input v-model="form.name" suffix="次" />
+          <a-form-model-item label="购买次数" prop="">
+            <a-input v-model="valiForm.purchase_number" suffix="次" />
           </a-form-model-item>
-          <a-form-model-item label="商品金额" prop="name">
-            <a-input v-model="form.name" suffix="元" />
+          <a-form-model-item label="商品金额" prop="">
+            <a-input v-model="valiForm.good_amount" suffix="元" />
           </a-form-model-item>
-          <a-form-model-item label="商品数量" prop="name">
-            <a-input v-model="form.name" />
+          <a-form-model-item label="商品数量" prop="">
+            <a-input v-model="valiForm.good_number" />
           </a-form-model-item>
         </a-form-model>
         <p>已按照您设置的规则进行验证，验证结果为：</p>
@@ -137,7 +148,7 @@
         </p>
       </div>
       <div class="handle">
-        <a-button type="primary" @click="handleOk">点击验证</a-button>
+        <a-button type="primary" @click="handleValid">点击验证</a-button>
       </div>
     </a-modal>
     <!--end modal-->
@@ -145,44 +156,69 @@
 </template>
 
 <script>
+import moment from 'moment'
 import LabelSelect from '../../components/SelectLabel/index.vue'
 import GoodsSelect from '../../components/SelectGoods/index.vue'
 import clientAttr from './expendComponents/clientAttr'
 import goodsAttr from './expendComponents/goodsAttr'
 import { getDict } from '@/api/common.js'
-import { isObjectValueEqual } from '@/utils/util'
+import { isObjectValueEqual, deepClonev2 } from '@/utils/util'
+import {
+  consumeAutoLabelAdd,
+  consumeAutoLabelDetail,
+  consumeAutoLabelUpdate,
+  consumeAutoLabelValidRule
+} from '@/api/clientFollow.js'
 
 export default {
   components: { LabelSelect, clientAttr, GoodsSelect, goodsAttr },
   data () {
     return {
-      id: '',
+      loading: false,
+      id: '', // 类别
+      label: '', // id
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       labelShow: false,
-      ruleShow: true,
-      goodShow: 1, // 1=不限商品 2=选择商品
+      goodBounds: [],
       visible: false,
       form: {
         name: '',
-        label: [], // 规则标签
-        clientAttr: [], // 客户属性
-        goodsAttr: [], // 商品
-        expendAttr: [] // 消费属性
+        labelIdGroup: [], // 规则标签
+        customerAttributeSelect: '0', // 是否包含客户属性
+        customerAttributeRef: 'and', // 客户属性关系
+        customerRule: [], // 客户属性
+        goodBounds: '0', // 是否限制商品
+        erpGoodIds: [], // 商品
+        consumeAttributeRef: 'and', //消费属性关系
+        consumeRule: [] // 消费属性
       },
       valiForm: {
-        date: '',
-        num: '',
-        price: '',
-        order: ''
-      }
+        purchase_time: '',
+        purchase_number: '',
+        good_amount: '',
+        good_number: ''
+      },
+      formRules: {
+        name: [
+          { required: true, message: '请填规则名称', trigger: 'blur' }
+        ],
+        labelIdGroup: [
+          { required: true, message: '请选择标签', trigger: 'change' }
+        ]
+      },
+      rules: {}
     }
   },
   watch: {},
   created () {
     this.id = this.$route.query.id
+    this.label = this.$route.query.label
+    this.getDict('good_bounds')
+    this.getDetail()
   },
   methods: {
+    deepClonev2,
     isObjectValueEqual,
     /**
      * 返回列表，判断是否有操作
@@ -212,36 +248,108 @@ export default {
       }
     },
     /**
-     * 设置且或
-     * @param {*} e
+     * 获取详情
      */
-    setRelation (e) {
-      this.relationState = e
+    getDetail () {
+      if (this.label && this.label.length > 0) {
+        const param = {
+          id: this.label
+        }
+        consumeAutoLabelDetail(param).then(res => {
+          this.form = this.formatData(res.data)
+        })
+      }
+    },
+    /**
+     * 回显数据格式化
+     */
+    formatData (data) {
+      const arr = data //this.deepClonev2(data)
+      // 格式化时间段
+      for (let i = 0; i < arr.consumeRule.length; i++) {
+        if (arr.consumeRule[i].columnName === 'purchase_time') {
+          arr.consumeRule[i].val = (arr.consumeRule[i].val).split(',')
+        }
+      }
+      return arr
     },
     /**
      * 保存
      */
     addRule () {
-      console.log('保存', this.form)
-      this.visible = true
+      this.loading = true
+      if (this.label && this.label.length > 0) {
+        console.log('编辑')
+        const param = {
+          id: this.label,
+          ...this.formatSaveData()
+        }
+        consumeAutoLabelUpdate(param).then(res => {
+          this.loading = false
+          if (res.code === 200) {
+            this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+          }
+        })
+      } else {
+        console.log('创建')
+        const param = {
+          ...this.formatSaveData()
+        }
+        consumeAutoLabelAdd(param).then(res => {
+          this.loading = false
+          if (res.code === 200) {
+            this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+          }
+        })
+      }
+    },
+    /**
+     * 提交数据格式化
+     */
+    formatSaveData () {
+      let data = this.deepClonev2(this.form)
+      // 标签
+      let labels = []
+      for (let i = 0; i < data.labelIdGroup.length; i++) {
+        labels.push(data.labelIdGroup[i].id)
+      }
+      data.labelIdGroup = labels.join(',')
+      // 消费属性规则
+      for (let i = 0; i < data.consumeRule.length; i++) {
+        data.consumeRule[i].sort = i
+        if (data.consumeRule[i].columnName === 'purchase_time') {
+          data.consumeRule[i].val = (data.consumeRule[i].val).join(',')
+        }
+      }
+      // 客户属性规则
+      for (let i = 0; i < data.customerRule.length; i++) {
+        const arr = data.customerRule[i].val
+        let res = []
+        data.customerRule[i].sort = i
+        for (let j = 0; j < arr.length; j++) {
+          res.push(arr[j].id)
+        }
+        data.customerRule[i].val = res.join(',')
+      }
+      // 商品
+      let goods = []
+      for (let i = 0; i < data.erpGoodIds.length; i++) {
+        goods.push(data.erpGoodIds[i].id)
+      }
+      data.erpGoodIds = goods.join(',')
+      return data
     },
     /**
      * 拉取字典
      * @param {*} e
-     * @param {*} key
      */
-    getSelectData (e, key) {
+    getDict (e) {
       const obj = {
         dictType: e
       }
       getDict(obj).then((res) => {
-        this[key] = res.data.map((item) => {
-          item.label = item.name
-          item.value = item.code
-          return item
-        })
-        if (key == 'relationData') {
-          this.relationState = this[key][0].value
+        if (e === 'good_bounds') {
+          this.goodBounds = res.data
         }
       })
     },
@@ -250,26 +358,52 @@ export default {
      * @param {*} e
      */
     onChange (e) {
-      this.ruleShow = e.target.checked
+      if (e.target.checked) {
+        this.form.customerAttributeSelect = '1'
+      } else {
+        this.form.customerAttributeSelect = '0'
+        this.form.customerRule = []
+      }
     },
     /**
      * 开启商品选择
      */
     onGoodChange (e) {
-      console.log(111111, e.target.value)
-      this.goodShow = e.target.value
+      this.form.goodBounds = e.target.value
+    },
+    /**
+     * 打开验证窗口
+     */
+    openValid () {
+      this.visible = true
+    },
+    /**
+     * 关闭验证窗口
+     */
+    handleCancel () {
+      this.visible = false
     },
     /**
      * 验证
      */
-    handleOk () {
-      this.visible = false
+    handleValid () {
+      const param = {
+        ...this.valiForm
+      }
+      console.log(11111, param)
+      consumeAutoLabelValidRule(param).then(res => {
+        console.log(11111, res)
+      })
     },
     /**
-     * 关闭验证
+     * 客户属性关系回调
      */
-    handleCancel () {
-      this.visible = false
+    getRelation (e, type) {
+      if (type === 'client') {
+        this.form.customerAttributeRef = e
+      } else {
+        this.form.consumeAttributeRef = e
+      }
     }
   }
 }
@@ -304,7 +438,7 @@ export default {
     }
     .content{
       .item{
-        margin-bottom:20px;
+        margin-bottom:30px;
         .label{
           margin-bottom:10px;
           span{

@@ -14,7 +14,7 @@
       @change="handleChange"
       :data="{time:1}"></a-upload>
     <quill-editor
-      class="editor"
+      class="myQuillEditor"
       :style="{height,width}"
       v-model="content"
       ref="myQuillEditor"
@@ -213,11 +213,11 @@ export default {
   display: none;
 }
 
-.editor {
+.myQuillEditor {
   line-height: normal !important;
   height: 354px;
 
-  .ql-editor {
+  .ql-container {
     min-height: 800px;
   }
 

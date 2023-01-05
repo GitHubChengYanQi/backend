@@ -1,21 +1,18 @@
 <template>
   <div>
     <breadcrumb v-if="!select" :titles="['考试管理','试卷管理']" back></breadcrumb>
-    <a-card v-if="!select" :bordered="false" class="my-table-search">
+    <a-card :bordered="false" class="my-table-search" :body-style="{padding:select ? 0 : 24}">
       <a-form layout="inline">
 
-        <a-form-item
-          label="试卷名称">
+        <a-form-item :label="select ? '' : '试卷名称'">
           <a-input v-model="screenData.questionnaireName" placeholder="请输入试卷名称" :maxLength="20"></a-input>
         </a-form-item>
 
-        <a-form-item
-          label="创建时间">
+        <a-form-item :label="select ? '' : '创建时间'">
           <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
-        <a-form-item
-          label="创建人">
+        <a-form-item v-if="!select" label="创建人">
           <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
         </a-form-item>
 
@@ -316,12 +313,145 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.my-space {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-search {
+  .ant-form-inline {
+    .ant-form-item {
+      margin-bottom: 24px;
+    }
+  }
+}
+
+.warnButton {
+  color: rgba(255, 152, 0, 1);
+  background-color: rgba(252, 192, 104, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.linkButton {
+  color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.delButton {
+  color: #ff4d4f;
+  background-color: rgba(255, 77, 79, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.successButton {
+  color: #01ba77;
+  background-color: rgba(1, 186, 119, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.my-table-search {
+  border-radius: 8px;
+
+  .ant-form-inline .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .ant-input,
+  .ant-select-selection,
+  .ant-time-picker-input {
+    border-radius: 8px !important;
+  }
+
+  .ant-btn {
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+}
+
+.my-table-wrapper {
+  border-radius: 8px;
+
+  .btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 24px;
+
+    > .ant-btn {
+      margin-left: 12px;
+      border-radius: 8px;
+    }
+  }
+}
+
+.my-table {
+  background-color: #fff;
+
+  .ant-table-pagination {
+    padding: 24px;
+    float: none;
+    text-align: center;
+  }
+}
+
+.myTooltip {
+  background-color: #fff;
+
+  .ant-tooltip-inner {
+    color: #000;
+    background-color: #fff;
+  }
+
+  .ant-tooltip-arrow::before {
+    background-color: #fff;
+  }
+}
+
+.myLabelBox {
+  width: 400px;
+
+  span {
+    margin-bottom: 10px;
+  }
+}
+
+.my-modal {
+  .ant-modal-footer {
+    padding: 24px;
+    text-align: center;
+
+    .ant-btn {
+      padding: 0 24px;
+      border-radius: 8px;
+    }
+
+    .ant-modal-footer button + button {
+      margin-left: 24px;
+    }
+  }
+}
 
 .my-table-wrapper {
   border-radius: 8px;

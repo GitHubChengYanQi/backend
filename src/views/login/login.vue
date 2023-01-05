@@ -122,8 +122,10 @@
 import { mapActions } from 'vuex'
 import store from '@/store'
 import { resetRoutes } from '@/utils/menu'
+import TestPaper from '/src/views/study/examination/TestPaper/Create/index'
 
 export default {
+  components: { TestPaper },
   data () {
     return {
       customActiveKey: 'tab1',
@@ -227,29 +229,34 @@ export default {
   justify-content: center;
   flex-direction: column;
   background: url('../../assets/background.png') no-repeat center;
+
   .img-wrapper {
     width: 100%;
     margin: 0 auto;
     padding: 42px 0 45px 0;
     box-sizing: border-box;
     text-align: center;
+
     .img {
       width: 200px;
-      height:auto;
+      height: auto;
     }
   }
+
   .contant {
     width: 370px;
     height: 430px;
     margin-bottom: 25px;
     background: #293152;
     border-radius: 10px;
-    box-shadow: 0px 11px 24px 0px rgba(18,21,40,0.58)
+    box-shadow: 0px 11px 24px 0px rgba(18, 21, 40, 0.58)
   }
+
   .input {
     height: 60px;
     font-size: 16px;
   }
+
   .footer {
     color: #e4eafa;
     font-size: 18px;
@@ -257,8 +264,10 @@ export default {
     margin-top: 80px;
   }
 }
+
 .user-layout-login {
   padding: 0 21px;
+
   label {
     font-size: 14px;
   }
@@ -273,18 +282,21 @@ export default {
   .forge-password {
     font-size: 14px;
   }
-  .btn-wrapper{
+
+  .btn-wrapper {
     width: 100%;
     margin-top: 25px;
     display: flex;
     justify-content: center;
   }
+
   .confirm-wrapper {
     width: 100%;
     margin-top: 40px;
     display: flex;
     justify-content: center;
   }
+
   button.login-button {
     padding: 0 15px;
     font-size: 20px;
