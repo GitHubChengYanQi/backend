@@ -1,10 +1,12 @@
 <template>
   <div>
-    <!-- :action="action" :headers="headers" method="post" -->
     <a-upload-dragger
       name="file"
       :multiple="false"
+      :action="action"
+      :headers="headers"
       :default-file-list="defaultFileList"
+      method="post"
       @change="handleChange"
       @preview="handlePreview"
     >
@@ -24,7 +26,7 @@
 <script>
 /* eslint-disable */
 import storage from 'store'
-import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
+
 function getBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -91,6 +93,9 @@ export default {
     }
   },
   methods: {
+    beforeUploadMethod () {
+      return false
+    },
     handleCancel() {
       this.previewVisible = false
     },
@@ -106,7 +111,7 @@ export default {
         // 限制只能上传一个文件 再次上传时则替换(覆盖)以前的文件
         fileList.splice(0, 1)
       }
-
+      console.log(file, 'file')
       let ext = file.name.substring(file.name.lastIndexOf('.') + 1)
       if (this.accept.length > 1 && !this.accept.includes(ext.toLowerCase())) {
         file.status = 'beforeUploadReject'

@@ -84,7 +84,6 @@
             </div>
           </div> -->
           <SendContent
-            :isLoadingStatus.sync="loadingStatus"
             v-if="addInfo.listTaskInfo && addInfo.listTaskInfo.length && currentShowTabId === 1"
             :contentArray.sync="contentArray"
             :isSopEdit.sync="isSopEdit"
@@ -146,7 +145,6 @@
           </a-form-item>
         </a-form> -->
         <SendContent
-          :isLoadingStatus.sync="loadingStatus"
           :contentArray.sync="sendCalendarContentArray"
           :isSopEdit.sync="isSopEdit"
           :isDisableEdit="false"/>

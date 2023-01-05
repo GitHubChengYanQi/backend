@@ -1,6 +1,5 @@
 <template>
   <div class="material-library">
-
     <a-row>
       <a-col>
         <a-modal
@@ -991,17 +990,9 @@
                 <a-input v-model="FormData.title" :maxLength="15" />
               </a-form-model-item>
               <a-form-item label="上传视频：">
-                <!-- <vpload
+                <vpload
                   @successDefine="uploadSuccessV"
-                  :file-type="3"></vpload> -->
-                <div class="uploadMediaDiv">
-                  <ImgUpload
-                    :fileMaxSize="200"
-                    :isLoadingStatus.sync="isLoadingStatus"
-                    @successUpload="successUpload">
-                    <a-button><a-icon type="upload" /> 上传 </a-button>
-                  </ImgUpload>
-                </div>
+                  :file-type="3"></vpload>
                 <div>(视频上传大小不超过10M，支持MP4格式)</div>
                 <div v-if="uploadDefine" style="color: red">上传成功</div>
               </a-form-item>
@@ -1225,15 +1216,12 @@ import storage from 'store'
 import { materialLibraryList, mediumGroup, addMediumGroup, editMediumGroup, delMediumGroup, delMaterialLibrary, addMaterialLibrary, moveGroup, getMaterialLibrary, editMaterialLibrary } from '@/api/mediumGroup'
 import upload from './components/upload'
 import vpload from './components/vpload'
-import ImgUpload from '../sales/sop/components/ImgUpload/index.vue'
 import mtextarea from './components/mtextarea'
-import { upLoad } from '@/api/common'
 export default {
   components: {
     upload,
     vpload,
-    mtextarea,
-    ImgUpload
+    mtextarea
   },
   props: {
     isComponent: {
@@ -1243,7 +1231,6 @@ export default {
   },
   data () {
     return {
-      isLoadingStatus: false,
       deleteGroupId: '',
       deleteGroupModel: false,
       editGroupPid: '',
@@ -1462,54 +1449,6 @@ export default {
     }
   },
   methods: {
-    async successUpload (file) {
-      console.log(file, 'successUpload上传成功的返回')
-      if (file.size) {
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        // const res = await upLoad(formData)
-        this.$emit('update:isLoadingStatus', true)
-        await upLoad(formData).then(res => {
-          const videoPath = res.data.path
-          this.upLoadRes.videoPath = videoPath
-          this.upLoadRes.videoName = file.name
-          this.uploadDefine = true
-          // this.$emit('update:isLoadingStatus', false)
-          // const videoInfo = {
-          //   type: 3,
-          //   videoUrl: res.data.fullPath
-          // }
-          // if (this.submitType === 'add') {
-          //   this.sendContentArray.push(videoInfo)
-          // } else {
-          //   this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
-          // }
-          // this.isSopEditStatus = true
-          // this.$emit('update:isSopEdit', this.isSopEditStatus)
-          // this.$emit('update:contentArray', this.sendContentArray)
-          // this.$refs.uploadVideoRef.value = ''
-        })
-      } else {
-        // const videoPath = `${file.host}/${file.key}`
-        this.upLoadRes.videoPath = file.key
-        this.upLoadRes.videoName = file.key
-        this.uploadDefine = true
-        // const videoInfo = {
-        //   type: 3,
-        //   videoUrl: `${file.host}/${file.key}`
-        // }
-        // if (this.submitType === 'add') {
-        //   this.sendContentArray.push(videoInfo)
-        // } else {
-        //   this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
-        // }
-        // this.isSopEditStatus = true
-        // this.$emit('update:isSopEdit', this.isSopEditStatus)
-        // this.$emit('update:contentArray', this.sendContentArray)
-      }
-    },
     flatTree (data, childName = 'children') {
       const clone = JSON.parse(JSON.stringify(data))
       if (!Array.isArray(clone)) {
@@ -2218,31 +2157,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.uploadMediaDiv {
-    /deep/.img-avatar-uploader {
-      .ant-upload {
-        width: auto;
-        height: auto;
-        margin-bottom: 0px;
-        margin-right: 0px;
-        padding: 0px;
-        background-color: white;
-        border: 0;
-        color: #1c1c1c;
-        .anticon-upload {
-          font-size: 14px;
-          color: #1c1c1c;
-        }
-      }
-      // width: auto;
-      // height: auto;
-      // margin-bottom: 0px;
-      // margin-right: 0px;
-      // padding: 0px;
-      // background-color: white;
-      // color: #1c1c1c;
-    }
-}
 .material-library {
     height: 100%;
     .left {

@@ -174,9 +174,6 @@
           >
             <a-spin slot="notFoundContent" v-if="fetching" />
             <a-select-option v-for="item in commonNameList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
-            <!-- <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-              {{ (i + 9).toString(36) + i }}
-            </a-select-option> -->
           </a-select>
         </a-form-item>
       </a-form>
@@ -615,10 +612,16 @@ export default {
     editFn (record) {
       const params = { id: record.id }
       getErpDrugInformation(params).then(response => {
-        console.log(response)
         this.showEdit = true
         this.$nextTick(() => {
           this.editInfo = response.data
+          // 生成通用名字典
+          this.commonNameList = [
+            {
+              id: response.data.commonNameId,
+              name: response.data.commonName
+            }
+          ]
           if (this.editInfo.commonName && this.editInfo.commonNameId) {
 
           } else {

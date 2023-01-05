@@ -24,7 +24,7 @@
           <!-- 选择标签 -->
           <div class="item">
             <div class="label"><span>*</span> 选择标签： </div>
-            <LabelSelect v-model="form.label" @input="inputFn" style="width:400px" />
+            <LabelSelect v-model="form.label" :addState="true" style="width:400px" />
           </div>
           <!-- end 选择标签 -->
 
@@ -44,9 +44,7 @@
             <a-checkbox @change="onChange" :checked="ruleShow">
               客户属性
             </a-checkbox>
-            <div v-if="ruleShow">
-              11111111
-            </div>
+            <clientAttr v-model="form.clientAttr" v-if="ruleShow" />
           </div>
           <!-- end 设置打标签规则 -->
 
@@ -73,8 +71,9 @@
               </a-radio>
             </a-radio-group>
             <div v-if="goodShow === 2">
-              11111111
+              <GoodsSelect v-model="form.goods" />
             </div>
+            <goodsAttr v-model="form.expendAttr" />
           </div>
           <!-- end 消费属性 -->
 
@@ -95,25 +94,87 @@
         >保存并创建跟客任务</a-button>
       </div>
     </a-card>
+    <!--modal-->
+    <a-modal
+      title="规则验证"
+      class="modalBox"
+      @cancel="handleCancel"
+      :footer="null"
+      :visible="visible"
+    >
+      <p>默认客户属性满足要求</p>
+      <div class="content">
+        <a-form-model
+          ref="ruleForm"
+          :model="form"
+          :rules="rules"
+          :label-col="labelCol"
+          :wrapper-col="wrapperCol"
+        >
+          <a-form-model-item label="购买时间" required prop="date1">
+            <a-date-picker
+              v-model="form.date"
+              show-time
+              type="date"
+              placeholder="Pick a date"
+              style="width: 100%;"
+            />
+          </a-form-model-item>
+          <a-form-model-item label="购买次数" prop="name">
+            <a-input v-model="form.name" suffix="次" />
+          </a-form-model-item>
+          <a-form-model-item label="商品金额" prop="name">
+            <a-input v-model="form.name" suffix="元" />
+          </a-form-model-item>
+          <a-form-model-item label="商品数量" prop="name">
+            <a-input v-model="form.name" />
+          </a-form-model-item>
+        </a-form-model>
+        <p>已按照您设置的规则进行验证，验证结果为：</p>
+        <p class="result">
+          <span class="success">标签添加成功!</span>
+          <span class="warn">标签添加失败!</span>
+        </p>
+      </div>
+      <div class="handle">
+        <a-button type="primary" @click="handleOk">点击验证</a-button>
+      </div>
+    </a-modal>
+    <!--end modal-->
   </div>
 </template>
 
 <script>
-import LabelSelect from '../../components/SelectLabel/select.vue'
-// import LabelSelect from './components/LabelSelect'
+import LabelSelect from '../../components/SelectLabel/index.vue'
+import GoodsSelect from '../../components/SelectGoods/index.vue'
+import clientAttr from './expendComponents/clientAttr'
+import goodsAttr from './expendComponents/goodsAttr'
 import { getDict } from '@/api/common.js'
+import { isObjectValueEqual } from '@/utils/util'
 
 export default {
-  components: { LabelSelect },
+  components: { LabelSelect, clientAttr, GoodsSelect, goodsAttr },
   data () {
     return {
       id: '',
+      labelCol: { span: 4 },
+      wrapperCol: { span: 14 },
       labelShow: false,
       ruleShow: true,
       goodShow: 1, // 1=不限商品 2=选择商品
+      visible: false,
       form: {
         name: '',
-        label: []
+        label: [], // 规则标签
+        clientAttr: [], // 客户属性
+        goodsAttr: [], // 商品
+        expendAttr: [] // 消费属性
+      },
+      valiForm: {
+        date: '',
+        num: '',
+        price: '',
+        order: ''
       }
     }
   },
@@ -122,27 +183,32 @@ export default {
     this.id = this.$route.query.id
   },
   methods: {
+    isObjectValueEqual,
     /**
      * 返回列表，判断是否有操作
      */
     returnPage () {
-      let state = true
-      if (this.input.length > 0 || this.dateRule.length > 0) {
-        state = false
-      }
-      if (state) {
-        this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.table}`)
-      } else {
-        this.$confirm({
-          title: '提示',
-          content: '退出后无法保存',
-          okText: '确认',
-          cancelText: '取消',
-          onOk: () => {
-            this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.table}`)
-          },
-          onCancel () {}
-        })
+      try {
+        let state = true
+        // if () {
+        //   state = false
+        // }
+        if (state) {
+          this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+        } else {
+          this.$confirm({
+            title: '提示',
+            content: '退出后无法保存',
+            okText: '确认',
+            cancelText: '取消',
+            onOk: () => {
+              this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+            },
+            onCancel () {}
+          })
+        }
+      } catch (error) {
+
       }
     },
     /**
@@ -156,7 +222,8 @@ export default {
      * 保存
      */
     addRule () {
-      console.log('保存')
+      console.log('保存', this.form)
+      this.visible = true
     },
     /**
      * 拉取字典
@@ -193,10 +260,16 @@ export default {
       this.goodShow = e.target.value
     },
     /**
-     * 标签选择回调
+     * 验证
      */
-    inputFn (e) {
-      // this.form.label = e
+    handleOk () {
+      this.visible = false
+    },
+    /**
+     * 关闭验证
+     */
+    handleCancel () {
+      this.visible = false
     }
   }
 }
@@ -250,6 +323,20 @@ export default {
     button{
       margin-right:10px;
     }
+  }
+}
+.modalBox{
+  .result{
+    font-size:17px;
+    .success{
+      color:#00cb35;
+    }
+    .warn{
+      color:#ff0000;
+    }
+  }
+  .handle{
+    text-align: center;
   }
 }
 </style>

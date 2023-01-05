@@ -97,7 +97,6 @@
           </div>
           <!-- 等式成立不可编辑 -->
           <SendContent
-            :isLoadingStatus.sync="loadingStatus"
             :contentArray.sync="contentArray"
             :isSopEdit.sync="isSopEdit"
             :isDisableEdit="addInfo.listTaskInfo && addInfo.listTaskInfo[selectTimeIndex] && (addInfo.listTaskInfo[selectTimeIndex].invalidState === 2)"/>
