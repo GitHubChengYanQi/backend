@@ -33,7 +33,14 @@
     </a-card>
     <div class="my-table-wrapper">
       <div v-if="!select" class="btn">
-        <a-icon type="question-circle" />
+        <div v-permission="'uploadFile'" >
+          <a-tooltip>
+            <template slot="title">
+              上传文件支持格式: jpg、png、ppt、pptx、pdf、doc、docx文件大小不超过100M
+            </template>
+            <a-icon type="question-circle"/>
+          </a-tooltip>
+        </div>
         <upload
           v-permission="'uploadFile'"
           :max-size="100"
@@ -350,6 +357,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   },
   components: { upload, FilePreview, SelectEmployee }
@@ -498,7 +506,7 @@ export default {
 
   .nickname {
     white-space: nowrap;
-    max-width: 160px;
+    max-width: 208px;
     overflow: hidden;
     text-overflow: ellipsis;
   }

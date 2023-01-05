@@ -14,7 +14,7 @@
           </div>
         </div>
         <div class="column">
-          <div class="title">标题</div>
+          <div class="title">{{ detail.name }}</div>
           <div class="space">
             <div>分类：{{ detail.courseClassResult && detail.courseClassResult.name }}</div>
             <div>创建时间：{{ moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
@@ -60,7 +60,12 @@
             </div>
           </div>
           <div class="note">
-            <div>{{ detail.note && detail.note.replace(/<.*?>/g, '') }}</div>
+            <div>
+              {{
+                detail.note && detail.note.replace(/<.*?>/g, '').slice(0, 200)
+              }}
+              {{ (detail.note && detail.note.replace(/<.*?>/g, '').length > 200) ? '...' : '' }}
+            </div>
           </div>
         </div>
       </div>
@@ -394,6 +399,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   }
 }
@@ -532,6 +538,7 @@ export default {
     }
   }
 }
+
 .lessonAnalysis {
 
   .title {

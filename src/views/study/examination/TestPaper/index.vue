@@ -1,21 +1,18 @@
 <template>
   <div>
     <breadcrumb v-if="!select" :titles="['考试管理','试卷管理']" back></breadcrumb>
-    <a-card v-if="!select" :bordered="false" class="my-table-search">
+    <a-card :bordered="false" class="my-table-search" :body-style="{padding:select ? 0 : 24}">
       <a-form layout="inline">
 
-        <a-form-item
-          label="试卷名称">
+        <a-form-item :label="select ? '' : '试卷名称'">
           <a-input v-model="screenData.questionnaireName" placeholder="请输入试卷名称" :maxLength="20"></a-input>
         </a-form-item>
 
-        <a-form-item
-          label="创建时间">
+        <a-form-item :label="select ? '' : '创建时间'">
           <a-range-picker v-model="screenData.time" />
         </a-form-item>
 
-        <a-form-item
-          label="创建人">
+        <a-form-item v-if="!select" label="创建人">
           <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
         </a-form-item>
 
@@ -316,6 +313,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   }
 }

@@ -20,6 +20,7 @@
           <a-form-item label="标题">
             <a-input
               :maxLength="50"
+              :suffix="`${form.getFieldValue('title') ? form.getFieldValue('title').length : 0} / 50`"
               placeholder="请输入标题"
               v-decorator="['title', { rules: [{ required: true, message: '请输入标题!' }] }]"
             />
@@ -58,7 +59,7 @@
       :content="content"
     >
       <div>
-        <img class="img" :src="url" alt="avatar" width="283" />
+        <img v-if="url" class="img" :src="url" alt="avatar" width="283" />
       </div>
     </Preview>
   </div>

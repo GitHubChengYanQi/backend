@@ -22,6 +22,7 @@
             <a-input
               :maxLength="50"
               placeholder="请输入标题"
+              :suffix="`${form.getFieldValue('title') ? form.getFieldValue('title').length : 0} / 50`"
               v-decorator="['title', { rules: [{ required: true, message: '请输入标题!' }] }]"
             />
           </a-form-item>
@@ -70,7 +71,7 @@
       :content="content"
     >
       <div>
-        <video :src="url" style="width: 100%" controls></video>
+        <video v-if="url" :src="url" style="width: 100%" controls></video>
       </div>
     </Preview>
   </div>
@@ -298,6 +299,7 @@ export default {
     }
   }
 }
+
 .content {
   border-radius: 8px;
   padding: 24px;
