@@ -296,6 +296,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   },
   components: { upload, vpload, Preview, SelectEmployee }

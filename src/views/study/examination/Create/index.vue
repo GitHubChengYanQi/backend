@@ -28,19 +28,38 @@
             >
               <a-radio :value="1">
                 允许重复考试
+                <a-tooltip>
+                  <template slot="title">
+                    在有效时间段内员工可一直重复考试
+                  </template>
+                  <a-icon type="question-circle"/>
+                </a-tooltip>
               </a-radio>
               <a-radio :value="2">
                 不允许重复考试
+                <a-tooltip>
+                  <template slot="title">
+                    员工只能参加一次考试
+                  </template>
+                  <a-icon type="question-circle"/>
+                </a-tooltip>
               </a-radio>
               <a-radio :value="3">
                 仅允许未通过的重复考试
+                <a-tooltip>
+                  <template slot="title">
+                    在有效时间内考试分数未达到通过分数时，需继续考试直至考试通过，通过后不可再考试
+                  </template>
+                  <a-icon type="question-circle"/>
+                </a-tooltip>
               </a-radio>
             </a-radio-group>
           </a-form-item>
           <a-form-item label="试卷选择">
             <SelectTestPager
               :disabled="!!$router.history.current.query.id"
-              v-decorator="['questionnaire', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: {} }]" />
+              v-decorator="['questionnaire', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: null }]"
+            />
           </a-form-item>
           <a-form-item label="封面图">
             <div class="my-space">
@@ -74,14 +93,12 @@
             <a-spin v-else />
           </a-form-item>
           <a-form-item label="考试说明">
-            <VueQuillEditor
-              width="400px"
-              v-if="!detailLoading"
-              :height="'auto'"
+            <a-textarea
+              :auto-size="{ minRows: 6 }"
+              :max-length="100"
               placeholder="请输入考试说明"
-              v-decorator="['note', { rules: [{ required: true, message: '请输入考试说明!' }],initialValue:'' }]"
+              v-decorator="['note', { initialValue:'' }]"
             />
-            <a-spin v-else />
           </a-form-item>
           <div style="text-align: center">
             <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
@@ -310,6 +327,7 @@ export default {
     }
   }
 }
+
 .content {
   border-radius: 8px;
   padding: 24px;

@@ -13,25 +13,16 @@
         部分员工
       </a-radio>
     </a-radio-group>
-    <div>
-      <a-button
-        :disabled="disabled"
-        v-if="userType === 2"
-        style="width: 200px"
-        class="add"
-        @click="$refs.selectEmployee.$show(selectEmployee)">
-        <a-icon
-          type="plus"
-        />
-        添加
-      </a-button>
-    </div>
-    <div>
-      <a-tag v-for="employee in employeeShowData" color="blue">
-        {{ employee }}
-      </a-tag>
-    </div>
-    <SelectEmployee ref="selectEmployee" @change="selectEmployeeChange" />
+    <selectPersonnel
+      v-model="ids"
+      :disabled="disabled"
+      v-if="userType === 2"
+      name="添加"
+      :button-style="{width: '200px'}"
+      :num="5"
+      :type="'default'"
+      @getVal="selectEmployeeChange"
+    />
   </div>
 </template>
 
@@ -42,36 +33,23 @@ export default {
     value: {
       type: Array,
       default: _ => []
-    },
-    employees: {
-      type: Array,
-      default: _ => []
     }
   },
   data () {
     return {
-      employeeShowData: this.employees,
-      selectEmployee: [],
+      ids: [],
       userType: this.value[0] === 'all' ? 1 : 2
     }
   },
+  created () {
+    this.ids = this.value.map(item => item + '')
+  },
   methods: {
     change ({ target: { value } }) {
-      this.employeeShowData = []
+      this.ids = []
       this.$emit('change', value === 1 ? ['all'] : null)
     },
-    selectEmployeeChange (e) {
-      this.selectShowData = e
-
-      const names = e.map(v => {
-        return v.name
-      })
-
-      this.selectEmployee = e
-      this.employeeShowData = names
-      const ids = this.selectEmployee.map(v => {
-        return v.id
-      })
+    selectEmployeeChange (ids) {
       this.$emit('change', ids)
     }
   }

@@ -158,7 +158,10 @@ export default {
           title: '大小',
           width: '200px',
           dataIndex: 'size',
-          align: 'center'
+          align: 'center',
+          customRender: (text) => {
+            return text + 'kb'
+          }
         },
         {
           title: '上传时间',
@@ -280,6 +283,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   }
 }

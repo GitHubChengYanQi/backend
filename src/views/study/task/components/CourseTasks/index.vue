@@ -209,6 +209,13 @@ export default {
           sorter: true
         },
         {
+          title: '完成率',
+          width: '150px',
+          dataIndex: 'doneCount',
+          align: 'center',
+          sorter: true
+        },
+        {
           title: '参与人数',
           width: '150px',
           dataIndex: 'participantsCount',
@@ -375,6 +382,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   }
 }

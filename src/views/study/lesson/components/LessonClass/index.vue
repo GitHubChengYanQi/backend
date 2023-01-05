@@ -100,7 +100,7 @@
     >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="className" placeholder="请输入分类名称"></a-input>
+        <a-input v-model="className" placeholder="请输入分类名称" :maxLength="8"></a-input>
       </div>
     </a-modal>
 
@@ -114,7 +114,7 @@
     >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="className" placeholder="请输入分类名称"></a-input>
+        <a-input v-model="className" placeholder="请输入分类名称" :maxLength="8"></a-input>
       </div>
     </a-modal>
 
@@ -128,7 +128,7 @@
     >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="updateClass.title" placeholder="请输入分类名称"></a-input>
+        <a-input v-model="updateClass.title" placeholder="请输入分类名称" :maxLength="8"></a-input>
       </div>
     </a-modal>
 
@@ -222,7 +222,7 @@ export default {
       }
       this.loading = true
       courseClassAdd({ name: this.className, pid: pid || 0 }).then((res) => {
-        this.$message.success('添加成功!')
+        this.$message.success('分类创建成功!')
         this.openAddClass = false
         this.openAddChildrenClass = false
         this.getTreeData()
@@ -236,7 +236,7 @@ export default {
       }
       this.loading = true
       courseClassUpdate({ courseClassId: this.updateClass.key, name: this.updateClass.title }).then((res) => {
-        this.$message.success('修改成功!')
+        this.$message.success('分类修改成功!')
         this.openUpdateClass = false
         this.getTreeData()
       }).finally(() => {
@@ -246,7 +246,7 @@ export default {
     deleteClass () {
       this.loading = true
       courseClassDelete({ courseClassId: this.delClass.key }).then((res) => {
-        this.$message.success('删除成功!')
+        this.$message.success('分类删除成功!')
         this.getTreeData()
         this.openDelClass = false
       }).finally(() => {
@@ -464,7 +464,7 @@ export default {
 }
 
 .lessonClass {
-  max-height: 400px;
+  max-height: 440px;
   overflow: auto;
 
   .ant-btn {

@@ -62,15 +62,15 @@
           <div style="display: inline-block">
             <div class="my-space">
               <div class="time" style="gap: 0">
-                <a-input-number v-model="record.hour" id="inputNumber" />
+                <a-input-number :min="0" v-model="record.hour" id="inputNumber" />
                 <span class="unit">时</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number v-model="record.minute" id="inputNumber" />
+                <a-input-number :min="0" v-model="record.minute" id="inputNumber" />
                 <span class="unit">分</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number v-model="record.second" id="inputNumber" />
+                <a-input-number :min="0" v-model="record.second" id="inputNumber" />
                 <span class="unit">秒</span>
               </div>
             </div>
@@ -245,7 +245,12 @@ export default {
       this.tableView = this.tableView.filter(item => item.courseWareId !== row.courseWareId)
     },
     selectRows (type, rows) {
-      this.courseWares[type] = rows
+      this.courseWares[type] = rows.map(item => ({
+        ...item,
+        hour: typeof item.hour === 'number' ? item.hour : 0,
+        minute: typeof item.minute === 'number' ? item.minute : 0,
+        second: typeof item.second === 'number' ? item.second : 20
+      }))
     },
     submit () {
       this.tableView = [

@@ -20,6 +20,7 @@
           <a-form-item label="课程名称">
             <a-input
               :maxLength="20"
+              :suffix="`${form.getFieldValue('name') ? form.getFieldValue('name').length : 0} / 20`"
               placeholder="请输入课程名称"
               v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }] }]"
             />
@@ -40,7 +41,6 @@
             :wrapper-col="{ span: 19 }"
           >
             <selectCourseware
-              :hiddenExam="hiddenExam"
               v-if="!detailLoading"
               placeholder="请选择课件"
               v-decorator="['wareBindParams', { rules: [{ required: true, message: '请选择课件!' }],initialValue:[] }]"

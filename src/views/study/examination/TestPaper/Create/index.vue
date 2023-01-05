@@ -24,7 +24,7 @@
           <div class="set">
             <div :style="{width: '120px'}">每题相同分：</div>
             <a-switch :disabled="disabled" v-model="sname" @change="switchChange" />
-            <a-input-number :disabled="disabled" class="input" v-model="number" @change="numberChange" />
+            <a-input-number :disabled="disabled" class="input" v-model="number" @change="numberChange" :min="0" />
             分
           </div>
 
@@ -43,6 +43,7 @@
                 <a-input
                   :maxLength="20"
                   placeholder="请输入试卷名称"
+                  :suffix="`${form.getFieldValue('name') ? form.getFieldValue('name').length : 0} / 20`"
                   v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }],initialValue:'' }]"
                 />
               </a-form-item>
@@ -59,12 +60,19 @@
                       <div class="questionTitle">问题{{ index + 1 }}</div>
                       <div class="questionContent">
                         <a-form-item label="试卷题目">
-                          <a-textarea
-                            auto-size
-                            :max-length="100"
-                            placeholder="请输入试卷名称"
-                            v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
-                          />
+                          <div class="quesituionTextArea">
+                            <a-textarea
+                              auto-size
+                              :max-length="100"
+                              placeholder="试卷题目"
+                              v-decorator="[`questions[${questionItem.index}].name`, { rules: [{ required: true, message: '请输入课程名称!' }] ,initialValue:''}]"
+                            />
+                            <div class="suffix">
+                              {{ `${form.getFieldValue(`questions[${questionItem.index}].name`) ? form.getFieldValue(`questions[${questionItem.index}].name`).length : 0} / 100`
+                              }}
+                            </div>
+                          </div>
+
                         </a-form-item>
                         <a-form-item label="题目类型" style="margin-bottom: 12px">
                           <a-radio-group
@@ -123,6 +131,7 @@
                                     :disabled="sname || disabled"
                                     @change="count"
                                     class="input"
+                                    :min="0"
                                     v-decorator="[`questions[${questionItem.index}].fen`, { initialValue:0 }]"
                                   />
                                 </a-form-item>
@@ -343,7 +352,7 @@ export default {
                 questionType: item.type,
                 sort: index,
                 score: item.fen,
-                answerParams: item.type === 'judge' ? [{
+                answerResults: item.type === 'judge' ? [{
                   answerContent: 'true',
                   isTrue: item.answer === 'true' ? 1 : 0,
                   sort: 0
@@ -815,5 +824,19 @@ export default {
 .submit {
   padding: 24px;
   text-align: center;
+}
+
+.quesituionTextArea {
+  position: relative;
+
+  .suffix {
+    position: absolute;
+    bottom: 0;
+    right: 12px;
+  }
+
+  /deep/ textarea {
+    padding-right: 70px;
+  }
 }
 </style>

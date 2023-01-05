@@ -14,12 +14,19 @@
           :wrapper-col="{ span: 12 }"
         >
           <div class="option">
-            <a-textarea
-              auto-size
-              :max-length="100"
-              placeholder="请输入选项"
-              v-decorator="[`questions[${questionItemIndex}].options.${option.label}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
-            />
+            <div class="quesituionTextArea">
+              <a-textarea
+                auto-size
+                :max-length="100"
+                placeholder="请输入选项123"
+                v-decorator="[`questions[${questionItemIndex}].options.${option.label}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
+              />
+              <div class="suffix">
+                {{
+                  `${form.getFieldValue(`questions[${questionItemIndex}].options.${option.label}`) ? form.getFieldValue(`questions[${questionItemIndex}].options.${option.label}`).length : 0} / 100`
+                }}
+              </div>
+            </div>
             <div class="other" v-if="!disabled">
               <div class="actions">
                 <a-icon
@@ -351,34 +358,34 @@ export default {
         border-radius: 8px;
         padding: 24px;
         margin: 24px 0 0 24px;
-
-        .option {
-          display: flex;
-          align-items: center;
-          gap: 24px;
-
-          /deep/ .ant-select-selection {
-
-          }
-
-          .other {
-            display: inline-block;
-          }
-
-        }
       }
     }
+  }
+}
 
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 24px;
+.option {
+  display: flex;
+  align-items: center;
+  gap: 24px;
 
-      i, div {
-        font-size: 24px;
-        line-height: 40px;
-      }
-    }
+  /deep/ .ant-select-selection {
+
+  }
+
+  .other {
+    display: inline-block;
+  }
+
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  i, div {
+    font-size: 24px;
+    line-height: 40px;
   }
 }
 
@@ -390,5 +397,20 @@ export default {
 .submit {
   padding: 24px;
   text-align: center;
+}
+
+.quesituionTextArea {
+  position: relative;
+  flex-grow: 1;
+
+  .suffix {
+    position: absolute;
+    bottom: 0;
+    right: 12px;
+  }
+
+  /deep/ textarea {
+    padding-right: 70px;
+  }
 }
 </style>

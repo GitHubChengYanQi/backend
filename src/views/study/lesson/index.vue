@@ -107,12 +107,7 @@
           </div>
           <div slot="note" slot-scope="text">
             <div class="introduction">
-              <a-tooltip overlayClassName="myTooltip">
-                <template slot="title">
-                  <div class="ql-editor" v-html="text"></div>
-                </template>
-                <div>{{ text.replace(/<.*?>/g, '') }}</div>
-              </a-tooltip>
+              <div>{{ text.replace(/<.*?>/g, '') }}</div>
             </div>
           </div>
           <div slot="tag" slot-scope="text,row">
@@ -446,6 +441,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   }
 }

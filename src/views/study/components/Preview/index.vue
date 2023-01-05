@@ -82,7 +82,7 @@ export default {
   .content {
     overflow: hidden auto;
     max-width: 289px;
-    max-height: 628px;
+    max-height: 580px;
   }
 }
 </style>
