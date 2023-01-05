@@ -2,25 +2,41 @@
   <div class="attrBox">
     <div class="box" v-if="data.length > 1">
       <p>
-        <span v-for="(val, key) in relation" :key="key" @click="tapFn(key)" :class="key == active ? 'active': ''">{{ val }}</span>
+        <span v-for="item in relation" :key="item.code" @click="tapFn(item.code)" :class="item.code == active ? 'active': ''">{{ item.name }}</span>
       </p>
     </div>
     <ul>
       <li v-for="(item, index) in data" :key="index">
-        <span>{{ item.name }}：</span>
+        <!-- 类别 -->
         <span>
-          <a-select v-model="item.range" style="width: 120px">
-            <a-select-option v-for="(val, key) in option" :key="key" :value="key">{{ val }}</a-select-option>
+          <a-select placeholder="请选择" v-model="item.columnName" @change="onColumnChange(item)" style="width: 120px">
+            <a-select-option v-for="item in option" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
           </a-select>
         </span>
-        <span>
-          <a-select v-model="item.range" style="width: 120px">
-            <a-select-option v-for="(val, key) in range" :key="key" :value="key">{{ val }}</a-select-option>
+        <!-- end 类别 -->
+
+        <!-- 区间 -->
+        <span v-if="item.columnName !== 'purchase_time'">
+          <a-select placeholder="请选择" v-model="item.judgmentConditions" style="width: 120px">
+            <a-select-option v-for="item in range" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
           </a-select>
         </span>
-        <span>
-          <a-input-number id="inputNumber" v-model="num" :min="1" :max="10" />
+        <!-- end 区间 -->
+
+        <!-- 时间 -->
+        <span v-if="item.columnName === 'purchase_time'">
+          <a-range-picker :valueFormat="dateFormat" v-model="item.val" format="YYYY-MM-DD" />
         </span>
+        <!-- end 时间 -->
+
+        <!-- 正常值 -->
+        <span v-else>
+          <a-input-number placeholder="请输入" v-model="item.val" :min="1" :max="10" />
+          <i v-if="item.columnName === 'purchase_number'">次</i>
+          <i v-if="item.columnName === 'good_amount'">元</i>
+        </span>
+        <!-- end 正常值 -->
+
         <span class="btn">
           <a-icon @click="handleAdd" type="plus-circle" />
           <a-icon v-if="index > 0" @click="handleDel(index)" type="minus-circle" />
@@ -31,6 +47,7 @@
 </template>
 
 <script>
+import { getDict } from '@/api/common.js'
 export default {
   components: { },
   props: {
@@ -43,26 +60,12 @@ export default {
   },
   data () {
     return {
+      dateFormat: 'YYYY-MM-DD hh:mm:ss',
       data: [],
-      active: 1,
-      num: 0,
-      option: {
-        1: '购买时间',
-        2: '购买次数',
-        3: '商品金额',
-        4: '商品数量'
-      },
-      range: {
-        1: '大于',
-        2: '大于等于',
-        3: '等于',
-        4: '小于等于',
-        5: '小于'
-      },
-      relation: {
-        1: '且',
-        2: '或'
-      }
+      active: 'and',
+      option: [],
+      range: [],
+      relation: []
     }
   },
   created () {
@@ -71,16 +74,22 @@ export default {
   watch: {
     value (val) {
       this.init(val)
+    },
+    data () {
+      this.$emit('input', this.data)
     }
   },
   methods: {
     init (data) {
+      this.getDict('auto_lable_number_relationship')
+      this.getDict('consume_filed')
+      this.getDict('auto_lable_consume_condition')
       if (data.length === 0) {
         this.data = [
           {
-            name: '客户标签',
-            range: 1,
-            label: []
+            columnName: undefined,
+            judgmentConditions: undefined,
+            val: ''
           }
         ]
       } else {
@@ -89,9 +98,9 @@ export default {
     },
     handleAdd () {
       this.data.push({
-        name: '客户标签',
-        range: '1',
-        label: []
+        columnName: undefined,
+        judgmentConditions: undefined,
+        val: ''
       })
       this.$emit('input', this.data)
     },
@@ -101,6 +110,46 @@ export default {
     },
     tapFn (key) {
       this.active = key
+      this.$emit('relation', key)
+    },
+    /**
+     * 时间回调
+     */
+    // onChange (e, item) {
+    //   item.val = moment(e[0]).format('YYYY-MM-DD hh:mm:ss') + ',' + moment(e[1]).format('YYYY-MM-DD hh:mm:ss')
+    // },
+    /**
+     * 类别回调
+     */
+    onColumnChange (e) {
+      console.log(e, e.columnName)
+      if (e.columnName === 'purchase_time') {
+        e.judgmentConditions = 'between'
+        e.val = []
+      } else {
+        e.judgmentConditions = ''
+      }
+    },
+    /**
+     * 拉取字典
+     * @param {*} e
+     * @param {*} key
+     */
+     getDict (e) {
+      const obj = {
+        dictType: e
+      }
+      getDict(obj).then((res) => {
+        if (e === 'auto_lable_number_relationship') {
+          this.relation = res.data
+        }
+        if (e === 'consume_filed') {
+          this.option = res.data
+        }
+        if (e === 'auto_lable_consume_condition') {
+          this.range = res.data
+        }
+      })
     }
   }
 }
@@ -149,6 +198,10 @@ export default {
       span{
         display:inline-block;
         margin-right:10px;
+        i{
+          font-style:normal;
+          margin-left:10px;
+        }
       }
       span.btn{
         font-size:20px;

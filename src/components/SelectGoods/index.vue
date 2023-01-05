@@ -9,20 +9,17 @@
     <!-- head -->
     <a-select
       class="select"
+      :value="val"
       show-search
-      placeholder="Select a person"
-      option-filter-prop="children"
-      :filter-option="filterOption"
+      placeholder="请选择"
+      :default-active-first-option="false"
+      :filter-option="false"
+      :not-found-content="null"
+      @search="handleSearch"
       @change="handleChange"
     >
-      <a-select-option value="jack">
-        Jack
-      </a-select-option>
-      <a-select-option value="lucy">
-        Lucy
-      </a-select-option>
-      <a-select-option value="tom">
-        Tom
+      <a-select-option v-for="item in option" :key="item.id" :value="item.id">
+        {{ item.name }}
       </a-select-option>
     </a-select>
     <!-- end head -->
@@ -32,10 +29,10 @@
         <li v-for="(item, index) in goods" :key="index">
           <h2>{{ item.name }}</h2>
           <p>
-            <span>售价 ￥{{ item.price }}</span>
-            <span>毛利率 {{ item.gain }}%</span>
+            <span>售价 ￥{{ item.newestPrice ? (Number(item.newestPrice)).toFixed(2) : '' }}</span>
+            <span>毛利率 {{ item.margin ? (Number(item.margin)).toFixed(2) : '' }}%</span>
           </p>
-          <a-icon class="btn" type="close-circle" />
+          <a-icon class="btn" @click="handleDel(index)" type="close-circle" />
         </li>
       </ul>
     </div>
@@ -44,6 +41,9 @@
 </template>
 
 <script>
+import {
+  consumeAutoLabelErpGoodList
+} from '@/api/clientFollow.js'
 export default {
   props: {
     value: {
@@ -55,72 +55,79 @@ export default {
   },
   data () {
     return {
-      goods: [
-        {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }, {
-          name: '(会限)利君沙/琥乙红霉素片 10片/板*2板/盒',
-          price: '23.03',
-          gain: '20'
-        }
-      ]
+      val: undefined,
+      option: [], // 备选列表
+      goods: [] // 商品列表
     }
   },
   created () {
+    this.goods = this.value
   },
   watch: {
     value (val, oldval) {
-      console.log(1111, val)
+      this.goods = val
+    },
+    goods (val) {
+      this.$emit('input', val)
     }
   },
   methods: {
     /**
-     * select搜索
-     * @param {*} input
-     * @param {*} option
+     * 获取药品列表
+     * @param {*} e
      */
-    filterOption (input, option) {
-      return (
-        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      )
+    getList (name) {
+      if (name) {
+        const param = {
+          name
+        }
+        consumeAutoLabelErpGoodList(param).then(res => {
+          this.option = res.data
+        })
+      } else {
+        this.option = []
+      }
+    },
+    /**
+     * 搜索回调
+     * @param {*} e 
+     */
+    handleSearch (e) {
+      this.getList(e)
+    },
+    /**
+     * 选择药品回调
+     * @param {*} e 
+     */
+    handleChange (e) {
+      this.getGoods(e)
+    },
+    /**
+     * 删除药品
+     * @param {*} item 
+     */
+    handleDel (index) {
+      this.goods.splice(index, 1)
+    },
+    /**
+     * 根据id查药品
+     */
+    getGoods (id) {
+      const arr = this.option
+      const goods = this.goods
+      for (let i = 0; i < arr.length; i++) {
+        if (id === arr[i].id) {
+          let flag = false
+          for (let j = 0; j < goods.length; j++) {
+            if (id === goods[j].id) {
+              flag = true
+            }
+          }
+          if (!flag) {
+            goods.push(arr[i])
+          }
+        }
+      }
     }
   }
 }
