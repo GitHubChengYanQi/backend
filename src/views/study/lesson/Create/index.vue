@@ -20,6 +20,7 @@
           <a-form-item label="课程名称">
             <a-input
               :maxLength="20"
+              :suffix="`${form.getFieldValue('name') ? form.getFieldValue('name').length : 0} / 20`"
               placeholder="请输入课程名称"
               v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }] }]"
             />
@@ -40,7 +41,6 @@
             :wrapper-col="{ span: 19 }"
           >
             <selectCourseware
-              :hiddenExam="hiddenExam"
               v-if="!detailLoading"
               placeholder="请选择课件"
               v-decorator="['wareBindParams', { rules: [{ required: true, message: '请选择课件!' }],initialValue:[] }]"
@@ -167,7 +167,7 @@ export default {
       courseDetail({ courseId: id }).then((res) => {
         const detail = res.data || {}
         this.employees = detail.bindEmpList ? detail.bindEmpList.map(item => item.name) : []
-        this.hiddenExam = !detail.examResults
+        this.hiddenExam = !(detail.examResults && detail.examResults[0])
         this.form.setFieldsValue({
           name: detail.name,
           courseClassId: this.getClassIds(detail.courseClassId, this.classTree),
@@ -198,7 +198,8 @@ export default {
             ...values,
             wareBindParams: values.wareBindParams ? values.wareBindParams.map((item, index) => ({
               ...item,
-              sort: index
+              sort: index,
+              examId: values.exam ? item.examId : null
             })) : [],
             courseClassId: values.courseClassId ? values.courseClassId[values.courseClassId.length - 1] : null,
             questionnaireIds: [values.questionnaireId],
@@ -231,6 +232,139 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.my-space {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-search {
+  .ant-form-inline {
+    .ant-form-item {
+      margin-bottom: 24px;
+    }
+  }
+}
+
+.warnButton {
+  color: rgba(255, 152, 0, 1);
+  background-color: rgba(252, 192, 104, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.linkButton {
+  color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.delButton {
+  color: #ff4d4f;
+  background-color: rgba(255, 77, 79, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.successButton {
+  color: #01ba77;
+  background-color: rgba(1, 186, 119, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.my-table-search {
+  border-radius: 8px;
+
+  .ant-form-inline .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .ant-input,
+  .ant-select-selection,
+  .ant-time-picker-input {
+    border-radius: 8px !important;
+  }
+
+  .ant-btn {
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+}
+
+.my-table-wrapper {
+  border-radius: 8px;
+
+  .btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 24px;
+
+    > .ant-btn {
+      margin-left: 12px;
+      border-radius: 8px;
+    }
+  }
+}
+
+.my-table {
+  background-color: #fff;
+
+  .ant-table-pagination {
+    padding: 24px;
+    float: none;
+    text-align: center;
+  }
+}
+
+.myTooltip {
+  background-color: #fff;
+
+  .ant-tooltip-inner {
+    color: #000;
+    background-color: #fff;
+  }
+
+  .ant-tooltip-arrow::before {
+    background-color: #fff;
+  }
+}
+
+.myLabelBox {
+  width: 400px;
+
+  span {
+    margin-bottom: 10px;
+  }
+}
+
+.my-modal {
+  .ant-modal-footer {
+    padding: 24px;
+    text-align: center;
+
+    .ant-btn {
+      padding: 0 24px;
+      border-radius: 8px;
+    }
+
+    .ant-modal-footer button + button {
+      margin-left: 24px;
+    }
+  }
+}
+
 .content {
   border-radius: 8px;
   padding: 24px;

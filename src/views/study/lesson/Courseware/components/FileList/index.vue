@@ -33,7 +33,14 @@
     </a-card>
     <div class="my-table-wrapper">
       <div v-if="!select" class="btn">
-        <a-icon type="question-circle" />
+        <div v-permission="'uploadFile'" >
+          <a-tooltip>
+            <template slot="title">
+              上传文件支持格式: jpg、png、ppt、pptx、pdf、doc、docx文件大小不超过100M
+            </template>
+            <a-icon type="question-circle"/>
+          </a-tooltip>
+        </div>
         <upload
           v-permission="'uploadFile'"
           :max-size="100"
@@ -350,6 +357,7 @@ export default {
     // 重置
     reset () {
       this.screenData = {}
+      this.getTableData()
     }
   },
   components: { upload, FilePreview, SelectEmployee }
@@ -357,6 +365,138 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.my-space {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-search {
+  .ant-form-inline {
+    .ant-form-item {
+      margin-bottom: 24px;
+    }
+  }
+}
+
+.warnButton {
+  color: rgba(255, 152, 0, 1);
+  background-color: rgba(252, 192, 104, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.linkButton {
+  color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.delButton {
+  color: #ff4d4f;
+  background-color: rgba(255, 77, 79, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.successButton {
+  color: #01ba77;
+  background-color: rgba(1, 186, 119, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.my-table-search {
+  border-radius: 8px;
+
+  .ant-form-inline .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .ant-input,
+  .ant-select-selection,
+  .ant-time-picker-input {
+    border-radius: 8px !important;
+  }
+
+  .ant-btn {
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+}
+
+.my-table-wrapper {
+  border-radius: 8px;
+
+  .btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 24px;
+
+    > .ant-btn {
+      margin-left: 12px;
+      border-radius: 8px;
+    }
+  }
+}
+
+.my-table {
+  background-color: #fff;
+
+  .ant-table-pagination {
+    padding: 24px;
+    float: none;
+    text-align: center;
+  }
+}
+
+.myTooltip {
+  background-color: #fff;
+
+  .ant-tooltip-inner {
+    color: #000;
+    background-color: #fff;
+  }
+
+  .ant-tooltip-arrow::before {
+    background-color: #fff;
+  }
+}
+
+.myLabelBox {
+  width: 400px;
+
+  span {
+    margin-bottom: 10px;
+  }
+}
+
+.my-modal {
+  .ant-modal-footer {
+    padding: 24px;
+    text-align: center;
+
+    .ant-btn {
+      padding: 0 24px;
+      border-radius: 8px;
+    }
+
+    .ant-modal-footer button + button {
+      margin-left: 24px;
+    }
+  }
+}
 
 .user-info {
 
@@ -366,7 +506,7 @@ export default {
 
   .nickname {
     white-space: nowrap;
-    max-width: 160px;
+    max-width: 208px;
     overflow: hidden;
     text-overflow: ellipsis;
   }

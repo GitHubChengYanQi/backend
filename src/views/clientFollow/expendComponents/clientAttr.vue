@@ -2,18 +2,18 @@
   <div class="attrBox">
     <div class="box" v-if="data.length > 1">
       <p>
-        <span v-for="(val, key) in relation" :key="key" @click="tapFn(key)" :class="key == active ? 'active': ''">{{ val }}</span>
+        <span v-for="item in relation" :key="item.code" @click="tapFn(item.code)" :class="item.code == active ? 'active': ''">{{ item.name }}</span>
       </p>
     </div>
     <ul>
       <li v-for="(item, index) in data" :key="index">
-        <span>{{ item.name }}：</span>
+        <span>客户标签：</span>
         <span>
-          <a-select v-model="item.range" style="width: 120px">
-            <a-select-option v-for="(val, key) in option" :key="key" :value="key">{{ val }}</a-select-option>
+          <a-select placeholder="请选择" v-model="item.judgmentConditions" style="width: 120px">
+            <a-select-option v-for="item in option" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
           </a-select>
         </span>
-        <span><LabelSelect v-model="item.label" :addState="true" style="width:300px" /></span>
+        <span class="label"><LabelSelect v-model="item.val" :addState="true" style="width:300px" /></span>
         <span class="btn">
           <a-icon @click="handleAdd" type="plus-circle" />
           <a-icon v-if="index > 0" @click="handleDel(index)" type="minus-circle" />
@@ -25,6 +25,7 @@
 
 <script>
 import LabelSelect from '../../../components/SelectLabel/index.vue'
+import { getDict } from '@/api/common.js'
 export default {
   components: { LabelSelect },
   props: {
@@ -38,18 +39,9 @@ export default {
   data () {
     return {
       data: [],
-      active: 1,
-      option: {
-        1: '包含所有',
-        2: '包含',
-        3: '不包含',
-        4: '为空',
-        5: '不为空'
-      },
-      relation: {
-        1: '且',
-        2: '或'
-      }
+      active: 'and',
+      option: [],
+      relation: []
     }
   },
   created () {
@@ -58,36 +50,71 @@ export default {
   watch: {
     value (val) {
       this.init(val)
+    },
+    data () {
+      this.$emit('input', this.data)
     }
   },
   methods: {
+    /**
+     * 初始化
+     * @param {*} data 
+     */
     init (data) {
+      this.getDict('auto_lable_customer_condition')
+      this.getDict('auto_lable_number_relationship')
       if (data.length === 0) {
         this.data = [
           {
-            name: '客户标签',
-            range: 1,
-            label: []
+            judgmentConditions: undefined,
+            val: []
           }
         ]
       } else {
         this.data = data
       }
     },
+    /**
+     * 添加
+     */
     handleAdd () {
       this.data.push({
-        name: '客户标签',
-        range: '1',
-        label: []
+        judgmentConditions: undefined,
+        val: []
       })
-      this.$emit('input', this.data)
     },
+    /**
+     * 删除
+     * @param {*} index 
+     */
     handleDel (index) {
       this.data.splice(index, 1)
-      this.$emit('input', this.data)
     },
+    /**
+     * 切换关系
+     * @param {*} key 
+     */
     tapFn (key) {
       this.active = key
+      this.$emit('relation', key)
+    },
+    /**
+     * 拉取字典
+     * @param {*} e
+     * @param {*} key
+     */
+     getDict (e) {
+      const obj = {
+        dictType: e
+      }
+      getDict(obj).then((res) => {
+        if (e === 'auto_lable_customer_condition') {
+          this.option = res.data
+        }
+        if (e === 'auto_lable_number_relationship') {
+          this.relation = res.data
+        }
+      })
     }
   }
 }
@@ -101,7 +128,7 @@ export default {
   box-sizing: border-box;
   .box{
     width:30px;
-    margin:22px 5px 30px 0px;
+    margin:18px 5px 26px 0px;
     border: 1px solid #ccc;
     border-right:0;
     position: relative;
@@ -136,6 +163,9 @@ export default {
       span{
         display:inline-block;
         margin-right:10px;
+      }
+      span.label{
+        vertical-align: middle;
       }
       span.btn{
         font-size:20px;

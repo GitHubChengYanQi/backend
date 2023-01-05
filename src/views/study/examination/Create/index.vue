@@ -28,19 +28,38 @@
             >
               <a-radio :value="1">
                 允许重复考试
+                <a-tooltip>
+                  <template slot="title">
+                    在有效时间段内员工可一直重复考试
+                  </template>
+                  <a-icon type="question-circle"/>
+                </a-tooltip>
               </a-radio>
               <a-radio :value="2">
                 不允许重复考试
+                <a-tooltip>
+                  <template slot="title">
+                    员工只能参加一次考试
+                  </template>
+                  <a-icon type="question-circle"/>
+                </a-tooltip>
               </a-radio>
               <a-radio :value="3">
                 仅允许未通过的重复考试
+                <a-tooltip>
+                  <template slot="title">
+                    在有效时间内考试分数未达到通过分数时，需继续考试直至考试通过，通过后不可再考试
+                  </template>
+                  <a-icon type="question-circle"/>
+                </a-tooltip>
               </a-radio>
             </a-radio-group>
           </a-form-item>
           <a-form-item label="试卷选择">
             <SelectTestPager
               :disabled="!!$router.history.current.query.id"
-              v-decorator="['questionnaire', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: {} }]" />
+              v-decorator="['questionnaire', { rules: [{ required: true, message: '请选择试卷选择!' }],initialValue: null }]"
+            />
           </a-form-item>
           <a-form-item label="封面图">
             <div class="my-space">
@@ -74,14 +93,12 @@
             <a-spin v-else />
           </a-form-item>
           <a-form-item label="考试说明">
-            <VueQuillEditor
-              width="400px"
-              v-if="!detailLoading"
-              :height="'auto'"
+            <a-textarea
+              :auto-size="{ minRows: 6 }"
+              :max-length="100"
               placeholder="请输入考试说明"
-              v-decorator="['note', { rules: [{ required: true, message: '请输入考试说明!' }],initialValue:'' }]"
+              v-decorator="['note', { initialValue:'' }]"
             />
-            <a-spin v-else />
           </a-form-item>
           <div style="text-align: center">
             <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
@@ -178,6 +195,139 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.my-space {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-search {
+  .ant-form-inline {
+    .ant-form-item {
+      margin-bottom: 24px;
+    }
+  }
+}
+
+.warnButton {
+  color: rgba(255, 152, 0, 1);
+  background-color: rgba(252, 192, 104, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.linkButton {
+  color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.delButton {
+  color: #ff4d4f;
+  background-color: rgba(255, 77, 79, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.successButton {
+  color: #01ba77;
+  background-color: rgba(1, 186, 119, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.my-table-search {
+  border-radius: 8px;
+
+  .ant-form-inline .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .ant-input,
+  .ant-select-selection,
+  .ant-time-picker-input {
+    border-radius: 8px !important;
+  }
+
+  .ant-btn {
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+}
+
+.my-table-wrapper {
+  border-radius: 8px;
+
+  .btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 24px;
+
+    > .ant-btn {
+      margin-left: 12px;
+      border-radius: 8px;
+    }
+  }
+}
+
+.my-table {
+  background-color: #fff;
+
+  .ant-table-pagination {
+    padding: 24px;
+    float: none;
+    text-align: center;
+  }
+}
+
+.myTooltip {
+  background-color: #fff;
+
+  .ant-tooltip-inner {
+    color: #000;
+    background-color: #fff;
+  }
+
+  .ant-tooltip-arrow::before {
+    background-color: #fff;
+  }
+}
+
+.myLabelBox {
+  width: 400px;
+
+  span {
+    margin-bottom: 10px;
+  }
+}
+
+.my-modal {
+  .ant-modal-footer {
+    padding: 24px;
+    text-align: center;
+
+    .ant-btn {
+      padding: 0 24px;
+      border-radius: 8px;
+    }
+
+    .ant-modal-footer button + button {
+      margin-left: 24px;
+    }
+  }
+}
+
 .content {
   border-radius: 8px;
   padding: 24px;

@@ -266,7 +266,10 @@ import {
   groupAutoLabelStatusChange,
   timeAutoLabelIndex,
   timeAutoLabelDelete,
-  timeAutoLabelStatusChange
+  timeAutoLabelStatusChange,
+  consumeAutoLabel,
+  consumeAutoLabelStatus,
+  consumeAutoLabelDelete
 } from '@/api/clientFollow.js'
 export default {
   components: { 'label-select': LabelSelect, 'svg-icon': SvgIcon },
@@ -583,7 +586,7 @@ export default {
       const data = {
         id: e
       }
-      const apiArr = ['', groupAutoLabelDelete, timeAutoLabelDelete, numberAutoLabelDelete]
+      const apiArr = ['', groupAutoLabelDelete, timeAutoLabelDelete, numberAutoLabelDelete, consumeAutoLabelDelete]
       apiArr[this.table](data).then((res) => {
         if (res.code == 200) this.$message.success('删除成功')
         this.getTableData()
@@ -594,7 +597,7 @@ export default {
         id: e,
         status: i == '1' ? '0' : '1'
       }
-      const apiArr = ['', groupAutoLabelStatusChange, timeAutoLabelStatusChange, numberAutoLabelStatusChange]
+      const apiArr = ['', groupAutoLabelStatusChange, timeAutoLabelStatusChange, numberAutoLabelStatusChange, consumeAutoLabelStatus]
       apiArr[this.table](data).then((res) => {
         this.getTableData()
       })
@@ -627,7 +630,7 @@ export default {
         page: this.pagination.current,
         perPage: this.pagination.pageSize
       }
-      const apiArr = ['', groupAutoLabelIndex, timeAutoLabelIndex, numberAutoLabelIndex, numberAutoLabelIndex]
+      const apiArr = ['', groupAutoLabelIndex, timeAutoLabelIndex, numberAutoLabelIndex, consumeAutoLabel]
       apiArr[this.table](obj).then((res) => {
         this.tableData = res.data.list
         this.pagination.total = res.data.page.total
