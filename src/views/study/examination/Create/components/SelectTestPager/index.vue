@@ -10,7 +10,7 @@
           <a-icon type="close-circle" style="cursor: pointer" @click="remove" />
         </div>
         <a-button style="width: 200px;border-radius: 8px" class="linkButton">
-          {{ name }}
+          <div class="selectTestPager">{{ name }}</div>
         </a-button>
       </a-badge>
       <a-button type="link" @click="preview = true">
@@ -249,5 +249,13 @@ export default {
   border-radius: 8px;
   padding: 24px;
   background-color: #fff;
+}
+
+.selectTestPager {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

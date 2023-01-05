@@ -53,24 +53,28 @@
         >
           <div class="questionName">
             <div class="name">
-              {{ index + 1 }}.{{ question.questionContent }}
+              <div class="nameShow">{{ index + 1 }}.{{ question.questionContent }}</div>
             </div>
             <div class="my-space">
-              （{{ question.score }}分）
+              <div style="min-width: 100px;text-align: right">（{{ question.score }}分）</div>
               <a-tag color="#108ee9">
                 {{ questionType(question.questionType) }}
               </a-tag>
             </div>
           </div>
           <div class="options" v-if="question.questionType !== 'judge'">
-            <a-radio
-              :style="radioStyle"
+            <div
+              style="display: flex;padding-bottom: 16px"
               v-for="(answer,answerIndex) in question.answerResults"
               :key="answerIndex"
-              :checked="answer.isTrue === 1"
             >
+              <a-radio
+                :style="radioStyle"
+                :checked="answer.isTrue === 1"
+              />
               {{ String.fromCharCode(65 + answerIndex) }}.{{ answer.answerContent }}
-            </a-radio>
+            </div>
+
           </div>
           <div class="answer" :style="{marginTop:question.questionType === 'judge' ? '24px' : 0}">
             <div class="tip">正确答案</div>
@@ -78,6 +82,7 @@
               <div
                 v-for="(answer,answerIndex) in question.answerResults.map((item,index)=>({...item,option:String.fromCharCode(65 + index) })).filter(item=>item.isTrue === 1)"
                 :key="answerIndex"
+                style="padding-bottom: 8px"
               >
                 {{ answer.option }}.{{ answer.answerContent }}
               </div>
@@ -410,11 +415,21 @@ export default {
 
       .name {
         flex-grow: 1;
+
+        .nameShow {
+          max-width: 90%;
+        }
       }
     }
 
     .options {
       padding: 24px 110px 0;
+
+      ///deep/ span {
+      //  display: inline-block;
+      //  max-width: 100%;
+      //  white-space: break-spaces;
+      //}
     }
 
     .answer {
