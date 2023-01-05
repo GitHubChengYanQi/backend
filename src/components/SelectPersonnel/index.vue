@@ -38,14 +38,18 @@
     <a-button :loading="loading" @click.native="openModal" type="primary" v-if="type==='button'">{{ name }}</a-button>
     <a-button :loading="loading" @click.native="openModal" type="link" v-if="type==='link'">{{ name }}</a-button>
     <a-button :loading="loading" @click.native="openModal" type="primary" v-if="type==='buttonLink'">{{ name }}</a-button>
+    <a-button :loading="loading" :style="buttonStyle" :disabled="disabled" @click.native="openModal" type="default" v-if="type==='default'">{{ name }}</a-button>
     <a-button :loading="loading" ghost @click.native="openModal" type="primary" v-if="type==='buttonGhost'">{{ name }}</a-button>
-    <div class="list" v-if="type==='button'">
+    <div class="list" v-if="type==='button' || type==='default'">
       <template v-if="num">
-        <a-tag closable @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows.slice(0,num)" :key="index">{{ item.name }}</a-tag>
+        <a-tag :closable="!disabled" @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows.slice(0,num)" :key="index">
+          {{ item.name }}
+        </a-tag>
         <a-tag v-if="rows.length>num">+ {{ rows.length - num }} ...</a-tag>
       </template>
       <template v-else>
-        <a-tag closable @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows" :key="index">{{ item.name }}</a-tag>
+        <a-tag :closable="!disabled" @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows" :key="index">{{ item.name }}
+        </a-tag>
       </template>
     </div>
     <SelectModal
@@ -56,7 +60,7 @@
       :list="treeData"
       :fieldNames="fieldNames"
       :transferTip="transferTip"
-      ref="SelectPersonnel"/>
+      ref="SelectPersonnel" />
   </div>
 </template>
 
@@ -90,6 +94,12 @@ export default {
       type: String,
       default: 'selector'
     },
+    buttonStyle: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    },
     name: {
       type: String,
       default: '请选择'
@@ -101,6 +111,10 @@ export default {
     multiple: {
       type: Boolean,
       default: true
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     },
     layout: {
       type: String,
@@ -228,7 +242,6 @@ export default {
     getKeys (e, type) {
       this.$set(this, 'keys', e)
       const arr = this.getNodes(this.treeData, this.keys)
-      console.log(arr)
       sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
       this.rows = arr[0]
       if (type === 'ok') {
@@ -292,18 +305,21 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .selector{
-    &.inline{
-      display:inline-block;
-    }
-    &.block{
-      display:block;
-    }
-    .list{
-      margin-top:10px;
-      span{
-        margin-bottom:10px;
-      }
+.selector {
+  &.inline {
+    display: inline-block;
+  }
+
+  &.block {
+    display: block;
+  }
+
+  .list {
+    margin-top: 10px;
+
+    span {
+      margin-bottom: 10px;
     }
   }
+}
 </style>

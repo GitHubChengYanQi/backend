@@ -12,7 +12,9 @@
       <div class="preview">
         <div class="title">
           <a-icon type="close" />
-          <div>{{ title }}</div>
+          <div>
+            <div>{{ title }}</div>
+          </div>
           <a-icon type="more" />
         </div>
         <div class="content">
@@ -69,9 +71,16 @@ export default {
     font-weight: bold;
     padding-bottom: 24px;
 
-    div {
+    > div {
       flex-grow: 1;
-      text-align: center;
+
+      > div {
+        margin: auto;
+        white-space: nowrap;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 
@@ -82,7 +91,7 @@ export default {
   .content {
     overflow: hidden auto;
     max-width: 289px;
-    max-height: 628px;
+    max-height: 580px;
   }
 }
 </style>
