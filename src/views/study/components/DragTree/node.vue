@@ -159,7 +159,7 @@ export default {
     }
   },
   created () {
-    let parent = this.$parent
+    const parent = this.$parent
     if (parent.isTree) {
       this.tree = parent
     } else {
@@ -172,8 +172,8 @@ export default {
     // console.log(parent.tree)
     // 有没有自定义icon
     if (this.icon.length != 0) {
-      let s = this.icon.slice(0, 2)
-      let url = this.icon.slice(2)
+      const s = this.icon.slice(0, 2)
+      const url = this.icon.slice(2)
       if (s == '@/') {
         // this.iconImg = require(`@/${url}`)
       } else {
@@ -183,8 +183,8 @@ export default {
       // this.iconImg = require('@/assets/images/business/tree/right.png')
     }
     if (this.data.TreeImg) {
-      let s = this.data.TreeImg.slice(0, 2)
-      let url = this.data.TreeImg.slice(2)
+      const s = this.data.TreeImg.slice(0, 2)
+      const url = this.data.TreeImg.slice(2)
       if (s == '@/') {
         // this.dataImg = require(`@/${url}`)
       } else {
@@ -227,7 +227,7 @@ export default {
     },
     // 行点击事件
     itemClick (ev, data) {
-      let dropNode = findNearestComponent(ev.target, 'MyNode') // 现在的节点
+      const dropNode = findNearestComponent(ev.target, 'MyNode') // 现在的节点
       this.active = data.id
       this.data.defaultExpandAll = !this.data.defaultExpandAll // 改变树的伸缩状态
       this.tree.$emit('tree-click', this.data, dropNode)
