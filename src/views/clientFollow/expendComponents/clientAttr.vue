@@ -10,7 +10,7 @@
         <span>客户标签：</span>
         <span>
           <a-select placeholder="请选择" v-model="item.judgmentConditions" style="width: 120px">
-            <a-select-option v-for="item in option" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
+            <a-select-option v-for="items in option" :key="items.code" :value="items.code">{{ items.name }}</a-select-option>
           </a-select>
         </span>
         <span class="label"><LabelSelect v-model="item.val" :addState="true" style="width:300px" /></span>
@@ -34,6 +34,10 @@ export default {
       default: () => {
         return []
       }
+    },
+    customerAttributeRef: {
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -58,7 +62,7 @@ export default {
   methods: {
     /**
      * 初始化
-     * @param {*} data 
+     * @param {*} data
      */
     init (data) {
       this.getDict('auto_lable_customer_condition')
@@ -73,6 +77,7 @@ export default {
       } else {
         this.data = data
       }
+      this.active = this.customerAttributeRef
     },
     /**
      * 添加
@@ -85,14 +90,14 @@ export default {
     },
     /**
      * 删除
-     * @param {*} index 
+     * @param {*} index
      */
     handleDel (index) {
       this.data.splice(index, 1)
     },
     /**
      * 切换关系
-     * @param {*} key 
+     * @param {*} key
      */
     tapFn (key) {
       this.active = key
@@ -103,7 +108,7 @@ export default {
      * @param {*} e
      * @param {*} key
      */
-     getDict (e) {
+    getDict (e) {
       const obj = {
         dictType: e
       }
