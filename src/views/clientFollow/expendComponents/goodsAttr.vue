@@ -25,7 +25,7 @@
 
         <!-- 时间 -->
         <span v-if="item.columnName === 'purchase_time'">
-          <a-range-picker :valueFormat="dateFormat" v-model="item.val" format="YYYY-MM-DD" valueFormat="YYYY-MM-DD" />
+          <a-range-picker v-model="item.val" format="YYYY-MM-DD" valueFormat="YYYY-MM-DD" />
         </span>
         <!-- end 时间 -->
 
@@ -64,7 +64,6 @@ export default {
   },
   data () {
     return {
-      dateFormat: 'YYYY-MM-DD hh:mm:ss',
       data: [],
       active: 'and',
       option: [],

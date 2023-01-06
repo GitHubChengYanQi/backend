@@ -170,7 +170,7 @@
             @getVal="employeeIdsChange"
           />
         </div>
-      </div>    
+      </div>
       <template slot="footer">
         <a-button
           @click="closeIntegralFriendCircleModal()"

@@ -40,16 +40,16 @@
             <li v-for="(item, index) in info.rule.ruleList" :key="index">
               <h3>{{ item.ruleName }}</h3>
               <p>
-                <span v-for="(item1) in item.customerRule">
+                <span v-for="(item1, index1) in item.customerRule" :key="index1">
                   {{ item1.judgmentConditions }}
-                  <a-tag color="green" v-for="item11 in item1.labelGroup">{{ item11 }}</a-tag>
+                  <a-tag color="green" v-for="(item11, index11) in item1.labelGroup" :key="index11">{{ item11 }}</a-tag>
                 </span>
                 标签的客户在购买商品时，
-                <span v-for="(item2) in item.consumeRule">
+                <span v-for="(item2, index2) in item.consumeRule" :key="index2">
                   {{ item2.columnName }}{{ item2.judgmentConditions }}{{ item2.val }}
                 </span>
                 时，将会被打上
-                <a-tag color="green" v-for="(item3) in item.labelGroup">{{ item3 }}</a-tag>
+                <a-tag color="green" v-for="(item3, index3) in item.labelGroup" :key="index3">{{ item3 }}</a-tag>
                 标签。
               </p>
             </li>
