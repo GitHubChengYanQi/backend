@@ -78,7 +78,7 @@ export default {
   data () {
     return {
       preview: false,
-      selectRow: {},
+      selectRow: null,
       name: '',
       questionnaire: {},
       visible: false
@@ -114,7 +114,7 @@ export default {
       this.$emit('change', null)
     },
     submit () {
-      this.name = this.selectRow.name
+      this.name = this.selectRow ? this.selectRow.name : ''
       this.$emit('change', this.selectRow)
       this.$emit('input', this.selectRow)
       this.visible = false

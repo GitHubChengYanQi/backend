@@ -1015,5 +1015,11 @@ export const routeList = {
     // hideChildrenInMenu: true,
     component: () => import('@/views/study/task'),
     meta: { title: '任务列表' }
+  },
+  '/integralManager/customerIntegral': {
+    path: '/integralManager/customerIntegral',
+    name: '员工积分',
+    component: () => import('@/views/integralManager/customerIntegral/index'),
+    meta: { title: '员工积分' }
   }
 }

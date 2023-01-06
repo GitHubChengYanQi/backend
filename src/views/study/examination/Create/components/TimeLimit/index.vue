@@ -25,7 +25,7 @@ export default {
   props: {
     value: {
       type: Number,
-      default: _ => 0
+      default: _ => -1
     }
   },
   data () {

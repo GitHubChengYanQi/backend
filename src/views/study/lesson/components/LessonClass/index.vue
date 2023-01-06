@@ -100,7 +100,11 @@
     >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="className" placeholder="请输入分类名称" :maxLength="8"></a-input>
+        <a-input
+          v-model="className"
+          placeholder="请输入分类名称"
+          :suffix="`${className.length} / 8`"
+          :maxLength="8" />
       </div>
     </a-modal>
 
@@ -114,7 +118,7 @@
     >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="className" placeholder="请输入分类名称" :maxLength="8"></a-input>
+        <a-input v-model="className" :suffix="`${className.length} / 8`" placeholder="请输入分类名称" :maxLength="8" />
       </div>
     </a-modal>
 
@@ -128,7 +132,12 @@
     >
       <div class="my-space">
         <div style="width: 100px">分类名称：</div>
-        <a-input v-model="updateClass.title" placeholder="请输入分类名称" :maxLength="8"></a-input>
+        <a-input
+
+          :suffix="`${updateClass.title ? updateClass.title.length : 0} / 8`"
+          v-model="updateClass.title"
+          placeholder="请输入分类名称"
+          :maxLength="8" />
       </div>
     </a-modal>
 
