@@ -22,12 +22,12 @@
             <span>创建时间：</span>
             <span>{{ info.createTime }}</span>
           </p>
-          <p>
-          </p><p>自动添加标签：</p>
-          <span>
-            <a-tag class="label" v-for="(item, index) in info.labelIdNameGroup" :key="index">{{ item }}</a-tag>
-          </span>
-          </p>
+          <div>
+            <p>自动添加标签：</p>
+            <span>
+              <a-tag class="label" v-for="(item, index) in info.labelIdNameGroup" :key="index">{{ item }}</a-tag>
+            </span>
+          </div>
         </div>
         <div class="right">
           <h2>规则设置：共 {{ info.rule ? info.rule.ruleNum : 0 }} 条规则</h2>
