@@ -128,7 +128,7 @@ export default {
     // 富文本图片上传前
     beforeUpload (file) {
       const isJPG = file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
+      const isLt2M = file.size / 1024 / 1024 < 400
       if (!isJPG) {
         this.$message.error('支持JPG、PNG格式的图片，大小不得超过2M')
       }

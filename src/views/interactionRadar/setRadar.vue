@@ -2,9 +2,7 @@
   <div class="setRadar_page">
     <div class="setRadar_card">
       <div class="setRadar_content">
-        <div class="setRadar_title">
-          基础设置
-        </div>
+        <div class="setRadar_title">基础设置</div>
         <div class="content">
           <div
             class="row"
@@ -12,15 +10,12 @@
             v-for="(item,index) in setData.changeType"
             :key="index"
           >
-            <span class="title"><span
-              class="icon"
-              v-if="item.title"
-            >*</span><span class="text">{{ item.title }}</span></span>
+            <span class="title">
+              <span class="icon" :style="item.hide ? {opacity: 0} : {}">*</span>
+              <span class="text">{{ item.title }}</span>
+            </span>
             <span class="import_box">
-              <span
-                class="select_box"
-                v-if="item.type == 'select'"
-              >
+              <span class="select_box" v-if="item.type == 'select'">
                 <a-select
                   class="select"
                   v-model="setData.inputData[item.key]"
@@ -33,10 +28,7 @@
                   >{{ items.name }}</a-select-option>
                 </a-select>
               </span>
-              <span
-                class="checkbox_box"
-                v-else-if="item.type == 'checkbox'"
-              >
+              <span class="checkbox_box" v-else-if="item.type == 'checkbox'">
                 <a-select
                   class="checkbox"
                   :maxTagCount="1"
@@ -52,10 +44,7 @@
                   >{{ items.name }}</a-select-option>
                 </a-select>
               </span>
-              <span
-                class="radio_box"
-                v-else-if="item.type == 'radio'"
-              >
+              <span class="radio_box" v-else-if="item.type == 'radio'">
                 <a-radio-group
                   @change="setType"
                   class="radio"
@@ -68,10 +57,7 @@
                   >{{ items.name }}</a-radio>
                 </a-radio-group>
               </span>
-              <span
-                class="cover_box"
-                v-else-if="item.type == 'cover'"
-              >
+              <span class="cover_box" v-else-if="item.type == 'cover'">
                 <div>
                   <div
                     v-if="setData.inputData[item.key].length != 0"
@@ -79,15 +65,8 @@
                     @mouseenter.stop="mouseOver(1)"
                     @mouseleave.stop="mouseOver(-1)"
                   >
-                    <img
-                      class="cover_img"
-                      :src="setData.inputData[item.key]"
-                      alt=""
-                    >
-                    <div
-                      class="show_box"
-                      v-if="isShow"
-                    >
+                    <img class="cover_img" :src="setData.inputData[item.key]" alt />
+                    <div class="show_box" v-if="isShow">
                       <span
                         class="btn"
                         @click="()=>{
@@ -95,68 +74,35 @@
                           imageUrl = setData.inputData[item.key]
                         }"
                       >查看</span>
-                      <span
-                        class="btn"
-                        @click="close(item.key)"
-                      >删除</span>
+                      <span class="btn" @click="close(item.key)">删除</span>
                     </div>
                   </div>
-                  <div
-                    v-else
-                    class="add_img_box"
-                    @click="setMedium(2)"
-                  >
-                    <img
-                      class="add_icon"
-                      :src="require('@/assets/add_icon.svg')"
-                      alt=""
-                    >
+                  <div v-else class="add_img_box" @click="setMedium(2)">
+                    <img class="add_icon" :src="require('@/assets/add_icon.svg')" alt />
                   </div>
                 </div>
-                <div
-                  class="hint"
-                  v-if="item.hint"
-                >{{ item.hint }}</div>
+                <div class="hint" v-if="item.hint">{{ item.hint }}</div>
               </span>
-              <span
-                class="uploading_box"
-                v-else-if="item.type == 'uploading'"
-              >
+              <span class="uploading_box" v-else-if="item.type == 'uploading'">
                 <div>
                   <img
                     @click="setMedium(7)"
                     v-if="setData.inputData[item.key].length == 0"
                     class="uploading_icon"
                     :src="require('@/assets/upload_btn.png')"
-                    alt=""
-                  >
-                  <div
-                    class="pdf_box"
-                    v-else
-                  >
-                    <div
-                      class="close"
-                      @click.stop="close(item.key)"
-                    >+</div>
+                    alt
+                  />
+                  <div class="pdf_box" v-else>
+                    <div class="close" @click.stop="close(item.key)">+</div>
                     <div class="icon_box">
-                      <img
-                        class="icon"
-                        :src="require('@/assets/pdf.png')"
-                        alt=""
-                      >
+                      <img class="icon" :src="require('@/assets/pdf.png')" alt />
                     </div>
                     <div class="title">{{ setData.inputData.linkTitle }}</div>
                   </div>
                 </div>
-                <div
-                  class="hint"
-                  v-if="item.hint"
-                >{{ item.hint }}</div>
+                <div class="hint" v-if="item.hint">{{ item.hint }}</div>
               </span>
-              <span
-                class="quillEditor_box"
-                v-else-if="item.type == 'quillEditor'"
-              >
+              <span class="quillEditor_box" v-else-if="item.type == 'quillEditor'">
                 <quill-editor
                   class="quillEditor"
                   @editorChange="editorChange"
@@ -172,38 +118,18 @@
                   }"
                 >预览</a-button>
               </span>
-              <span
-                class="button_box"
-                v-else-if="item.type == 'button'"
-              >
-                <a-button
-                  type="primary"
-                  class="button"
-                  @click="setMedium(3)"
-                >{{ item.btnText }}</a-button>
-                <div
-                  class="article"
-                  v-if="setData.inputData[item.key].length > 0"
-                >
-                  <div
-                    class="close"
-                    @click.stop="close(item.key)"
-                  >+</div>
-                  <img
-                    class="article_img"
-                    :src="setData.inputData[item.key]"
-                    alt=""
-                  >
+              <span class="button_box" v-else-if="item.type == 'button'">
+                <a-button type="primary" class="button" @click="setMedium(3)">{{ item.btnText }}</a-button>
+                <div class="article" v-if="setData.inputData[item.key].length > 0">
+                  <div class="close" @click.stop="close(item.key)">+</div>
+                  <img class="article_img" :src="setData.inputData[item.key]" alt />
                   <div class="article_txt">
                     <div class="title">{{ setData.inputData.linkTitle }}</div>
                     <div class="content">{{ setData.inputData.linkDigest }}</div>
                   </div>
                 </div>
               </span>
-              <span
-                class="input_box"
-                v-else
-              >
+              <span class="input_box" v-else>
                 <a-input
                   :disabled="item.key == 'title'&& tableId != -1"
                   class="input"
@@ -221,19 +147,9 @@
                   @click="getArticle"
                   class="button"
                 >生成雷达文章</a-button>
-                <div
-                  class="article"
-                  v-if="item.btnState && setData.inputData.linkImg.length > 0"
-                >
-                  <div
-                    class="close"
-                    @click.stop="close('linkImg')"
-                  >+</div>
-                  <img
-                    class="article_img"
-                    :src="setData.inputData.linkImg"
-                    alt=""
-                  >
+                <div class="article" v-if="item.btnState && setData.inputData.linkImg.length > 0">
+                  <div class="close" @click.stop="close('linkImg')">+</div>
+                  <img class="article_img" :src="setData.inputData.linkImg" alt />
                   <div class="article_txt">
                     <div class="title">{{ setData.inputData.linkTitle }}</div>
                     <div class="content">{{ setData.inputData.linkDigest }}</div>
@@ -246,39 +162,23 @@
       </div>
     </div>
     <div class="setRadar_link">
-      <div class="setRadar_title">
-        链接追踪设置
-      </div>
+      <div class="setRadar_title">链接追踪设置</div>
       <div class="setRadar_content">
         <a-checkbox-group
           class="checkbox_box"
           v-model="linkData.linkState"
           :options="linkData.linkType"
         />
-        <div
-          class="select_box"
-          v-if="linkData.linkState.includes('2')"
-        >
-          <div
-            class="select"
-            @click="showBox"
-          >选择标签</div>
-          <span
-            class="tabs"
-            v-for="(item,index) in tabsArr"
-            :key="index"
-          ><span>{{ item.name }}</span><span
-            class="empty"
-            @click="empty(item.id)"
-          >+</span></span>
+        <div class="select_box" v-if="linkData.linkState.includes('2')">
+          <div class="select" @click="showBox">选择标签</div>
+          <span class="tabs" v-for="(item,index) in tabsArr" :key="index">
+            <span>{{ item.name }}</span>
+            <span class="empty" @click="empty(item.id)">+</span>
+          </span>
         </div>
       </div>
     </div>
-    <a-button
-      type="primary"
-      style="margin-top:50px;"
-      @click="setRadar"
-    >保存并创建</a-button>
+    <a-button type="primary" style="margin-top:50px;" @click="setRadar">保存并创建</a-button>
     <a-modal
       v-model="modalState"
       :title="modalTitle"
@@ -298,75 +198,29 @@
           >{{ item.title }}</div>
         </div>
         <div class="model_content">
-          <div
-            class="upload_box"
-            v-if="modelTab == 0"
-          >
-            <div
-              v-if="uploadUrl.length == 0"
-              class="upload_btn"
-              @click="getLink"
-            >
-              <img
-                class="upload_icon"
-                :src="require('@/assets/upload.svg')"
-                alt=""
-              >
+          <div class="upload_box" v-if="modelTab == 0">
+            <div v-if="uploadUrl.length == 0" class="upload_btn" @click="getLink">
+              <img class="upload_icon" :src="require('@/assets/upload.svg')" alt />
               <span class="upload_text">{{ modalTitle }}</span>
             </div>
-            <div
-              class="show"
-              v-else
-              @click="getLink"
-            >
-              <img
-                v-if="medium.type == 2"
-                class="upload_image"
-                :src="uploadUrl"
-                alt=""
-              >
-              <video
-                v-else-if="medium.type == 5"
-                :src="uploadUrl"
-                class="upload_image"
-              ></video>
-              <div
-                class="pdf_box"
-                v-else
-              >
+            <div class="show" v-else @click="getLink">
+              <img v-if="medium.type == 2" class="upload_image" :src="uploadUrl" alt />
+              <video v-else-if="medium.type == 5" :src="uploadUrl" class="upload_image"></video>
+              <div class="pdf_box" v-else>
                 <div class="icon_box">
-                  <img
-                    class="icon"
-                    :src="require('@/assets/pdf.png')"
-                    alt=""
-                  >
+                  <img class="icon" :src="require('@/assets/pdf.png')" alt />
                 </div>
                 <div class="title">{{ uploadName }}</div>
               </div>
             </div>
-
           </div>
-          <div
-            class="material_library_box"
-            v-else
-          >
+          <div class="material_library_box" v-else>
             <div class="search_box">
               <div class="hint">共有{{ medium.pagination.total }}个素材</div>
               <div class="seach">
-                <a-input
-                  class="input"
-                  v-model="modelSearch"
-                  placeholder="输入要搜素的内容"
-                ></a-input>
-                <a-button
-                  type="primary"
-                  class="button"
-                  @click="searchMedium"
-                >搜索</a-button>
-                <a-button
-                  class="button"
-                  @click="resetMedium"
-                >清空</a-button>
+                <a-input class="input" v-model="modelSearch" placeholder="输入要搜素的内容"></a-input>
+                <a-button type="primary" class="button" @click="searchMedium">搜索</a-button>
+                <a-button class="button" @click="resetMedium">清空</a-button>
               </div>
             </div>
             <div class="table_box">
@@ -378,26 +232,16 @@
                 :pagination="medium.pagination"
                 @change="handleTableChange"
               >
-                <div
-                  slot="contents"
-                  slot-scope="text, record"
-                >
+                <div slot="contents" slot-scope="text, record">
                   <template>
                     <img
                       v-if="medium.type == 2"
                       :src="record.content.imageFullPath"
-                      alt=""
+                      alt
                       style="width:80px;height:80px;"
-                    >
-                    <div
-                      v-if="medium.type == 7"
-                      style="display: flex;flex-direction: column;"
-                    >
-                      <a-icon
-                        type="file"
-                        theme="twoTone"
-                        style="fontSize: 46px;"
-                      />
+                    />
+                    <div v-if="medium.type == 7" style="display: flex;flex-direction: column;">
+                      <a-icon type="file" theme="twoTone" style="fontSize: 46px;" />
                       <span style="fontSize: 10px;">{{ record.content.fileName }}</span>
                     </div>
                     <video
@@ -409,14 +253,10 @@
                       v-if="medium.type == 3"
                       style="display: flex;flex-direction: column;position: relative;"
                     >
-                      <img
-                        :src="record.content.imageFullPath"
-                        alt=""
-                        style="width:100%;height:80px;"
-                      >
-                      <span style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;">
-                        {{ record.content.maintitle }}
-                      </span>
+                      <img :src="record.content.imageFullPath" alt style="width:100%;height:80px;" />
+                      <span
+                        style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;"
+                      >{{ record.content.maintitle }}</span>
                     </div>
                   </template>
                 </div>
@@ -449,7 +289,7 @@
       @change="uploadPDF"
       name="testFile"
       accept="application/pdf"
-    >
+    />
     <label-select
       :state="ruleState"
       ref="labelSelect"
@@ -473,8 +313,7 @@
           @click="()=>{
             modalVisible = false
           }"
-          key="back"
-        >关闭</a-button>
+          key="back">关闭</a-button>
       </template>
     </a-modal>
     <a-modal
@@ -488,18 +327,14 @@
     >
       <div class="preview_box">
         <img :src="require('@/assets/phone14.jpg')" />
-        <div
-          class="content_box ql-editor"
-          v-html="setData.inputData.content"
-        ></div>
+        <div class="content_box ql-editor" v-html="setData.inputData.content"></div>
       </div>
       <template slot="footer">
         <a-button
           @click="()=>{
             preview = false
           }"
-          key="back"
-        >关闭</a-button>
+          key="back">关闭</a-button>
       </template>
     </a-modal>
   </div>
@@ -561,7 +396,8 @@ export default {
           contentSource: '0',
           tsLink: '',
           articleLink: '',
-          materialId: ''
+          materialId: '',
+          linkBgImg: ''
         },
         articleArr: {
           0: [
@@ -590,6 +426,7 @@ export default {
             {
               title: '链接摘要：',
               type: 'input',
+              hide: true,
               key: 'linkDigest',
               fontNumber: 30
             },
@@ -597,6 +434,7 @@ export default {
               title: '链接封面：',
               type: 'cover',
               key: 'linkImg',
+              hide: true,
               hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
             },
             {
@@ -624,7 +462,7 @@ export default {
           },
           {
             code: '4',
-            name: '视频'
+            name: '自定义视频'
           }
         ],
         grouping: [],
@@ -652,12 +490,14 @@ export default {
           {
             title: '链接摘要：',
             type: 'input',
+            hide: true,
             key: 'linkDigest',
             fontNumber: 30
           },
           {
             title: '链接封面：',
             type: 'cover',
+            hide: true,
             key: 'linkImg',
             hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
           }
@@ -688,12 +528,14 @@ export default {
           {
             title: '链接摘要：',
             type: 'input',
+            hide: true,
             key: 'linkDigest',
             fontNumber: 30
           },
           {
             title: '链接封面：',
             type: 'cover',
+            hide: true,
             key: 'linkImg',
             hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
           },
@@ -702,7 +544,27 @@ export default {
             type: 'quillEditor',
             key: 'content'
           }
-        ]
+        ],
+        5: [{
+          title: '链接标题：',
+          type: 'input',
+          key: 'linkTitle',
+          fontNumber: 15
+        },
+        {
+          title: '链接摘要：',
+          type: 'input',
+          hide: true,
+          key: 'linkDigest',
+          fontNumber: 30
+        },
+        {
+          title: '链接封面：',
+          type: 'cover',
+          hide: true,
+          key: 'linkImg',
+          hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
+        }]
       },
       modalState: false,
       modalVisible: false,
@@ -914,6 +776,9 @@ export default {
         const { data } = res
         this.selectArr.grouping = data.group
         this.selectArr.channel = data.ditch
+        if (data.ditch.length == 1) {
+          this.setData.inputData.ditch = [data.ditch[0].id]
+        }
       })
     },
     close (key) {
@@ -1056,7 +921,6 @@ export default {
         const formData = new FormData()
         formData.append('file', file)
         formData.append('time', 1)
-        console.log(formData, 'formData')
         const res = await upLoad(formData)
         console.log(res)
         this.uploadUrl = res.data.fullPath
