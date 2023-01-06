@@ -23,10 +23,10 @@
             <span>{{ info.createTime }}</span>
           </p>
           <p>
-            <p>自动添加标签：</p>
-            <span>
-              <a-tag class="label" v-for="(item, index) in info.labelIdNameGroup" :key="index">{{ item }}</a-tag>
-            </span>
+          </p><p>自动添加标签：</p>
+          <span>
+            <a-tag class="label" v-for="(item, index) in info.labelIdNameGroup" :key="index">{{ item }}</a-tag>
+          </span>
           </p>
         </div>
         <div class="right">
