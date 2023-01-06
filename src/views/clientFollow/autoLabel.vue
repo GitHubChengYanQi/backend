@@ -25,7 +25,7 @@
             class="label_input"
             @click="showBox"
           >
-            <span v-if="inputArr.length == 0">请选择标签</span>
+            <span v-if="inputArr.length == 0">请选择标签<a-icon class="arrow" type="right" /></span>
             <span
               v-if="inputArr.length > 0"
               class="label_input_title"
@@ -836,6 +836,11 @@ export default {
         border-radius: 2px;
         padding-left: 5px;
         margin-right: 10px;
+        .arrow{
+          position: absolute;
+          right:5px;
+          top:8px;
+        }
         .label_input_title {
           position: relative;
           flex-shrink: 0;
@@ -1003,6 +1008,12 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+.popoverBox{
+  width:500px;
+  span{
+    margin-bottom:5px;
   }
 }
 </style>
