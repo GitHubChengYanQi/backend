@@ -10,6 +10,7 @@ export function isIE () {
   const ie11 = (() => 'ActiveXObject' in window)()
   return compare('MSIE') || ie11
 }
+
 export const createValidate = (callback, value, message) => {
   if (!value) {
     return callback(new Error(message))
@@ -167,4 +168,51 @@ export const toChinesNum = (num) => {
   let noWan = num % 10000
   if (noWan.toString().length < 4) noWan = '0' + noWan
   return overWan ? getWan(overWan) + '万' + getWan(noWan) : getWan(num)
+}
+
+/**
+ * 通过时间戳计算时分秒
+ */
+export const getTimeDifference = (timeDifference) => {
+  // 获取时间戳
+  var hour = 60 * 60 * 1000
+  // 一小时等于的毫秒数
+  var min = 60 * 1000
+  // 一秒等于的毫秒数
+  var h = parseInt(timeDifference / hour)
+  // 获取小时部分
+  var m = parseInt(timeDifference % hour / min)
+  // 获取分钟部分
+  var s = parseInt(timeDifference % min / 1000)
+  // 获取秒数
+  return `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`
+}
+
+/**
+ * 对象比较
+ * @param {*} a 对象1
+ * @param {*} b 对象2
+ * @returns Boolean
+ */
+export const isObjectValueEqual = (a, b) => {
+  // 判断两个对象是否指向同一内存，指向同一内存返回 true
+  if (a === b) return true // 获取两个对象键值数组
+  const aProps = Object.getOwnPropertyNames(a)
+  const bProps = Object.getOwnPropertyNames(b)
+  // 判断两个对象键值数组长度是否一致，不一致返回 false
+  if (aProps.length !== bProps.length) return false // 遍历对象的键值
+  for (const prop in a) {
+    // 判断 a 的键值，在 b 中是否存在，不存在，返回 false
+    if (b.hasOwnProperty(prop)) {
+      // 判断 a 的键值是否为对象，是则递归，不是对象直接判断键值是否相等，不相等返回 false
+      if (typeof a[prop] === 'object') {
+        if (!isObjectValueEqual(a[prop], b[prop])) return false
+      } else if (a[prop] !== b[prop]) {
+        return false
+      }
+    } else {
+      return false
+    }
+  }
+  return true
 }

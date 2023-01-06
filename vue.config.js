@@ -12,9 +12,11 @@ function resolve (dir) {
 function getGitHash () {
   try {
     return GitRevision.version()
-  } catch (e) { }
+  } catch (e) {
+  }
   return 'unknown'
 }
+
 const isProd = process.env.NODE_ENV === 'production'
 
 const assetsCDN = {
@@ -28,12 +30,12 @@ const assetsCDN = {
   css: [],
   // https://unpkg.com/browse/vue@2.6.10/
   js: [
-    './dll/vue.min.js',
-    './dll/vue-router.min.js',
-    './dll/vuex.min.js',
-    './dll/axios.min.js'
+    '/dll/vue.min.js',
+    '/dll/vue-router.min.js',
+    '/dll/vuex.min.js',
+    '/dll/axios.min.js'
   ],
-  dll: ['./dll/antDesignVue.dll.js', './dll/echarts.dll.js', './dll/vueCropper.dll.js', './dll/corejs.dll.js', './dll/vueContainerQuery.dll.js']
+  dll: ['/dll/antDesignVue.dll.js', '/dll/echarts.dll.js', '/dll/vueCropper.dll.js', '/dll/corejs.dll.js', '/dll/vueContainerQuery.dll.js']
 }
 
 // vue.config.js
@@ -134,10 +136,11 @@ const vueConfig = {
         target: 'https://devjavascrm.yifeijiankang.com/', // 开发
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.253:6007/',
-        // target: 'http://124.70.77.92:6007/',
+        // target: 'http://172.16.0.207:6007/',
         // target: 'http://192.168.31.18:6007/',
         // target: 'http://192.168.50.109:6007/',
         // target: 'http://192.168.31.18:6007/',
+        // target: 'http://192.168.31.43:6007/',
         ws: false,
         changeOrigin: true,
         pathRewrite: {

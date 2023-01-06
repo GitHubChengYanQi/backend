@@ -780,10 +780,11 @@ export default {
       }
       const target = list[0]
       const content = target.entry
+      const startLen = process.env.NODE_ENV === 'development' ? 43 : 44
       this.modalLinkObj = {
         title: content.linkTitle,
         url: target.link,
-        pic: { url: content.linkImg, path: content.linkImgPath || content.linkImg.slice(43, content.linkImg.indexOf('?')) },
+        pic: { url: content.linkImg, path: content.linkImgPath || content.linkImg.slice(startLen, content.linkImg.indexOf('?')) },
         desc: content.linkDigest,
         radarLink: '1',
         radarName: target.channelTxt

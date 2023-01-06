@@ -6,11 +6,11 @@
         <div class="content">
           <div
             class="row"
-            :style="item.type == 'cover'|| item.type == 'quillEditor' ? {alignItems:'flex-start'}:{}"
+            :style="item.type == 'cover'|| item.type == 'quillEditor' || item.key == 'tsLink' ? {alignItems:'flex-start'}: {}"
             v-for="(item,index) in setData.changeType"
             :key="index"
           >
-            <span class="title">
+            <span class="title" :style="item.key == 'tsLink' ? {transform:'translateY(8px)'}: {}">
               <span class="icon" :style="item.hide ? {opacity: 0} : {}">*</span>
               <span class="text">{{ item.title }}</span>
             </span>
@@ -342,7 +342,7 @@
 
 <script>
 import QuillEditor from './components/QuillEditor'
-import { upLoad } from '@/api/common'
+import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
 import { materialLibraryList } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
@@ -352,6 +352,7 @@ export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
   data () {
     return {
+      oss: {},
       preview: false,
       isShow: false,
       setData: {
@@ -744,6 +745,7 @@ export default {
         })
         this.setData.inputData.shape = data.shape
         this.setData.inputData.contentSource = data.entry.contentSource
+        this.setData.inputData.tsLink = data.entry.articleLink
 
         for (const key in data.entry) {
           if (inputData.shape == '3') {

@@ -156,3 +156,123 @@ export function timeAutoLabelStatusChange (params) {
     data: params
   })
 }
+/**
+ * 消费属性打标签列表
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabel (params) {
+  return request({
+    url: '/consumeAutoLabel/index',
+    method: 'GET',
+    params
+  })
+}
+/**
+ * 消费属性状态更新
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelStatus (data) {
+  return request({
+    url: '/consumeAutoLabel/statusChange',
+    method: 'PUT',
+    data
+  })
+}
+/**
+ * 消费属性创建
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelAdd (data) {
+  return request({
+    url: '/consumeAutoLabel/add',
+    method: 'POST',
+    data
+  })
+}
+/**
+ * 消费属性更新
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelUpdate (data) {
+  return request({
+    url: '/consumeAutoLabel/update',
+    method: 'PUT',
+    data
+  })
+}
+/**
+ * 商品列表
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelErpGoodList (params) {
+  return request({
+    url: '/consumeAutoLabel/erpGoodList',
+    method: 'GET',
+    params
+  })
+}
+/**
+ * 消费规则编辑回显
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelDetail (params) {
+  return request({
+    url: '/consumeAutoLabel/detail',
+    method: 'GET',
+    params
+  })
+}
+/**
+ * 消费规则删除
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelDelete (data) {
+  return request({
+    url: '/consumeAutoLabel/delete',
+    method: 'DELETE',
+    data
+  })
+}
+/**
+ * 验证消费属性规则
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelValidRule (data) {
+  return request({
+    url: '/consumeAutoLabel/validRule',
+    method: 'PUT',
+    data
+  })
+}
+/**
+ * 规则详情
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelRuleDetail (params) {
+  return request({
+    url: '/consumeAutoLabel/ruleDetail',
+    method: 'GET',
+    params
+  })
+}
+/**
+ * 规则详情列表
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelRuleDetailIndex (params) {
+  return request({
+    url: '/consumeAutoLabel/ruleDetail/index',
+    method: 'GET',
+    params
+  })
+}

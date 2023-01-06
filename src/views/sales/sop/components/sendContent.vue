@@ -13,8 +13,9 @@
                 'handleBtn disabled' :
                 'handleBtn'"
               :key="index"
-              @click="chooseSendType(item.type)"
-            >+ {{ item.name }}</div>
+              @click="chooseSendType(item.type)">
+              + {{ item.name }}
+            </div>
             <div
               class="disabledBox"
               v-if="isDisableEdit === true"
@@ -342,6 +343,10 @@ export default {
     'MediumGroup': () => import('@/views/mediumGroup/index.vue')
   },
   props: {
+    isLoadingStatus: {
+      type: Boolean,
+      default: false
+    },
     isDisableEdit: {
       type: Boolean,
       default: false
@@ -856,25 +861,28 @@ export default {
         const file = e.target.files[0]
         if (file.size > 10 * 1000 * 1000) {
           return this.$message.warn('请上传小于10MB的视频文件')
-        }
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        console.log(formData, 'formData')
-        const res = await upLoad(formData)
-        const videoInfo = {
-          type: 3,
-          videoUrl: res.data.fullPath
-        }
-        if (this.submitType === 'add') {
-          this.sendContentArray.push(videoInfo)
         } else {
-          this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('time', 1)
+          console.log(formData, 'formData')
+          // const res = await upLoad(formData)
+          await upLoad(formData).then(res => {
+            const videoInfo = {
+              type: 3,
+              videoUrl: res.data.fullPath
+            }
+            if (this.submitType === 'add') {
+              this.sendContentArray.push(videoInfo)
+            } else {
+              this.sendContentArray.splice(this.chooseEditIndex, 1, videoInfo)
+            }
+            this.isSopEditStatus = true
+            this.$emit('update:isSopEdit', this.isSopEditStatus)
+            this.$emit('update:contentArray', this.sendContentArray)
+            this.$refs.uploadVideoRef.value = ''
+          })
         }
-        this.isSopEditStatus = true
-        this.$emit('update:isSopEdit', this.isSopEditStatus)
-        this.$emit('update:contentArray', this.sendContentArray)
-        this.$refs.uploadVideoRef.value = ''
       } else {
         console.log(e)
       }
@@ -1164,4 +1172,5 @@ export default {
   width: 1px;
   height: 1px;
 }
+
 </style>

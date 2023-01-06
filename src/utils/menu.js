@@ -17,6 +17,7 @@ export function exChangeMenu (path) {
     }
   }
 }
+
 export function setBreadcrumb (path, data) {
   const sideMenus = store.state.permission.sideMenus
   let firstTitle = ''
@@ -41,7 +42,10 @@ export function setBreadcrumb (path, data) {
     2: {
       path: [
         '/clientFollow/labelInfo',
-        '/clientFollow/addRule'],
+        '/clientFollow/addRule',
+        '/clientFollow/labelExpendInfo',
+        '/clientFollow/addExpendRule'
+      ],
       returnPath: '/clientFollow/autoLabel'
     },
     3: {
@@ -149,8 +153,7 @@ export function setBreadcrumb (path, data) {
     path: '/clientFollow/addRule', // 需要改变面包屑的地址
     title: '编辑规则', // 改变的名称
     key: 'label'// 根据参数
-  },
-  {
+  }, {
     path: '/riskEarlyWarning/creatingWarningRule', // 需要改变面包屑的地址
     title: '编辑预警策略', // 改变的名称
     key: 'id'// 根据参数
@@ -177,6 +180,20 @@ export function setBreadcrumb (path, data) {
             secondTitle = item.title
           }
         })
+        if (inner.hiddenBreadcrumb) {
+          firstTitle = 'hiddenBreadcrumb'
+          secondTitle = 'hiddenBreadcrumb'
+          return
+        }
+        if (inner.path == '/clientFollow/addRule' && data.label) {
+          secondTitle = '编辑规则'
+        }
+        if (inner.path == '/riskEarlyWarning/creatingWarningRule' && data.id) {
+          secondTitle = '编辑预警策略'
+        }
+        if (inner.path == '/riskEarlyWarning/creatingScoringTemplate' && data.id) {
+          secondTitle = '编辑评分模型'
+        }
         if (inner.path == '/groupMess/setGroup' && data.type != 0) {
           secondTitle = data.type == 1 ? '编辑群群发' : '复制群群发'
         }
@@ -203,6 +220,7 @@ export function setBreadcrumb (path, data) {
   })
   store.commit('SET_BREADCRUMB', [firstTitle, secondTitle])
 }
+
 export function resetRoutes () {
   router.matcher = newRouter().matcher
   store.commit('CLEAR_ROUTERS')
