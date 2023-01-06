@@ -1,5 +1,5 @@
 <template>
-  <div class="ruleBox" v-if="info">
+  <div class="ruleBox" v-if="info.rule">
     <a-card class="item">
       <div class="title">
         基本信息
@@ -23,10 +23,10 @@
             <span>{{ info.createTime }}</span>
           </p>
           <p>
-          </p><p>自动添加标签：</p>
-          <span>
-            <a-tag class="label" v-for="(item, index) in info.labelIdNameGroup" :key="index">{{ item }}</a-tag>
-          </span>
+            <p>自动添加标签：</p>
+            <span>
+              <a-tag class="label" v-for="(item, index) in info.labelIdNameGroup" :key="index">{{ item }}</a-tag>
+            </span>
           </p>
         </div>
         <div class="right">
@@ -40,16 +40,21 @@
             <li v-for="(item, index) in info.rule.ruleList" :key="index">
               <h3>{{ item.ruleName }}</h3>
               <p>
-                <span v-for="(item1, index1) in item.customerRule" :key="index1">
+                <span v-for="(item1, index1) in item.customerRule" :key="`customerRule${index1}`">
                   {{ item1.judgmentConditions }}
                   <a-tag color="green" v-for="(item11, index11) in item1.labelGroup" :key="index11">{{ item11 }}</a-tag>
+                  <i v-if="index1 < item1.labelGroup.length">且</i>
                 </span>
                 标签的客户在购买商品时，
-                <span v-for="(item2, index2) in item.consumeRule" :key="index2">
-                  {{ item2.columnName }}{{ item2.judgmentConditions }}{{ item2.val }}
+                <span v-for="(item2, index2) in item.consumeRule" :key="`consumeRule${index2}`">
+                  <span v-if="item2.columnName === '购买时间'">{{ item2.columnName }}为{{ item2.val }}</span>
+                  <span v-if="item2.columnName === '购买次数'">{{ item2.columnName }}{{ item2.judgmentConditions }}{{ item2.val }}次</span>
+                  <span v-if="item2.columnName === '商品金额'">{{ item2.columnName }}{{ item2.judgmentConditions }}{{ item2.val }}元</span>
+                  <span v-if="item2.columnName === '商品数量'">{{ item2.columnName }}{{ item2.judgmentConditions }}{{ item2.val }}</span>
+                  <i v-if="index2 < item.consumeRule.length - 1" class="i01">且</i>
                 </span>
                 时，将会被打上
-                <a-tag color="green" v-for="(item3, index3) in item.labelGroup" :key="index3">{{ item3 }}</a-tag>
+                <a-tag color="green" v-for="(item3, index3) in item.labelGroup" :key="`labelGroup${index3}`">{{ item3 }}</a-tag>
                 标签。
               </p>
             </li>
@@ -75,7 +80,7 @@
       </div>
     </a-card>
     <a-card>
-      <tableList />
+      <RuleTable />
     </a-card>
     <!--modal-->
     <a-modal
@@ -106,12 +111,11 @@
 </template>
 
 <script>
-import SvgIcon from './components/SvgIcon.vue'
-import tableList from './expendComponents/list.vue'
+import RuleTable from './expendComponents/list.vue'
 import { consumeAutoLabelRuleDetail } from '@/api/clientFollow.js'
 
 export default {
-  components: { 'svg-icon': SvgIcon, tableList },
+  components: { RuleTable },
   data () {
     return {
       info: {},
@@ -177,6 +181,15 @@ export default {
         ul{
           margin:0;
           padding:0;
+          li{
+            line-height:30px;
+          }
+        }
+        i{
+          font-style:normal
+        }
+        i.i01{
+          margin:0 8px;
         }
       }
       .box{

@@ -65,31 +65,31 @@ export default {
       loading: false,
       date: [],
       screenData: {
-        nickName: [],
+        nickName: '',
         startTime: '',
         endTime: ''
       },
       columns: [
         {
           title: '客户昵称',
-          dataIndex: 'name',
+          dataIndex: 'nickName',
           align: 'center',
           width: 100,
-          scopedSlots: { customRender: 'name' }
+          scopedSlots: { customRender: 'nickName' }
         },
         {
           title: '触发规则的订单编号',
-          dataIndex: 'symptomDiseaseClassifyOneLevel',
+          dataIndex: 'orderNo',
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'symptomDiseaseClassifyOneLevel' }
+          scopedSlots: { customRender: 'orderNo' }
         },
         {
           title: '下单时间',
-          dataIndex: 'symptomDiseaseClassifyTwoLevel',
+          dataIndex: 'orderTime',
           align: 'center',
           width: 150,
-          scopedSlots: { customRender: 'symptomDiseaseClassifyTwoLevel' }
+          scopedSlots: { customRender: 'orderTime' }
         }
       ],
       tableData: [],
@@ -142,13 +142,12 @@ export default {
        * 重置查询
        */
     resetSearch () {
-      // this.storeIds = []
       this.screenData = {
-        symptomDiseaseClassify: NaN
+        nickName: '',
+        startTime: '',
+        endTime: ''
       }
-      this.selectedRowKeys = []
-      this.selectedRows = []
-      // this.screenData.erpOrderNos = ''
+      this.date = ''
       this.search()
     },
     /**
