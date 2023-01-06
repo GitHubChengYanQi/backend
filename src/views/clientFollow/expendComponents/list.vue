@@ -6,7 +6,7 @@
         <a-row :gutter="16">
           <a-col :lg="8" :md="6">
             <a-form-item label="搜索用户：" :labelCol="{ lg: { span: 7 } }" :wrapperCol="{ lg: { span: 17 } }">
-              <a-input v-model="screenData.nickName" />
+              <a-input placeholder="请输入要搜索的客户" v-model="screenData.nickName" />
             </a-form-item>
           </a-col>
           <a-col :lg="8" :md="6">

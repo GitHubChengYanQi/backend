@@ -17,7 +17,7 @@
               <span>*</span> 规则名称：
             </div>
             <a-input
-              style="width: 400px; height: 36px"
+              style="width: 500px; height: 36px"
               placeholder="请填写规则名称，仅内部可见"
               v-model="form.name"
               :maxLength="30"
@@ -31,7 +31,7 @@
             <div class="label">
               <span>*</span> 选择标签：
             </div>
-            <LabelSelect v-model="form.labelIdGroup" :addState="true" style="width:400px;" />
+            <LabelSelect v-model="form.labelIdGroup" :addState="true" style="width:500px;" />
           </div>
           <!-- end 选择标签 -->
 
@@ -157,12 +157,19 @@ import {
   consumeAutoLabelUpdate,
   consumeAutoLabelValidRule
 } from '@/api/clientFollow.js'
+import { mapGetters } from 'vuex'
 
 export default {
   components: { LabelSelect, clientAttr, GoodsSelect, goodsAttr },
+  computed: {
+    ...mapGetters([
+      'permissionList'
+    ])
+  },
   data () {
     return {
       loading: false,
+      btnShow: false,
       id: '', // 类别
       label: '', // id
       labelCol: { span: 4 },
@@ -199,6 +206,13 @@ export default {
     this.label = this.$route.query.label
     this.getDict('good_bounds')
     this.getDetail()
+    // 根据sop权限判断是否显示按钮“保存并创建跟客任务”
+    const permissinon = this.permissionList[0].routes
+    if (permissinon.indexOf('/sales/sop') > -1) {
+      this.btnShow = true
+    } else {
+      this.btnShow = false
+    }
   },
   methods: {
     deepClonev2,
@@ -273,7 +287,11 @@ export default {
             this.loading = false
             if (res.code === 200) {
               if (type === 'save') {
-                this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                if (this.btnShow) {
+                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                } else {
+                  this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
+                }
               } else {
                 sessionStorage.setItem('activeType', 'Regular')
                 this.$router.push('/sales/sop')
@@ -293,7 +311,11 @@ export default {
             this.loading = false
             if (res.code === 200) {
               if (type === 'save') {
-                this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                if (this.btnShow) {
+                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                } else {
+                  this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
+                }
               } else {
                 sessionStorage.setItem('activeType', 'Regular')
                 this.$router.push('/sales/sop')
