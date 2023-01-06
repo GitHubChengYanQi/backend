@@ -97,7 +97,6 @@
           type="primary"
           :loading="loading"
           @click="addRule('task')"
-          v-if="btnShow"
         >保存并创建跟客任务</a-button>
       </div>
     </a-card>
@@ -288,7 +287,11 @@ export default {
             this.loading = false
             if (res.code === 200) {
               if (type === 'save') {
-                this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                if (this.btnShow) {
+                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                } else {
+                  this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
+                }
               } else {
                 sessionStorage.setItem('activeType', 'Regular')
                 this.$router.push('/sales/sop')
@@ -308,7 +311,11 @@ export default {
             this.loading = false
             if (res.code === 200) {
               if (type === 'save') {
-                this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                if (this.btnShow) {
+                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                } else {
+                  this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
+                }
               } else {
                 sessionStorage.setItem('activeType', 'Regular')
                 this.$router.push('/sales/sop')
