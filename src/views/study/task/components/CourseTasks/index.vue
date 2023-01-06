@@ -211,9 +211,12 @@ export default {
         {
           title: '完成率',
           width: '150px',
-          dataIndex: 'doneCount',
+          dataIndex: 'doneRate',
           align: 'center',
-          sorter: true
+          sorter: true,
+          customRender (value) {
+            return (value || 0) + '%'
+          }
         },
         {
           title: '参与人数',
@@ -229,7 +232,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value) {
-            return value + '%'
+            return (value || 0) + '%'
           }
         },
         {

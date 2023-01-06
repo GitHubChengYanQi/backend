@@ -199,7 +199,7 @@ export default {
             wareBindParams: values.wareBindParams ? values.wareBindParams.map((item, index) => ({
               ...item,
               sort: index,
-              examId: values.exam ? item.examId : null
+              examId: item.exam ? item.examId : null
             })) : [],
             courseClassId: values.courseClassId ? values.courseClassId[values.courseClassId.length - 1] : null,
             questionnaireIds: [values.questionnaireId],

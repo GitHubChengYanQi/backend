@@ -158,8 +158,8 @@ export function timeAutoLabelStatusChange (params) {
 }
 /**
  * 消费属性打标签列表
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabel (params) {
   return request({
@@ -170,8 +170,8 @@ export function consumeAutoLabel (params) {
 }
 /**
  * 消费属性状态更新
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabelStatus (data) {
   return request({
@@ -182,8 +182,8 @@ export function consumeAutoLabelStatus (data) {
 }
 /**
  * 消费属性创建
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabelAdd (data) {
   return request({
@@ -194,8 +194,8 @@ export function consumeAutoLabelAdd (data) {
 }
 /**
  * 消费属性更新
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabelUpdate (data) {
   return request({
@@ -206,8 +206,8 @@ export function consumeAutoLabelUpdate (data) {
 }
 /**
  * 商品列表
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabelErpGoodList (params) {
   return request({
@@ -218,8 +218,8 @@ export function consumeAutoLabelErpGoodList (params) {
 }
 /**
  * 消费规则编辑回显
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabelDetail (params) {
   return request({
@@ -230,8 +230,8 @@ export function consumeAutoLabelDetail (params) {
 }
 /**
  * 消费规则删除
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabelDelete (data) {
   return request({
@@ -242,13 +242,37 @@ export function consumeAutoLabelDelete (data) {
 }
 /**
  * 验证消费属性规则
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function consumeAutoLabelValidRule (data) {
   return request({
     url: '/consumeAutoLabel/validRule',
     method: 'PUT',
     data
+  })
+}
+/**
+ * 规则详情
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelRuleDetail (params) {
+  return request({
+    url: '/consumeAutoLabel/ruleDetail',
+    method: 'GET',
+    params
+  })
+}
+/**
+ * 规则详情列表
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelRuleDetailIndex (params) {
+  return request({
+    url: '/consumeAutoLabel/ruleDetail/index',
+    method: 'GET',
+    params
   })
 }

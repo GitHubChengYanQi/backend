@@ -66,11 +66,11 @@
                 <span class="unit">时</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number :min="0" v-model="record.minute" id="inputNumber" />
+                <a-input-number :min="0" :max="59" v-model="record.minute" id="inputNumber" />
                 <span class="unit">分</span>
               </div>
               <div class="time" style="gap: 0">
-                <a-input-number :min="0" v-model="record.second" id="inputNumber" />
+                <a-input-number :min="0" :max="59" v-model="record.second" id="inputNumber" />
                 <span class="unit">秒</span>
               </div>
             </div>

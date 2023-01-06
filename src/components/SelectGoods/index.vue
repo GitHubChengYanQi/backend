@@ -90,21 +90,21 @@ export default {
     },
     /**
      * 搜索回调
-     * @param {*} e 
+     * @param {*} e
      */
     handleSearch (e) {
       this.getList(e)
     },
     /**
      * 选择药品回调
-     * @param {*} e 
+     * @param {*} e
      */
     handleChange (e) {
       this.getGoods(e)
     },
     /**
      * 删除药品
-     * @param {*} item 
+     * @param {*} item
      */
     handleDel (index) {
       this.goods.splice(index, 1)

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-button v-if="!name" style="width: 200px;border-radius: 8px" class="add" @click="visible = true">
+    <a-button v-if="!name" style="width: 200px;border-radius: 8px" class="add" @click="selectRow=null;visible = true">
       <a-icon type="plus" />
       添加试卷
     </a-button>
@@ -10,7 +10,7 @@
           <a-icon type="close-circle" style="cursor: pointer" @click="remove" />
         </div>
         <a-button style="width: 200px;border-radius: 8px" class="linkButton">
-          {{ name }}
+          <div class="selectTestPager">{{ name }}</div>
         </a-button>
       </a-badge>
       <a-button type="link" @click="preview = true">
@@ -49,7 +49,7 @@
       :visible="preview"
       @cancel="preview = false"
     >
-      <TestPaperDetail preview :questionResults="selectRow.questionResults" />
+      <TestPaperDetail preview :questionResults="selectRow ? selectRow.questionResults : null" />
     </a-modal>
   </div>
 </template>
@@ -72,7 +72,7 @@ export default {
   data () {
     return {
       preview: false,
-      selectRow: {},
+      selectRow: null,
       name: '',
       sorter: {},
       pagination: {
@@ -103,7 +103,7 @@ export default {
       this.$emit('change', null)
     },
     submit () {
-      this.name = this.selectRow.questionnaireName
+      this.name = this.selectRow ? this.selectRow.questionnaireName : ''
       this.$emit('change', this.selectRow)
       this.visible = false
     }
@@ -249,5 +249,13 @@ export default {
   border-radius: 8px;
   padding: 24px;
   background-color: #fff;
+}
+
+.selectTestPager {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

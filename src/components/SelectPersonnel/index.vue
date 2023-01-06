@@ -38,7 +38,13 @@
     <a-button :loading="loading" @click.native="openModal" type="primary" v-if="type==='button'">{{ name }}</a-button>
     <a-button :loading="loading" @click.native="openModal" type="link" v-if="type==='link'">{{ name }}</a-button>
     <a-button :loading="loading" @click.native="openModal" type="primary" v-if="type==='buttonLink'">{{ name }}</a-button>
-    <a-button :loading="loading" :style="buttonStyle" :disabled="disabled" @click.native="openModal" type="default" v-if="type==='default'">{{ name }}</a-button>
+    <a-button
+      :loading="loading"
+      :style="buttonStyle"
+      :disabled="disabled"
+      @click.native="openModal"
+      type="default"
+      v-if="type==='default'">{{ name }}</a-button>
     <a-button :loading="loading" ghost @click.native="openModal" type="primary" v-if="type==='buttonGhost'">{{ name }}</a-button>
     <div class="list" v-if="type==='button' || type==='default'">
       <template v-if="num">
