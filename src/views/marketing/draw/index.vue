@@ -10,7 +10,7 @@
                 <a-input v-model="screenData.name" placeholder="请输入活动名称"></a-input>
               </a-form-item>
             </a-col>
-            <!-- <a-col :lg="12">
+            <a-col :lg="12">
               <a-form-item label="活动时间：" :labelCol="{ lg: { span: 7 } }" :wrapperCol="{ lg: { span: 17 } }">
                 <a-range-picker
                   style="width: 300px"
@@ -20,7 +20,7 @@
                   @change="onOk"
                 />
               </a-form-item>
-            </a-col> -->
+            </a-col>
             <a-col :lg="6">
               <a-form-item
                 label="活动状态："
@@ -34,7 +34,16 @@
               </a-form-item>
             </a-col>
             <a-col :lg="6">
-
+              <a-form-item
+                label="活动类型："
+                :labelCol="{lg: {span: 7} }"
+                :wrapperCol="{lg: {span: 17} }" >
+                <a-select v-model="screenData.status" placeholder="请选择">
+                  <a-select-option v-for="(item,index) in statusList" :key="index" :value="item.code">
+                    {{ item.name }}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
             </a-col>
           </a-row>
         </a-form>
@@ -46,6 +55,7 @@
         <div class="table-head">
           <div class="fl">
             <a-button type="primary" :loading="loading" v-permission="'/activityVideoInfo/index@create'" @click="addFn">新建活动</a-button>
+            <a-button type="danger" :loading="loading" v-permission="'/activityVideoInfo/index@create'" @click="addFn">暂停活动</a-button>
           </div>
           <div class="fr">
             <a-button type="primary" @click="search">查询</a-button>
@@ -58,6 +68,7 @@
           :columns="columns"
           :data-source="tableData"
           :pagination="pagination"
+          :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
           :pageSizeOptions="['10', '20', '30', '50']"
           :scroll="{ x: 1500 }"
           @change="handleTableChange"
@@ -68,6 +79,7 @@
               <a v-permission="'/activityVideoInfo/index@edit'" @click="editFn(record)">编辑</a>
               <a v-if="record.status!=='2'" v-permission="'/activityVideoInfo/index@del'" @click="delFn(record)">删除</a>
               <a v-permission="'/activityVideoInfo/index@copy'" @click="copyFn(record)">复制链接</a>
+              <a v-permission="'/activityVideoInfo/index@copy'" @click="copyFn(record)">复制活动</a>
             </template>
           </div>
         </a-table>
@@ -86,6 +98,8 @@ export default {
   data () {
     return {
       loading: false,
+      selectedRowKeys: [], // 选中key
+      selectedRows: [], // 选中row
       screenData: {},
       statusList: [],
       time: [],
@@ -96,6 +110,14 @@ export default {
           align: 'center',
           width: 300,
           ellipsis: true
+        },
+        {
+          title: '活动类型',
+          dataIndex: 'name',
+          width: 200,
+          align: 'left',
+          sorter: true,
+          sortName: 'name'
         },
         {
           title: '创建时间',
@@ -112,7 +134,7 @@ export default {
           width: 200
         },
         {
-          title: '开始时间',
+          title: '活动开始时间',
           dataIndex: 'startTime',
           align: 'center',
           sorter: true,
@@ -120,7 +142,7 @@ export default {
           sortName: 'orderByStartTime'
         },
         {
-          title: '结束时间',
+          title: '活动结束时间',
           dataIndex: 'endTIme',
           align: 'center',
           sorter: true,
@@ -128,7 +150,19 @@ export default {
           sortName: 'orderByEndTime'
         },
         {
+          title: '活动展现',
+          dataIndex: 'statusName',
+          align: 'center',
+          width: 100
+        },
+        {
           title: '活动状态',
+          dataIndex: 'statusName',
+          align: 'center',
+          width: 100
+        },
+        {
+          title: '排序',
           dataIndex: 'statusName',
           align: 'center',
           width: 100
@@ -192,6 +226,8 @@ export default {
      * 查询
      */
     search () {
+      this.selectedRowKeys = []
+      this.selectedRows = []
       this.pagination.current = 1
       this.getTableData()
     },
@@ -200,6 +236,8 @@ export default {
      */
     resetSearch () {
       this.time = []
+      this.selectedRowKeys = []
+      this.selectedRows = []
       this.screenData = {}
       this.search()
     },
@@ -207,6 +245,8 @@ export default {
      * 表格监听事件
      */
     handleTableChange (pagination, filters, sorter) {
+      this.selectedRowKeys = []
+      this.selectedRows = []
       const sort = {}
       console.log(sorter.order)
       if (sorter.order) {

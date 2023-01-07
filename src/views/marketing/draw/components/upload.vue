@@ -31,7 +31,7 @@
           <a-icon :type="loading ? 'loading' : 'plus'" />
         </div>
       </div>
-      <a-button type="primary" style="width:360px" v-else >{{ btnVal }}</a-button>
+      <a-button type="primary" v-else >{{ btnVal }}</a-button>
     </a-upload>
     <!--modal-->
     <a-modal
@@ -256,11 +256,11 @@ export default {
 }
 .btn-type {
   width: 0;
-  height: 0;
+  height: auto;
   .ant-upload {
     padding:0 !important;
     width: 100%;
-    height: 0;
+    height: auto;
     border: 0;
     background: none;
     button{
