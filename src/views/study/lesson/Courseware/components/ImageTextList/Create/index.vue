@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课件管理','创建图文']" back back-tip></breadcrumb>
+    <breadcrumb :titles="['课程管理','课件管理',`${$router.history.current.query.id ? '编辑' : '创建'}图文`]" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">

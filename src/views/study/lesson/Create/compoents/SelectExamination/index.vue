@@ -112,6 +112,7 @@ export default {
     remove () {
       this.name = ''
       this.$emit('change', null)
+      this.$emit('input', null)
     },
     submit () {
       this.name = this.selectRow ? this.selectRow.name : ''

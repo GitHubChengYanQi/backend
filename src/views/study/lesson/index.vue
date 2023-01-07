@@ -83,6 +83,7 @@
       </div>
       <a-spin :spinning="loading">
         <a-table
+          :scroll="{ x: 'max-content'}"
           class="my-table"
           :columns="columns"
           :data-source="tableData"
@@ -213,6 +214,7 @@ export default {
       screenData: {},
       columns: [
         {
+          fixed: 'left',
           title: '课程名称',
           dataIndex: 'name',
           scopedSlots: { customRender: 'name' },
@@ -272,7 +274,7 @@ export default {
           dataIndex: 'examResults',
           customRender: (examResults, record) => {
             const isExam = record.courseWareBindResults && record.courseWareBindResults.find(item => item.examId)
-            return (isExam && examResults && examResults.length > 0) ? '是' : '否'
+            return (isExam || (examResults && examResults.length > 0)) ? '是' : '否'
           }
         },
         {
@@ -293,6 +295,7 @@ export default {
           sorter: true
         },
         {
+          fixed: 'right',
           title: '操作',
           width: 200,
           align: 'center',

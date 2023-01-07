@@ -141,7 +141,6 @@ import moment from 'moment'
 import { message } from 'ant-design-vue'
 import { courseClassTreeView } from '@/api/study/lessonClass'
 import SelectEmployee from '../../../components/SelectEmployee/index'
-import { courseExcelExport } from '@/api/study/course'
 import { excelExport } from '@/utils/downloadUtil'
 
 export default {
@@ -247,7 +246,7 @@ export default {
           align: 'center',
           customRender (value, record) {
             const isExam = record.courseResult && record.courseResult.courseWareBindResults && record.courseResult.courseWareBindResults.find(item => item.examId)
-            return (isExam && record.courseResult && record.courseResult.examResults && record.courseResult.examResults[0]) ? '是' : '否'
+            return (isExam || (record.courseResult && record.courseResult.examResults && record.courseResult.examResults[0])) ? '是' : '否'
           }
         },
         {

@@ -210,7 +210,7 @@ export default {
   watch: {
     tableView: {
       handler () {
-        this.$emit('change', this.tableView.map((item) => ({ ...item, examId: item.exam && item.exam.examId })))
+        this.$emit('change', this.tableView.map((item) => ({ ...item, examId: item.exam ? item.exam.examId : null })))
       },
       deep: true
     }
