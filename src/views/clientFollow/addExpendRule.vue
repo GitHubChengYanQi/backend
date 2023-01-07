@@ -190,7 +190,7 @@ export default {
         customerRule: [], // 客户属性
         goodBounds: '0', // 是否限制商品
         erpGoodIds: [], // 商品
-        consumeAttributeRef: 'and', //消费属性关系
+        consumeAttributeRef: 'and', // 消费属性关系
         consumeRule: [] // 消费属性
       },
       valiForm: {
@@ -225,7 +225,7 @@ export default {
      */
     returnPage () {
       try {
-        let state = true
+        const state = true
         // if () {
         //   state = false
         // }
@@ -264,7 +264,7 @@ export default {
      * 回显数据格式化
      */
     formatData (data) {
-      const arr = data //this.deepClonev2(data)
+      const arr = data // this.deepClonev2(data)
       // 格式化时间段
       for (let i = 0; i < arr.consumeRule.length; i++) {
         if (arr.consumeRule[i].columnName === 'purchase_time') {
@@ -307,9 +307,9 @@ export default {
      * 提交数据格式化
      */
     formatSaveData () {
-      let data = this.deepClonev2(this.form)
+      const data = this.deepClonev2(this.form)
       // 标签
-      let labels = []
+      const labels = []
       for (let i = 0; i < data.labelIdGroup.length; i++) {
         labels.push(data.labelIdGroup[i].id)
       }
@@ -324,7 +324,7 @@ export default {
       // 客户属性规则
       for (let i = 0; i < data.customerRule.length; i++) {
         const arr = data.customerRule[i].val
-        let res = []
+        const res = []
         data.customerRule[i].sort = i
         for (let j = 0; j < arr.length; j++) {
           res.push(arr[j].id)
@@ -332,7 +332,7 @@ export default {
         data.customerRule[i].val = res.join(',')
       }
       // 商品
-      let goods = []
+      const goods = []
       for (let i = 0; i < data.erpGoodIds.length; i++) {
         goods.push(data.erpGoodIds[i].id)
       }

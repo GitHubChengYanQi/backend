@@ -58,7 +58,7 @@ export default {
   methods: {
     /**
      * 初始化
-     * @param {*} data 
+     * @param {*} data
      */
     init (data) {
       this.getDict('auto_lable_customer_condition')
@@ -85,14 +85,14 @@ export default {
     },
     /**
      * 删除
-     * @param {*} index 
+     * @param {*} index
      */
     handleDel (index) {
       this.data.splice(index, 1)
     },
     /**
      * 切换关系
-     * @param {*} key 
+     * @param {*} key
      */
     tapFn (key) {
       this.active = key
@@ -103,7 +103,7 @@ export default {
      * @param {*} e
      * @param {*} key
      */
-     getDict (e) {
+    getDict (e) {
       const obj = {
         dictType: e
       }
