@@ -7,11 +7,10 @@
           @click="()=>{
             catalogIndex = -1
             getTableData()
-          }">
+          }"
+        >
           <div class="header">
-            <div class="title">
-              分组名称
-            </div>
+            <div class="title">分组名称</div>
             <div
               class="add_btn"
               @click="()=>{
@@ -19,9 +18,7 @@
                 modalTitle = '新建分组'
                 modalState = true
               }"
-            >
-              添加
-            </div>
+            >添加</div>
           </div>
           <div class="catalog_box">
             <div
@@ -38,28 +35,15 @@
             >
               <span class="title">{{ item.name }}</span>
               <span v-if="catalogIndex == item.id && index != 0">
-                <a-dropdown
-                  :trigger="['click']"
-                  placement="bottomLeft"
-                >
-                  <img
-                    class="icon"
-                    :src="require('@/assets/more.svg')"
-                    alt=""
-                  >
+                <a-dropdown :trigger="['click']" placement="bottomLeft">
+                  <img class="icon" :src="require('@/assets/more.svg')" alt />
                   <template #overlay>
                     <a-menu>
                       <a-menu-item>
-                        <div
-                          class="down_select"
-                          @click="setGroup(1,item)"
-                        >修改分组</div>
+                        <div class="down_select" @click="setGroup(1,item)">修改分组</div>
                       </a-menu-item>
                       <a-menu-item>
-                        <div
-                          class="down_select"
-                          @click="setGroup(2,item)"
-                        >删除分组</div>
+                        <div class="down_select" @click="setGroup(2,item)">删除分组</div>
                       </a-menu-item>
                     </a-menu>
                   </template>
@@ -71,11 +55,7 @@
         <div class="interactionRadar_table_box">
           <div class="hearder">
             <div class="search_box">
-              <div
-                class="search"
-                v-for="(item,index) in searchData.searchInput"
-                :key="index"
-              >
+              <div class="search" v-for="(item,index) in searchData.searchInput" :key="index">
                 <div class="title">{{ item.title }}</div>
                 <div class="input_box">
                   <a-range-picker
@@ -104,20 +84,9 @@
               </div>
             </div>
             <div class="button_box">
-              <a-button
-                type="primary"
-                class="button"
-                @click="getSearch"
-              >查询</a-button>
-              <a-button
-                class="button"
-                @click="reset"
-              >重置</a-button>
-              <a-button
-                type="primary"
-                class="button"
-                @click="exportsElxe"
-              >导出</a-button>
+              <a-button type="primary" class="button" @click="getSearch">查询</a-button>
+              <a-button class="button" @click="reset">重置</a-button>
+              <a-button type="primary" class="button" @click="exportsElxe">导出</a-button>
             </div>
           </div>
           <div class="content">
@@ -133,11 +102,7 @@
                   <template #content>
                     <div class="batches_box">
                       <div class="input_box">
-                        <a-select
-                          class="input"
-                          placeholder="请选择"
-                          v-model="unitId"
-                        >
+                        <a-select class="input" placeholder="请选择" v-model="unitId">
                           <a-select-option
                             v-for="(items,indexs) in catalog"
                             :value="items.id"
@@ -146,33 +111,15 @@
                         </a-select>
                       </div>
                       <div class="btn_box">
-                        <a-button
-                          class="button"
-                          @click="handleClickChange"
-                        >取消</a-button>
-                        <a-button
-                          type="primary"
-                          class="button"
-                          @click="batchesAmend"
-                        >确定</a-button>
+                        <a-button class="button" @click="handleClickChange">取消</a-button>
+                        <a-button type="primary" class="button" @click="batchesAmend">确定</a-button>
                       </div>
                     </div>
                   </template>
-                  <a-button
-                    type="primary"
-                    class="button"
-                  >批量修改分组</a-button>
+                  <a-button type="primary" class="button">批量修改分组</a-button>
                 </a-popover>
-                <a-button
-                  type="primary"
-                  class="button"
-                  @click="batchesDel"
-                >批量删除</a-button>
-                <a-button
-                  type="primary"
-                  class="button"
-                  @click="goPage(0)"
-                >新建雷达连接</a-button>
+                <a-button type="primary" class="button" @click="batchesDel">批量删除</a-button>
+                <a-button type="primary" class="button" @click="goPage(0)">新建雷达连接</a-button>
               </span>
             </div>
             <div class="table_box">
@@ -188,72 +135,36 @@
                 class="table"
                 ref="table"
               >
-                <div
-                  slot="operation"
-                  slot-scope="text, record"
-                >
+                <div slot="operation" slot-scope="text, record">
                   <template>
-                    <a-button
-                      type="link"
-                      @click="goPage(3,record)"
-                    >数据</a-button>
-                    <a-button
-                      type="link"
-                      @click="goPage(1,record)"
-                    >修改</a-button>
-                    <a-button
-                      type="link"
-                      @click="remove(record)"
-                    >删除</a-button>
-                    <a-button
-                      type="link"
-                      @click="copylink(record)"
-                    >复制链接</a-button>
+                    <a-button type="link" @click="goPage(3,record)">数据</a-button>
+                    <a-button type="link" @click="goPage(1,record)">修改</a-button>
+                    <a-button type="link" @click="remove(record)">删除</a-button>
+                    <a-button type="link" @click="copylink(record)">复制链接</a-button>
                   </template>
                 </div>
-                <div
-                  slot="example"
-                  slot-scope="text,record"
-                >
+                <div slot="example" slot-scope="text,record">
                   <template>
                     <div class="example" v-if="record.entry">
-                      <div
-                        v-if="record.type == 2"
-                        class="pdf"
-                      >
+                      <div v-if="record.type == 2" class="pdf">
                         <div class="title">{{ record.entry.linkTitle }}</div>
                         <div class="icon_box">
-                          <img
-                            class="icon"
-                            :src="require('@/assets/pdf.png')"
-                            alt=""
-                          >
+                          <img class="icon" :src="require('@/assets/pdf.png')" alt />
                         </div>
                       </div>
-                      <div
-                        v-else
-                        class="example_box"
-                      >
+                      <div v-else class="example_box">
                         <div class="left">
                           <div class="title">{{ record.entry.linkTitle }}</div>
                           <div class="content">{{ record.entry.linkDigest }}</div>
                         </div>
                         <div class="right">
-                          <img
-                            class="img"
-                            :src="record.entry.linkImg"
-                            alt=""
-                          />
+                          <img class="img" :src="record.entry.linkImg" alt />
                         </div>
                       </div>
-
                     </div>
                   </template>
                 </div>
-                <div
-                  slot="radarTab"
-                  slot-scope="text,record"
-                >
+                <div slot="radarTab" slot-scope="text,record">
                   <template>
                     <a-popover
                       title="标签"
@@ -267,14 +178,9 @@
                           >{{ item.name }}</a-tag>
                         </div>
                       </template>
-                      <a-tag type="button">
-                        查看
-                      </a-tag>
+                      <a-tag type="button">查看</a-tag>
                     </a-popover>
-                    <span
-                      class="nolabel"
-                      v-else
-                    >无标签</span>
+                    <span class="nolabel" v-else>无标签</span>
                   </template>
                 </div>
               </a-table>
@@ -294,11 +200,10 @@
       }"
     >
       <div class="model_input_box">
-        <span class="model_input_title"> <span class="model_input_icon">* </span> 分组名称：</span>
-        <a-input
-          v-model="catalogName"
-          :maxLength="15"
-        ></a-input>
+        <span class="model_input_title">
+          <span class="model_input_icon">*</span> 分组名称：
+        </span>
+        <a-input v-model="catalogName" :maxLength="15"></a-input>
         <span class="hint">{{ catalogName.length + '/15' }}</span>
       </div>
     </a-modal>
@@ -312,12 +217,7 @@
       }"
     >
       <div class="model_input_box">
-        <a-select
-          style="width:300px"
-          class="input"
-          placeholder="请选择"
-          v-model="copylinkName"
-        >
+        <a-select style="width:300px" class="input" placeholder="请选择" v-model="copylinkName">
           <a-select-option
             v-for="(items,indexs) in channel"
             :value="items.id"
@@ -482,7 +382,7 @@ export default {
             this.getTableData()
           })
         },
-        onCancel () {}
+        onCancel () { }
       })
     },
     batchesAmend () {
@@ -510,7 +410,7 @@ export default {
             this.getTableData()
           })
         },
-        onCancel () {}
+        onCancel () { }
       })
     },
     copylink (e) {
@@ -639,9 +539,13 @@ export default {
             scrmRadarLabelDrop(obj).then(res => {
               console.log(res)
               this.getGroup()
+              this.catalogIndex = -1
+              this.table.pagination.current = 1
+              this.table.pagination.pageSize = 10
+              this.getTableData()
             })
           },
-          onCancel () {}
+          onCancel () { }
         })
       }
     },
@@ -856,6 +760,11 @@ export default {
                   .title {
                     flex-grow: 1;
                     text-align: start;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
                   }
                   .icon {
                     width: 70px;

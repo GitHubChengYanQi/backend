@@ -10,7 +10,7 @@
         <!-- 类别 -->
         <span>
           <a-select placeholder="请选择" v-model="item.columnName" @change="onColumnChange(item)" style="width: 120px">
-            <a-select-option v-for="item in option" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
+            <a-select-option v-for="items in option" :key="items.code" :value="items.code">{{ items.name }}</a-select-option>
           </a-select>
         </span>
         <!-- end 类别 -->
@@ -18,14 +18,14 @@
         <!-- 区间 -->
         <span v-if="item.columnName !== 'purchase_time'">
           <a-select placeholder="请选择" v-model="item.judgmentConditions" style="width: 120px">
-            <a-select-option v-for="item in range" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
+            <a-select-option v-for="items in range" :key="items.code" :value="items.code">{{ items.name }}</a-select-option>
           </a-select>
         </span>
         <!-- end 区间 -->
 
         <!-- 时间 -->
         <span v-if="item.columnName === 'purchase_time'">
-          <a-range-picker :valueFormat="dateFormat" v-model="item.val" format="YYYY-MM-DD" />
+          <a-range-picker v-model="item.val" format="YYYY-MM-DD" valueFormat="YYYY-MM-DD" />
         </span>
         <!-- end 时间 -->
 
@@ -56,11 +56,14 @@ export default {
       default: () => {
         return []
       }
+    },
+    consumeAttributeRef: {
+      type: String,
+      default: ''
     }
   },
   data () {
     return {
-      dateFormat: 'YYYY-MM-DD hh:mm:ss',
       data: [],
       active: 'and',
       option: [],
@@ -95,6 +98,7 @@ export default {
       } else {
         this.data = data
       }
+      this.active = this.consumeAttributeRef
     },
     handleAdd () {
       this.data.push({

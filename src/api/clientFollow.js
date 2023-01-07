@@ -252,3 +252,27 @@ export function consumeAutoLabelValidRule (data) {
     data
   })
 }
+/**
+ * 规则详情
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelRuleDetail (params) {
+  return request({
+    url: '/consumeAutoLabel/ruleDetail',
+    method: 'GET',
+    params
+  })
+}
+/**
+ * 规则详情列表
+ * @param {*} params
+ * @returns
+ */
+export function consumeAutoLabelRuleDetailIndex (params) {
+  return request({
+    url: '/consumeAutoLabel/ruleDetail/index',
+    method: 'GET',
+    params
+  })
+}

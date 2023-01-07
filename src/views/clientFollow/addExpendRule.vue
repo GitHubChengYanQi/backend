@@ -10,35 +10,29 @@
       <div class="add_rule_box">
         <div class="title">{{ id.length == 0 ?'新建':'编辑' }}消费属性打标签</div>
         <div class="content">
-          <a-form-model
-            ref="name"
-            :model="form"
-            :rules="formRules"
-          >
-            <!-- 规则名称 -->
-            <a-form-model-item label="规则名称" prop="name">
-              <a-input
-                style="width: 400px; height: 36px"
-                placeholder="请填写规则名称，仅内部可见"
-                v-model="form.name"
-                :maxLength="30"
-                :suffix="`${form.name.length}/30`"
-              ></a-input>
-            </a-form-model-item>
-            <!-- end 规则名称 -->
-            <!-- 选择标签 -->
-            <a-form-model-item label="选择标签" prop="labelIdGroup">
-              <!-- <input v-model="form.labelIdGroup" /> -->
-              <LabelSelect v-model="form.labelIdGroup" :addState="true" style="width:400px" />
-            </a-form-model-item>
-            <!-- end 选择标签 -->
-          </a-form-model>
+
+          <!-- 规则名称 -->
+          <div class="item">
+            <div class="label">
+              <span>*</span> 规则名称：
+            </div>
+            <a-input
+              style="width: 500px; height: 36px"
+              placeholder="请填写规则名称，仅内部可见"
+              v-model="form.name"
+              :maxLength="30"
+              :suffix="`${form.name.length}/30`"
+            ></a-input>
+          </div>
+          <!-- end 规则名称 -->
 
           <!-- 选择标签 -->
-          <!-- <div class="item">
-            <div class="label"><span>*</span> 选择标签： </div>
-            <LabelSelect v-model="form.labelIdGroup" :addState="true" style="width:400px" />
-          </div> -->
+          <div class="item">
+            <div class="label">
+              <span>*</span> 选择标签：
+            </div>
+            <LabelSelect v-model="form.labelIdGroup" :addState="true" style="width:500px;" />
+          </div>
           <!-- end 选择标签 -->
 
           <!-- 设置打标签规则 -->
@@ -57,7 +51,7 @@
             <a-checkbox @change="onChange" :checked="form.customerAttributeSelect === '1' ? true : false">
               客户属性
             </a-checkbox>
-            <clientAttr v-model="form.customerRule" v-if="form.customerAttributeSelect === '1'" @relation="(e) => {getRelation(e, 'client')}" />
+            <clientAttr v-model="form.customerRule" :customerAttributeRef="form.customerAttributeRef" v-if="form.customerAttributeSelect === '1'" @relation="(e) => {getRelation(e, 'client')}" />
           </div>
           <!-- end 设置打标签规则 -->
 
@@ -83,7 +77,7 @@
             <div v-if="form.goodBounds === '1'">
               <GoodsSelect v-model="form.erpGoodIds" />
             </div>
-            <goodsAttr v-model="form.consumeRule" @relation="(e) => {getRelation(e, 'goods')}" />
+            <goodsAttr v-model="form.consumeRule" :consumeAttributeRef="form.consumeAttributeRef" @relation="(e) => {getRelation(e, 'goods')}" />
           </div>
           <!-- end 消费属性 -->
 
@@ -97,12 +91,12 @@
         <a-button
           type="primary"
           :loading="loading"
-          @click="addRule()"
+          @click="addRule('save')"
         >保存</a-button>
         <a-button
           type="primary"
           :loading="loading"
-          @click="addRule()"
+          @click="addRule('task')"
         >保存并创建跟客任务</a-button>
       </div>
     </a-card>
@@ -119,32 +113,27 @@
         <a-form-model
           ref="ruleForm"
           :model="valiForm"
-          :rules="rules"
           :label-col="labelCol"
           :wrapper-col="wrapperCol"
         >
-          <a-form-model-item label="购买时间" prop="">
+          <a-form-model-item v-for="(item, index) in valiForm.consumeRuleVal" :key="index" :label="valMap[item.columnName]">
             <a-date-picker
-              v-model="valiForm.purchase_time"
+              v-model="item.val"
               type="date"
               placeholder="请选择"
+              valueFormat="YYYY-MM-DD"
               style="width: 100%;"
+              v-if="item.columnName === 'purchase_time'"
             />
-          </a-form-model-item>
-          <a-form-model-item label="购买次数" prop="">
-            <a-input v-model="valiForm.purchase_number" suffix="次" />
-          </a-form-model-item>
-          <a-form-model-item label="商品金额" prop="">
-            <a-input v-model="valiForm.good_amount" suffix="元" />
-          </a-form-model-item>
-          <a-form-model-item label="商品数量" prop="">
-            <a-input v-model="valiForm.good_number" />
+            <a-input v-model="item.val" v-if="item.columnName === 'purchase_number'" suffix="次" />
+            <a-input v-model="item.val" v-if="item.columnName === 'good_amount'" suffix="元" />
+            <a-input v-model="item.val" v-if="item.columnName === 'good_number'" />
           </a-form-model-item>
         </a-form-model>
         <p>已按照您设置的规则进行验证，验证结果为：</p>
         <p class="result">
-          <span class="success">标签添加成功!</span>
-          <span class="warn">标签添加失败!</span>
+          <span class="success" v-if="validateRes === 1">标签添加成功!</span>
+          <span class="warn" v-if="validateRes === 0">标签添加失败!</span>
         </p>
       </div>
       <div class="handle">
@@ -156,7 +145,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import LabelSelect from '../../components/SelectLabel/index.vue'
 import GoodsSelect from '../../components/SelectGoods/index.vue'
 import clientAttr from './expendComponents/clientAttr'
@@ -169,12 +157,19 @@ import {
   consumeAutoLabelUpdate,
   consumeAutoLabelValidRule
 } from '@/api/clientFollow.js'
+import { mapGetters } from 'vuex'
 
 export default {
   components: { LabelSelect, clientAttr, GoodsSelect, goodsAttr },
+  computed: {
+    ...mapGetters([
+      'permissionList'
+    ])
+  },
   data () {
     return {
       loading: false,
+      btnShow: false,
       id: '', // 类别
       label: '', // id
       labelCol: { span: 4 },
@@ -182,6 +177,7 @@ export default {
       labelShow: false,
       goodBounds: [],
       visible: false,
+      validateRes: 2,
       form: {
         name: '',
         labelIdGroup: [], // 规则标签
@@ -194,20 +190,14 @@ export default {
         consumeRule: [] // 消费属性
       },
       valiForm: {
-        purchase_time: '',
-        purchase_number: '',
-        good_amount: '',
-        good_number: ''
+        consumeRuleVal: []
       },
-      formRules: {
-        name: [
-          { required: true, message: '请填规则名称', trigger: 'blur' }
-        ],
-        labelIdGroup: [
-          { required: true, message: '请选择标签', trigger: 'change' }
-        ]
-      },
-      rules: {}
+      valMap: {
+        'purchase_time': '购买时间',
+        'purchase_number': '购买次数',
+        'good_amount': '商品金额',
+        'good_number': '商品数量'
+      }
     }
   },
   watch: {},
@@ -216,6 +206,13 @@ export default {
     this.label = this.$route.query.label
     this.getDict('good_bounds')
     this.getDetail()
+    // 根据sop权限判断是否显示按钮“保存并创建跟客任务”
+    const permissinon = this.permissionList[0].routes
+    if (permissinon.indexOf('/sales/sop') > -1) {
+      this.btnShow = true
+    } else {
+      this.btnShow = false
+    }
   },
   methods: {
     deepClonev2,
@@ -276,32 +273,91 @@ export default {
     /**
      * 保存
      */
-    addRule () {
-      this.loading = true
+    addRule (type) {
       if (this.label && this.label.length > 0) {
-        console.log('编辑')
-        const param = {
-          id: this.label,
-          ...this.formatSaveData()
-        }
-        consumeAutoLabelUpdate(param).then(res => {
-          this.loading = false
-          if (res.code === 200) {
-            this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+        // console.log('编辑')
+        const flag = this.validateFn(this.formatSaveData())
+        if (flag) {
+          this.loading = true
+          const param = {
+            id: this.label,
+            ...this.formatSaveData()
           }
-        })
+          consumeAutoLabelUpdate(param).then(res => {
+            this.loading = false
+            if (res.code === 200) {
+              if (type === 'save') {
+                if (this.btnShow) {
+                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                } else {
+                  this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
+                }
+              } else {
+                sessionStorage.setItem('activeType', 'Regular')
+                this.$router.push('/sales/sop')
+              }
+            }
+          })
+        }
       } else {
-        console.log('创建')
-        const param = {
-          ...this.formatSaveData()
-        }
-        consumeAutoLabelAdd(param).then(res => {
-          this.loading = false
-          if (res.code === 200) {
-            this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+        // console.log('创建')
+        const flag = this.validateFn(this.formatSaveData())
+        if (flag) {
+          this.loading = true
+          const param = {
+            ...this.formatSaveData()
           }
-        })
+          consumeAutoLabelAdd(param).then(res => {
+            this.loading = false
+            if (res.code === 200) {
+              if (type === 'save') {
+                if (this.btnShow) {
+                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                } else {
+                  this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
+                }
+              } else {
+                sessionStorage.setItem('activeType', 'Regular')
+                this.$router.push('/sales/sop')
+              }
+            }
+          })
+        }
       }
+    },
+    /**
+     * 保存校验
+     */
+    validateFn (data) {
+      if (data.name === '') {
+        this.$message.error('请输入规则名称')
+        return false
+      }
+      if (data.labelIdGroup.length === 0) {
+        this.$message.error('请至少选择一个标签')
+        return false
+      }
+      if (data.customerAttributeSelect === '1') {
+        for (let i = 0; i < data.customerRule.length; i++) {
+          const item = data.customerRule[i]
+          if (!item.judgmentConditions || !item.val) {
+            this.$message.error('请选择客户属性')
+            return false
+          }
+        }
+      }
+      if (data.goodBounds === '1' && data.erpGoodIds.length === 0) {
+        this.$message.error('请选择商品')
+        return false
+      }
+      for (let i = 0; i < data.consumeRule.length; i++) {
+        const item = data.consumeRule[i]
+        if (!item.columnName || !item.judgmentConditions || !item.val) {
+          this.$message.error('请输入消费属性')
+          return false
+        }
+      }
+      return true
     },
     /**
      * 提交数据格式化
@@ -375,7 +431,30 @@ export default {
      * 打开验证窗口
      */
     openValid () {
+      const data = this.formatSaveData()
+      // 检验属性数据
+      for (let i = 0; i < data.consumeRule.length; i++) {
+        const item = data.consumeRule[i]
+        if (!item.columnName || !item.judgmentConditions || !item.val) {
+          this.$message.error('请输入消费属性')
+          return false
+        }
+      }
+      // 打开表单，生成表单数据
       this.visible = true
+      let res = []
+      for (let i = 0; i < data.consumeRule.length; i++) {
+        res.push(data.consumeRule[i].columnName)
+      }
+      res = Array.from(new Set(res))
+      const arr = []
+      for (let i = 0; i < res.length; i++) {
+        arr.push({
+          columnName: res[i],
+          val: undefined
+        })
+      }
+      this.valiForm.consumeRuleVal = arr
     },
     /**
      * 关闭验证窗口
@@ -387,12 +466,23 @@ export default {
      * 验证
      */
     handleValid () {
+      const data = this.formatSaveData() // 规则数据
+      const arr = this.valiForm.consumeRuleVal // 验证数据
+      for (let i = 0; i < arr.length; i++) {
+        if (!arr[i].val) {
+          this.$message.error(`请输入${this.valMap[arr[i].columnName]}`)
+          return false
+        }
+      }
+      this.loading = true
       const param = {
+        consumeAttributeRef: data.consumeAttributeRef,
+        consumeRule: data.consumeRule,
         ...this.valiForm
       }
-      console.log(11111, param)
       consumeAutoLabelValidRule(param).then(res => {
-        console.log(11111, res)
+        this.loading = false
+        this.validateRes = res.data
       })
     },
     /**

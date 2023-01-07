@@ -2,25 +2,25 @@
   <div class="setRadar_page">
     <div class="setRadar_card">
       <div class="setRadar_content">
-        <div class="setRadar_title">
-          基础设置
-        </div>
+        <div class="setRadar_title">基础设置</div>
         <div class="content">
           <div
             class="row"
-            :style="item.type == 'cover'|| item.type == 'quillEditor' || item.key == 'tsLink' ? {alignItems:'flex-start'}: {}"
+            :style="item.type == 'cover' ||
+              item.type == 'quillEditor' ||
+              item.key == 'tsLink' ||
+              item.key == 'bgImg' ||
+              item.key == 'uploadVideo'
+              ? {alignItems:'flex-start'}: {}"
             v-for="(item,index) in setData.changeType"
             :key="index"
           >
-            <span class="title" :style="item.key == 'tsLink' ? {transform:'translateY(8px)'}: {}"><span
-              class="icon"
-              v-if="item.title"
-            >*</span><span class="text">{{ item.title }}</span></span>
+            <span class="title" :style="item.key == 'tsLink' ? {transform:'translateY(8px)'}: {}">
+              <span class="icon" :style="item.hide ? {opacity: 0} : {}">*</span>
+              <span class="text">{{ item.title }}</span>
+            </span>
             <span class="import_box">
-              <span
-                class="select_box"
-                v-if="item.type == 'select'"
-              >
+              <span class="select_box" v-if="item.type == 'select'">
                 <a-select
                   class="select"
                   v-model="setData.inputData[item.key]"
@@ -33,10 +33,7 @@
                   >{{ items.name }}</a-select-option>
                 </a-select>
               </span>
-              <span
-                class="checkbox_box"
-                v-else-if="item.type == 'checkbox'"
-              >
+              <span class="checkbox_box" v-else-if="item.type == 'checkbox'">
                 <a-select
                   class="checkbox"
                   :maxTagCount="1"
@@ -52,10 +49,7 @@
                   >{{ items.name }}</a-select-option>
                 </a-select>
               </span>
-              <span
-                class="radio_box"
-                v-else-if="item.type == 'radio'"
-              >
+              <span class="radio_box" v-else-if="item.type == 'radio'">
                 <a-radio-group
                   @change="setType"
                   class="radio"
@@ -68,26 +62,86 @@
                   >{{ items.name }}</a-radio>
                 </a-radio-group>
               </span>
-              <span
-                class="cover_box"
-                v-else-if="item.type == 'cover'"
-              >
+              <span class="bgImg_box" v-else-if="item.type == 'bgImgRadio'">
+                <a-radio-group
+                  @change="setType"
+                  class="radio"
+                  v-model="setData.inputData[item.key]"
+                >
+                  <a-radio
+                    :value="items.code"
+                    v-for="(items,indexs) in selectArr[item.selectKey]"
+                    :key="indexs"
+                  >{{ items.name }}</a-radio>
+                </a-radio-group>
+                <span class="btn_box" v-if="setData.inputData[item.key] == 1">
+                  <span class="btn" v-for="(items,indexs) in bgImgArr" :key="indexs">
+                    <div class="text" @click="setMedium(2,false,items.key)">{{ items.btnTxt }}</div>
+                    <div class="upload">
+                      <div
+                        v-if="setData.inputData[items.key].length != 0"
+                        class="cover_img_box"
+                        @mouseenter.stop="mouseOver(1,items.key)"
+                        @mouseleave.stop="mouseOver(-1)"
+                      >
+                        <img class="cover_img" :src="setData.inputData[items.key]" alt />
+                        <div class="show_box" v-if="isShow && items.key == isShowKey">
+                          <span
+                            class="btn"
+                            @click="()=>{
+                              modalVisible = true
+                              imageUrl = setData.inputData[items.key]
+                            }"
+                          >查看</span>
+                          <span class="btn" @click="close(items.key)">删除</span>
+                        </div>
+                      </div>
+                    </div>
+                  </span>
+                </span>
+              </span>
+              <span class="uploadVideo" v-else-if="item.type == 'uploadVideo'">
+                <div
+                  class="video_box"
+                  v-for="(items,indexs) in setData.inputData[item.key]"
+                  :key="indexs"
+                >
+                  <div class="upload_box">
+                    <div class="cover_video_box" v-if="items.video.length != 0">
+                      <img
+                        class="close"
+                        :src="require('@/assets/healthManage/u2050.png')"
+                        alt
+                        @click="closeVideo(indexs)"
+                      />
+                      <video class="cover_video" :src="items.video" alt />
+                    </div>
+                    <div class="add_img_box" @click="setMedium(5,false,item.key,indexs)" v-else>
+                      <img class="add_icon" :src="require('@/assets/add_icon.svg')" alt />
+                    </div>
+                  </div>
+                  <div class="input_box">
+                    <a-input
+                      :disabled="item.key == 'uploadVideo'&& tableId != -1"
+                      class="input"
+                      placeholder="请输入标题"
+                      v-model="items.title"
+                      :maxLength="15"
+                    ></a-input>
+                    <span class="hint">{{ items.title.length + '/' + 15 }}</span>
+                  </div>
+                </div>
+              </span>
+              <span class="cover_box" v-else-if="item.type == 'cover'">
                 <div>
                   <div
                     v-if="setData.inputData[item.key].length != 0"
                     class="cover_img_box"
-                    @mouseenter.stop="mouseOver(1)"
+                    @mouseenter.stop="mouseOver(1,item.key)"
                     @mouseleave.stop="mouseOver(-1)"
                   >
-                    <img
-                      class="cover_img"
-                      :src="setData.inputData[item.key]"
-                      alt=""
-                    >
-                    <div
-                      class="show_box"
-                      v-if="isShow"
-                    >
+                    <img class="cover_img" :src="setData.inputData[item.key]" alt />
+                    <div class="show_box" v-if="isShow && item.key == isShowKey">
                       <span
                         class="btn"
                         @click="()=>{
@@ -95,68 +149,35 @@
                           imageUrl = setData.inputData[item.key]
                         }"
                       >查看</span>
-                      <span
-                        class="btn"
-                        @click="close(item.key)"
-                      >删除</span>
+                      <span class="btn" @click="close(item.key)">删除</span>
                     </div>
                   </div>
-                  <div
-                    v-else
-                    class="add_img_box"
-                    @click="setMedium(2)"
-                  >
-                    <img
-                      class="add_icon"
-                      :src="require('@/assets/add_icon.svg')"
-                      alt=""
-                    >
+                  <div v-else class="add_img_box" @click="setMedium(2)">
+                    <img class="add_icon" :src="require('@/assets/add_icon.svg')" alt />
                   </div>
                 </div>
-                <div
-                  class="hint"
-                  v-if="item.hint"
-                >{{ item.hint }}</div>
+                <div class="hint" v-if="item.hint">{{ item.hint }}</div>
               </span>
-              <span
-                class="uploading_box"
-                v-else-if="item.type == 'uploading'"
-              >
+              <span class="uploading_box" v-else-if="item.type == 'uploading'">
                 <div>
                   <img
                     @click="setMedium(7)"
                     v-if="setData.inputData[item.key].length == 0"
                     class="uploading_icon"
                     :src="require('@/assets/upload_btn.png')"
-                    alt=""
-                  >
-                  <div
-                    class="pdf_box"
-                    v-else
-                  >
-                    <div
-                      class="close"
-                      @click.stop="close(item.key)"
-                    >+</div>
+                    alt
+                  />
+                  <div class="pdf_box" v-else>
+                    <div class="close" @click.stop="close(item.key)">+</div>
                     <div class="icon_box">
-                      <img
-                        class="icon"
-                        :src="require('@/assets/pdf.png')"
-                        alt=""
-                      >
+                      <img class="icon" :src="require('@/assets/pdf.png')" alt />
                     </div>
                     <div class="title">{{ setData.inputData.linkTitle }}</div>
                   </div>
                 </div>
-                <div
-                  class="hint"
-                  v-if="item.hint"
-                >{{ item.hint }}</div>
+                <div class="hint" v-if="item.hint">{{ item.hint }}</div>
               </span>
-              <span
-                class="quillEditor_box"
-                v-else-if="item.type == 'quillEditor'"
-              >
+              <span class="quillEditor_box" v-else-if="item.type == 'quillEditor'">
                 <quill-editor
                   class="quillEditor"
                   @editorChange="editorChange"
@@ -172,38 +193,18 @@
                   }"
                 >预览</a-button>
               </span>
-              <span
-                class="button_box"
-                v-else-if="item.type == 'button'"
-              >
-                <a-button
-                  type="primary"
-                  class="button"
-                  @click="setMedium(3)"
-                >{{ item.btnText }}</a-button>
-                <div
-                  class="article"
-                  v-if="setData.inputData[item.key].length > 0"
-                >
-                  <div
-                    class="close"
-                    @click.stop="close(item.key)"
-                  >+</div>
-                  <img
-                    class="article_img"
-                    :src="setData.inputData[item.key]"
-                    alt=""
-                  >
+              <span class="button_box" v-else-if="item.type == 'button'">
+                <a-button type="primary" class="button" @click="setMedium(3)">{{ item.btnText }}</a-button>
+                <div class="article" v-if="setData.inputData[item.key].length > 0">
+                  <div class="close" @click.stop="close(item.key)">+</div>
+                  <img class="article_img" :src="setData.inputData[item.key]" alt />
                   <div class="article_txt">
                     <div class="title">{{ setData.inputData.linkTitle }}</div>
                     <div class="content">{{ setData.inputData.linkDigest }}</div>
                   </div>
                 </div>
               </span>
-              <span
-                class="input_box"
-                v-else
-              >
+              <span class="input_box" v-else>
                 <a-input
                   :disabled="item.key == 'title'&& tableId != -1"
                   class="input"
@@ -221,19 +222,9 @@
                   @click="getArticle"
                   class="button"
                 >生成雷达文章</a-button>
-                <div
-                  class="article"
-                  v-if="item.btnState && setData.inputData.linkImg.length > 0"
-                >
-                  <div
-                    class="close"
-                    @click.stop="close('linkImg')"
-                  >+</div>
-                  <img
-                    class="article_img"
-                    :src="setData.inputData.linkImg"
-                    alt=""
-                  >
+                <div class="article" v-if="item.btnState && setData.inputData.linkImg.length > 0">
+                  <div class="close" @click.stop="close('linkImg')">+</div>
+                  <img class="article_img" :src="setData.inputData.linkImg" alt />
                   <div class="article_txt">
                     <div class="title">{{ setData.inputData.linkTitle }}</div>
                     <div class="content">{{ setData.inputData.linkDigest }}</div>
@@ -246,39 +237,23 @@
       </div>
     </div>
     <div class="setRadar_link">
-      <div class="setRadar_title">
-        链接追踪设置
-      </div>
+      <div class="setRadar_title">链接追踪设置</div>
       <div class="setRadar_content">
         <a-checkbox-group
           class="checkbox_box"
           v-model="linkData.linkState"
           :options="linkData.linkType"
         />
-        <div
-          class="select_box"
-          v-if="linkData.linkState.includes('2')"
-        >
-          <div
-            class="select"
-            @click="showBox"
-          >选择标签</div>
-          <span
-            class="tabs"
-            v-for="(item,index) in tabsArr"
-            :key="index"
-          ><span>{{ item.name }}</span><span
-            class="empty"
-            @click="empty(item.id)"
-          >+</span></span>
+        <div class="select_box" v-if="linkData.linkState.includes('2')">
+          <div class="select" @click="showBox">选择标签</div>
+          <span class="tabs" v-for="(item,index) in tabsArr" :key="index">
+            <span>{{ item.name }}</span>
+            <span class="empty" @click="empty(item.id)">+</span>
+          </span>
         </div>
       </div>
     </div>
-    <a-button
-      type="primary"
-      style="margin-top:50px;"
-      @click="setRadar"
-    >保存并创建</a-button>
+    <a-button type="primary" style="margin-top:50px;" @click="setRadar">保存并创建</a-button>
     <a-modal
       v-model="modalState"
       :title="modalTitle"
@@ -298,75 +273,30 @@
           >{{ item.title }}</div>
         </div>
         <div class="model_content">
-          <div
-            class="upload_box"
-            v-if="modelTab == 0"
-          >
-            <div
-              v-if="uploadUrl.length == 0"
-              class="upload_btn"
-              @click="getLink"
-            >
-              <img
-                class="upload_icon"
-                :src="require('@/assets/upload.svg')"
-                alt=""
-              >
+          <div class="upload_box" v-if="modelTab == 0">
+            <div v-if="uploadUrl.length == 0" class="upload_btn" @click="getLink">
+              <img class="upload_icon" :src="require('@/assets/upload.svg')" alt />
               <span class="upload_text">{{ modalTitle }}</span>
             </div>
-            <div
-              class="show"
-              v-else
-              @click="getLink"
-            >
-              <img
-                v-if="medium.type == 2"
-                class="upload_image"
-                :src="uploadUrl"
-                alt=""
-              >
-              <video
-                v-else-if="medium.type == 5"
-                :src="uploadUrl"
-                class="upload_image"
-              ></video>
-              <div
-                class="pdf_box"
-                v-else
-              >
+            <div class="show" v-else @click="getLink">
+              <img v-if="medium.type == 2" class="upload_image" :src="uploadUrl" alt />
+              <video v-else-if="medium.type == 5" :src="uploadUrl" class="upload_image"></video>
+              <div class="pdf_box" v-else>
                 <div class="icon_box">
-                  <img
-                    class="icon"
-                    :src="require('@/assets/pdf.png')"
-                    alt=""
-                  >
+                  <img class="icon" :src="require('@/assets/pdf.png')" alt />
                 </div>
                 <div class="title">{{ uploadName }}</div>
               </div>
             </div>
-
+            <div class="hint" v-if="medium.type == 5">视频最大300M，视频类型MP4、MOV</div>
           </div>
-          <div
-            class="material_library_box"
-            v-else
-          >
+          <div class="material_library_box" v-else>
             <div class="search_box">
               <div class="hint">共有{{ medium.pagination.total }}个素材</div>
               <div class="seach">
-                <a-input
-                  class="input"
-                  v-model="modelSearch"
-                  placeholder="输入要搜素的内容"
-                ></a-input>
-                <a-button
-                  type="primary"
-                  class="button"
-                  @click="searchMedium"
-                >搜索</a-button>
-                <a-button
-                  class="button"
-                  @click="resetMedium"
-                >清空</a-button>
+                <a-input class="input" v-model="modelSearch" placeholder="输入要搜素的内容"></a-input>
+                <a-button type="primary" class="button" @click="searchMedium">搜索</a-button>
+                <a-button class="button" @click="resetMedium">清空</a-button>
               </div>
             </div>
             <div class="table_box">
@@ -378,26 +308,16 @@
                 :pagination="medium.pagination"
                 @change="handleTableChange"
               >
-                <div
-                  slot="contents"
-                  slot-scope="text, record"
-                >
+                <div slot="contents" slot-scope="text, record">
                   <template>
                     <img
                       v-if="medium.type == 2"
                       :src="record.content.imageFullPath"
-                      alt=""
+                      alt
                       style="width:80px;height:80px;"
-                    >
-                    <div
-                      v-if="medium.type == 7"
-                      style="display: flex;flex-direction: column;"
-                    >
-                      <a-icon
-                        type="file"
-                        theme="twoTone"
-                        style="fontSize: 46px;"
-                      />
+                    />
+                    <div v-if="medium.type == 7" style="display: flex;flex-direction: column;">
+                      <a-icon type="file" theme="twoTone" style="fontSize: 46px;" />
                       <span style="fontSize: 10px;">{{ record.content.fileName }}</span>
                     </div>
                     <video
@@ -409,14 +329,10 @@
                       v-if="medium.type == 3"
                       style="display: flex;flex-direction: column;position: relative;"
                     >
-                      <img
-                        :src="record.content.imageFullPath"
-                        alt=""
-                        style="width:100%;height:80px;"
-                      >
-                      <span style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;">
-                        {{ record.content.maintitle }}
-                      </span>
+                      <img :src="record.content.imageFullPath" alt style="width:100%;height:80px;" />
+                      <span
+                        style="font-size:10px;width:100%; height:20px; background-color:#000;position:absolute;left:0;bottom:0;color:#fff;"
+                      >{{ record.content.maintitle }}</span>
                     </div>
                   </template>
                 </div>
@@ -449,7 +365,7 @@
       @change="uploadPDF"
       name="testFile"
       accept="application/pdf"
-    >
+    />
     <label-select
       :state="ruleState"
       ref="labelSelect"
@@ -473,8 +389,7 @@
           @click="()=>{
             modalVisible = false
           }"
-          key="back"
-        >关闭</a-button>
+          key="back">关闭</a-button>
       </template>
     </a-modal>
     <a-modal
@@ -488,18 +403,14 @@
     >
       <div class="preview_box">
         <img :src="require('@/assets/phone14.jpg')" />
-        <div
-          class="content_box ql-editor"
-          v-html="setData.inputData.content"
-        ></div>
+        <div class="content_box ql-editor" v-html="setData.inputData.content"></div>
       </div>
       <template slot="footer">
         <a-button
           @click="()=>{
             preview = false
           }"
-          key="back"
-        >关闭</a-button>
+          key="back">关闭</a-button>
       </template>
     </a-modal>
   </div>
@@ -562,7 +473,17 @@ export default {
           contentSource: '0',
           tsLink: '',
           articleLink: '',
-          materialId: ''
+          materialId: '',
+          linkBgImg: '',
+          videoFormat: '0',
+          bgImg: '0',
+          uoloadBgImg: '',
+          uoloadTitleBorderImg: '',
+          uoloadVideoBorderImg: '',
+          uploadVideo: [{
+            title: '',
+            video: ''
+          }]
         },
         articleArr: {
           0: [
@@ -591,6 +512,7 @@ export default {
             {
               title: '链接摘要：',
               type: 'input',
+              hide: true,
               key: 'linkDigest',
               fontNumber: 30
             },
@@ -598,6 +520,7 @@ export default {
               title: '链接封面：',
               type: 'cover',
               key: 'linkImg',
+              hide: true,
               hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
             },
             {
@@ -625,7 +548,11 @@ export default {
           },
           {
             code: '4',
-            name: '视频'
+            name: '自定义视频'
+          },
+          {
+            code: '5',
+            name: '模板视频'
           }
         ],
         grouping: [],
@@ -634,6 +561,14 @@ export default {
           { code: '0', name: '素材库' },
           { code: '1', name: '公众号' },
           { code: '2', name: '新建' }
+        ],
+        videoType: [
+          { code: '0', name: '横板' },
+          { code: '1', name: '竖版' }
+        ],
+        bgImgType: [
+          { code: '0', name: '系统模板' },
+          { code: '1', name: '自定义上传' }
         ]
       },
       change: {
@@ -653,12 +588,14 @@ export default {
           {
             title: '链接摘要：',
             type: 'input',
+            hide: true,
             key: 'linkDigest',
             fontNumber: 30
           },
           {
             title: '链接封面：',
             type: 'cover',
+            hide: true,
             key: 'linkImg',
             hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
           }
@@ -689,12 +626,14 @@ export default {
           {
             title: '链接摘要：',
             type: 'input',
+            hide: true,
             key: 'linkDigest',
             fontNumber: 30
           },
           {
             title: '链接封面：',
             type: 'cover',
+            hide: true,
             key: 'linkImg',
             hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
           },
@@ -703,7 +642,41 @@ export default {
             type: 'quillEditor',
             key: 'content'
           }
-        ]
+        ],
+        5: [{
+          title: '链接标题：',
+          type: 'input',
+          key: 'linkTitle',
+          fontNumber: 15
+        },
+        {
+          title: '链接摘要：',
+          type: 'input',
+          hide: true,
+          key: 'linkDigest',
+          fontNumber: 30
+        },
+        {
+          title: '链接封面：',
+          type: 'cover',
+          hide: true,
+          key: 'linkImg',
+          hint: '图片大小不超过10M，支持JPG、JPEG及PNG格式'
+        }, {
+          title: '视频版式',
+          type: 'radio',
+          key: 'videoFormat',
+          selectKey: 'videoType'
+        }, {
+          title: '背景图：',
+          type: 'bgImgRadio',
+          key: 'bgImg',
+          selectKey: 'bgImgType'
+        }, {
+          title: '上传视频：',
+          type: 'uploadVideo',
+          key: 'uploadVideo'
+        }]
       },
       modalState: false,
       modalVisible: false,
@@ -790,7 +763,23 @@ export default {
       ruleState: false,
       isEditor: false,
       tabsArr: [],
-      tableId: -1
+      tableId: -1,
+      bgImgArr: [
+        {
+          btnTxt: '上传背景图',
+          key: 'uoloadBgImg'
+        },
+        {
+          btnTxt: '上传标题边框',
+          key: 'uoloadTitleBorderImg'
+        },
+        {
+          btnTxt: '上传视频边框',
+          key: 'uoloadVideoBorderImg'
+        }],
+      selectKey: null,
+      isShowKey: null,
+      selectIndex: 0
     }
   },
   created () {
@@ -819,6 +808,9 @@ export default {
     }
   },
   methods: {
+    closeVideo (e) {
+      this.setData.inputData.uploadVideo[e].video = ''
+    },
     getArticle () {
       console.log(this.setData.inputData.tsLink)
       if (!this.isUrl(this.setData.inputData.tsLink, 1)) { return this.$message.warn('微信文章链接 必须以 https://mp.weixin.qq.com/s/ 开头') }
@@ -905,9 +897,10 @@ export default {
         this.setType(false)
       })
     },
-    mouseOver (e) {
+    mouseOver (e, key) {
       console.log(e)
       this.isShow = e == 1
+      this.isShowKey = key
     },
     getFind () {
       const obj = {}
@@ -916,6 +909,9 @@ export default {
         const { data } = res
         this.selectArr.grouping = data.group
         this.selectArr.channel = data.ditch
+        if (data.ditch.length == 1) {
+          this.setData.inputData.ditch = [data.ditch[0].id]
+        }
       })
     },
     close (key) {
@@ -1055,16 +1051,34 @@ export default {
         if (file.size > 10 * 1000 * 1000) {
           return this.$message.warn('请上传小于10MB的视频文件')
         }
+        // await mediaGetToken({ type: file.name }).then(res => {
+        //   // console.log(res, '获取ossToken')
+        //   this.oss = { ...res.data, key: res.data.key }
+        //   this.dealUploadMethod(this.oss, file)
+        // }).catch(() => {
+        //   this.$message.error('获取ossToken失败')
+        // })
         const formData = new FormData()
         formData.append('file', file)
         formData.append('time', 1)
-        console.log(formData, 'formData')
         const res = await upLoad(formData)
         console.log(res)
         this.uploadUrl = res.data.fullPath
       } else {
         console.log(e)
       }
+    },
+    dealUploadMethod (info, fileInfo) {
+      mediaGetToken()
+      const tempFormData = new FormData()
+      for (const i in info) {
+        console.log(i, 'iii')
+        tempFormData.append(i, info[i])
+      }
+      tempFormData.append('file', fileInfo)
+      ossUpload(tempFormData).then(res => {
+        console.log(res, '11111111')
+      })
     },
     getRadio (key, row) {
       console.log(key, row)
@@ -1114,7 +1128,7 @@ export default {
       if (this.modelTab == 0) {
         if (this.medium.type == 2) {
           if (!this.isEditor) {
-            this.setData.inputData.linkImg = this.uploadUrl
+            this.setData.inputData[this.selectKey] = this.uploadUrl
           } else {
             this.$refs.editor[0].getEditorData('image', this.uploadUrl)
           }
@@ -1129,7 +1143,7 @@ export default {
         if (this.radio.id == -1) return this.$message.warn('至少选择一个选项')
         if (this.medium.type == 2) {
           if (!this.isEditor) {
-            this.setData.inputData.linkImg = content.imageFullPath
+            this.setData.inputData[this.selectKey] = content.imageFullPath
             this.radio = {
               id: -1,
               content: {},
@@ -1147,7 +1161,15 @@ export default {
           this.setData.inputData.materialId = id
         } else if (this.medium.type == 5) {
           console.log(content)
-          this.$refs.editor[0].getEditorData('video', content.videoFullPath)
+          if (this.setData.inputData.shape == 5) {
+            this.setData.inputData.uploadVideo[this.selectIndex].video = content.videoFullPath
+            this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
+              title: '',
+              video: ''
+            }]
+          } else {
+            this.$refs.editor[0].getEditorData('video', content.videoFullPath)
+          }
         } else {
           this.setData.inputData.radarPDF = content.fileFullPath
           this.setData.inputData.linkTitle = content.fileName
@@ -1162,6 +1184,7 @@ export default {
       this.modelTab = 0
       this.medium.pagination.current = 1
       this.medium.pagination.pageSize = 10
+      this.selectKey = 'linkImg'
       this.modalState = false
     },
     editorChange (html) {
@@ -1215,7 +1238,7 @@ export default {
         })
       })
     },
-    setMedium (e, isEditor = false) {
+    setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0) {
       this.isEditor = isEditor
       const title = {
         2: {
@@ -1231,6 +1254,8 @@ export default {
           title: '上传PDF'
         }
       }
+      this.selectKey = selectKey
+      this.selectIndex = selectIndex
       this.medium.type = e == -1 ? 2 : e
       this.modalTitle = e == -1 ? '上传图片' : title[e].title
       this.modalState = e != -1
@@ -1288,6 +1313,8 @@ export default {
             }
           }
           .import_box {
+            display: flex;
+
             .input_box {
               position: relative;
               display: flex;
@@ -1553,6 +1580,143 @@ export default {
                 }
               }
             }
+            .bgImg_box {
+              flex-shrink: 0;
+              position: relative;
+              min-width: 480px;
+              min-height: 200px;
+              .radio {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                label {
+                  margin-top: 20px;
+                }
+              }
+              .btn_box {
+                position: absolute;
+                bottom: 118px;
+                right: 0;
+                display: flex;
+                align-items: center;
+                .btn {
+                  margin-right: 20px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+
+                  .text {
+                    cursor: pointer;
+                    min-width: 86px;
+                    height: 21px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid #1c96f0;
+                    color: #1c96f0;
+                    padding: 0 10px;
+                    box-sizing: border-box;
+                    white-space: nowrap;
+                    border-radius: 5px;
+                  }
+                  .upload {
+                    display: flex;
+                    align-items: center;
+                    height: 0;
+                    transform: translateY(55px);
+                    .cover_img_box {
+                      position: relative;
+                      width: 80px;
+                      height: 80px;
+                      .cover_img {
+                        width: 100%;
+                        height: 100%;
+                      }
+                      .show_box {
+                        display: flex;
+                        align-items: center;
+                        box-sizing: border-box;
+                        padding: 10px;
+                        justify-content: space-between;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(74, 74, 74, 0.6);
+                        color: #fff;
+                        .btn {
+                          cursor: pointer;
+                        }
+                      }
+                    }
+
+                    .add_img_box {
+                      cursor: pointer;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      width: 73px;
+                      height: 68px;
+                      background-color: #fff;
+                      border-radius: 5px;
+                      border: 1px solid #ccc;
+                      .add_icon {
+                        width: 30px;
+                        height: auto;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            .uploadVideo {
+              display: flex;
+              flex-wrap: wrap;
+              .video_box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-right: 20px;
+                margin-bottom: 20px;
+                .upload_box {
+                  margin-bottom: 10px;
+                }
+                .cover_video_box {
+                  width: 80px;
+                  height: 80px;
+                  position: relative;
+                  .close {
+                    cursor: pointer;
+                    width: 30px;
+                    height: 30px;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    transform: translate(50%, -50%);
+                  }
+                  .cover_video {
+                    width: 100%;
+                    height: 100%;
+                  }
+                }
+                .add_img_box {
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 80px;
+                  height: 80px;
+                  background-color: #fff;
+                  border-radius: 5px;
+                  border: 1px solid #ccc;
+                  .add_icon {
+                    width: 30px;
+                    height: auto;
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1656,8 +1820,14 @@ export default {
       width: 100%;
       overflow: auto;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+
+      .hint {
+        margin-top: 90px;
+      }
+
       .upload_btn {
         width: 115px;
         height: 35px;
