@@ -58,6 +58,7 @@ import Sortable from 'sortablejs'
 
 export default {
   components: { DragIcon },
+  // eslint-disable-next-line vue/require-prop-types
   props: ['questionItemIndex', 'options', 'disabled', 'form', 'itemIndex'],
   data () {
     return {

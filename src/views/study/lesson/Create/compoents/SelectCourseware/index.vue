@@ -172,7 +172,10 @@ import Preview from '../../../../components/Preview'
 
 export default {
   props: {
-    value: Array,
+    value: {
+      type: Array,
+      default: _ => []
+    },
     hiddenExam: Boolean
   },
   components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination, Preview },

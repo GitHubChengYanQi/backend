@@ -133,8 +133,6 @@ import {
 import moment from 'moment'
 import FilePreview from '../../../../components/FilePreview/index'
 import SelectEmployee from '../../../../components/SelectEmployee/index'
-import { courseExcelExport } from '@/api/study/course'
-import { excelExport } from '@/utils/downloadUtil'
 
 export default {
   props: {

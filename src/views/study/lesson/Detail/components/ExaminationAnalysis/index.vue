@@ -75,8 +75,7 @@
 <script>
 
 import router from '@/router'
-import { courseExcelExport, examCourseBindPageExcelExport, examCourseBindPageList } from '@/api/study/course'
-import moment from 'moment'
+import { examCourseBindPageExcelExport, examCourseBindPageList } from '@/api/study/course'
 import { excelExport } from '@/utils/downloadUtil'
 import { message } from 'ant-design-vue'
 
@@ -128,7 +127,7 @@ export default {
           dataIndex: 'questionnaireResults',
           align: 'center',
           customRender (value) {
-            return value && value[0] && value[0].score || 0
+            return (value && value[0] && value[0].score) || 0
           }
         },
         {

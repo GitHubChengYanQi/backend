@@ -105,8 +105,6 @@ import { courseWareCheckBind, courseWareDelete, courseWareList } from '@/api/stu
 import Preview from '../../../../components/Preview/index'
 import SelectEmployee from '../../../../components/SelectEmployee/index'
 import router from '@/router'
-import { courseExcelExport } from '@/api/study/course'
-import { excelExport } from '@/utils/downloadUtil'
 
 export default {
   props: {

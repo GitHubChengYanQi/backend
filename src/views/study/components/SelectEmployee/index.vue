@@ -25,7 +25,10 @@ export default {
       type: String,
       default: _ => '请选择'
     },
-    value: Number
+    value: {
+      type: Number,
+      default: _ => null
+    }
   },
   watch: {
     value () {

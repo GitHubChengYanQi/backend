@@ -92,13 +92,12 @@
 
 import router from '@/router'
 import {
-  courseExcelExport, courseTaskBindDetailExcelExport,
+  courseTaskBindDetailExcelExport,
   courseTaskBindDetailList,
   courseWareBindExcelExport,
   courseWareBindList
 } from '@/api/study/course'
 import { getTimeDifference } from '@/utils/util'
-import moment from 'moment'
 import { excelExport } from '@/utils/downloadUtil'
 import { message } from 'ant-design-vue'
 

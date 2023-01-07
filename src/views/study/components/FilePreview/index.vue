@@ -9,7 +9,6 @@
         frameborder="0"
         :src="'https://view.officeapps.live.com/op/view.aspx?src=' + this.downloadUrl "
         :style=" { width: '500px', height: '500px' } ">
-
       </iframe>
     </div>
   </div>
@@ -17,7 +16,6 @@
 <script>
 
 export default {
-  props: { file: {} },
   data () {
     return {
       fileName: '',

@@ -104,8 +104,6 @@ import { examCheckBind, examDelete, examList } from '@/api/study/exam'
 import moment from 'moment'
 import { message } from 'ant-design-vue'
 import router from '@/router'
-import { courseExcelExport } from '@/api/study/course'
-import { excelExport } from '@/utils/downloadUtil'
 
 export default {
   components: { TagName, breadcrumb, SelectEmployee },
