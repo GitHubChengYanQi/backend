@@ -10,10 +10,9 @@
     <div class="select" @click="openLabel">
       <span v-if="idArr.length === 0">请选择</span>
       <div class="box" v-else>
-        <a-tag closable @close="handleDelete(index)" v-for="(item, index) in (inputArr.slice(0, num))" :key="index">
+        <a-tag closable @close="(e) => {handleDelete(e, index)}" v-for="(item, index) in inputArr" :key="index">
           {{ item.name }}
         </a-tag>
-        <a-tag v-if="inputArr.length > num">...</a-tag>
       </div>
     </div>
     <!-- end head -->
@@ -165,29 +164,26 @@ export default {
     }
   },
   created () {
-    this.getLabelData()
+    this.init(this.state)
   },
   watch: {
     state: {
       handler (val, oldval) {
-        this.visible = val
-        this.getLabelData()
+        this.init(val)
       },
       deep: true
-    },
-    value (val, oldval) {
-      this.record = this.deepClonev2(val)
-      this.getIds(val)
-      this.inputArr = val
     }
   },
   methods: {
     deepClonev2,
+    init (val) {
+      this.visible = val
+      this.getLabelData(-1)
+    },
     getLabelData (e) {
       if (e == -1) {
         getContactTagGroup().then((res) => {
           const newData = res.data.tagGroupList
-          console.log(newData)
           this.labelDate = newData.map((item) => {
             item.tags = item.tags.filter((items) => {
               return items.name.indexOf(this.search) != -1
@@ -197,10 +193,18 @@ export default {
           this.labelDate = this.labelDate.filter(item => {
             return item.tags.length > 0 || item.groupName.indexOf(this.search) != -1
           })
+          // 数据回显
+          this.record = this.deepClonev2(this.value)
+          this.getIds(this.value)
+          this.inputArr = this.value
         })
       } else {
         getContactTagGroup().then((res) => {
           this.labelDate = res.data.tagGroupList
+          // 数据回显
+          this.record = this.deepClonev2(this.value)
+          this.getIds(this.value)
+          this.inputArr = this.value
         })
       }
     },
@@ -312,9 +316,12 @@ export default {
     /**
      * 删除
      * @param {*} e
+     * @param {*} index
      */
-    handleDelete (e) {
-      this.inputArr.splice(e, 1)
+    handleDelete (e, index) {
+      this.inputArr.splice(index, 1)
+      this.idArr.splice(index, 1)
+      e.preventDefault()
     }
   }
 }
