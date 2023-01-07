@@ -128,69 +128,69 @@ export default {
   },
 
   methods: {
-    // 获取数据
-    async getTableData () {
-      this.tableLoading = true
-      const params = {
-        sopName: this.searchInfo.sopName,
-        idsStr: this.searchInfo.employeeIds.join(','),
-        page: this.pagination.current,
-        perPage: this.pagination.pageSize,
-        sort: this.sorter
-      }
-      // console.log(params, '查询数据提交接口的对象')
-      await getSopTemplateListMethod(params).then(response => {
-        this.tableLoading = false
-        console.log(response, '获取群SOP模板信息')
-        this.tableData = response.data.list
-        this.$set(this.pagination, 'total', Number(response.data.page.total))
-        if (this.tableData.length === 0) {
-          // 列表中没有数据
-          if (this.pagination.total !== 0) {
-            // 总数据有,但当前页没有
-            // 重新将页码换成1
-            this.$set(this.pagination, 'current', 1)
-            this.getTableData()
-          } else {
-            // 是真没有数据
-          }
-        }
-      }).catch(() => {
-        this.tableLoading = false
-      })
-      // 临时接收假数据
-      // this.tableData = getTempSopList()
-    },
-    // 群SOP模板切换页码
-    handleTableChange ({ current, pageSize }, filters, sorter) {
-      this.pagination.current = current
-      this.pagination.pageSize = pageSize
-      console.log(sorter, 'sorter')
-      if (sorter.order) {
-        if (sorter.order === 'ascend') {
-          this.sorter = 'asc'
-        } else {
-          this.sorter = 'desc'
-        }
-      } else {
-        this.sorter = ''
-      }
-      this.getTableData()
-    },
-    // 搜索
-    goSearch () {
-      // 重新将页码换成1
-      this.$set(this.pagination, 'current', 1)
-      this.getTableData()
-    },
-    // 重置
-    goReset () {
-      // 重新将页码换成1
-      this.$set(this.pagination, 'current', 1)
-      this.searchInfo = {}
-      this.$set(this.searchInfo, 'employeeIds', [])
-      this.getTableData()
-    }
+    // // 获取数据
+    // async getTableData () {
+    //   this.tableLoading = true
+    //   const params = {
+    //     sopName: this.searchInfo.sopName,
+    //     idsStr: this.searchInfo.employeeIds.join(','),
+    //     page: this.pagination.current,
+    //     perPage: this.pagination.pageSize,
+    //     sort: this.sorter
+    //   }
+    //   // console.log(params, '查询数据提交接口的对象')
+    //   await getSopTemplateListMethod(params).then(response => {
+    //     this.tableLoading = false
+    //     console.log(response, '获取群SOP模板信息')
+    //     this.tableData = response.data.list
+    //     this.$set(this.pagination, 'total', Number(response.data.page.total))
+    //     if (this.tableData.length === 0) {
+    //       // 列表中没有数据
+    //       if (this.pagination.total !== 0) {
+    //         // 总数据有,但当前页没有
+    //         // 重新将页码换成1
+    //         this.$set(this.pagination, 'current', 1)
+    //         this.getTableData()
+    //       } else {
+    //         // 是真没有数据
+    //       }
+    //     }
+    //   }).catch(() => {
+    //     this.tableLoading = false
+    //   })
+    //   // 临时接收假数据
+    //   // this.tableData = getTempSopList()
+    // },
+    // // 群SOP模板切换页码
+    // handleTableChange ({ current, pageSize }, filters, sorter) {
+    //   this.pagination.current = current
+    //   this.pagination.pageSize = pageSize
+    //   console.log(sorter, 'sorter')
+    //   if (sorter.order) {
+    //     if (sorter.order === 'ascend') {
+    //       this.sorter = 'asc'
+    //     } else {
+    //       this.sorter = 'desc'
+    //     }
+    //   } else {
+    //     this.sorter = ''
+    //   }
+    //   this.getTableData()
+    // },
+    // // 搜索
+    // goSearch () {
+    //   // 重新将页码换成1
+    //   this.$set(this.pagination, 'current', 1)
+    //   this.getTableData()
+    // },
+    // // 重置
+    // goReset () {
+    //   // 重新将页码换成1
+    //   this.$set(this.pagination, 'current', 1)
+    //   this.searchInfo = {}
+    //   this.$set(this.searchInfo, 'employeeIds', [])
+    //   this.getTableData()
+    // }
   }
 }
 </script>

@@ -392,16 +392,12 @@ export default {
       employeeIds: [],
       // 积分规则设置好友查看素材任务弹框
       integralMaterialShowStatus: false,
-      // 积分规则设置好友购买任务弹框
-      integralBuyShowStatus: false,
       // 积分规则设置群发朋友圈任务弹框
       integralFriendCircleShowStatus: false,
       // 积分规则设置加好友任务弹框
       integralAddFriendShowStatus: false,
       // 积分规则设置购买任务弹框
       integralBuyShowStatus: false,
-      // 积分规则设置查看素材任务弹框
-      integralMaterialShowStatus: false,
       // 通用规则积分到期提醒单选value值
       remindTypeName: 'noRemind',
       // 通用规则积分到期提醒弹框
