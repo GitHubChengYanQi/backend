@@ -270,8 +270,9 @@ export default {
           title: '关联考试',
           align: 'center',
           dataIndex: 'examResults',
-          customRender: (examResults) => {
-            return examResults && examResults.length > 0 ? '是' : '否'
+          customRender: (examResults, record) => {
+            const isExam = record.courseWareBindResults && record.courseWareBindResults.find(item => item.examId)
+            return (isExam && examResults && examResults.length > 0) ? '是' : '否'
           }
         },
         {

@@ -160,7 +160,7 @@ export default {
           dataIndex: 'examResult',
           align: 'center',
           customRender (value) {
-            return ((value && value.timeLimit) || 0) + '分钟'
+            return (value && value.timeLimit) >= 0 ? (value.timeLimit) + '分钟' : '不限定时长'
           }
         },
         {
@@ -502,6 +502,7 @@ export default {
 }
 
 .user-info {
+  min-height: 50px;
 
   img {
     border-radius: 2px;

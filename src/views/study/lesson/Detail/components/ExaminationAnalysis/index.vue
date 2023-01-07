@@ -120,7 +120,7 @@ export default {
           dataIndex: 'timeLimit',
           align: 'center',
           customRender (value) {
-            return value + '分钟'
+            return value >= 0 ? value + '分钟' : '不限定时长'
           }
         },
         {

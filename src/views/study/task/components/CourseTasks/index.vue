@@ -90,15 +90,11 @@
           </div>
           <div slot="note" slot-scope="text,record">
             <div class="introduction">
-              <a-tooltip overlayClassName="myTooltip">
-                <template slot="title">
-                  <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
-                </template>
-                <div>
-                  {{ record.courseResult && record.courseResult.note && record.courseResult.note.replace(/<.*?>/g, '')
-                  }}
-                </div>
-              </a-tooltip>
+              <div>
+                {{
+                  record.courseResult && record.courseResult.note && record.courseResult.note.replace(/<.*?>/g, '')
+                }}
+              </div>
             </div>
           </div>
           <div slot="tag" slot-scope="text,row">
@@ -250,7 +246,8 @@ export default {
           dataIndex: '5',
           align: 'center',
           customRender (value, record) {
-            return (record.courseResult && record.courseResult.examResults && record.courseResult.examResults[0]) ? '是' : '否'
+            const isExam = record.courseResult && record.courseResult.courseWareBindResults && record.courseResult.courseWareBindResults.find(item => item.examId)
+            return (isExam && record.courseResult && record.courseResult.examResults && record.courseResult.examResults[0]) ? '是' : '否'
           }
         },
         {
