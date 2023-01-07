@@ -287,14 +287,14 @@ export default {
             this.loading = false
             if (res.code === 200) {
               if (type === 'save') {
+                this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+              } else {
                 if (this.btnShow) {
-                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                  sessionStorage.setItem('activeType', 'Regular')
+                  this.$router.push('/sales/sop')
                 } else {
                   this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
                 }
-              } else {
-                sessionStorage.setItem('activeType', 'Regular')
-                this.$router.push('/sales/sop')
               }
             }
           })
@@ -311,14 +311,14 @@ export default {
             this.loading = false
             if (res.code === 200) {
               if (type === 'save') {
+                this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+              } else {
                 if (this.btnShow) {
-                  this.$router.push(`${'/clientFollow/autoLabel'}?id=${this.id}`)
+                  sessionStorage.setItem('activeType', 'Regular')
+                  this.$router.push('/sales/sop')
                 } else {
                   this.$message.error('暂无创建sop权限，可联系管理员开通此权限。')
                 }
-              } else {
-                sessionStorage.setItem('activeType', 'Regular')
-                this.$router.push('/sales/sop')
               }
             }
           })
