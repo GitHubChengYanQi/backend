@@ -100,7 +100,7 @@
       :fieldNames="fieldNames"
       :transferTip="transferTip"
       ref="SelectPersonnel" /> -->
-      <SelectModal
+    <SelectModal
       :selectedKeys="keys"
       :selectedRows="rows"
       @output="getKeys"
@@ -305,7 +305,7 @@ export default {
         this.sorter = ''
       }
       // this.getTableData()
-    },
+    }
     // // 搜索
     // goSearch () {
     //   // 重新将页码换成1

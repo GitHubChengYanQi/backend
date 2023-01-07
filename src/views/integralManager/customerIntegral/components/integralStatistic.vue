@@ -61,15 +61,15 @@
         <a-button>导出</a-button>
       </div>
       <a-table
-      :loading="tableLoading"
-      :row-key="record => record.id"
-      :data-source="tableData"
-      :columns="tableColumns"
-      :pagination="pagination"
-      class="tableBox"
-      :scroll="{ x: 1500}"
-      @change="handleTableChange">
-    </a-table>
+        :loading="tableLoading"
+        :row-key="record => record.id"
+        :data-source="tableData"
+        :columns="tableColumns"
+        :pagination="pagination"
+        class="tableBox"
+        :scroll="{ x: 1500}"
+        @change="handleTableChange">
+      </a-table>
     </div>
     <goodsManager
       :isRadioStatus="false"
