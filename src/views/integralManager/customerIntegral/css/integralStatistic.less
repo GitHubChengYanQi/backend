@@ -1,0 +1,98 @@
+#integral_statistic_container {
+    /deep/.allStatistic {
+        .allStatisticTitle {
+            font-size: 18px;
+        }
+        .searchLine {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            .searchTitle {
+                font-size: 14px;
+            }
+            .pickTimeClass {
+                margin-left: 10px;
+            }
+        }
+        .statisticCardDiv {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            .singleStatisticCard {
+                width: 350px;
+                margin-left: 50px;
+                border: 1px solid rgba(0, 0, 0, 0.3);
+                background-color: white;
+                border-radius: 4px;
+                padding: 20px;
+                .cardTopClass {
+                    display: flex;
+                    align-items: center;
+                    .cardTopTitle {
+                        font-size: 14px;
+                    }
+                }
+                .cardNumberClass {
+                    font-size: 20px;
+                    font-weight: bolder;
+                    margin-top: 12px;
+                }
+            }
+            .singleStatisticCard:nth-child(1) {
+                margin-left: 0px;
+            }
+        }
+    }
+    /deep/.integralStatistic {
+        margin-top: 20px;
+        .integralStatisticTitle {
+            font-size: 18px;
+        }
+        .searchLine {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            width: 100%;
+            .singleSearch {
+                display: flex;
+                align-items: center;
+                margin-left: 10px;
+                .singleSearchTitle {
+                    font-size: 14px;
+                    flex-shrink: 0;
+                }
+                .selectPersonnelCom {
+                    width: 200px;
+                    margin-left: 8px;
+                }
+                .pickTimeClass {
+                    width: 400px;
+                    margin-left: 8px;
+                }
+                .pickSelectClass {
+                    width: 200px;
+                    margin-left: 8px;
+                }
+                .noGoodsClass {
+                    display: flex;
+                    align-items: center;
+                    padding: 0px 4px;
+                    height: 38px;
+                    width: 200px;
+                    margin-left: 8px;
+                    background-color: white;
+                    border: 1px solid rgba(0, 0, 0, 0.3);
+                }
+            }
+        }
+        .searchButtonLine {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .tableBox {
+            margin-top: 20px;
+        }
+    }
+}
