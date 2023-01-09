@@ -16,7 +16,7 @@
     <quill-editor
       class="myQuillEditor"
       v-model="content"
-      ref="editor"
+      ref="myQuillEditor"
       :options="editorOption"
       @blur="onEditorBlur($event)"
       @change="onEditorChange($event)"></quill-editor>
