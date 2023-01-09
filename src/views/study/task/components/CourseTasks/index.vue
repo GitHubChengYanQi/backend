@@ -75,7 +75,7 @@
               <div class="avatar mr12">
                 <img
                   height="50"
-                  :src="(record.courseResult && record.courseResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_100'"
+                  :src="(record.courseResult && record.courseResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_50'"
                 >
               </div>
               <div class="nickname">
