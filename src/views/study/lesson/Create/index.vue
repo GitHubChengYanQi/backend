@@ -53,7 +53,7 @@
                 placeholder="请选择封面图"
                 v-decorator="['coverImageUrl', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
               />
-              建议尺寸：750 × 1448
+              建议尺寸：750 × 750
             </div>
           </a-form-item>
           <a-form-item label="适用员工">
@@ -73,14 +73,16 @@
             />
           </a-form-item>
           <a-form-item label="课程简介">
-            <VueQuillEditor
-              width="400px"
-              v-if="!detailLoading"
-              :height="'auto'"
-              placeholder="请输入课程简介"
-              v-decorator="['note', { rules: [{ required: true, message: '请输入课程简介!' }],initialValue:'' }]"
-            />
-            <a-spin v-else />
+            <div style="height: 500px">
+              <VueQuillEditor
+                width="400px"
+                v-if="!detailLoading"
+                :height="'auto'"
+                placeholder="请输入课程简介"
+                v-decorator="['note', { rules: [{ required: true, message: '请输入课程简介!' }],initialValue:'' }]"
+              />
+              <a-spin v-else />
+            </div>
           </a-form-item>
         </a-form>
       </div>
@@ -92,7 +94,7 @@
 import breadcrumb from '../../components/Breadcrumd'
 import selectCourseware from './compoents/SelectCourseware'
 import SelectExamination from './compoents/SelectExamination'
-import VueQuillEditor from '../../components/VueQuillEditor'
+import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../components/ImgUpload/index'
 import Employee from '../../components/Employee/index'
 import { courseClassTreeView } from '@/api/study/lessonClass'
