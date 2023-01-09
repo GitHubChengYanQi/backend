@@ -59,7 +59,7 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12" v-if="record.coverImageUrl">
-                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
+                <img height="50" width="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50'">
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">

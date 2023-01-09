@@ -67,7 +67,7 @@
           <div slot="fileName" slot-scope="text,record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" v-if="['jpg','png'].includes(record.suffix)" :src="record.mediaUrl">
+                <img height="50" width="50" v-if="['jpg','png'].includes(record.suffix)" :src="record.mediaUrl">
                 <a-icon v-if="['doc','docx'].includes(record.suffix)" type="file-word" style="font-size: 24px" />
                 <a-icon v-if="['ppt','pptx'].includes(record.suffix)" type="file-ppt" style="font-size: 24px" />
                 <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />

@@ -68,7 +68,7 @@
                 placeholder="请选择封面图"
                 v-decorator="['coverImageUrl', {initialValue: '' }]"
               />
-              建议尺寸：750 × 1448
+              建议尺寸：750 × 750
             </div>
           </a-form-item>
           <a-form-item label="答卷时长">
@@ -111,7 +111,7 @@
 
 <script>
 import breadcrumb from '../../components/Breadcrumd'
-import VueQuillEditor from '../../components/VueQuillEditor'
+import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../components/ImgUpload/index'
 import Employee from '../../components/Employee/index'
 import SelectTestPager from './components/SelectTestPager'

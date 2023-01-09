@@ -43,18 +43,20 @@
                 placeholder="请选择封面图"
                 v-decorator="['coverImageUrl', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
               />
-              建议尺寸：750 × 1448
+              建议尺寸：750 × 750
             </div>
           </a-form-item>
           <a-form-item label="课程详情">
-            <VueQuillEditor
-              width="400px"
-              v-if="!detailLoading"
-              :height="'auto'"
-              placeholder="请输入课程详情"
-              v-decorator="['note', { rules: [{ required: true, message: '请输入课程详情!' }],initialValue:'' }]"
-            />
-            <a-spin v-else />
+            <div style="height: 500px">
+              <VueQuillEditor
+                width="400px"
+                v-if="!detailLoading"
+                :height="'auto'"
+                placeholder="请输入课程详情"
+                v-decorator="['note', { rules: [{ required: true, message: '请输入课程详情!' }],initialValue:'' }]"
+              />
+              <a-spin v-else />
+            </div>
           </a-form-item>
         </a-form>
 
@@ -80,7 +82,7 @@
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd'
 import Preview from '../../../../../components/Preview'
-import VueQuillEditor from '../../../../../components/VueQuillEditor'
+import VueQuillEditor from '@/components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
 import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
 import { message } from 'ant-design-vue'
