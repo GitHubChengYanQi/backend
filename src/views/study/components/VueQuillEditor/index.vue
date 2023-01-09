@@ -15,9 +15,8 @@
       :data="{time:1}"></a-upload>
     <quill-editor
       class="myQuillEditor"
-      :style="{height,width}"
       v-model="content"
-      ref="myQuillEditor"
+      ref="editor"
       :options="editorOption"
       @blur="onEditorBlur($event)"
       @change="onEditorChange($event)"></quill-editor>
@@ -55,18 +54,6 @@ export default {
     quillEditor
   },
   props: {
-    width: {
-      type: [String, Number],
-      default () {
-        return ''
-      }
-    },
-    height: {
-      type: [String, Number],
-      default () {
-        return 354
-      }
-    },
     value: {
       type: String,
       default: ''
@@ -216,11 +203,6 @@ export default {
 .myQuillEditor {
   line-height: normal !important;
   height: 354px;
-
-  .ql-container {
-    min-height: 800px;
-  }
-
 }
 
 .ql-snow .ql-tooltip[data-mode='link']::before {
