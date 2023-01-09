@@ -24,9 +24,9 @@
           />
         </a-form-model-item>
         <!--活动介绍-->
-        <a-form-model-item label="活动介绍" prop="introduceImage">
-          <a-input v-show="false" v-model="form.introduceImage"/>
-          <UploadImg @changeImg="(e)=>{getImg(e, 'introduceImage')}" :imgUrl="introduceImageFullPath" :fileType="1" />
+        <a-form-model-item label="活动介绍" prop="introduceImageFullPath">
+          <a-input v-show="false" v-model="form.introduceImageFullPath"/>
+          <UploadImg @changeImg="(e)=>{getImg(e, 'introduceImageFullPath')}" :imgUrl="form.introduceImageFullPath" :fileType="1" />
           <span>尺寸建议为:宽750px,格式为jpg/png/jpeg;</span>
         </a-form-model-item>
       </div>
@@ -36,67 +36,82 @@
         <div class="fl">
           <h2 class="title">活动首页</h2>
           <!--多图区一-->
-          <a-form-model-item label="多图区一" prop="Image01">
-            <a-input v-show="false" v-model="form.prizeImage"/>
+          <a-form-model-item label="多图区一" prop="image01FullPath">
+            <a-input v-show="false" v-model="form.image01FullPath"/>
             <div class="formBox">
-              <UploadImg @changeImg="(e)=>{getImg(e, 'Image01')}" :imgUrl="Image01FullPath" :btnType="false" :fileType="1" />
+              <UploadImg @changeImg="(e)=>{getImg(e, 'image01FullPath')}" :imgUrl="image01FullPath" :btnType="false" :fileType="1" />
               <span>最多可上传3张图片，单张图片大小不超过5M，尺寸：宽375px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
           <!--视频专区名称-->
-          <a-form-model-item label="视频专区名称" prop="text">
+          <a-form-model-item label="视频专区名称" prop="couponIntroduce">
             <a-input style="width:350px;" v-model="form.couponIntroduce" :maxLength="8" :suffix="`${form.couponIntroduce ? form.couponIntroduce.length : 0}/8`" />
           </a-form-model-item>
-          <a-form-model-item prop="videoBg" :wrapper-col="{ span: 14, offset: 4 }">
-            <a-input v-show="false" v-model="form.videoBg"/>
+          <a-form-model-item prop="videoBgFullPath" :wrapper-col="{ span: 14, offset: 4 }">
+            <a-input v-show="false" v-model="form.videoBgFullPath"/>
             <div class="formBox">
-              <UploadImg @changeImg="(e)=>{getImg(e, 'videoBg')}" :imgUrl="videoBgFullPath" :btnType="false" :fileType="1" />
+              <UploadImg @changeImg="(e)=>{getImg(e, 'videoBgFullPath')}" :imgUrl="videoBgFullPath" :btnType="false" :fileType="1" />
               <span>图片大小不超过5M，尺寸为：宽375px*275px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
           <!--走马灯开关-->
-          <a-form-model-item label="走马灯开关" prop="text">
+          <a-form-model-item label="走马灯开关" prop="rollShow">
             <div class="item">
-              <a-checkbox v-model="form.roll" @change="onChange">
+              <a-checkbox v-model="form.rollShow" @change="handleChangeRoll">
                 显示
               </a-checkbox>
             </div>
           </a-form-model-item>
           <a-form-model-item prop="rollBg" :wrapper-col="{ span: 14, offset: 4 }">
-            <a-input v-show="false" v-model="form.videoBg"/>
+            <a-input v-show="false" v-model="form.rollBg"/>
             <div class="formBox">
               <UploadImg @changeImg="(e)=>{getImg(e, 'rollBg')}" :imgUrl="rollBgFullPath" :btnType="false" :fileType="1" />
               <span>图片大小不超过5M，尺寸为：宽375px*275px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
           <!--多图区二-->
-          <a-form-model-item label="多图区二" prop="Image02">
-            <a-input v-show="false" v-model="form.prizeImage"/>
+          <a-form-model-item label="多图区二" prop="image02">
+            <a-input v-show="false" v-model="form.image02"/>
             <div class="formBox">
-              <UploadImg @changeImg="(e)=>{getImg(e, 'Image02')}" :imgUrl="Image02FullPath" :btnType="false" :fileType="1" />
+              <UploadImg @changeImg="(e)=>{getImg(e, 'image02')}" :imgUrl="image02FullPath" :btnType="false" :fileType="1" />
               <span>最多可上传3张图片，单张图片大小不超过5M，尺寸：宽375px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
-          <!--按钮一-->
-          <a-form-model-item label="按钮文案" prop="text">
-            <a-input style="width:350px;" v-model="form.btn01Txt" :maxLength="6" :suffix="`${form.btn01Txt ? form.btn01Txt.length : 0}/6`" />
-          </a-form-model-item>
-          <a-form-model-item label="按钮链接" prop="rollBg">
-            <div class="formBox">
-              <div style="width:280px;margin-right:10px;"><a-input placeholder="外部链接直接粘贴在这里需要以https://开头" v-model="form.btn01Link"/></div>
-              <a href="">在已有页面中选</a>
-            </div>
-          </a-form-model-item>
-          <!--按钮二-->
-          <a-form-model-item label="按钮文案" prop="text">
-            <a-input style="width:350px;" v-model="form.btn02Txt" :maxLength="6" :suffix="`${form.btn02Txt ? form.btn01Txt.length : 0}/6`" />
-          </a-form-model-item>
-          <a-form-model-item label="按钮链接" prop="rollBg">
-            <div class="formBox">
-              <div style="width:280px;margin-right:10px;"><a-input placeholder="外部链接直接粘贴在这里需要以https://开头" v-model="form.btn02Link"/></div>
-              <a href="">在已有页面中选</a>
-            </div>
-          </a-form-model-item>
+          <!--按钮1-->
+          <div class="btnList">
+            <p class="title">
+              <a-checkbox v-model="form.showBtn01" @change="(e) => {handleChangeBtn(e, 'showBtn01')}">按钮一</a-checkbox>
+            </p>
+            <p class="ctx">
+              <a-form-model-item label="按钮文案" prop="text">
+                <a-input style="width:300px;" v-model="form.btn01Txt" :maxLength="6" :suffix="`${form.btn01Txt ? form.btn01Txt.length : 0}/6`" />
+              </a-form-model-item>
+              <a-form-model-item label="按钮链接" prop="rollBg">
+                <div class="formBox">
+                  <div style="width:240px;margin-right:10px;"><a-input placeholder="外部链接直接粘贴在这里需要以https://开头" v-model="form.btn01Link"/></div>
+                  <a href="">选择</a>
+                </div>
+              </a-form-model-item>
+            </p>
+          </div>
+
+          <!--按钮2-->
+          <div class="btnList">
+            <p class="title">
+              <a-checkbox v-model="form.showBtn02" @change="(e) => {handleChangeBtn(e, 'showBtn02')}">按钮二</a-checkbox>
+            </p>
+            <p class="ctx">
+              <a-form-model-item label="按钮文案" prop="text">
+                <a-input style="width:300px;" v-model="form.btn02Txt" :maxLength="6" :suffix="`${form.btn02Txt ? form.btn02Txt.length : 0}/6`" />
+              </a-form-model-item>
+              <a-form-model-item label="按钮链接" prop="rollBg">
+                <div class="formBox">
+                  <div style="width:240px;margin-right:10px;"><a-input placeholder="外部链接直接粘贴在这里需要以https://开头" v-model="form.btn02Link"/></div>
+                  <a href="">选择</a>
+                </div>
+              </a-form-model-item>
+            </p>
+          </div>
         </div>
         <div class="fr">
           <div class="phone">
@@ -104,12 +119,15 @@
               <div class="head">活动首页</div>
               <draggable v-model="homePage" :options="{ group: { name: 'tt', pull: 'clone' }, sort: true, }" animation="300">
                 <transition-group>
-                  <div class="items" v-for="item in homePage" :key="item.type">{{ item.typeName }}</div>
+                  <div class="items" v-show="item.show" v-for="item in homePage" :key="item.type">
+                    <h2>{{ item.typeName }}</h2>
+                    <img :src="item.url" />
+                  </div>
                 </transition-group>
               </draggable>
               <div class="handle">
-                <a-button>按钮一</a-button>
-                <a-button>按钮二</a-button>
+                <a-button v-if="form.showBtn01">{{ form.btn01Txt }}</a-button>
+                <a-button v-if="form.showBtn02">{{ form.btn02Txt }}</a-button>
               </div>
             </div>
           </div>
@@ -169,7 +187,10 @@
               </div>
               <draggable v-model="answerPage" :options="{ group: { name: 'tt', pull: 'clone' }, sort: true, }" animation="300">
                 <transition-group>
-                  <div class="items" v-for="item in answerPage" :key="item.type">{{ item.typeName }}</div>
+                  <div class="items" v-show="item.show" v-for="item in answerPage" :key="item.type">
+                    <h2>{{ item.typeName }}</h2>
+                    <img :src="item.url" />
+                  </div>
                 </transition-group>
               </draggable>
             </div>
@@ -206,51 +227,77 @@ export default {
       loading: false,
       homePage: [
         {
-          type: 'Image01',
+          type: 'image01',
           typeName: '多图区一',
-          value: ''
+          value: '',
+          url: '',
+          show: true
         }, {
-          type: 'video',
+          type: 'videoBg',
           typeName: '视频专区名称',
-          value: ''
+          value: '',
+          url: '',
+          show: true
         }, {
-          type: 'roll',
-          typeName: '走马灯'
+          type: 'rollBg',
+          typeName: '走马灯',
+          value: '',
+          url: '',
+          show: true
         }, {
-          type: 'Image02',
+          type: 'image02',
           typeName: '多图区二',
-          value: ''
+          value: '',
+          url: '',
+          show: true
         }
       ],
       answerPage: [
         {
-          type: 'txt1',
+          type: 'regTxt',
           typeName: '注册会员文案',
-          value: ''
+          value: '',
+          url: '',
+          show: true
         }, {
           type: 'qrcode',
           typeName: '客服二维码',
-          value: ''
+          value: '',
+          url: '',
+          show: true
         }, {
-          type: 'txt2',
-          typeName: '优惠券文案'
+          type: 'ticketTxt',
+          typeName: '优惠券文案',
+          value: '',
+          url: '',
+          show: true
         }
       ],
       form: {
+        // 基础信息
         name: '',
         date: null,
         startTime: '',
         endTime: '',
-        introduceImage: '',
-        Image01FullPath: '',
-        // -----
-        employeeQrcodeImage: '',
-        couponIntroduce: '',
         introduceImageFullPath: '',
-        Image01FullPath: '',
+        // 活动首页
+        image01FullPath: '',
+        couponIntroduce: '',
         videoBgFullPath: '',
+        rollShow: true,
         rollBgFullPath: '',
-        Image02FullPath: ''
+        image02FullPath: '',
+        showBtn01: true,
+        btn01Txt: '按钮一',
+        btn01Link: '',
+        showBtn02: true,
+        btn02Txt: '按钮二',
+        btn02Link: '',
+        // 答题页身份认证
+        style: '',
+        regTxt: '',
+        employeeQrcodeImageFullPath: '',
+        ticketTxt: ''
       },
       rules: {
         name: [{ required: true, message: '请输入活动名称', trigger: 'change' }],
@@ -266,23 +313,12 @@ export default {
       immediate: true,
       deep: true,
       handler (val) {
-        this.form.name = val.name
-        this.form.couponIntroduce = val.couponIntroduce
-        this.form.introduceImage = val.introduceImage
-        this.form.prizeImage = val.prizeImage
-        this.form.employeeQrcodeImage = val.employeeQrcodeImage
+        this.form = val
         if (val.startTime) {
           this.form.date = [moment(val.startTime), moment(val.endTime)]
         }
         this.form.startTime = val.startTime
         this.form.endTime = val.endTime
-        // ---
-        this.employeeQrcodeImageFullPath = val.employeeQrcodeImageFullPath
-        this.introduceImageFullPath = val.introduceImageFullPath
-        this.Image01FullPath = val.Image01FullPath
-        this.videoBgFullPath = val.videoBgFullPath
-        this.rollBgFullPath = val.rollBgFullPath
-        this.Image02FullPath = val.Image02FullPath
       }
     }
   },
@@ -300,15 +336,31 @@ export default {
      * @param {*} img
      */
     getImg (img, type) {
-      this.form[type] = img.path
-      this[type + 'FullPath'] = img.fullPath
+      this.form[type] = img.fullPath
       this.$refs['baseForm'].validateField(['content'])
+      const arr = this.homePage
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].type === type) {
+          arr[i].url = img.fullPath
+        }
+      }
     },
     /**
      * 走马灯回调
      */
-    onChange (e) {
-      console.log(e)
+    handleChangeRoll (e) {
+      const arr = this.homePage
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].type === 'rollBg') {
+          arr[i].show = e.target.checked
+        }
+      }
+    },
+    /**
+     * 切换按钮显示
+     */
+    handleChangeBtn (e, type) {
+      this.form[type] = e.target.checked
     }
   }
 }
@@ -336,6 +388,7 @@ export default {
         .box{
           width:264px;
           height:470px;
+          overflow: auto;
           background:#f2f2f2;
           position: absolute;
           top:40px;
@@ -349,11 +402,27 @@ export default {
             text-align: center;
           }
           .items {
-            padding: 6px 12px;
+            padding: 0;
             background: #f4f6fc;
             border: 1px solid #f4f6fc;
             text-align: left;
-            margin-bottom: 5px;
+            position: relative;
+            width:100%;
+            height:auto;
+            min-height:40px;
+            h2{
+              position: absolute;
+              top:50%;
+              left:50%;
+              transform: translate(-50%, -50%);
+              padding:0px 5px;
+              background:rgba(255, 255, 255, .7);
+              font-size:14px;
+              z-index: 99;
+            }
+            img{
+              width:100%;
+            }
             i{
               margin-right:10px;
             }
@@ -361,16 +430,6 @@ export default {
               border:1px dashed #409eff;
               color:#409eff;
               cursor: move;
-            }
-          }
-          .handle{
-            width:100%;
-            position: absolute;
-            bottom:0;
-            left:0;
-            display:flex;
-            button{
-              flex:1;
             }
           }
           .demo{
@@ -383,6 +442,13 @@ export default {
               padding:0;
               margin:0;
               margin-bottom:30px;
+            }
+          }
+          .handle{
+            width:100%;
+            display:flex;
+            button{
+              flex:1;
             }
           }
         }
@@ -443,15 +509,15 @@ export default {
       }
     }
   }
-  .item{
+  .btnList{
     display:flex;
-    input{
-      width:400px;
+    p.title{
+      font-size:14px;
+      width:15%;
+      text-align: right;
     }
-    span{
+    p.ctx{
       flex:1;
-      margin-left:20px;
-      line-height:40px;
     }
   }
 </style>
