@@ -39,7 +39,7 @@
           <a-form-model-item label="多图区一" prop="image01FullPath">
             <a-input v-show="false" v-model="form.image01FullPath"/>
             <div class="formBox">
-              <UploadImg @changeImg="(e)=>{getImg(e, 'image01FullPath')}" :imgUrl="image01FullPath" :btnType="false" :fileType="1" />
+              <UploadImg @changeImg="(e)=>{getImg(e, 'image01FullPath')}" :imgUrl="form.image01FullPath" :btnType="false" :fileType="1" />
               <span>最多可上传3张图片，单张图片大小不超过5M，尺寸：宽375px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
@@ -50,7 +50,7 @@
           <a-form-model-item prop="videoBgFullPath" :wrapper-col="{ span: 14, offset: 4 }">
             <a-input v-show="false" v-model="form.videoBgFullPath"/>
             <div class="formBox">
-              <UploadImg @changeImg="(e)=>{getImg(e, 'videoBgFullPath')}" :imgUrl="videoBgFullPath" :btnType="false" :fileType="1" />
+              <UploadImg @changeImg="(e)=>{getImg(e, 'videoBgFullPath')}" :imgUrl="form.videoBgFullPath" :btnType="false" :fileType="1" />
               <span>图片大小不超过5M，尺寸为：宽375px*275px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
@@ -62,18 +62,18 @@
               </a-checkbox>
             </div>
           </a-form-model-item>
-          <a-form-model-item prop="rollBg" :wrapper-col="{ span: 14, offset: 4 }">
-            <a-input v-show="false" v-model="form.rollBg"/>
+          <a-form-model-item prop="rollBgFullPath" :wrapper-col="{ span: 14, offset: 4 }">
+            <a-input v-show="false" v-model="form.rollBgFullPath"/>
             <div class="formBox">
-              <UploadImg @changeImg="(e)=>{getImg(e, 'rollBg')}" :imgUrl="rollBgFullPath" :btnType="false" :fileType="1" />
+              <UploadImg @changeImg="(e)=>{getImg(e, 'rollBgFullPath')}" :imgUrl="form.rollBgFullPath" :btnType="false" :fileType="1" />
               <span>图片大小不超过5M，尺寸为：宽375px*275px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
           <!--多图区二-->
-          <a-form-model-item label="多图区二" prop="image02">
-            <a-input v-show="false" v-model="form.image02"/>
+          <a-form-model-item label="多图区二" prop="image02FullPath">
+            <a-input v-show="false" v-model="form.image02FullPath"/>
             <div class="formBox">
-              <UploadImg @changeImg="(e)=>{getImg(e, 'image02')}" :imgUrl="image02FullPath" :btnType="false" :fileType="1" />
+              <UploadImg @changeImg="(e)=>{getImg(e, 'image02FullPath')}" :imgUrl="form.image02FullPath" :btnType="false" :fileType="1" />
               <span>最多可上传3张图片，单张图片大小不超过5M，尺寸：宽375px，格式为jpg/png/jpeg；</span>
             </div>
           </a-form-model-item>
@@ -139,7 +139,7 @@
         <div class="fl">
           <h2>答题页身份认证</h2>
           <!--答题页主题色-->
-          <a-form-model-item label="答题页主题色" prop="text">
+          <a-form-model-item label="答题页主题色" prop="style">
             <div class="item">
               <a-radio-group name="radioGroup" class="styleSelect" v-model="form.style">
                 <a-radio :value="1">
@@ -158,18 +158,18 @@
             </div>
           </a-form-model-item>
           <!--注册会员文案-->
-          <a-form-model-item label="注册会员文案" prop="text">
-            <a-input style="width:350px;" v-model="form.couponIntroduce" :maxLength="20" :suffix="`${form.couponIntroduce ? form.couponIntroduce.length : 0}/20`" />
+          <a-form-model-item label="注册会员文案" prop="regTxt">
+            <a-input style="width:350px;" v-model="form.regTxt" :maxLength="20" :suffix="`${form.regTxt ? form.regTxt.length : 0}/20`" />
           </a-form-model-item>
           <!--客服二维码-->
-          <a-form-model-item label="客服二维码" prop="employeeQrcodeImage">
-            <a-input v-show="false" v-model="form.employeeQrcodeImage"/>
-            <UploadImg @changeImg="(e)=>{getImg(e, 'employeeQrcodeImage')}" :btnType="false" :imgUrl="employeeQrcodeImageFullPath" :fileType="1" />
+          <a-form-model-item label="客服二维码" prop="employeeQrcodeImageFullPath">
+            <a-input v-show="false" v-model="form.employeeQrcodeImageFullPath"/>
+            <UploadImg @changeImg="(e)=>{getImg(e, 'employeeQrcodeImageFullPath')}" :btnType="false" :imgUrl="form.employeeQrcodeImageFullPath" :fileType="1" />
             <span>尺寸：114px*114px，格式为jpg/png/jpeg；</span>
           </a-form-model-item>
           <!--优惠券文案-->
-          <a-form-model-item label="优惠券文案" prop="text">
-            <a-input style="width:350px;" v-model="form.couponIntroduce" :maxLength="20" :suffix="`${form.couponIntroduce ? form.couponIntroduce.length : 0}/20`" />
+          <a-form-model-item label="优惠券文案" prop="ticketTxt">
+            <a-input style="width:350px;" v-model="form.ticketTxt" :maxLength="20" :suffix="`${form.ticketTxt ? form.ticketTxt.length : 0}/20`" />
           </a-form-model-item>
         </div>
         <div class="fr">
@@ -227,25 +227,25 @@ export default {
       loading: false,
       homePage: [
         {
-          type: 'image01',
+          type: 'image01FullPath',
           typeName: '多图区一',
           value: '',
           url: '',
           show: true
         }, {
-          type: 'videoBg',
+          type: 'videoBgFullPath',
           typeName: '视频专区名称',
           value: '',
           url: '',
           show: true
         }, {
-          type: 'rollBg',
+          type: 'rollBgFullPath',
           typeName: '走马灯',
           value: '',
           url: '',
           show: true
         }, {
-          type: 'image02',
+          type: 'image02FullPath',
           typeName: '多图区二',
           value: '',
           url: '',
@@ -260,7 +260,7 @@ export default {
           url: '',
           show: true
         }, {
-          type: 'qrcode',
+          type: 'employeeQrcodeImageFullPath',
           typeName: '客服二维码',
           value: '',
           url: '',
@@ -294,17 +294,22 @@ export default {
         btn02Txt: '按钮二',
         btn02Link: '',
         // 答题页身份认证
-        style: '',
+        style: 1,
         regTxt: '',
         employeeQrcodeImageFullPath: '',
         ticketTxt: ''
       },
       rules: {
-        name: [{ required: true, message: '请输入活动名称', trigger: 'change' }],
+        // 基础信息
+        name: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
         date: [{ required: true, message: '请选择日期', trigger: 'change' }],
-        introduceImage: [{ required: true, message: '请上传活动介绍', trigger: 'blur' }],
-        employeeQrcodeImage: [{ required: true, message: '请上传员工二维码', trigger: 'blur' }],
-        shareIcon: [{ required: true, message: '请上传活动分享图标', trigger: 'blur' }]
+        introduceImageFullPath: [{ required: true, message: '请上传活动介绍', trigger: 'blur' }],
+        // 活动首页
+        couponIntroduce: [{ required: true, message: '请输入视频专区名称', trigger: 'blur' }],
+        // 答题页身份认证
+        style: [{ required: true, message: '请选主题', trigger: 'change' }],
+        regTxt: [{ required: true, message: '注册会员文案', trigger: 'blur' }],
+        employeeQrcodeImageFullPath: [{ required: true, message: '请上传客服二维码', trigger: 'blur' }]
       }
     }
   },
@@ -313,7 +318,7 @@ export default {
       immediate: true,
       deep: true,
       handler (val) {
-        this.form = val
+        this.form = {...this.form, ...val}
         if (val.startTime) {
           this.form.date = [moment(val.startTime), moment(val.endTime)]
         }
@@ -337,8 +342,13 @@ export default {
      */
     getImg (img, type) {
       this.form[type] = img.fullPath
-      this.$refs['baseForm'].validateField(['content'])
-      const arr = this.homePage
+      // this.$refs['baseForm'].validateField(['content'])
+      let  arr = []
+      if (type === 'employeeQrcodeImageFullPath') {
+        arr = this.answerPage
+      } else {
+        arr = this.homePage
+      }
       for (let i = 0; i < arr.length; i++) {
         if (arr[i].type === type) {
           arr[i].url = img.fullPath
@@ -351,7 +361,7 @@ export default {
     handleChangeRoll (e) {
       const arr = this.homePage
       for (let i = 0; i < arr.length; i++) {
-        if (arr[i].type === 'rollBg') {
+        if (arr[i].type === 'rollBgFullPath') {
           arr[i].show = e.target.checked
         }
       }

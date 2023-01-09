@@ -94,6 +94,7 @@ export default {
       immediate: true,
       deep: true,
       handler (val) {
+        console.log(11111, val)
         this.imageUrl = val
       }
     },
@@ -159,7 +160,7 @@ export default {
         const data = info.file.response.data
         this.$emit('success', data)
         this.$emit('changeImg', data)
-        this.imageUrl = data
+        this.imageUrl = data.fullPath
         this.loading = false
       }
       if (info.file.status === 'error') {
