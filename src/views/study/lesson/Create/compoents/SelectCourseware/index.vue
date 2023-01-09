@@ -85,14 +85,11 @@
               <a-button class="delButton" @click="remove(record)">删除</a-button>
               <SelectExamination
                 v-if="!hiddenExam"
+                type="2"
                 v-model="record.exam"
                 placeholder="请选择关联考试"
                 showStyle="successButton"
-              >
-                <a-button class="successButton">
-                  关联考试
-                </a-button>
-              </SelectExamination>
+              />
               <div class="my-handle">
                 <DragIcon :width="24" />
               </div>

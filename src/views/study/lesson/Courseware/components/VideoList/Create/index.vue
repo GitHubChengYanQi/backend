@@ -82,7 +82,7 @@
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd'
 import Preview from '../../../../../components/Preview'
-import VueQuillEditor from '@/components/VueQuillEditor'
+import VueQuillEditor from '../../../../../components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
 import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
 import { message } from 'ant-design-vue'
