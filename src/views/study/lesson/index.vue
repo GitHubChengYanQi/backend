@@ -83,6 +83,7 @@
       </div>
       <a-spin :spinning="loading">
         <a-table
+          :scroll="{ x: 'max-content'}"
           class="my-table"
           :columns="columns"
           :data-source="tableData"
@@ -93,7 +94,7 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
+                <img height="50" width="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50'">
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">
@@ -213,6 +214,7 @@ export default {
       screenData: {},
       columns: [
         {
+          fixed: 'left',
           title: '课程名称',
           dataIndex: 'name',
           scopedSlots: { customRender: 'name' },
@@ -231,7 +233,7 @@ export default {
           dataIndex: 'courseClassResult',
           align: 'center',
           customRender (value) {
-            return value && value.name || '-'
+            return (value && value.name) || '-'
           }
         },
         {
@@ -270,8 +272,9 @@ export default {
           title: '关联考试',
           align: 'center',
           dataIndex: 'examResults',
-          customRender: (examResults) => {
-            return examResults && examResults.length > 0 ? '是' : '否'
+          customRender: (examResults, record) => {
+            const isExam = record.courseWareBindResults && record.courseWareBindResults.find(item => item.examId)
+            return (isExam || (examResults && examResults.length > 0)) ? '是' : '否'
           }
         },
         {
@@ -292,6 +295,7 @@ export default {
           sorter: true
         },
         {
+          fixed: 'right',
           title: '操作',
           width: 200,
           align: 'center',

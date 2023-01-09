@@ -133,6 +133,43 @@ export function getTempIntegralData () {
     }
   ]
 }
+// 临时获取积分管理列表数据
+export function getTempIntegralManagerData () {
+  return [
+    {
+      id: 1,
+      managerName: '员工1',
+      integralTotal: 100,
+      integralSend: 10,
+      integralUse: 20,
+      integralOver: 30
+    },
+    {
+      id: 2,
+      managerName: '员工2',
+      integralTotal: 100,
+      integralSend: 10,
+      integralUse: 20,
+      integralOver: 30
+    },
+    {
+      id: 3,
+      managerName: '员工3',
+      integralTotal: 100,
+      integralSend: 10,
+      integralUse: 20,
+      integralOver: 30
+    },
+    {
+      id: 4,
+      managerName: '员工4',
+      integralTotal: 100,
+      integralSend: 10,
+      integralUse: 20,
+      integralOver: 30
+    }
+  ]
+}
 // 获取字典
 export function getDictData (params) {
   return request({

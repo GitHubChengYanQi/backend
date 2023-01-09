@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课件管理','创建图文']" back back-tip></breadcrumb>
+    <breadcrumb :titles="['课程管理','课件管理',`${$router.history.current.query.id ? '编辑' : '创建'}图文`]" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
@@ -31,18 +31,20 @@
                 placeholder="请选择封面图"
                 v-decorator="['coverImageUrl', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
               />
-              建议尺寸：750 × 1448
+              建议尺寸：750 × 750
             </div>
           </a-form-item>
           <a-form-item label="课程详情">
-            <VueQuillEditor
-              width="400px"
-              v-if="!detailLoading"
-              :height="'auto'"
-              placeholder="请输入课程详情"
-              v-decorator="['note', { rules: [{ required: true, message: '请输入课程详情!' }], initialValue:detail.note }]"
-            />
-            <a-spin v-else />
+            <div style="height: 500px">
+              <VueQuillEditor
+                width="400px"
+                v-if="!detailLoading"
+                :height="'auto'"
+                placeholder="请输入课程详情"
+                v-decorator="['note', { rules: [{ required: true, message: '请输入课程详情!' }], initialValue:detail.note }]"
+              />
+              <a-spin v-else />
+            </div>
           </a-form-item>
         </a-form>
 

@@ -192,7 +192,7 @@ export default {
           align: 'center',
           width: '200px',
           customRender (value, record) {
-            return record.employeeEntity && record.employeeEntity.name || '-'
+            return (record.employeeEntity && record.employeeEntity.name) || '-'
           }
         },
         {
@@ -201,7 +201,7 @@ export default {
           dataIndex: '2',
           align: 'center',
           customRender (value, record) {
-            return record.employeeEntity && record.employeeEntity.masterDepartmentName || '-'
+            return (record.employeeEntity && record.employeeEntity.masterDepartmentName) || '-'
           }
         },
         {
@@ -209,7 +209,7 @@ export default {
           dataIndex: '3',
           align: 'center',
           customRender (value, record) {
-            return record.employeeEntity && record.employeeEntity.department && record.employeeEntity.department.departmentName || '-'
+            return (record.employeeEntity && record.employeeEntity.department && record.employeeEntity.department.departmentName) || '-'
           }
         },
         {

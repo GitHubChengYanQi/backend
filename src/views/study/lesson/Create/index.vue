@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','新建课程']" back back-tip></breadcrumb>
+    <breadcrumb :titles="['课程管理',`${$router.history.current.query.id ? '编辑' : '创建'}课程`]" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
@@ -25,13 +25,13 @@
               v-decorator="['name', { rules: [{ required: true, message: '请输入课程名称!' }] }]"
             />
           </a-form-item>
-          <a-form-item label="模板分类">
+          <a-form-item label="课程分类">
             <a-cascader
               change-on-select
               v-if="!classTreeLoading"
               :options="classTree"
-              placeholder="请选择模板分类"
-              v-decorator="['courseClassId', { rules: [{ required: true, message: '请选择模板分类!' }] }]"
+              placeholder="请选择课程分类"
+              v-decorator="['courseClassId', { rules: [{ required: true, message: '请选择课程分类!' }] }]"
             />
             <a-spin v-else />
           </a-form-item>
@@ -53,7 +53,7 @@
                 placeholder="请选择封面图"
                 v-decorator="['coverImageUrl', { rules: [{ required: true, message: '请选择封面图!'}],initialValue: '' }]"
               />
-              建议尺寸：750 × 1448
+              建议尺寸：750 × 750
             </div>
           </a-form-item>
           <a-form-item label="适用员工">
@@ -73,14 +73,16 @@
             />
           </a-form-item>
           <a-form-item label="课程简介">
-            <VueQuillEditor
-              width="400px"
-              v-if="!detailLoading"
-              :height="'auto'"
-              placeholder="请输入课程简介"
-              v-decorator="['note', { rules: [{ required: true, message: '请输入课程简介!' }],initialValue:'' }]"
-            />
-            <a-spin v-else />
+            <div style="height: 500px">
+              <VueQuillEditor
+                width="400px"
+                v-if="!detailLoading"
+                :height="'auto'"
+                placeholder="请输入课程简介"
+                v-decorator="['note', { rules: [{ required: true, message: '请输入课程简介!' }],initialValue:'' }]"
+              />
+              <a-spin v-else />
+            </div>
           </a-form-item>
         </a-form>
       </div>

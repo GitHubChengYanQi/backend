@@ -42,7 +42,7 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
+                <img height="50" width="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50'">
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">
@@ -75,8 +75,7 @@
 <script>
 
 import router from '@/router'
-import { courseExcelExport, examCourseBindPageExcelExport, examCourseBindPageList } from '@/api/study/course'
-import moment from 'moment'
+import { examCourseBindPageExcelExport, examCourseBindPageList } from '@/api/study/course'
 import { excelExport } from '@/utils/downloadUtil'
 import { message } from 'ant-design-vue'
 
@@ -120,7 +119,7 @@ export default {
           dataIndex: 'timeLimit',
           align: 'center',
           customRender (value) {
-            return value + '分钟'
+            return value >= 0 ? value + '分钟' : '不限定时长'
           }
         },
         {
@@ -128,7 +127,7 @@ export default {
           dataIndex: 'questionnaireResults',
           align: 'center',
           customRender (value) {
-            return value && value[0] && value[0].score || 0
+            return (value && value[0] && value[0].score) || 0
           }
         },
         {

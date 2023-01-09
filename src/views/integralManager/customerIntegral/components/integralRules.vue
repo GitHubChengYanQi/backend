@@ -144,22 +144,24 @@
       title="执行群发朋友圈任务"
       :maskCloseable="false"
       :width="1000"
-      :visible="integralFriendCircleShowSatus"
+      :visible="integralFriendCircleShowStatus"
       class="friendCircleModalClass"
       @cancel="closeIntegralFriendCircleModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
       <div class="formDivContent">
         <div class="singleFormDiv">
-          <div>规则状态</div>
+          <div class="singleFormTitle">规则状态</div>
+          <a-switch :checked="true"></a-switch>
           <div>已启用</div>
         </div>
         <div class="singleFormDiv">
-          <div>积分规则</div>
-          <div>任务时间内完成朋友圈群发任务，可获得</div>
+          <div class="singleFormTitle">积分规则</div>
+          <div class="singleFormText">任务时间内完成朋友圈群发任务，可获得</div>
+          <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
         </div>
         <div class="singleFormDiv">
-          <div>适用员工</div>
+          <div class="singleFormTitle">适用员工</div>
           <selectPersonnel
             v-if="treeData"
             :record="treeData"
@@ -170,6 +172,7 @@
             @getVal="employeeIdsChange"
           />
         </div>
+        <div class="formRulesDesc">积分奖励将在员工执行群发朋友圈任务后立即发放</div>
       </div>
       <template slot="footer">
         <a-button
@@ -178,25 +181,223 @@
         <a-button type="primary" @click="confirmIntegralFriendCircle">确定</a-button>
       </template>
     </a-modal>
+    <a-modal
+      title="加好友"
+      :maskCloseable="false"
+      :width="1000"
+      :visible="integralAddFriendShowStatus"
+      class="addFriendModalClass"
+      @cancel="closeIntegralAddFriendModal()"
+      :getContainer="() => $refs['integral_rules_container']"
+    >
+      <div class="formDivContent">
+        <div class="singleFormDiv">
+          <div class="singleFormTitle">规则状态</div>
+          <a-switch :checked="true"></a-switch>
+          <div>已启用</div>
+        </div>
+        <div class="singleFormDiv">
+          <div class="singleFormTitle">积分规则</div>
+          <div class="singleFormText">新添加1个好友，且</div>
+          <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
+          <div class="singleFormText">未流失，员工可获得</div>
+          <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+        </div>
+        <div class="singleFormDiv">
+          <div class="singleFormTitle">适用员工</div>
+          <selectPersonnel
+            v-if="treeData"
+            :record="treeData"
+            class="selectPersonnelCom"
+            type="button"
+            name="添加员工"
+            v-model="employeeIds"
+            @getVal="employeeIdsChange"
+          />
+        </div>
+        <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
+      </div>
+      <template slot="footer">
+        <a-button
+          @click="closeIntegralAddFriendModal()"
+        >取消</a-button>
+        <a-button type="primary" @click="confirmIntegralAddFriend">确定</a-button>
+      </template>
+    </a-modal>
+    <a-modal
+      title="目标客户产生购买"
+      :maskCloseable="false"
+      :width="1000"
+      :zIndex="600"
+      :visible="integralBuyShowStatus"
+      class="buyModalClass"
+      @cancel="closeIntegralBuyModal()"
+      :getContainer="() => $refs['integral_rules_container']"
+    >
+      <div class="formDivContent">
+        <div class="singleFormDiv">
+          <div class="singleFormTitle">规则状态</div>
+          <a-switch :checked="true"></a-switch>
+          <div>已启用</div>
+        </div>
+        <div class="singleFormRulesDiv">
+          <div class="singleFormTitle">积分规则</div>
+          <div class="singleFormContent">
+            <div class="singleRulesContent">
+              <div class="singleFormText">好友查看了</div>
+              <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
+              <div class="radarContentDiv" @click="chooseRadarMethod">
+                <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
+                <div v-else class="tagDiv">
+                  <div v-for="item in radarList.slice(0,1)" :key="item.id" class="singleTagDiv">
+                    {{ item.title }}
+                    <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
+                  </div>
+                  <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
+                  <div v-if="radarList.length !== 0" class="clearTagDiv" @click.stop="clearTagMethod">X</div>
+                </div>
+              </div>
+              <div class="singleFormText">后</div>
+              <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
+              <div class="singleFormText">内,购买了</div>
+              <!-- <a-button @click="chooseGoods()">+添加商品</a-button> -->
+              <div class="goodsContentDiv" @click="chooseGoodsMethod">
+                <div v-if="goodsList.length === 0" class="noGoodsDiv">+商品库</div>
+                <div v-else class="tagDiv">
+                  <div v-for="item in goodsList" :key="item.id" class="singleTagDiv">
+                    {{ item.name }}
+                    <div class="delete" @click.stop="deleteSingleGoods(item)">+</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="singleRulesContent">
+              <div class="singleFormText">且</div>
+              <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
+              <div class="singleFormText">内，未退货，员工可获得</div>
+              <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+            </div>
+          </div>
+        </div>
+        <div class="singleFormDiv">
+          <div class="singleFormTitle">适用员工</div>
+          <selectPersonnel
+            v-if="treeData"
+            :record="treeData"
+            class="selectPersonnelCom"
+            type="button"
+            name="添加员工"
+            v-model="employeeIds"
+            @getVal="employeeIdsChange"
+          />
+        </div>
+        <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
+      </div>
+      <template slot="footer">
+        <a-button
+          @click="closeIntegralBuyModal()"
+        >取消</a-button>
+        <a-button type="primary" @click="confirmIntegralBuy">确定</a-button>
+      </template>
+    </a-modal>
+    <a-modal
+      title="好友查看素材"
+      :maskCloseable="false"
+      :width="1000"
+      :visible="integralMaterialShowStatus"
+      class="materialModalClass"
+      @cancel="closeIntegralMaterialModal()"
+      :getContainer="() => $refs['integral_rules_container']"
+    >
+      <div class="formDivContent">
+        <div class="singleFormDiv">
+          <div class="singleFormTitle">规则状态</div>
+          <a-switch :checked="true"></a-switch>
+          <div>已启用</div>
+        </div>
+        <div class="singleFormRulesDiv">
+          <div class="singleFormTitle">积分规则</div>
+          <div class="singleFormContent">
+            <div class="singleRulesContent">
+              <div class="singleFormText">好友查看了</div>
+              <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
+              <div class="radarContentDiv" @click="chooseRadarMethod">
+                <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
+                <div v-else class="tagDiv">
+                  <div v-for="item in radarList.slice(0,1)" :key="item.id" class="singleTagDiv">
+                    {{ item.title }}
+                    <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
+                  </div>
+                  <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
+                  <div v-if="radarList.length !== 0" class="clearTagDiv" @click.stop="clearTagMethod">X</div>
+                </div>
+              </div>
+              <div class="singleFormText">后，员工可获得</div>
+              <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+            </div>
+            <div class="singleRulesContent">
+              <div class="singleFormText">每个素材</div>
+              <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
+              <div class="singleFormText">内可生效1次</div>
+            </div>
+          </div>
+        </div>
+        <div class="singleFormDiv">
+          <div class="singleFormTitle">适用员工</div>
+          <selectPersonnel
+            v-if="treeData"
+            :record="treeData"
+            class="selectPersonnelCom"
+            type="button"
+            name="添加员工"
+            v-model="employeeIds"
+            @getVal="employeeIdsChange"
+          />
+        </div>
+        <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
+      </div>
+      <template slot="footer">
+        <a-button
+          @click="closeIntegralMaterialModal()"
+        >取消</a-button>
+        <a-button type="primary" @click="confirmIntegralMaterial">确定</a-button>
+      </template>
+    </a-modal>
+    <goodsManager
+      :isRadioStatus="true"
+      :zIndex="1200"
+      :showStatus.sync="chooseGoodsManagerShowStatus"
+      :permissionText="''"
+      @submitConfirm="submitGoodsConfirm">
+    </goodsManager>
+    <chooseRadar :zIndex="800" :isRadioStatus="false" v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk"></chooseRadar>
   </div>
 </template>
 
 <script>
+import goodsManager from './goodsManager.vue'
+import chooseRadar from './chooseRadar.vue'
 import { getTempCommonData, getTempIntegralData, getValidityTypeData, getSingleIntegralTypeData, getCommonLimitListData, getCommonRemindListData } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralRules',
   data () {
     return {
+      radarList: [], // 选中的雷达列表
+      goodsList: [], // 选中的商品列表
+      // 雷达素材组件显示状态
+      radarVisible: false,
+      // 商品库组件显示状态
+      chooseGoodsManagerShowStatus: false,
       treeData: [],
       employeeIds: [],
+      // 积分规则设置好友查看素材任务弹框
+      integralMaterialShowStatus: false,
       // 积分规则设置群发朋友圈任务弹框
-      integralFriendCircleShowSatus: false,
+      integralFriendCircleShowStatus: false,
       // 积分规则设置加好友任务弹框
       integralAddFriendShowStatus: false,
       // 积分规则设置购买任务弹框
       integralBuyShowStatus: false,
-      // 积分规则设置查看素材任务弹框
-      integralMaterialShowStatus: false,
       // 通用规则积分到期提醒单选value值
       remindTypeName: 'noRemind',
       // 通用规则积分到期提醒弹框
@@ -316,11 +517,49 @@ export default {
       }
     }
   },
+  components: {
+    goodsManager,
+    chooseRadar
+  },
   created () {
     this.commonTableData = getTempCommonData()
     this.integralTableData = getTempIntegralData()
   },
   methods: {
+    // 选择商品
+    chooseGoodsMethod () {
+      this.chooseGoodsManagerShowStatus = true
+    },
+    // 商品库确认回调
+    submitGoodsConfirm (e) {
+      this.chooseGoodsManagerShowStatus = false
+      console.log(e, '选择商品库回调')
+      this.goodsList = Object.assign([], e)
+    },
+    // 删除单个商品标签
+    deleteSingleGoods (item) {
+      const deleteIndex = this.goodsList.findIndex(info => info.id === item.id)
+      this.goodsList.splice(deleteIndex, 1)
+    },
+    // 选择雷达素材
+    chooseRadarMethod () {
+      this.radarVisible = true
+    },
+    // 雷达素材选择回调
+    handleAddRadarOk (e) {
+      console.log(e, '选择雷达素材回调')
+      this.radarVisible = false
+      this.radarList = Object.assign([], e)
+    },
+    // 清空雷达选择
+    clearTagMethod () {
+      this.radarList = []
+    },
+    // 删除单个标签
+    deleteSingleTag (item) {
+      const deleteIndex = this.radarList.findIndex(info => info.id === item.id)
+      this.radarList.splice(deleteIndex, 1)
+    },
     // 选择组织机构
     employeeIdsChange (e) {
       console.log(e, 'eeee')
@@ -370,7 +609,7 @@ export default {
       console.log(info, 'info')
       if (info.type === 'friendCircle') {
         // 群发朋友圈任务
-        this.integralFriendCircleShowSatus = true
+        this.integralFriendCircleShowStatus = true
       } else if (info.type === 'addFriend') {
         // 加好友
         this.integralAddFriendShowStatus = true
@@ -384,11 +623,35 @@ export default {
     },
     // 设置朋友圈弹框点击取消
     closeIntegralFriendCircleModal () {
-      this.integralFriendCircleShowSatus = false
+      this.integralFriendCircleShowStatus = false
     },
     // 设置朋友圈弹框点击确定
     confirmIntegralFriendCircle () {
-      this.integralFriendCircleShowSatus = false
+      this.integralFriendCircleShowStatus = false
+    },
+    // 设置加好友弹框点击取消
+    closeIntegralAddFriendModal () {
+      this.integralAddFriendShowStatus = false
+    },
+    // 设置朋友圈弹框点击确定
+    confirmIntegralAddFriend () {
+      this.integralAddFriendShowStatus = false
+    },
+    // 设置购买弹框点击取消
+    closeIntegralBuyModal () {
+      this.integralBuyShowStatus = false
+    },
+    // 设置购买弹框点击确定
+    confirmIntegralBuy () {
+      this.integralBuyShowStatus = false
+    },
+    // 设置购买弹框点击取消
+    closeIntegralMaterialModal () {
+      this.integralMaterialShowStatus = false
+    },
+    // 设置购买弹框点击确定
+    confirmIntegralMaterial () {
+      this.integralMaterialShowStatus = false
     },
     // 新增商品
     addGoodsMethod (info) {
@@ -397,142 +660,6 @@ export default {
   }
 }
 </script>
-
 <style lang="less" scoped>
-.commonRulesDiv {
-  .headTitleDiv {
-    font-size: 20px;
-    font-weight: bolder;
-    color: black;
-  }
-  .tableBox {
-    background-color: white;
-    margin-top: 20px;
-  }
-}
-.integralRulesDiv {
-  margin-top: 30px;
-  .headTitleDiv {
-    font-size: 20px;
-    font-weight: bolder;
-    color: black;
-  }
-  .tableBox {
-    background-color: white;
-    margin-top: 20px;
-  }
-}
-.radioValityGroupDiv {
-  /deep/.singleRadioDiv {
-    margin-top: 20px;
-    display: flex;
-    .singleRadioTitle {
-      font-size: 16px;
-      color: black;
-    }
-    .singleRegularTopDiv {
-      display: flex;
-      align-items: center;
-      .singleRadioTitle {
-        font-size: 16px;
-        color: black;
-      }
-      .regularText {
-        font-size: 10px;
-        color: #4e4e4e;
-        margin-left: 20px;
-      }
-    }
-    .singleRadioContent {
-      display: flex;
-      align-items: center;
-      .singleRadioTitle {
-        margin-right: 10px;
-        font-size: 16px;
-        color: black;
-      }
-    }
-    .ant-radio {
-      padding-top: 4px;
-    }
-    .regularContentView {
-      .singleRegularContent {
-        margin-top: 20px;
-        font-size: 14px;
-        color: black;
-      }
-    }
-  }
-}
-.radioLimitGroupDiv {
-  /deep/.singleRadioDiv {
-    display: flex;
-    margin-top: 20px;
-    .ant-radio {
-      display: flex;
-      align-items: center;
-    }
-    .singleRadioTitle {
-      font-size: 16px;
-      color: black;
-    }
-    .singleRadioContent {
-      display: flex;
-      align-items: center;
-      .singleRadioTitle {
-        font-size: 16px;
-        color: black;
-        margin-right: 10px;
-      }
-    }
-  }
-}
-.radioRemindGroupDiv {
-  /deep/.singleRadioDiv {
-    display: flex;
-    margin-top: 20px;
-    .ant-radio {
-      display: flex;
-      align-items: center;
-    }
-    .singleRadioTitle {
-      font-size: 16px;
-      color: black;
-    }
-    .singleRadioContent {
-      display: flex;
-      align-items: center;
-      .singleRadioTitle {
-        font-size: 16px;
-        color: black;
-        margin-right: 10px;
-      }
-      .singleRadioText {
-        margin-left: 10px;
-        margin-right: 10px;
-      }
-    }
-  }
-}
-.friendCircleModalClass {
-  .formDivContent {
-    /deep/.singleFormDiv {
-      .selectPersonnelCom {
-        width: 90%;
-        .ant-btn {
-          width: 180px;
-          height: 30px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 3px;
-          border: 1px dashed #8a8a8a;
-          background: none;
-          color: rgba(0, 0, 0, 0.6);
-          text-shadow: none;
-        }
-      }
-    }
-  }
-}
+@import url('../css/integralRules.less');;
 </style>

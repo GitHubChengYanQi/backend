@@ -63,7 +63,7 @@
               <div class="avatar mr12">
                 <img
                   height="50"
-                  :src="(record.examResult && record.examResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_100'"
+                  :src="(record.examResult && record.examResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_50'"
                 >
               </div>
               <div class="nickname">
@@ -160,7 +160,7 @@ export default {
           dataIndex: 'examResult',
           align: 'center',
           customRender (value) {
-            return ((value && value.timeLimit) || 0) + '分钟'
+            return (value && value.timeLimit) >= 0 ? (value.timeLimit) + '分钟' : '不限定时长'
           }
         },
         {
@@ -502,6 +502,7 @@ export default {
 }
 
 .user-info {
+  min-height: 50px;
 
   img {
     border-radius: 2px;

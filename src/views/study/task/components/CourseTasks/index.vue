@@ -75,7 +75,7 @@
               <div class="avatar mr12">
                 <img
                   height="50"
-                  :src="(record.courseResult && record.courseResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_100'"
+                  :src="(record.courseResult && record.courseResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_50'"
                 >
               </div>
               <div class="nickname">
@@ -90,15 +90,11 @@
           </div>
           <div slot="note" slot-scope="text,record">
             <div class="introduction">
-              <a-tooltip overlayClassName="myTooltip">
-                <template slot="title">
-                  <div class="ql-editor" v-html="record.courseResult && record.courseResult.note"></div>
-                </template>
-                <div>
-                  {{ record.courseResult && record.courseResult.note && record.courseResult.note.replace(/<.*?>/g, '')
-                  }}
-                </div>
-              </a-tooltip>
+              <div>
+                {{
+                  record.courseResult && record.courseResult.note && record.courseResult.note.replace(/<.*?>/g, '')
+                }}
+              </div>
             </div>
           </div>
           <div slot="tag" slot-scope="text,row">
@@ -145,7 +141,6 @@ import moment from 'moment'
 import { message } from 'ant-design-vue'
 import { courseClassTreeView } from '@/api/study/lessonClass'
 import SelectEmployee from '../../../components/SelectEmployee/index'
-import { courseExcelExport } from '@/api/study/course'
 import { excelExport } from '@/utils/downloadUtil'
 
 export default {
@@ -250,7 +245,8 @@ export default {
           dataIndex: '5',
           align: 'center',
           customRender (value, record) {
-            return (record.courseResult && record.courseResult.examResults && record.courseResult.examResults[0]) ? '是' : '否'
+            const isExam = record.courseResult && record.courseResult.courseWareBindResults && record.courseResult.courseWareBindResults.find(item => item.examId)
+            return (isExam || (record.courseResult && record.courseResult.examResults && record.courseResult.examResults[0])) ? '是' : '否'
           }
         },
         {

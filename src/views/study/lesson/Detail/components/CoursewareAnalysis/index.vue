@@ -46,7 +46,7 @@
                 <img
                   height="50"
                   v-if="['jpg','png'].includes(text && text.suffix)"
-                  :src="(text && text.coverImageUrl || text && text.mediaUrl) +'?x-oss-process=image/resize,m_fill,h_50,w_100'"
+                  :src="(text && text.coverImageUrl || text && text.mediaUrl) +'?x-oss-process=image/resize,m_fill,h_50,w_50'"
                 >
                 <a-icon v-if="['doc','docx'].includes(text && text.suffix)" type="file-word" style="font-size: 24px" />
                 <a-icon v-if="['ppt','pptx'].includes(text && text.suffix)" type="file-ppt" style="font-size: 24px" />
@@ -92,13 +92,12 @@
 
 import router from '@/router'
 import {
-  courseExcelExport, courseTaskBindDetailExcelExport,
+  courseTaskBindDetailExcelExport,
   courseTaskBindDetailList,
   courseWareBindExcelExport,
   courseWareBindList
 } from '@/api/study/course'
 import { getTimeDifference } from '@/utils/util'
-import moment from 'moment'
 import { excelExport } from '@/utils/downloadUtil'
 import { message } from 'ant-design-vue'
 

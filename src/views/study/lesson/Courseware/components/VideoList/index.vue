@@ -49,7 +49,7 @@
           <div slot="titleRender" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_100'">
+                <img height="50" width="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50'">
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">
@@ -100,8 +100,6 @@ import { message } from 'ant-design-vue'
 import Preview from '../../../../components/Preview/index'
 import SelectEmployee from '../../../../components/SelectEmployee/index'
 import router from '@/router'
-import { courseExcelExport } from '@/api/study/course'
-import { excelExport } from '@/utils/downloadUtil'
 
 export default {
   components: { Preview, SelectEmployee },

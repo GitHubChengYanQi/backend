@@ -85,14 +85,11 @@
               <a-button class="delButton" @click="remove(record)">删除</a-button>
               <SelectExamination
                 v-if="!hiddenExam"
+                type="2"
                 v-model="record.exam"
                 placeholder="请选择关联考试"
                 showStyle="successButton"
-              >
-                <a-button class="successButton">
-                  关联考试
-                </a-button>
-              </SelectExamination>
+              />
               <div class="my-handle">
                 <DragIcon :width="24" />
               </div>
@@ -172,7 +169,10 @@ import Preview from '../../../../components/Preview'
 
 export default {
   props: {
-    value: Array,
+    value: {
+      type: Array,
+      default: _ => []
+    },
     hiddenExam: Boolean
   },
   components: { DragIcon, FileList, VideoList, ImageTextList, SelectExamination, Preview },
@@ -210,7 +210,7 @@ export default {
   watch: {
     tableView: {
       handler () {
-        this.$emit('change', this.tableView.map((item) => ({ ...item, examId: item.exam && item.exam.examId })))
+        this.$emit('change', this.tableView.map((item) => ({ ...item, examId: item.exam ? item.exam.examId : null })))
       },
       deep: true
     }
