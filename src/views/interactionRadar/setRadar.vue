@@ -116,6 +116,7 @@
                       />
                       <video class="cover_video" :src="items.video" v-if="!items.isUpload" alt />
                       <div class="cover_video" v-if="items.isUpload">
+                        <a-spin class="spin" :indicator="items.isUpload" />
                         <img :src="require('@/assets/upload_video.svg')" alt />
                       </div>
                       <div
@@ -909,6 +910,7 @@ export default {
       this.setData.inputData.uploadVideo[e].video = ''
       this.setData.inputData.uploadVideo[e].isUpload = false
       this.setData.inputData.uploadVideo[e].source.cancel('取消上传')
+      this.setData.inputData.uploadVideo[e].source = null
     },
     getArticle () {
       console.log(this.setData.inputData.tsLink)
@@ -1215,6 +1217,7 @@ export default {
         this.setData.inputData.uploadVideo[index].source = source
         console.log(this.setData.inputData.uploadVideo)
       } else {
+        tempFormData.append('file', fileInfo)
         this.source = source
       }
       ossUpload(tempFormData, source.token).then(res => {
@@ -1225,7 +1228,9 @@ export default {
           this.uploadUrl = `${info.host}/${info.key}`
         }
       }).catch(() => {
-        this.setData.inputData.uploadVideo[index].isError = true
+        if (shape == 5 && this.setData.inputData.uploadVideo[index].source) {
+          this.setData.inputData.uploadVideo[index].isError = true
+        }
       })
     },
     getRadio (key, row) {
@@ -1285,7 +1290,11 @@ export default {
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
           } else {
-            this.$refs.editor[0].getEditorData('video', this.uploadUrl)
+            if (this.source) {
+              this.source.cancel()
+              this.source = null
+            }
+            if (this.uploadUrl.length > 0) { this.$refs.editor[0].getEditorData('video', this.uploadUrl) }
           }
         } else {
           this.setData.inputData.radarPDF = this.uploadUrl
@@ -1356,6 +1365,7 @@ export default {
       if (isState && inputData.shape != 5) {
         if (this.source) {
           this.source.cancel()
+          this.source = null
         }
         resetArr.map(item => {
           this.setData.inputData[item] = ''
@@ -1418,6 +1428,10 @@ export default {
         this.isImageText = false
         this.medium.pagination.current = 1
         this.medium.pagination.pageSize = 10
+        if (this.source) {
+          this.source.cancel()
+          this.source = null
+        }
       } else if (e == 3) {
         this.modelTab = 1
         this.isImageText = true
@@ -1850,8 +1864,15 @@ export default {
                     transform: translate(50%, -50%);
                   }
                   .cover_video {
+                    position: relative;
                     width: 100%;
                     height: 100%;
+                    .spin {
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%);
+                    }
                   }
                   .reupload {
                     cursor: pointer;
