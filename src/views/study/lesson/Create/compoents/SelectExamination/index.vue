@@ -1,20 +1,21 @@
 <template>
   <div>
     <div @click="visible = true" v-if="!name">
-      <slot>
-        <a-button style="width: 200px;border-radius: 8px" class="add">
-          <a-icon type="plus" />
-          关联
-        </a-button>
-      </slot>
+      <a-button v-if="type === '1'" style="width: 200px;border-radius: 8px" class="add">
+        <a-icon type="plus" />
+        关联
+      </a-button>
+      <a-button v-if="type === '2'" class="successButton">
+        关联考试
+      </a-button>
     </div>
     <div v-else>
       <a-badge>
         <div slot="count">
           <a-icon type="close-circle" style="cursor: pointer" @click="remove" />
         </div>
-        <a-button style="width: 200px;border-radius: 8px" :class="showStyle || 'linkButton'">
-          {{ name }}
+        <a-button style="width: 200px;border-radius: 8px" :class="type === '2' ? 'successButton' : 'linkButton'">
+          <div class="selectTestPager">{{ name }}</div>
         </a-button>
       </a-badge>
       <a-button type="link" @click="preview = true">
@@ -73,6 +74,10 @@ export default {
     showStyle: {
       type: String,
       default: _ => ''
+    },
+    type: {
+      type: String,
+      default: _ => '1'
     }
   },
   data () {
@@ -256,6 +261,24 @@ export default {
       margin-left: 24px;
     }
   }
+}
+
+.selectTestPager {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 16px;
+}
+
+.successButton {
+  color: #01ba77;
+  background-color: rgba(1, 186, 119, 0.1);
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
 }
 
 </style>

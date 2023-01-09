@@ -94,7 +94,7 @@
 import breadcrumb from '../../components/Breadcrumd'
 import selectCourseware from './compoents/SelectCourseware'
 import SelectExamination from './compoents/SelectExamination'
-import VueQuillEditor from '@/components/VueQuillEditor'
+import VueQuillEditor from '../../components/VueQuillEditor'
 import ImgUpload from '../../components/ImgUpload/index'
 import Employee from '../../components/Employee/index'
 import { courseClassTreeView } from '@/api/study/lessonClass'
