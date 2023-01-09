@@ -85,6 +85,14 @@
             />
             分
           </a-form-item>
+          <a-form-item label="试用员工">
+            <Employee
+              v-if="!detailLoading"
+              :employees="employees"
+              v-decorator="['applicableObject', { rules: [{ required: true, message: '请选择试用员工!' }],initialValue:['all'] }]"
+            />
+            <a-spin v-else />
+          </a-form-item>
           <a-form-item label="考试说明">
             <div class="myTextArea">
               <a-textarea
@@ -126,6 +134,7 @@ export default {
     return {
       detailLoading: false,
       data: {},
+      employees: [],
       loading: false,
       form: this.$form.createForm(this, { name: 'coordinated' })
     }
@@ -143,6 +152,7 @@ export default {
       this.detailLoading = true
       examDetail({ examId: id }).then((res) => {
         const detail = res.data || {}
+        this.employees = detail.bindEmpList ? detail.bindEmpList.map(item => item.name) : []
         this.form.setFieldsValue({
           name: detail.name,
           reexam: detail.reexam,
@@ -150,6 +160,7 @@ export default {
           coverImageUrl: detail.coverImageUrl,
           timeLimit: detail.timeLimit,
           passScore: detail.passScore,
+          applicableObject: detail.applicableObject === 1 ? ['all'] : detail.bindEmpList ? detail.bindEmpList.map(item => item.id) : [],
           note: detail.note
         })
       }).finally(() => {
@@ -163,7 +174,9 @@ export default {
           this.loading = true
           const data = {
             ...values,
-            questionnaireIds: [values.questionnaire.questionnaireId]
+            questionnaireIds: [values.questionnaire.questionnaireId],
+            applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
+            empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject
           }
           if (router.history.current.query.id) {
             examEdit({ ...data, examId: router.history.current.query.id }).then(() => {
