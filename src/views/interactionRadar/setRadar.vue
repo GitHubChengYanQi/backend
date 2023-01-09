@@ -107,17 +107,26 @@
                   :key="indexs"
                 >
                   <div class="upload_box">
-                    <div class="cover_video_box" v-if="items.video.length != 0">
+                    <div class="cover_video_box" v-if="items.video.length != 0 || items.isUpload">
                       <img
                         class="close"
                         :src="require('@/assets/healthManage/u2050.png')"
                         alt
                         @click="closeVideo(indexs)"
                       />
-                      <video class="cover_video" :src="items.video" alt />
+                      <video class="cover_video" :src="items.video" v-if="!items.isUpload" alt />
+                      <div class="cover_video" v-if="items.isUpload">
+                        <img :src="require('@/assets/upload_video.svg')" alt />
+                      </div>
+                      <div
+                        class="reupload"
+                        @click="reupload(items,indexs)"
+                        v-if="items.isError"
+                      >重新上传</div>
                     </div>
                     <div class="add_img_box" @click="setMedium(5,false,item.key,indexs)" v-else>
                       <img class="add_icon" :src="require('@/assets/add_icon.svg')" alt />
+                      <div class="index">{{ indexs + 1 }}</div>
                     </div>
                   </div>
                   <div class="input_box">
@@ -130,6 +139,15 @@
                     ></a-input>
                     <span class="hint">{{ items.title.length + '/' + 15 }}</span>
                   </div>
+                </div>
+                <div class="btn_box">
+                  <a-button
+                    type="primary"
+                    class="button"
+                    @click="()=>{
+                      preview = true
+                    }"
+                  >预览</a-button>
                 </div>
               </span>
               <span class="cover_box" v-else-if="item.type == 'cover'">
@@ -381,8 +399,8 @@
       }"
       title="附件预览"
     >
-      <div class="box">
-        <img :src="imageUrl" />
+      <div class="box" style="width:100%;">
+        <img :src="imageUrl" style="width:100%;height:auto;" />
       </div>
       <template slot="footer">
         <a-button
@@ -403,7 +421,62 @@
     >
       <div class="preview_box">
         <img :src="require('@/assets/phone14.jpg')" />
-        <div class="content_box ql-editor" v-html="setData.inputData.content"></div>
+        <div
+          class="content_box ql-editor"
+          v-html="setData.inputData.content"
+          v-if="setData.inputData.shape != 5"
+        ></div>
+        <div
+          class="templateVideo_box"
+          :style="setData.inputData.bgImg == '1' && setData.inputData.uploadBgImg.length > 0 ? {
+            background: `url(${setData.inputData.uploadBgImg}) no-repeat 0px 0px`,
+            padding : '60px 0 243px 0',
+            backgroundSize:'100% 100%'
+          }: { backgroundColor:'#fff' }"
+          v-else
+        >
+          <img
+            v-if="setData.inputData.bgImg == '0'"
+            :src="require('@/assets/default_header.png')"
+            class="header"
+            alt
+          />
+          <div class="video_box" :style="setData.inputData.bgImg == '0' ? {} :{background:'none'}">
+            <div class="video" v-for="(item,index) in setData.inputData.uploadVideo" :key="index">
+              <div
+                class="title"
+                :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat 0px 0px`}"
+              >{{ item.title }}</div>
+              <div
+                class="content"
+                :style="{width:setData.inputData.videoFormat == '0' ? '322px' :'245px'}"
+              >
+                <img
+                  class="bg_img"
+                  :style="setData.inputData.videoFormat == '0' ? {
+                    width:'322px',
+                    height:'181px'
+                  } : {
+                    width:'245px',
+                    height:'435px'
+                  }"
+                  :src="setData.inputData.bgImg == '0' ? require(`@/assets/default_${setData.inputData.videoFormat == '0' ? 'vertical' :'row'}.png` ): setData.inputData.uploadVideoBorderImg"
+                  alt
+                />
+                <video
+                  :class="setData.inputData.videoFormat == '0' ? 'vertical' :'row'"
+                  :src="item.video"
+                ></video>
+              </div>
+            </div>
+          </div>
+          <img
+            v-if="setData.inputData.bgImg == '0'"
+            :src="require('@/assets/default_bottom.png')"
+            class="bottom"
+            alt
+          />
+        </div>
       </div>
       <template slot="footer">
         <a-button
@@ -423,6 +496,7 @@ import { materialLibraryList } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
 import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad, scrmRadarArticleGrab } from '@/api/setRadar.js'
+import axios from 'axios'
 
 export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
@@ -477,12 +551,34 @@ export default {
           linkBgImg: '',
           videoFormat: '0',
           bgImg: '0',
-          uoloadBgImg: '',
-          uoloadTitleBorderImg: '',
-          uoloadVideoBorderImg: '',
+          uploadBgImg: '',
+          uploadTitleBorderImg: '',
+          uploadVideoBorderImg: '',
           uploadVideo: [{
             title: '',
-            video: ''
+            video: '',
+            isUpload: false,
+            isError: false
+          }, {
+            title: '',
+            video: '',
+            isUpload: false,
+            isError: false
+          }, {
+            title: '',
+            video: '',
+            isUpload: false,
+            isError: false
+          }, {
+            title: '',
+            video: '',
+            isUpload: false,
+            isError: false
+          }, {
+            title: '',
+            video: '',
+            isUpload: false,
+            isError: false
           }]
         },
         articleArr: {
@@ -767,19 +863,20 @@ export default {
       bgImgArr: [
         {
           btnTxt: '上传背景图',
-          key: 'uoloadBgImg'
+          key: 'uploadBgImg'
         },
         {
           btnTxt: '上传标题边框',
-          key: 'uoloadTitleBorderImg'
+          key: 'uploadTitleBorderImg'
         },
         {
           btnTxt: '上传视频边框',
-          key: 'uoloadVideoBorderImg'
+          key: 'uploadVideoBorderImg'
         }],
       selectKey: null,
       isShowKey: null,
-      selectIndex: 0
+      selectIndex: 0,
+      source: null
     }
   },
   created () {
@@ -810,6 +907,8 @@ export default {
   methods: {
     closeVideo (e) {
       this.setData.inputData.uploadVideo[e].video = ''
+      this.setData.inputData.uploadVideo[e].isUpload = false
+      this.setData.inputData.uploadVideo[e].source.cancel('取消上传')
     },
     getArticle () {
       console.log(this.setData.inputData.tsLink)
@@ -862,7 +961,8 @@ export default {
             1: ['linkTitle', 'linkImg', 'articleLink', 'linkDigest'],
             2: ['linkImg', 'linkTitle', 'linkDigest', 'content']
           },
-          4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+          4: ['linkImg', 'linkTitle', 'linkDigest', 'content'],
+          5: ['linkImg', 'linkTitle', 'linkDigest', 'videoFormat', 'bgImg', 'uploadVideo', 'uploadBgImg', 'uploadTitleBorderImg', 'uploadVideoBorderImg']
         }
         // const shapeArr = ['链接', 'PDF', '图文/文章', '视频']
         for (const key in data) {
@@ -923,6 +1023,18 @@ export default {
         return item.id != e
       })
     },
+    reupload (item, index) {
+      this.selectIndex = index
+      const obj = {}
+      const arr = ['title', 'video', 'isUpload', 'isError', 'fileInfo', 'source']
+      for (const i in item) {
+        if (!arr.includes(i)) {
+          obj[i] = item[i]
+        }
+      }
+      item.source.cancel('重新上传')
+      this.dealUploadMethod(obj, obj.fileInfo)
+    },
     showBox (e) {
       this.ruleState = e != -1
       if (e != -1) {
@@ -940,6 +1052,16 @@ export default {
       const { inputData } = this.setData
       const { linkState } = this.linkData
       const inputArr = ['title', 'unitId', 'ditch', 'shape']
+      if (inputData.shape == '5') {
+        this.setData.inputData.uploadVideo = inputData.uploadVideo.map(item => {
+          const obj = {}
+          obj.title = item.title
+          obj.video = item.video
+          return obj
+        }).filter(item => {
+          return item.video.length > 0
+        })
+      }
       const entry = {
         1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
         2: ['radarPDF', 'linkTitle'],
@@ -948,7 +1070,8 @@ export default {
           1: ['linkTitle', 'linkImg', 'linkDigest', 'articleLink', 'contentSource'],
           2: ['linkImg', 'linkTitle', 'linkDigest', 'content', 'contentSource']
         },
-        4: ['linkImg', 'linkTitle', 'linkDigest', 'content']
+        4: ['linkImg', 'linkTitle', 'linkDigest', 'content'],
+        5: ['linkImg', 'linkTitle', 'linkDigest', 'videoFormat', 'bgImg', 'uploadVideo', 'uploadBgImg', 'uploadTitleBorderImg', 'uploadVideoBorderImg']
       }
       const obj = {
         entry: {},
@@ -1048,36 +1171,61 @@ export default {
       // debugger
       if (e && e.target && e.target.files.length !== 0) {
         const file = e.target.files[0]
-        if (file.size > 10 * 1000 * 1000) {
-          return this.$message.warn('请上传小于10MB的视频文件')
+        if (file.size > 300 * 1000 * 1000) {
+          return this.$message.warn('请上传小于300MB的视频文件')
         }
-        // await mediaGetToken({ type: file.name }).then(res => {
-        //   // console.log(res, '获取ossToken')
-        //   this.oss = { ...res.data, key: res.data.key }
-        //   this.dealUploadMethod(this.oss, file)
-        // }).catch(() => {
-        //   this.$message.error('获取ossToken失败')
-        // })
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('time', 1)
-        const res = await upLoad(formData)
-        console.log(res)
-        this.uploadUrl = res.data.fullPath
+        if (file.size < 10 * 1000 * 1000) {
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('time', 1)
+          const res = await upLoad(formData)
+          console.log(res)
+          this.uploadUrl = res.data.fullPath
+        } else {
+          await mediaGetToken({ type: file.name }).then(res => {
+            // console.log(res, '获取ossToken')
+            this.oss = { ...res.data, key: res.data.key }
+            this.dealUploadMethod(this.oss, file)
+          }).catch(() => {
+            this.$message.error('获取ossToken失败')
+          })
+        }
       } else {
         console.log(e)
       }
     },
     dealUploadMethod (info, fileInfo) {
-      mediaGetToken()
       const tempFormData = new FormData()
+      const index = this.selectIndex
+      const shape = this.setData.inputData.shape
+      const CancelToken = axios.CancelToken
+      const source = CancelToken.source()
       for (const i in info) {
         console.log(i, 'iii')
         tempFormData.append(i, info[i])
+        if (shape == 5) {
+          this.setData.inputData.uploadVideo[index][i] = info[i]
+        }
       }
-      tempFormData.append('file', fileInfo)
-      ossUpload(tempFormData).then(res => {
-        console.log(res, '11111111')
+      if (shape == 5) {
+        this.setData.inputData.uploadVideo[index].fileInfo = fileInfo
+        tempFormData.append('file', fileInfo)
+        this.modalState = false
+        this.setData.inputData.uploadVideo[index].isUpload = true
+        this.setData.inputData.uploadVideo[index].source = source
+        console.log(this.setData.inputData.uploadVideo)
+      } else {
+        this.source = source
+      }
+      ossUpload(tempFormData, source.token).then(res => {
+        if (shape == 5) {
+          this.setData.inputData.uploadVideo[index].video = `${info.host}/${info.key}`
+          this.setData.inputData.uploadVideo[index].isUpload = false
+        } else {
+          this.uploadUrl = `${info.host}/${info.key}`
+        }
+      }).catch(() => {
+        this.setData.inputData.uploadVideo[index].isError = true
       })
     },
     getRadio (key, row) {
@@ -1134,7 +1282,11 @@ export default {
           }
           this.uploadUrl = ''
         } else if (this.medium.type == 5) {
-          this.$refs.editor[0].getEditorData('video', this.uploadUrl)
+          if (this.setData.inputData.shape == 5) {
+            this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
+          } else {
+            this.$refs.editor[0].getEditorData('video', this.uploadUrl)
+          }
         } else {
           this.setData.inputData.radarPDF = this.uploadUrl
           this.setData.inputData.linkTitle = this.uploadName
@@ -1163,10 +1315,6 @@ export default {
           console.log(content)
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = content.videoFullPath
-            this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
-              title: '',
-              video: ''
-            }]
           } else {
             this.$refs.editor[0].getEditorData('video', content.videoFullPath)
           }
@@ -1182,6 +1330,7 @@ export default {
       }
       this.medium.data = []
       this.modelTab = 0
+      this.uploadUrl = ''
       this.medium.pagination.current = 1
       this.medium.pagination.pageSize = 10
       this.selectKey = 'linkImg'
@@ -1193,7 +1342,7 @@ export default {
     },
     setType (isState = true) {
       const { shape, contentSource } = this.setData.inputData
-      const { inputType, articleArr } = this.setData
+      const { inputType, articleArr, inputData } = this.setData
       const newInputType = inputType.concat(this.change[shape])
       if (shape == 3) {
         const articleType = newInputType.concat(articleArr[contentSource])
@@ -1204,7 +1353,10 @@ export default {
         this.$set(this.setData, 'changeType', newInputType)
       }
       const resetArr = ['linkImg', 'radarLink', 'linkTitle', 'linkDigest', 'content', 'articleLink']
-      if (isState) {
+      if (isState && inputData.shape != 5) {
+        if (this.source) {
+          this.source.cancel()
+        }
         resetArr.map(item => {
           this.setData.inputData[item] = ''
         })
@@ -1429,6 +1581,7 @@ export default {
                   color: #fff;
                   .btn {
                     cursor: pointer;
+                    white-space: nowrap;
                   }
                 }
               }
@@ -1636,7 +1789,7 @@ export default {
                         display: flex;
                         align-items: center;
                         box-sizing: border-box;
-                        padding: 10px;
+                        padding: 0px;
                         justify-content: space-between;
                         position: absolute;
                         top: 0;
@@ -1647,6 +1800,7 @@ export default {
                         color: #fff;
                         .btn {
                           cursor: pointer;
+                          white-space: nowrap;
                         }
                       }
                     }
@@ -1699,8 +1853,27 @@ export default {
                     width: 100%;
                     height: 100%;
                   }
+                  .reupload {
+                    cursor: pointer;
+                    width: 100%;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: absolute;
+                    left: 0;
+                    bottom: 0;
+                    background-color: rgba(85, 85, 85);
+                    opacity: 0.8;
+                    color: #fff;
+                    font-family: 'Arial Normal', 'Arial';
+                    font-weight: 400;
+                    font-style: normal;
+                    font-size: 13px;
+                  }
                 }
                 .add_img_box {
+                  position: relative;
                   cursor: pointer;
                   display: flex;
                   align-items: center;
@@ -1714,7 +1887,22 @@ export default {
                     width: 30px;
                     height: auto;
                   }
+                  .index {
+                    font-family: 'Arial Normal', 'Arial';
+                    font-weight: 400;
+                    font-style: normal;
+                    font-size: 28px;
+                    position: absolute;
+                    bottom: 0px;
+                    right: 5px;
+                  }
                 }
+              }
+              .btn_box {
+                box-sizing: border-box;
+                display: flex;
+                align-items: flex-end;
+                padding-bottom: 20px;
               }
             }
           }
@@ -1909,6 +2097,70 @@ export default {
     height: 700px;
     overflow: auto;
   }
+  .templateVideo_box {
+    position: absolute;
+    background-color: #f3faff;
+    width: 350px;
+    height: 750px;
+    overflow: overlay;
+    border-radius: 15px;
+    box-sizing: border-box;
+    .header {
+      width: 100%;
+      height: auto;
+    }
+    .video_box {
+      width: 100%;
+      min-height: 540px;
+      background: url('../../assets/default_bg.png') 100% 100% no-repeat;
+      background-size: 100% 100%;
+      .video {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .title {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-family: '獅尾四季春加糖JP-Medium, 獅尾四季春加糖JP';
+          font-weight: 500;
+          color: #ffffff;
+          line-height: 38px;
+          width: 322px;
+          height: 40px;
+          background: url('../../assets/default_title.png') no-repeat 0px 0px;
+          background-size: 100%;
+        }
+        .content {
+          position: relative;
+          margin-top: 8px;
+          margin-bottom: 25px;
+
+          .vertical {
+            position: absolute;
+            top: 13px;
+            left: 12px;
+            width: 301px;
+            height: 158px;
+            background-color: #fff;
+          }
+          .row {
+            position: absolute;
+            top: 11px;
+            left: 18px;
+            width: 214px;
+            height: 409px;
+            background-color: #fff;
+          }
+        }
+      }
+    }
+    .bottom {
+      width: 100%;
+      height: auto;
+    }
+  }
 }
 ::v-deep(.ant-modal-header) {
   font-size: 14px;
@@ -1921,5 +2173,10 @@ export default {
 
 ::v-deep(.ant-modal-body) {
   padding: 0;
+  .box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>

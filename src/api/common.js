@@ -70,11 +70,13 @@ export function departmentList (params) {
 /**
  * oss上传
  */
-export function ossUpload (data) {
+export function ossUpload (data, cancelToken) {
   return ossRequest({
     url: '/',
     method: 'post',
-    data
+    data,
+    // 防止重复点击
+    cancelToken
   })
 }
 
