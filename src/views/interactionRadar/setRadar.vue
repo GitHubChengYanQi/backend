@@ -147,6 +147,9 @@
                     class="button"
                     @click="()=>{
                       preview = true
+                      previewArr = setData.inputData.uploadVideo.filter(item => {
+                        return item.video.length > 0
+                      })
                     }"
                   >预览</a-button>
                 </div>
@@ -443,7 +446,7 @@
             alt
           />
           <div class="video_box" :style="setData.inputData.bgImg == '0' ? {} :{background:'none'}">
-            <div class="video" v-for="(item,index) in setData.inputData.uploadVideo" :key="index">
+            <div class="video" v-for="(item,index) in previewArr" :key="index">
               <div
                 class="title"
                 :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat 0px 0px`}"
@@ -877,7 +880,8 @@ export default {
       selectKey: null,
       isShowKey: null,
       selectIndex: 0,
-      source: null
+      source: null,
+      previewArr: []
     }
   },
   created () {
@@ -907,10 +911,21 @@ export default {
   },
   methods: {
     closeVideo (e) {
-      this.setData.inputData.uploadVideo[e].video = ''
-      this.setData.inputData.uploadVideo[e].isUpload = false
-      this.setData.inputData.uploadVideo[e].source.cancel('取消上传')
-      this.setData.inputData.uploadVideo[e].source = null
+      this.$confirm({
+        title: '提示',
+        content: '是否确定删除该上传视频？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk: () => {
+          this.setData.inputData.uploadVideo[e].video = ''
+          this.setData.inputData.uploadVideo[e].isUpload = false
+          if (this.setData.inputData.uploadVideo[e].source) {
+            this.setData.inputData.uploadVideo[e].source.cancel('取消上传')
+            this.setData.inputData.uploadVideo[e].source = null
+          }
+        },
+        onCancel () { }
+      })
     },
     getArticle () {
       console.log(this.setData.inputData.tsLink)
@@ -1054,16 +1069,6 @@ export default {
       const { inputData } = this.setData
       const { linkState } = this.linkData
       const inputArr = ['title', 'unitId', 'ditch', 'shape']
-      if (inputData.shape == '5') {
-        this.setData.inputData.uploadVideo = inputData.uploadVideo.map(item => {
-          const obj = {}
-          obj.title = item.title
-          obj.video = item.video
-          return obj
-        }).filter(item => {
-          return item.video.length > 0
-        })
-      }
       const entry = {
         1: ['radarLink', 'linkTitle', 'linkDigest', 'linkImg'],
         2: ['radarPDF', 'linkTitle'],
@@ -1073,7 +1078,7 @@ export default {
           2: ['linkImg', 'linkTitle', 'linkDigest', 'content', 'contentSource']
         },
         4: ['linkImg', 'linkTitle', 'linkDigest', 'content'],
-        5: ['linkImg', 'linkTitle', 'linkDigest', 'videoFormat', 'bgImg', 'uploadVideo', 'uploadBgImg', 'uploadTitleBorderImg', 'uploadVideoBorderImg']
+        5: ['linkImg', 'linkTitle', 'linkDigest', 'videoFormat', 'bgImg', 'uploadBgImg', 'uploadTitleBorderImg', 'uploadVideoBorderImg']
       }
       const obj = {
         entry: {},
@@ -1108,6 +1113,17 @@ export default {
       obj.ditch = this.selectArr.channel.filter((item) => {
         return obj.ditch.includes(item.id)
       })
+      if (inputData.shape == '5') {
+        const uploadVideo = inputData.uploadVideo.map(item => {
+          const obj = {}
+          obj.title = item.title
+          obj.video = item.video
+          return obj
+        }).filter(item => {
+          return item.video.length > 0
+        })
+        obj.uploadVideo = uploadVideo
+      }
       if (!this.isUrl(obj.entry.radarLink) && obj.shape == 1) return this.$message.warn('请检查雷达链接')
       console.log(obj)
       if (this.tableId != -1) {
@@ -1347,7 +1363,6 @@ export default {
           console.log(content)
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = content.videoFullPath
-            this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
             const sum = this.setData.inputData.uploadVideo.filter(item => {
               return item.video.length > 0 || item.isUpload
             }).length
