@@ -63,7 +63,7 @@
               <div class="avatar mr12">
                 <img
                   height="50"
-                  :src="(record.examResult && record.examResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_50'"
+                  :src="(record.examResult && record.examResult.coverImageUrl) ? (record.examResult && record.examResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_50' : require('@/assets/study/examImg.png')"
                 >
               </div>
               <div class="nickname">
