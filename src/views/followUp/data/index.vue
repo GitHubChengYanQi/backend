@@ -74,11 +74,15 @@
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>
+    <div class="box">
+      <!-- <FanDiagram :type="0" :dataArr="[['北京公司', 3],['北京公', 3],['北京', 3]]" /> -->
+    </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
+import FanDiagram from './components/fanDiagram'
 const defaultSearchObj = {
   name: [],
   status: '',
@@ -87,6 +91,9 @@ const defaultSearchObj = {
   date: []
 }
 export default {
+  components: {
+    FanDiagram
+  },
   data () {
     return {
       tabArr: {
