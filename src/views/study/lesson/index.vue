@@ -237,16 +237,15 @@ export default {
           }
         },
         {
-          title: '试用员工',
+          title: '适用员工',
           dataIndex: 'tag',
           scopedSlots: { customRender: 'tag' },
           align: 'center'
         },
         {
-          title: '试用总人数',
+          title: '适用总人数',
           dataIndex: 'allCount',
-          align: 'center',
-          sorter: true
+          align: 'center'
         },
         {
           title: '完成人数',
@@ -350,7 +349,11 @@ export default {
         },
         {
           title: '创建人',
-          align: 'center'
+          dataIndex: 'employeeEntity',
+          align: 'center',
+          customRender: (text) => {
+            return text && text.name
+          }
         }
       ]
     }
