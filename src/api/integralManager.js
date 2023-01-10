@@ -4,26 +4,81 @@ export function getTempCommonData () {
   return [
     {
       id: '1',
-      rulesName: '积分有效期',
-      rulesDetail: '永久有效',
-      updateDate: '2022-07-21 17:27',
-      type: 'validity'
+      setName: '积分有效期',
+      setDetail: '永久有效',
+      updatedAt: '2022-07-21 17:27',
+      setType: '1',
+      creditsSetDeatilVo: {
+        restrictionType: '2',
+        isChecked: '1',
+        monthDay: '10-10',
+        lastYearMonthDay: '05-10',
+        nextYearMonthDay: '10-09'
+      }
     },
     {
       id: '2',
-      rulesName: '积分上限',
-      rulesDetail: '无上限',
-      updateDate: '2022-07-21 17:27',
-      type: 'limit'
+      setName: '积分上限',
+      setDetail: '无上限',
+      updatedAt: '2022-07-21 17:27',
+      setType: '2',
+      creditsSetDeatilVo: {
+        restrictionType: '4',
+        isChecked: '1'
+      }
     },
     {
       id: '3',
-      rulesName: '到期提醒',
-      rulesDetail: '不提醒',
-      updateDate: '2022-07-21 17:27',
-      type: 'remind'
+      setName: '到期提醒',
+      setDetail: '不提醒',
+      updatedAt: '2022-07-21 17:27',
+      setType: '3',
+      creditsSetDeatilVo: {
+        restrictionType: '6',
+        isChecked: '1'
+      }
     }
   ]
+}
+// 获取通用规则数据
+export function getCommonRulesApi (params) {
+  return request({
+    url: '/creditsSet/creditsSetlist',
+    method: 'get',
+    params
+  })
+}
+// 更新通用规则设置
+export function setCommonRulesApi (data) {
+  return request({
+    url: '/creditsSet/setCreditsSet',
+    method: 'post',
+    data
+  })
+}
+// 获取积分规则数据
+export function getIntegralRulesApi (params) {
+  return request({
+    url: '/creditsRule/creditsRulePage',
+    method: 'get',
+    params
+  })
+}
+// 更新积分规则数据
+export function setIntegralRulesApi (data) {
+  return request({
+    url: '/creditsRule/creditsRuleList',
+    method: 'post',
+    data
+  })
+}
+// 获取员工积分列表
+export function getCustomerIntegralApi (params) {
+  return request({
+    url: '/creditsEmployee/creditsEmployeePage',
+    method: 'get',
+    params
+  })
 }
 // 临时获取有效期类型数据
 export function getValidityTypeData () {
@@ -97,39 +152,70 @@ export function getTempIntegralData () {
   return [
     {
       id: '1',
-      rulesName: '执行群发朋友圈任务',
+      ruleType: '1',
+      ruleName: '执行群发朋友圈任务',
       rulesDetail: '每完成1次朋友圈群发任务，员工可获得10积分',
-      updateDate: '2022-07-21 17:27',
-      status: '已启用',
-      typeText: '系统规则',
-      type: 'friendCircle'
+      updatedAt: '2022-07-21 17:27',
+      state: '1',
+      sysRuleType: '系统规则',
+      creditsRuleJsonDetailVo: {
+        integral: '',
+        friendDayNum: '',
+        radarArticleIds: '',
+        lookAfterDayNum: '',
+        goodId: ''
+      }
     },
     {
       id: '2',
-      rulesName: '加好友',
+      ruleType: '2',
+      ruleName: '加好友',
       rulesDetail: '新添加1个好友，且3天未流失，员工可获得10积分',
-      updateDate: '2022-07-21 17:27',
-      status: '已启用',
-      typeText: '系统规则',
-      type: 'addFriend'
+      updatedAt: '2022-07-21 17:27',
+      state: '0',
+      sysRuleType: '系统规则',
+      creditsRuleJsonDetailVo: {
+        integral: '8',
+        friendDayNum: '2',
+        radarArticleIds: '',
+        lookAfterDayNum: '',
+        goodId: ''
+      }
     },
     {
       id: '3',
-      rulesName: '目标客户产生购买[商品名称]',
+      ruleType: '3',
+      ruleName: '目标客户产生购买[商品名称]',
       rulesDetail: '好友查看了[雷达素材]后，且7天内购买了[商品名称]，员工可获得10积分',
-      updateDate: '2022-07-21 17:27',
-      status: '已启用',
-      typeText: '系统规则',
-      type: 'buy'
+      updatedAt: '2022-07-21 17:27',
+      state: '1',
+      sysRuleType: '系统规则',
+      creditsRuleJsonDetailVo: {
+        integral: '10',
+        friendDayNum: '',
+        radarArticleIds: '',
+        lookAfterDayNum: '2',
+        goodId: '',
+        salesReturnDayNum: '3'
+      }
     },
     {
       id: '4',
-      rulesName: '好友查看素材',
+      ruleType: '4',
+      ruleName: '好友查看素材',
       rulesDetail: '好友查看了[雷达素材]后，员工可获得10积分',
-      updateDate: '2022-07-21 17:27',
-      status: '已启用',
-      typeText: '系统规则',
-      type: 'material'
+      updatedAt: '2022-07-21 17:27',
+      state: '1',
+      sysRuleType: '系统规则',
+      creditsRuleJsonDetailVo: {
+        integral: '10',
+        friendDayNum: '',
+        radarArticleIds: '',
+        lookAfterDayNum: '',
+        goodId: '',
+        validDayNum: '1',
+        salesReturnDayNum: ''
+      }
     }
   ]
 }
