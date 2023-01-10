@@ -138,7 +138,7 @@ export default {
             }
           }
           if (!flag) {
-            goods.push(arr[i])
+            goods.unshift(arr[i])
           }
         }
       }
