@@ -2107,8 +2107,6 @@ export default {
           p {
             width: 100%;
             margin: 0;
-            span {
-            }
           }
         }
       }
