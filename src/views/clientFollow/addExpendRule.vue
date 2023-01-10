@@ -47,7 +47,7 @@
                 <a-icon type="question-circle" />
               </a-tooltip>
             </div>
-            <div class="tip">注：客户属性与消费属性同时勾选时，客户需要同时满足客户属性条件与消费属性条件才会被打上标签。</div>
+            <div class="tip">注：勾选客户属性时，客户需要同时满足户客户属性条件与消费属性条件才会被打上标签。</div>
             <a-checkbox @change="onChange" :checked="form.customerAttributeSelect === '1' ? true : false">
               客户属性
             </a-checkbox>
