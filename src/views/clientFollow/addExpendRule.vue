@@ -297,6 +297,8 @@ export default {
                 }
               }
             }
+          }).catch(err => {
+            this.loading = false
           })
         }
       } else {
@@ -321,6 +323,8 @@ export default {
                 }
               }
             }
+          }).catch(err => {
+            this.loading = false
           })
         }
       }

@@ -31,7 +31,7 @@
 
         <!-- 正常值 -->
         <span v-else>
-          <a-input-number placeholder="请输入" v-model="item.val" :min="1" :max="10" />
+          <a-input-number placeholder="请输入" v-model="item.val" :min="1" />
           <i v-if="item.columnName === 'purchase_number'">次</i>
           <i v-if="item.columnName === 'good_amount'">元</i>
         </span>
