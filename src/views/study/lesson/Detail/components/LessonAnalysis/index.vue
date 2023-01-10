@@ -267,7 +267,7 @@ export default {
           }
         },
         {
-          title: '总考状态',
+          title: '考试状态',
           dataIndex: 'haveCourseExam',
           align: 'center',
           customRender (value) {
