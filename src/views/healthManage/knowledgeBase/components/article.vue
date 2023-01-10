@@ -13,6 +13,10 @@
             </a-col>
           </a-row>
         </div>
+        <a-radio-group v-model="selectListMode" class="selectListModeBox">
+          <a-radio-button value="1">素材库</a-radio-button>
+          <a-radio-button value="2">互动雷达</a-radio-button>
+        </a-radio-group>
         <a-form-model :label-col="{ span: 5 }" :wrapper-col="{ span: 14 }">
           <a-form-model-item label="选择分组">
             <a-tree-select
@@ -23,9 +27,27 @@
               allow-clear
               tree-default-expand-all
               :replaceFields="{
-                children:'children',
-                title:'name',
-                key:'id',
+                children: 'children',
+                title: 'name',
+                key: 'id',
+                value: 'id'
+              }"
+              @change="onSearch"
+              :treeData="treeData">
+            </a-tree-select>
+          </a-form-model-item>
+          <a-form-model-item label="雷达分类" v-if="selectListMode === '2'">
+            <a-tree-select
+              v-model="radarGroupId"
+              style="width: 100%"
+              :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
+              placeholder="请选择分组"
+              allow-clear
+              tree-default-expand-all
+              :replaceFields="{
+                children: 'children',
+                title: 'name',
+                key: 'id',
                 value: 'id'
               }"
               @change="onSearch"
@@ -43,7 +65,7 @@
             :infinite-scroll-disabled="busy"
             :infinite-scroll-distance="10">
             <a-list :data-source="currentList">
-              <a-list-item slot="renderItem" slot-scope="item, index" @click="listChange(item, index)">
+              <a-list-item slot="renderItem" slot-scope="item, index" @click.stop="listChange(item, index)">
                 <div :class="{ item: true, active: index === activeIndex }">
                   <!-- <div class="tip flex-row-center"
                                 :style="{ 'background': index == 0 ? '' : 'rgb(2, 167, 240)' }">
@@ -52,6 +74,14 @@
                   <div class="text">
                     {{ item.content.title || item.content.fileName }}
                   </div>
+                  <a-select
+                    v-if="selectListMode === '2'"
+                    size="small"
+                    style="width: 112px;"
+                    v-model="item.selectChannel"
+                    placeholder="请选择渠道"
+                    :options="item.batch || []"
+                  />
                 </div>
               </a-list-item>
             </a-list>
@@ -170,7 +200,10 @@ export default {
         page: 0,
         total: 0,
         totalPage: 0
-      }
+      },
+      // 新增雷达选择列表
+      selectListMode: '1',
+      radarGroupId: ''
     }
   },
   created () {
@@ -183,7 +216,7 @@ export default {
     this.getList()
     this.getGroupList()
   },
-  beforeDestroy () {},
+  beforeDestroy () { },
   methods: {
     // 按名称搜索问卷
     onSearch () {
@@ -248,13 +281,15 @@ export default {
   flex-direction: row;
   align-items: center;
 }
+
 .article {
   .content {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: stretch;
-    height:620px;
+    height: 620px;
+
     .titleContent {
       margin: 20px 0;
 
@@ -267,6 +302,17 @@ export default {
         display: flex;
         flex-direction: row;
         justify-content: flex-end;
+      }
+    }
+
+    .selectListModeBox {
+      width: 100%;
+      margin-bottom: 10px;
+      display: flex;
+      .ant-radio-button-wrapper {
+        width: 50%;
+        display: flex;
+        justify-content: center;
       }
     }
 
@@ -298,14 +344,19 @@ export default {
           //     font-size: 12px;
           //     text-align: center;
           // }
-          .text{
+          .text {
             max-height: 81px;
             overflow: hidden;
-            text-overflow: ellipsis;  /* 超出部分省略号 */
-            word-break: break-all;  /* break-all(允许在单词内换行。) */
-            display: -webkit-box; /* 对象作为伸缩盒子模型显示 */
-            -webkit-box-orient: vertical; /* 设置或检索伸缩盒对象的子元素的排列方式 */
-            -webkit-line-clamp: 2; /* 显示的行数 */
+            text-overflow: ellipsis;
+            /* 超出部分省略号 */
+            word-break: break-all;
+            /* break-all(允许在单词内换行。) */
+            display: -webkit-box;
+            /* 对象作为伸缩盒子模型显示 */
+            -webkit-box-orient: vertical;
+            /* 设置或检索伸缩盒对象的子元素的排列方式 */
+            -webkit-line-clamp: 2;
+            /* 显示的行数 */
           }
         }
 
@@ -334,39 +385,47 @@ export default {
         padding: 15px;
         overflow-y: auto;
         word-break: break-all;
+
         div {
           font-size: 16px;
           line-height: 1.5;
         }
-        .currentImg{
+
+        .currentImg {
           max-width: 100%;
         }
-        .typeId3{
+
+        .typeId3 {
           width: 100%;
           height: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          img{
+
+          img {
             height: 224px;
             width: 200px;
           }
-          a{
+
+          a {
             margin-top: 15px;
           }
-          .applets{
+
+          .applets {
             width: 287px;
             height: 309px;
             position: relative;
-            img{
+
+            img {
               position: absolute;
               top: 0;
               left: 0;
               width: 287px;
               height: 309px;
             }
-            .text1{
+
+            .text1 {
               color: #333;
               z-index: 2;
               position: absolute;
@@ -374,7 +433,8 @@ export default {
               left: 40px;
               top: 13px;
             }
-            .text2{
+
+            .text2 {
               color: #333;
               z-index: 2;
               position: absolute;
@@ -386,7 +446,8 @@ export default {
               overflow: hidden;
               text-overflow: ellipsis;
             }
-            .appletsImg{
+
+            .appletsImg {
               position: absolute;
               width: 247px;
               left: 20px;
@@ -395,6 +456,7 @@ export default {
             }
           }
         }
+
         .emptyCenter {
           height: 100%;
           display: flex;
@@ -406,6 +468,7 @@ export default {
     }
   }
 }
+
 .wj-preview {
   padding: 0 15px;
   box-sizing: border-box;
@@ -414,12 +477,18 @@ export default {
   height: 460px;
   width: 100%;
 }
-.addBtns{
+
+.addBtns {
   justify-content: center;
 }
 </style>
-<style>
+<style lang="less">
 .ant-list-item {
   padding: 0;
+  .item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 </style>

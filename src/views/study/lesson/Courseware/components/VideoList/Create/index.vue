@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课件管理',`${$router.history.current.query.id ? '编辑' : '创建'}视频`]" back back-tip></breadcrumb>
+    <breadcrumb :titles="['课程管理','课件管理','编辑视频']" back back-tip></breadcrumb>
 
     <a-spin :spinning="detailLoading">
       <div class="content">
@@ -82,7 +82,7 @@
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd'
 import Preview from '../../../../../components/Preview'
-import VueQuillEditor from '@/components/VueQuillEditor'
+import VueQuillEditor from '../../../../../components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
 import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
 import { message } from 'ant-design-vue'

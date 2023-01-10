@@ -1,6 +1,6 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理',`${$router.history.current.query.id ? '编辑' : '创建'}课程`]" back back-tip></breadcrumb>
+    <breadcrumb :titles="['课程管理','编辑课程']" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
@@ -94,7 +94,7 @@
 import breadcrumb from '../../components/Breadcrumd'
 import selectCourseware from './compoents/SelectCourseware'
 import SelectExamination from './compoents/SelectExamination'
-import VueQuillEditor from '@/components/VueQuillEditor'
+import VueQuillEditor from '../../components/VueQuillEditor'
 import ImgUpload from '../../components/ImgUpload/index'
 import Employee from '../../components/Employee/index'
 import { courseClassTreeView } from '@/api/study/lessonClass'

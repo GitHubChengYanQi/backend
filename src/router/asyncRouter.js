@@ -422,6 +422,12 @@ export const routeList = {
     component: () => import('@/views/followUp/knowledge/index'),
     meta: { title: '知识库' }
   },
+  '/followUp/data/index': {
+    path: '/followUp/data/index',
+    name: 'data',
+    component: () => import('@/views/followUp/data/index'),
+    meta: { title: '随访数据' }
+  },
   '/followUp/group': {
     path: '/followUp/group',
     name: 'group',

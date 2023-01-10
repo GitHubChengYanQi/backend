@@ -37,87 +37,53 @@
               :columns="columns"
               :data-source="tableData"
               :pagination="pagination"
-              :row-selection="{selectedRowKeys:rowSelection,onChange: onSelectChange}"
+              :row-selection="{ selectedRowKeys: rowSelection, onChange: onSelectChange }"
               @change="handleTableChange"
               class="table"
-              ref="table"
-            >
-              <div
-                slot="ditch"
-                slot-scope="list, record"
-              >
-                <a-select
-                  style="width: 100px;"
-                  v-model="record.selectChannel"
-                  placeholder="请选择..."
-                >
-                  <a-select-option v-for="item in list" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
+              ref="table">
+              <div slot="ditch" slot-scope="list, record">
+                <a-select style="width: 100px;" v-model="record.selectChannel" placeholder="请选择...">
+                  <a-select-option v-for="item in list" :key="item.id" :value="item.id">{{ item.name
+                  }}</a-select-option>
                 </a-select>
               </div>
-              <div
-                slot="example"
-                slot-scope="text,record"
-              >
+              <div slot="example" slot-scope="text,record">
                 <template>
                   <div class="example">
-                    <div
-                      v-if="record.type == 2"
-                      class="pdf"
-                    >
+                    <div v-if="record.type == 2" class="pdf">
                       <div class="title">{{ record.entry.linkTitle }}</div>
                       <div class="icon_box">
-                        <img
-                          class="icon"
-                          :src="require('@/assets/pdf.png')"
-                          alt=""
-                        >
+                        <img class="icon" :src="require('@/assets/pdf.png')" alt="">
                       </div>
                     </div>
-                    <div
-                      v-else
-                      class="example_box"
-                    >
+                    <div v-else class="example_box">
                       <div class="left">
                         <div class="title">{{ record.entry.linkTitle }}</div>
                         <div class="content">{{ record.entry.linkDigest }}</div>
                       </div>
                       <div class="right">
-                        <img
-                          class="img"
-                          :src="record.entry.linkImg"
-                          alt=""
-                        />
+                        <img v-if="record.entry.linkImg" class="img" :src="record.entry.linkImg" alt="" />
                       </div>
                     </div>
 
                   </div>
                 </template>
               </div>
-              <div
-                slot="radarTab"
-                slot-scope="text,record"
-              >
+              <div slot="radarTab" slot-scope="text,record">
                 <template>
                   <a-popover
                     title="标签"
-                    v-if="record.track && record.track.linkState && record.track.linkState.length > 0"
-                  >
+                    v-if="record.track && record.track.linkState && record.track.linkState.length > 0">
                     <template slot="content">
                       <div class="labelBox">
-                        <a-tag
-                          v-for="(item, index) in record.track.linkState"
-                          :key="index"
-                        >{{ item.name }}</a-tag>
+                        <a-tag v-for="(item, index) in record.track.linkState" :key="index">{{ item.name }}</a-tag>
                       </div>
                     </template>
                     <a-tag type="button">
                       查看
                     </a-tag>
                   </a-popover>
-                  <span
-                    class="nolabel"
-                    v-else
-                  >无标签</span>
+                  <span class="nolabel" v-else>无标签</span>
                 </template>
               </div>
             </a-table>
@@ -282,7 +248,7 @@ export default {
             return items.name == item.shape
           })
           item.type = typeArr.length == 0 ? 3 : typeArr[0].code
-          item.selectChannel = undefined
+          item.selectChannel = item.ditch.length === 1 ? item.ditch[0].id : undefined
           return item
         })
         this.pagination.total = res.data.total
@@ -332,7 +298,8 @@ export default {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      .rigBox{
+
+      .rigBox {
         display: flex;
         height: 45px;
         margin-right: 20px;

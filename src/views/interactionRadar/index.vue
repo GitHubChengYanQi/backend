@@ -157,7 +157,7 @@
                           <div class="title">{{ record.entry.linkTitle }}</div>
                           <div class="content">{{ record.entry.linkDigest }}</div>
                         </div>
-                        <div class="right">
+                        <div class="right" v-if="record.entry.linkImg">
                           <img class="img" :src="record.entry.linkImg" alt />
                         </div>
                       </div>

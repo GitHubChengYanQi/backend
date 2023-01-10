@@ -1,10 +1,10 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课件管理',`${$router.history.current.query.id ? '编辑' : '创建'}图文`]" back back-tip></breadcrumb>
+    <breadcrumb :titles="['课程管理','课件管理','编辑图文']" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
-          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">创建图文</div>
+          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">编辑图文</div>
           <div>
             <a-button style="border-radius: 8px" type="primary" @click="openPreview">预览</a-button>
           </div>
@@ -69,7 +69,7 @@
 
 <script>
 import breadcrumb from '../../../../../components/Breadcrumd'
-import VueQuillEditor from '@/components/VueQuillEditor'
+import VueQuillEditor from '../../../../../components/VueQuillEditor'
 import ImgUpload from '../../../../../components/ImgUpload/index'
 import { courseWareAdd, courseWareDetail, courseWarEdit } from '@/api/study/courseWare'
 import router from '@/router'
