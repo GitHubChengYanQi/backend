@@ -311,81 +311,37 @@
             </div>
             <div class="hint" v-if="medium.type == 5">视频最大300M，视频类型MP4、MOV</div>
             <div class="hint" v-if="medium.type == 2 && selectKey != 'linkImg'">
-              <div class="text">
-                <p>
-                  <span>横版：</span>
-                </p>
-                <p>
-                  <span>上传背景图文案：</span>
-                </p>
-                <p>
+              <div class="text" v-if="setData.inputData.videoFormat == '0'">
+                <p v-if="selectKey == 'uploadBgImg'">
                   <span>图片大小不超过10M，建议尺寸：宽375px，支持JPG、JPEG及PNG格式</span>
                 </p>
-                <p>
-                  <span>
-                    <br />
-                  </span>
-                </p>
-                <p>
-                  <span>上传标题边框文案：</span>
-                </p>
-                <p>
+                <p v-if="selectKey == 'uploadTitleBorderImg'">
                   <span>图片大小不超过10M，建议尺寸：347px*40px，支持JPG、JPEG及PNG格式</span>
                 </p>
-                <p>
-                  <span>
-                    <br />
-                  </span>
-                </p>
-                <p>
-                  <span>上传视频边框文案：</span>
-                </p>
-                <p>
+                <p v-if="selectKey == 'uploadVideoBorderImg'">
                   <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
                 </p>
-                <p>
+                <p v-if="selectKey == 'uploadVideoBorderImg'">
                   <span>视频外边框建议尺寸：347px*195px</span>
                 </p>
-                <p>
+                <p v-if="selectKey == 'uploadVideoBorderImg'">
                   <span>视频内边框建议尺寸：325px*171px</span>
                 </p>
               </div>
-              <div class="text">
-                <p>
-                  <span>竖版：</span>
-                </p>
-                <p>
-                  <span>上传背景图文案：</span>
-                </p>
-                <p>
+              <div class="text" v-else>
+                <p v-if="selectKey == 'uploadBgImg'">
                   <span>图片大小不超过10M，建议尺寸：宽375px，支持JPG、JPEG及PNG格式</span>
                 </p>
-                <p>
-                  <span>
-                    <br />
-                  </span>
-                </p>
-                <p>
-                  <span>上传标题边框文案：</span>
-                </p>
-                <p>
+                <p v-if="selectKey == 'uploadTitleBorderImg'">
                   <span>图片大小不超过10M，建议尺寸：347px*40px，支持JPG、JPEG及PNG格式</span>
                 </p>
-                <p>
-                  <span>
-                    <br />
-                  </span>
-                </p>
-                <p>
-                  <span>上传视频边框文案：</span>
-                </p>
-                <p>
+                <p v-if="selectKey == 'uploadVideoBorderImg'">
                   <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
                 </p>
-                <p>
+                <p v-if="selectKey == 'uploadVideoBorderImg'">
                   <span>视频外边框建议尺寸：264px*469px</span>
                 </p>
-                <p>
+                <p v-if="selectKey == 'uploadVideoBorderImg'">
                   <span>视频内边框建议尺寸：234px*436px</span>
                 </p>
               </div>
@@ -1526,6 +1482,7 @@ export default {
           title: '上传PDF'
         }
       }
+      console.log(this.setData)
       this.selectKey = selectKey
       this.selectIndex = selectIndex
       this.medium.type = e == -1 ? 2 : e
@@ -2151,7 +2108,6 @@ export default {
             width: 100%;
             margin: 0;
             span {
-
             }
           }
         }
