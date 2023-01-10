@@ -15,28 +15,77 @@
     <div class="tab_box">
       <div
         class="tab"
-        :style="tab_header == index ? {color:'rgba(2, 125, 180, 0.86)',textDecoration:'underline'}:{}"
+        :style="tab_header == index ? { color: 'rgba(2, 125, 180, 0.86)', textDecoration: 'underline' } : {}"
         v-for="(item,index) in tabArr.header"
-        @click="()=>{ tab_header = index }"
-        :key="index"
-      >{{ item }}</div>
+        @click="() => { tab_header = index }"
+        :key="index">{{ item }}</div>
     </div>
     <div class="conten_box">
       <div class="info_header">
         <div class="title">今日数据</div>
         <div class="time">{{ '更新时间：' + infoData.time }}</div>
         <div class="card_box">
-          <a-card class="card" v-for="(item,index) in tabArr.cardArr[tab_header]" :key="index">
+          <a-card class="card" v-for="(item, index) in tabArr.cardArr[tab_header]" :key="index">
             <div class="number">{{ infoData.card[item.key] }}</div>
             <div class="title">{{ item.title }}</div>
           </a-card>
         </div>
       </div>
     </div>
+    <div class="searchBar">
+      <div class="searchItem">
+        <span class="label">方案名称：</span>
+        <a-select
+          v-model="searchObj.name"
+          mode="multiple"
+          style="width: 300px"
+          :maxTagCount="2"
+          placeholder="请选择"
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+      </div>
+      <div class="searchItem">
+        <span class="label">方案状态：</span>
+        <a-select
+          v-model="searchObj.status"
+          style="width: 200px"
+          placeholder="请选择"
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+      </div>
+      <div class="searchItem">
+        <span class="label">方案分类：</span>
+        <a-select
+          v-model="searchObj.classify"
+          style="width: 200px"
+          placeholder="请选择"
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+      </div>
+      <div class="searchItem">
+        <a-radio-group class="chooseDateTypeRadio" v-model="searchObj.dateType" button-style="solid">
+          <a-radio-button value="day">日</a-radio-button>
+          <a-radio-button value="month">月</a-radio-button>
+          <a-radio-button value="year">年</a-radio-button>
+        </a-radio-group>
+        <a-range-picker v-model="searchObj.date" :disabled-date="disabledSearchDate" />
+      </div>
+      <div class="searchBtn">
+        <a-button type="primary" @click="handleSearch">
+          查询
+        </a-button>
+        <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import moment from 'moment'
+const defaultSearchObj = {
+  name: [],
+  status: '',
+  classify: '',
+  dateType: 'day',
+  date: []
+}
 export default {
   data () {
     return {
@@ -65,112 +114,32 @@ export default {
       infoData: {
         time: '2022-09-22 05:00',
         card: [0, 1, 3, 3, 4, 5, 6]
+      },
+      searchObj: { ...defaultSearchObj }
+    }
+  },
+  methods: {
+    disabledSearchDate (current) {
+      let num = 90
+      let type = 'days'
+      if (this.searchObj.dateType === 'month') {
+        num = 36
+        type = 'months'
+      } else if (this.searchObj.dateType === 'year') {
+        num = 3
+        type = 'years'
       }
+      const targetDate = moment().subtract(num, type).valueOf()
+      const currentDate = current.valueOf()
+      return (current > moment().endOf('day')) || (currentDate < targetDate)
+    },
+    handleSearch () {
+      console.log(this.searchObj)
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.data_page {
-  width: 100%;
-  min-height: 100vh;
-  .header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    font-family: 'Arial Negreta', 'Arial Normal', 'Arial', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    color: #333333;
-    margin-bottom: 45px;
-    .hint {
-      margin-left: 25px;
-      font-size: 12px;
-      font-weight: 400;
-      color: #333333;
-    }
-    .icon {
-      margin-left: 20px;
-      width: 15px;
-      height: 15px;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #ccc;
-      border-radius: 50%;
-      font-size: 12px;
-    }
-  }
-  .tab_box {
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-    font-family: 'Arial Negreta', 'Arial Normal', 'Arial', sans-serif;
-    font-weight: 700;
-    font-style: normal;
-    font-size: 15px;
-    color: #333333;
-    .tab {
-      cursor: pointer;
-      margin-right: 35px;
-    }
-  }
-  .conten_box {
-    width: 100%;
-    .info_header {
-      width: 100%;
-      font-family: 'Arial Normal', 'Arial', sans-serif;
-      font-weight: 400;
-      color: #333333;
-      .title {
-        font-size: 14px;
-        line-height: 25px;
-      }
-      .time {
-        font-size: 12px;
-      }
-      .card_box {
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        .card {
-          border-radius: 15px;
-          width: 200px;
-          height: 100px;
-          margin-right: 40px;
-          padding: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-between;
-          color: #333333;
-          font-family: 'Arial Normal', 'Arial', sans-serif;
-          font-weight: 400;
-          .number {
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-transform: none;
-            text-align: center;
-            font-size: 16px;
-            line-height: normal;
-          }
-          .title {
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-top: 15px;
-            white-space: nowrap;
-            text-transform: none;
-            font-size: 18px;
-            line-height: normal;
-          }
-        }
-      }
-    }
-  }
-}
+@import './index.less';
 </style>
