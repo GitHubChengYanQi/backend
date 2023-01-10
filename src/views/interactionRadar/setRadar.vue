@@ -132,7 +132,6 @@
                   </div>
                   <div class="input_box">
                     <a-input
-                      :disabled="item.key == 'uploadVideo'&& tableId != -1"
                       class="input"
                       placeholder="请输入标题"
                       v-model="items.title"
@@ -987,6 +986,7 @@ export default {
             this.setData.inputData[key] = data[key]
           }
         }
+
         this.setData.inputData.ditch = data.ditch.map((item) => {
           return item.id
         })
@@ -1006,6 +1006,14 @@ export default {
               this.setData.inputData[key] = data.entry[key]
             }
           }
+        }
+        if (this.setData.inputData.shape == '5') {
+          this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
+            title: '',
+            video: '',
+            isUpload: false,
+            isError: false
+          }]
         }
         if (this.setData.inputData.shape == 3) {
         }
@@ -1122,7 +1130,7 @@ export default {
         }).filter(item => {
           return item.video.length > 0
         })
-        obj.uploadVideo = uploadVideo
+        obj.entry.uploadVideo = uploadVideo
       }
       if (!this.isUrl(obj.entry.radarLink) && obj.shape == 1) return this.$message.warn('请检查雷达链接')
       console.log(obj)
