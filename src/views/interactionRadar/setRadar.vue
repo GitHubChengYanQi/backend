@@ -147,7 +147,7 @@
                     @click="()=>{
                       preview = true
                       previewArr = setData.inputData.uploadVideo.filter(item => {
-                        return item.video.length > 0
+                        return item.video.length > 0 || item.title.length > 0
                       })
                     }"
                   >预览</a-button>
@@ -310,6 +310,86 @@
               </div>
             </div>
             <div class="hint" v-if="medium.type == 5">视频最大300M，视频类型MP4、MOV</div>
+            <div class="hint" v-if="medium.type == 2 && selectKey != 'linkImg'">
+              <div class="text">
+                <p>
+                  <span>横版：</span>
+                </p>
+                <p>
+                  <span>上传背景图文案：</span>
+                </p>
+                <p>
+                  <span>图片大小不超过10M，建议尺寸：宽375px，支持JPG、JPEG及PNG格式</span>
+                </p>
+                <p>
+                  <span>
+                    <br />
+                  </span>
+                </p>
+                <p>
+                  <span>上传标题边框文案：</span>
+                </p>
+                <p>
+                  <span>图片大小不超过10M，建议尺寸：347px*40px，支持JPG、JPEG及PNG格式</span>
+                </p>
+                <p>
+                  <span>
+                    <br />
+                  </span>
+                </p>
+                <p>
+                  <span>上传视频边框文案：</span>
+                </p>
+                <p>
+                  <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
+                </p>
+                <p>
+                  <span>视频外边框建议尺寸：347px*195px</span>
+                </p>
+                <p>
+                  <span>视频内边框建议尺寸：325px*171px</span>
+                </p>
+              </div>
+              <div class="text">
+                <p>
+                  <span>竖版：</span>
+                </p>
+                <p>
+                  <span>上传背景图文案：</span>
+                </p>
+                <p>
+                  <span>图片大小不超过10M，建议尺寸：宽375px，支持JPG、JPEG及PNG格式</span>
+                </p>
+                <p>
+                  <span>
+                    <br />
+                  </span>
+                </p>
+                <p>
+                  <span>上传标题边框文案：</span>
+                </p>
+                <p>
+                  <span>图片大小不超过10M，建议尺寸：347px*40px，支持JPG、JPEG及PNG格式</span>
+                </p>
+                <p>
+                  <span>
+                    <br />
+                  </span>
+                </p>
+                <p>
+                  <span>上传视频边框文案：</span>
+                </p>
+                <p>
+                  <span>图片大小不超过10M，支持JPG、JPEG及PNG格式</span>
+                </p>
+                <p>
+                  <span>视频外边框建议尺寸：264px*469px</span>
+                </p>
+                <p>
+                  <span>视频内边框建议尺寸：234px*436px</span>
+                </p>
+              </div>
+            </div>
           </div>
           <div class="material_library_box" v-else>
             <div class="search_box">
@@ -423,62 +503,66 @@
       title="预览"
     >
       <div class="preview_box">
-        <img :src="require('@/assets/phone14.jpg')" />
+        <img class="bg_img" :src="require('@/assets/phone14.jpg')" />
         <div
           class="content_box ql-editor"
           v-html="setData.inputData.content"
           v-if="setData.inputData.shape != 5"
         ></div>
-        <div
-          class="templateVideo_box"
-          :style="setData.inputData.bgImg == '1' && setData.inputData.uploadBgImg.length > 0 ? {
-            background: `url(${setData.inputData.uploadBgImg}) no-repeat 0px 0px`,
-            padding : '60px 0 243px 0',
-            backgroundSize:'100% 100%'
-          }: { backgroundColor:'#fff' }"
-          v-else
-        >
-          <img
-            v-if="setData.inputData.bgImg == '0'"
-            :src="require('@/assets/default_header.png')"
-            class="header"
-            alt
-          />
-          <div class="video_box" :style="setData.inputData.bgImg == '0' ? {} :{background:'none'}">
-            <div class="video" v-for="(item,index) in previewArr" :key="index">
-              <div
-                class="title"
-                :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat 0px 0px`}"
-              >{{ item.title }}</div>
-              <div
-                class="content"
-                :style="{width:setData.inputData.videoFormat == '0' ? '322px' :'245px'}"
-              >
-                <img
-                  class="bg_img"
-                  :style="setData.inputData.videoFormat == '0' ? {
-                    width:'322px',
-                    height:'181px'
-                  } : {
-                    width:'245px',
-                    height:'435px'
-                  }"
-                  :src="setData.inputData.bgImg == '0' ? require(`@/assets/default_${setData.inputData.videoFormat == '0' ? 'vertical' :'row'}.png` ): setData.inputData.uploadVideoBorderImg"
-                  alt
-                />
-                <video
-                  :class="setData.inputData.videoFormat == '0' ? 'vertical' :'row'"
-                  :src="item.video"
-                ></video>
+        <div class="over_box" v-else>
+          <div
+            class="templateVideo_box"
+            :style="setData.inputData.bgImg == '1' && setData.inputData.uploadBgImg.length > 0 ? {
+              background: `url(${setData.inputData.uploadBgImg}) no-repeat top left  #FFFFFF`,
+              padding : '60px 0 243px 0',
+              backgroundSize:'100% auto'
+            }: { backgroundColor:'#fff' }"
+          >
+            <img
+              v-if="setData.inputData.bgImg == '0'"
+              :src="require('@/assets/default_header.png')"
+              class="header"
+              alt
+            />
+            <div
+              class="video_box"
+              :style="setData.inputData.bgImg == '0' ? {} :{background:'none'}"
+            >
+              <div class="video" v-for="(item,index) in previewArr" :key="index">
+                <div
+                  class="title"
+                  :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat 0px 0px`}"
+                >{{ item.title }}</div>
+                <div
+                  class="content"
+                  :style="{width:setData.inputData.videoFormat == '0' ? '322px' :'245px'}"
+                >
+                  <img
+                    class="bg_img"
+                    :style="setData.inputData.videoFormat == '0' ? {
+                      width:'322px',
+                      height:'181px'
+                    } : {
+                      width:'245px',
+                      height:'435px'
+                    }"
+                    :src="setData.inputData.bgImg == '0' ? require(`@/assets/default_${setData.inputData.videoFormat == '0' ? 'vertical' :'row'}.png` ): setData.inputData.uploadVideoBorderImg"
+                    alt
+                  />
+                  <video
+                    :class="setData.inputData.videoFormat == '0' ? 'vertical' :'row'"
+                    :src="item.video"
+                  ></video>
+                </div>
               </div>
             </div>
+            <img
+              v-if="setData.inputData.bgImg == '0'"
+              :src="require('@/assets/default_bottom.png')"
+              class="bottom"
+              alt
+            />
           </div>
-          <img
-            v-if="setData.inputData.bgImg == '0'"
-            :src="require('@/assets/default_bottom.png')"
-            class="bottom"
-            alt
-          />
         </div>
       </div>
       <template slot="footer">
@@ -1007,13 +1091,16 @@ export default {
             }
           }
         }
-        if (this.setData.inputData.shape == '5') {
-          this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
-            title: '',
-            video: '',
-            isUpload: false,
-            isError: false
-          }]
+        if (this.setData.inputData.shape == '5' && this.setData.inputData.uploadVideo.length < 5) {
+          const sum = 5 - this.setData.inputData.uploadVideo.length
+          for (let i = 0; i < sum; i++) {
+            this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
+              title: '',
+              video: '',
+              isUpload: false,
+              isError: false
+            }]
+          }
         }
         if (this.setData.inputData.shape == 3) {
         }
@@ -1239,18 +1326,6 @@ export default {
         this.modalState = false
         this.setData.inputData.uploadVideo[index].isUpload = true
         this.setData.inputData.uploadVideo[index].source = source
-        const sum = this.setData.inputData.uploadVideo.filter(item => {
-          return item.video.length > 0 || item.isUpload
-        }).length
-        console.log(sum)
-        if (sum == this.setData.inputData.uploadVideo.length) {
-          this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
-            title: '',
-            video: '',
-            isUpload: false,
-            isError: false
-          }]
-        }
       } else {
         tempFormData.append('file', fileInfo)
         this.source = source
@@ -1324,18 +1399,6 @@ export default {
         } else if (this.medium.type == 5) {
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
-            const sum = this.setData.inputData.uploadVideo.filter(item => {
-              return item.video.length > 0 || item.isUpload
-            }).length
-            console.log(sum)
-            if (sum == this.setData.inputData.uploadVideo.length) {
-              this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
-                title: '',
-                video: '',
-                isUpload: false,
-                isError: false
-              }]
-            }
           } else {
             if (this.source) {
               this.source.cancel()
@@ -1371,18 +1434,6 @@ export default {
           console.log(content)
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = content.videoFullPath
-            const sum = this.setData.inputData.uploadVideo.filter(item => {
-              return item.video.length > 0 || item.isUpload
-            }).length
-            console.log(sum)
-            if (sum == this.setData.inputData.uploadVideo.length) {
-              this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
-                title: '',
-                video: '',
-                isUpload: false,
-                isError: false
-              }]
-            }
           } else {
             this.$refs.editor[0].getEditorData('video', content.videoFullPath)
           }
@@ -2094,6 +2145,16 @@ export default {
 
       .hint {
         margin-top: 90px;
+        .text {
+          margin-bottom: 20px;
+          p {
+            width: 100%;
+            margin: 0;
+            span {
+
+            }
+          }
+        }
       }
 
       .upload_btn {
@@ -2177,13 +2238,18 @@ export default {
     height: 700px;
     overflow: auto;
   }
-  .templateVideo_box {
+  .over_box {
     position: absolute;
+    top: 60px;
     background-color: #f3faff;
     width: 350px;
-    height: 750px;
-    overflow: overlay;
-    border-radius: 15px;
+    height: 730px;
+    overflow: auto;
+  }
+  .templateVideo_box {
+    background-color: #f3faff;
+    width: 100%;
+    min-height: 750px;
     box-sizing: border-box;
     .header {
       width: 100%;
