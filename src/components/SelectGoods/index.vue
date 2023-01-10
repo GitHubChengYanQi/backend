@@ -18,7 +18,7 @@
       @search="handleSearch"
       @change="handleChange"
     >
-      <a-select-option v-for="item in option" :key="item.id" :value="item.id">
+      <a-select-option v-for="item in option" :key="item.id" :value="item.id" :disabled="isSelect(item.id)">
         {{ item.name }}
       </a-select-option>
     </a-select>
@@ -73,6 +73,20 @@ export default {
   },
   methods: {
     /**
+     * 返回是否已选
+     */
+    isSelect (id) {
+      const arr = this.goods
+      let flag = false
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].id === id) {
+          flag = true
+          break
+        }
+      }
+      return flag
+    },
+    /**
      * 获取药品列表
      * @param {*} e
      */
@@ -124,7 +138,7 @@ export default {
             }
           }
           if (!flag) {
-            goods.push(arr[i])
+            goods.unshift(arr[i])
           }
         }
       }
