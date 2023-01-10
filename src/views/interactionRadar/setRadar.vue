@@ -1215,7 +1215,18 @@ export default {
         this.modalState = false
         this.setData.inputData.uploadVideo[index].isUpload = true
         this.setData.inputData.uploadVideo[index].source = source
-        console.log(this.setData.inputData.uploadVideo)
+        const sum = this.setData.inputData.uploadVideo.filter(item => {
+          return item.video.length > 0 || item.isUpload
+        }).length
+        console.log(sum)
+        if (sum == this.setData.inputData.uploadVideo.length) {
+          this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
+            title: '',
+            video: '',
+            isUpload: false,
+            isError: false
+          }]
+        }
       } else {
         tempFormData.append('file', fileInfo)
         this.source = source
@@ -1289,6 +1300,18 @@ export default {
         } else if (this.medium.type == 5) {
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
+            const sum = this.setData.inputData.uploadVideo.filter(item => {
+              return item.video.length > 0 || item.isUpload
+            }).length
+            console.log(sum)
+            if (sum == this.setData.inputData.uploadVideo.length) {
+              this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
+                title: '',
+                video: '',
+                isUpload: false,
+                isError: false
+              }]
+            }
           } else {
             if (this.source) {
               this.source.cancel()
@@ -1324,6 +1347,19 @@ export default {
           console.log(content)
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = content.videoFullPath
+            this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
+            const sum = this.setData.inputData.uploadVideo.filter(item => {
+              return item.video.length > 0 || item.isUpload
+            }).length
+            console.log(sum)
+            if (sum == this.setData.inputData.uploadVideo.length) {
+              this.setData.inputData.uploadVideo = [...this.setData.inputData.uploadVideo, {
+                title: '',
+                video: '',
+                isUpload: false,
+                isError: false
+              }]
+            }
           } else {
             this.$refs.editor[0].getEditorData('video', content.videoFullPath)
           }
