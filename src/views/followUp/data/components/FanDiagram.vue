@@ -8,9 +8,16 @@
 /**
  * @param {Number} type 类型 0 扇形图 1 圆环 2 横柱状图 3 折线图带范围 4 折线图多条不带范围
  * @param {Array} dataArr 数据 扇形图格式  0 ：[[数据名称, 数据]]  1 ：[[数据名称, 数据]] 第一个默认为圆环中心数据 2 [[数据名称, 数据]] 3 [[数据名称, 数据]]
- * @param {Object} dataObj 折线图多条不带范围数据
+ * @param {Object} dataObj 折线图多条不带范围数据 {
+          xAxis: ['2021-1', '2021-2'],
+          data:{
+            'A片区': [200, 300, 400 ],
+            'B片区': [230, 330, 430 ]
+          }
+        }
 
  */
+
 export default {
   name: 'FanDiagram',
   props: {
@@ -273,6 +280,86 @@ export default {
             {
               type: 'line',
               data: [200, 500]
+            }
+          ]
+        },
+        5: {
+          color: ['#1890ff', '#55CB9C', '#586589', '#E8B215'],
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            }
+          },
+          legend: {
+            icon: 'rect',
+            itemHeight: 14,
+            itemWidth: 14,
+            data: ['任务总数', '发送数', '超时发送数', '未发送数'],
+            top: 'bottom'
+          },
+          toolbox: {
+            show: true,
+            orient: 'vertical',
+            left: 'right',
+            top: 'center',
+            feature: {
+              mark: { show: true },
+              dataView: { show: true, readOnly: false },
+              magicType: { show: true, type: ['line', 'bar', 'stack'] },
+              restore: { show: true },
+              saveAsImage: { show: true }
+            }
+          },
+          xAxis: [
+            {
+              type: 'category',
+              axisTick: { show: false },
+              data: ['2012', '2013', '2014', '2015', '2016']
+            }
+          ],
+          yAxis: [
+            {
+              type: 'value'
+            }
+          ],
+          series: [
+            {
+              name: '任务总数',
+              type: 'bar',
+              barGap: 0,
+              emphasis: {
+                focus: 'series'
+              },
+              barWidth: 20,
+              data: [320, 332, 301, 334, 390]
+            },
+            {
+              name: '发送数',
+              type: 'bar',
+              emphasis: {
+                focus: 'series'
+              },
+              barWidth: 20,
+              data: [220, 182, 191, 234, 290]
+            },
+            {
+              name: '超时发送数',
+              type: 'bar',
+              emphasis: {
+                focus: 'series'
+              },
+              barWidth: 20,
+              data: [150, 232, 201, 154, 190]
+            },
+            {
+              name: '未发送数',
+              type: 'bar',
+              emphasis: {
+                focus: 'series'
+              },
+              barWidth: 20,
+              data: [98, 77, 101, 99, 40]
             }
           ]
         }

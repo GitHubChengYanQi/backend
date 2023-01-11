@@ -99,8 +99,13 @@
     </div>
     <div class="box" style="width:100%;height:300px;">
       <FanDiagram
-        :type="4"
-        :dataObj="{xAxis: ['2021-1', '2021-2'],data:{'A片区': [200, 300, 400 ],'B片区': [230, 330, 430 ]}
+        :type="5"
+        :dataObj="{
+          xAxis: ['2021-1', '2021-2'],
+          data:{
+            'A片区': [200, 300, 400 ],
+            'B片区': [230, 330, 430 ]
+          }
         }"
       />
     </div>

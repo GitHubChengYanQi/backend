@@ -299,7 +299,7 @@
               <img class="upload_icon" :src="require('@/assets/upload.svg')" alt />
               <span class="upload_text">{{ modalTitle }}</span>
             </div>
-            <a-spin class="spin" v-else-if="isUpload"/>
+            <a-spin class="spin" v-else-if="isUpload" />
             <div class="show" v-else @click="getLink">
               <img v-if="medium.type == 2" class="upload_image" :src="uploadUrl" alt />
               <video v-else-if="medium.type == 5" :src="uploadUrl" class="upload_image"></video>
@@ -488,7 +488,7 @@
               <div class="video" v-for="(item,index) in previewArr" :key="index">
                 <div
                   class="title"
-                  :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat 0px 0px`}"
+                  :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat 0px 0px`,backgroundSize:'100% 100%'}"
                 >{{ item.title }}</div>
                 <div
                   class="content"
