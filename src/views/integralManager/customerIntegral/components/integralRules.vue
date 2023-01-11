@@ -70,7 +70,6 @@
                 v-model="commonValidityTypeInfo.monthDay"
                 @change="changeMonthDay"
               ></a-date-picker>
-              <!-- <selectMonthDate :inputWidth="'150'"></selectMonthDate> -->
               定期清零
             </div>
             <div class="singleRegularContent">
@@ -540,7 +539,6 @@
 </template>
 
 <script>
-import selectMonthDate from './selectMonthDate.vue'
 import moment from 'moment'
 import goodsManager from './goodsManager.vue'
 import chooseRadar from './chooseRadar.vue'
@@ -691,8 +689,7 @@ export default {
   },
   components: {
     goodsManager,
-    chooseRadar,
-    selectMonthDate
+    chooseRadar
   },
   created () {
     this.getIntegralValidateType()
