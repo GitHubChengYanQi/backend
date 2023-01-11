@@ -318,7 +318,7 @@ export default {
         },
         {
           title: '更新时间',
-          dataIndex: 'createdAt',
+          dataIndex: 'updateAt',
           sorter: true,
           align: 'center',
           width: 150
