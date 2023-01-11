@@ -218,6 +218,7 @@ export default {
       this.getGroupList()
     },
     /**
+<<<<<<< HEAD
      * 获取互动雷达数据
      */
     getRanda () {
@@ -229,6 +230,8 @@ export default {
       })
     },
     /**
+=======
+>>>>>>> develop
      * 获取字典
      */
     getDict () {
@@ -265,11 +268,17 @@ export default {
       }
       this.spinning = true
       try {
-        const { code, data } = await mediumIndex({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
-        if (code == 200) {
+        let res = {}
+        if (this.selectListMode === '1') {
+          res = await mediumIndex({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
+        }
+        if (this.selectListMode === '2') {
+          res = await scrmRadarArticleFind({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
+        }
+        if (res.code == 200) {
           const arr = this.list
-          this.list = arr.concat(data.list)
-          this.userListPagination.totalPage = data.page.totalPage
+          this.list = arr.concat(res.data.list)
+          this.userListPagination.totalPage = res.data.page.totalPage
         }
         this.spinning = false
       } catch (error) {
