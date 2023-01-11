@@ -74,11 +74,32 @@
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>
+    <div class="chartBox">
+      <ChartContainer width="49%" name="方案占比" style="margin-right: 1%;">
+        <template #rightTop>rightTop</template>
+        <template #searchTab>
+          <a-radio-group default-value="1" button-style="solid" @change="({target: {value}}) => handleChartItemChange(value, 'key')">
+            <a-radio-button value="1">
+              使用情况
+            </a-radio-button>
+            <a-radio-button value="2">
+              完成情况
+            </a-radio-button>
+            <a-radio-button value="3">
+              预警情况
+            </a-radio-button>
+          </a-radio-group>
+        </template>
+      </ChartContainer>
+      <ChartContainer width="50%" extra="123" name="启用方案TOP5" rightTop="用户总人数  1867" />
+    </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
+
+import ChartContainer from './components/chartContainer.vue'
 const defaultSearchObj = {
   name: [],
   status: '',
@@ -87,6 +108,9 @@ const defaultSearchObj = {
   date: []
 }
 export default {
+  components: {
+    ChartContainer
+  },
   data () {
     return {
       tabArr: {
@@ -135,6 +159,9 @@ export default {
     },
     handleSearch () {
       console.log(this.searchObj)
+    },
+    handleChartItemChange (value, key) {
+      console.log(value, key, this.searchObj)
     }
   }
 }
