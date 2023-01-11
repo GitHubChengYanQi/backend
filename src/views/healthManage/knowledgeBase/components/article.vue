@@ -13,12 +13,17 @@
             </a-col>
           </a-row>
         </div>
-        <a-radio-group v-model="selectListMode" class="selectListModeBox">
+
+        <!-- nav -->
+        <a-radio-group v-model="selectListMode" @change="handleRadio" class="selectListModeBox">
           <a-radio-button value="1">素材库</a-radio-button>
           <a-radio-button value="2">互动雷达</a-radio-button>
         </a-radio-group>
+        <!-- end nav -->
+
+        <!-- search -->
         <a-form-model :label-col="{ span: 5 }" :wrapper-col="{ span: 14 }">
-          <a-form-model-item label="选择分组">
+          <a-form-model-item label="选择分组" v-if="selectListMode === '1'">
             <a-tree-select
               v-model="editGroupId"
               style="width: 100%"
@@ -36,8 +41,15 @@
               :treeData="treeData">
             </a-tree-select>
           </a-form-model-item>
+          <a-form-model-item label="雷达分组" v-if="selectListMode === '2'">
+            <a-select @change="handleChange('group')" v-model="radarGroupId">
+              <a-select-option v-for="item in radarGroupArr" :key="item.id" :value="item.id">
+                {{ item.name }}
+              </a-select-option>
+            </a-select>
+          </a-form-model-item>
           <a-form-model-item label="雷达分类" v-if="selectListMode === '2'">
-            <a-select style="width: 120px" @change="handleChange">
+            <a-select @change="handleChange('class')" v-model="radarType">
               <a-select-option v-for="item in typeArr" :key="item.code" :value="item.code">
                 {{ item.name }}
               </a-select-option>
@@ -45,7 +57,10 @@
           </a-form-model-item>
         </a-form-model>
         <a-input-search placeholder="输入患教名称" v-model="searchVal" @search="onSearch" @change="onSearch" />
+        <!-- end search -->
         <!-- v-infinite-scroll="handleInfiniteOnLoad" :infinite-scroll-disabled="busy" :infinite-scroll-distance="10" -->
+
+        <!-- list -->
         <a-spin :spinning="spinning">
           <div
             class="demo-infinite-container"
@@ -53,15 +68,14 @@
             v-infinite-scroll="getList"
             :infinite-scroll-disabled="busy"
             :infinite-scroll-distance="10">
-            <a-list :data-source="currentList">
+            <a-list :data-source="selectListMode === '1' ? currentList : list">
               <a-list-item slot="renderItem" slot-scope="item, index" @click.stop="listChange(item, index)">
                 <div :class="{ item: true, active: index === activeIndex }">
-                  <!-- <div class="tip flex-row-center"
-                                :style="{ 'background': index == 0 ? '' : 'rgb(2, 167, 240)' }">
-                                {{ index == 0 ? '平台' : '个人' }}
-                            </div> -->
-                  <div class="text">
+                  <div class="text" v-if="selectListMode === '1'">
                     {{ item.content.title || item.content.fileName }}
+                  </div>
+                  <div class="text" v-if="selectListMode === '2'">
+                    {{ item.title }}
                   </div>
                   <a-select
                     v-if="selectListMode === '2'"
@@ -69,14 +83,20 @@
                     style="width: 112px;"
                     v-model="item.selectChannel"
                     placeholder="请选择渠道"
-                    :options="item.batch || []"
-                  />
+                  >
+                    <a-select-option v-for="items in item.ditch" :key="items.id" :value="items.id">
+                      {{ items.name }}
+                    </a-select-option>
+                  </a-select>
                 </div>
               </a-list-item>
             </a-list>
           </div>
         </a-spin>
+        <!-- end list -->
       </div>
+
+      <!-- detail -->
       <div class="r-detail">
         <div class="titleContent">
           <a-row>
@@ -138,14 +158,17 @@
           <Empty class="emptyCenter" v-else description="请选择患教" />
         </div>
       </div>
+      <!-- end detail -->
     </div>
-    <!-- 新建方案按钮 -->
+
+    <!-- handle -->
     <div class="addBtns flex-row-center" v-if="!isAdd">
       <Space>
         <a-button @click="closeModal(false)"> 取消 </a-button>
         <a-button type="primary" @click="closeModal(true)"> 确定 </a-button>
       </Space>
     </div>
+    <!-- end handle -->
   </div>
 </template>
 
@@ -154,7 +177,7 @@ import { Space, Empty } from 'ant-design-vue'
 import { mediumIndex } from '@/api/healthManage'
 import { mediumGroup } from '@/api/mediumGroup'
 import { getDict } from '@/api/common'
-import { scrmRadarArticleFind } from '@/api/setRadar'
+import { scrmRadarArticleFind, scrmRadarLabelFind } from '@/api/setRadar'
 import infiniteScroll from '@/utils/directive'
 export default {
   props: {
@@ -193,8 +216,10 @@ export default {
         totalPage: 0
       },
       // 新增雷达选择列表
-      selectListMode: '1',
-      radarGroupId: '',
+      selectListMode: '1', // 1:素材库 2:雷达
+      radarGroupArr: [],
+      radarType: '', // 雷达分类
+      radarGroupId: '', // 组id
       typeArr: [] // 互动雷达分类字典
     }
   },
@@ -226,10 +251,17 @@ export default {
       })
     },
     /**
-     * 互动雷达分类回调
+     * 素材库/互动雷达 切换回调
      */
-    handleChange (e) {
-      console.log(1111, e)
+    handleRadio () {
+      this.onSearch()
+    },
+    /**
+     * 互动雷达select回调
+     * type 'group/class'
+     */
+    handleChange (type) {
+      this.onSearch()
     },
     // 按名称搜索问卷
     onSearch () {
@@ -257,15 +289,27 @@ export default {
         let res = {}
         if (this.selectListMode === '1') {
           res = await mediumIndex({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
+          if (res.code == 200) {
+            const arr = this.list
+            this.list = arr.concat(res.data.list)
+            this.userListPagination.totalPage = res.data.page.totalPage
+          }
         }
         if (this.selectListMode === '2') {
-          res = await scrmRadarArticleFind({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
+          res = await scrmRadarArticleFind({ title: this.searchVal,
+            shape: 0,
+            unitId: this.editGroupId,
+            ...{
+              current: params.page,
+              size: params.perPage
+            } })
+          if (res.code == 200) {
+            const arr = this.list
+            this.list = arr.concat(res.data.datas)
+            this.userListPagination.totalPage = res.data.pages
+          }
         }
-        if (res.code == 200) {
-          const arr = this.list
-          this.list = arr.concat(res.data.list)
-          this.userListPagination.totalPage = res.data.page.totalPage
-        }
+
         this.spinning = false
       } catch (error) {
         this.spinning = false
@@ -274,10 +318,22 @@ export default {
     // 点击问卷查询详情
     async listChange (item, index) {
       this.activeIndex = index
-      this.currentItem = item
+      if (this.selectListMode === '1') {
+        this.currentItem = item
+      }
+      if (this.selectListMode === '2') {
+        this.currentItem = item.entry
+        console.log(11111, item.entry)
+      }
     },
     // 获取分组列表
     getGroupList () {
+      const param = {
+        left: 1
+      }
+      scrmRadarLabelFind(param).then(res => {
+        this.radarGroupArr = res.data.group
+      })
       mediumGroup().then(res => {
         this.treeData = res.data
       })
