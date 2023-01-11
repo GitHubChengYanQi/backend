@@ -44,10 +44,10 @@
             </div>
           </a-form-model-item>
           <!--视频专区名称-->
-          <a-form-model-item label="视频专区名称" prop="couponIntroduce">
+          <!-- <a-form-model-item label="视频背景" prop="couponIntroduce">
             <a-input style="width:350px;" v-model="form.couponIntroduce" :maxLength="8" :suffix="`${form.couponIntroduce ? form.couponIntroduce.length : 0}/8`" />
-          </a-form-model-item>
-          <a-form-model-item prop="videoBgFullPath" :wrapper-col="{ span: 14, offset: 4 }">
+          </a-form-model-item> -->
+          <a-form-model-item label="视频背景" prop="videoBgFullPath">
             <a-input v-show="false" v-model="form.videoBgFullPath"/>
             <div class="formBox">
               <UploadImg @changeImg="(e)=>{getImg(e, 'videoBgFullPath')}" :imgUrl="form.videoBgFullPath" :btnType="false" :fileType="1" />
@@ -60,6 +60,7 @@
               <a-checkbox v-model="form.rollShow" @change="handleChangeRoll">
                 显示
               </a-checkbox>
+              <span style="margin-left:35px;">示例：昵称为“温如清风”的用户参加了活动！</span>
             </div>
           </a-form-model-item>
           <a-form-model-item prop="rollBgFullPath" :wrapper-col="{ span: 14, offset: 4 }">
@@ -159,7 +160,7 @@
           </a-form-model-item>
           <!--注册会员文案-->
           <a-form-model-item label="注册会员文案" prop="regTxt">
-            <a-input style="width:350px;" v-model="form.regTxt" :maxLength="20" :suffix="`${form.regTxt ? form.regTxt.length : 0}/20`" />
+            <a-input style="width:350px;" v-model="form.regTxt" @input="handleInput('regTxt')" :maxLength="20" :suffix="`${form.regTxt ? form.regTxt.length : 0}/20`" />
           </a-form-model-item>
           <!--客服二维码-->
           <a-form-model-item label="客服二维码" prop="employeeQrcodeImageFullPath">
@@ -169,7 +170,7 @@
           </a-form-model-item>
           <!--优惠券文案-->
           <a-form-model-item label="优惠券文案" prop="ticketTxt">
-            <a-input style="width:350px;" v-model="form.ticketTxt" :maxLength="20" :suffix="`${form.ticketTxt ? form.ticketTxt.length : 0}/20`" />
+            <a-input style="width:350px;" v-model="form.ticketTxt" @input="handleInput('ticketTxt')" :maxLength="20" :suffix="`${form.ticketTxt ? form.ticketTxt.length : 0}/20`" />
           </a-form-model-item>
         </div>
         <div class="fr">
@@ -234,7 +235,7 @@ export default {
           show: true
         }, {
           type: 'videoBgFullPath',
-          typeName: '视频专区名称',
+          typeName: '视频背景',
           value: '',
           url: '',
           show: true
@@ -282,7 +283,7 @@ export default {
         introduceImageFullPath: '',
         // 活动首页
         image01FullPath: '',
-        couponIntroduce: '',
+        // couponIntroduce: '',
         videoBgFullPath: '',
         rollShow: true,
         rollBgFullPath: '',
@@ -305,7 +306,7 @@ export default {
         date: [{ required: true, message: '请选择日期', trigger: 'change' }],
         introduceImageFullPath: [{ required: true, message: '请上传活动介绍', trigger: 'blur' }],
         // 活动首页
-        couponIntroduce: [{ required: true, message: '请输入视频专区名称', trigger: 'blur' }],
+        // couponIntroduce: [{ required: true, message: '请输入视频专区名称', trigger: 'blur' }],
         // 答题页身份认证
         style: [{ required: true, message: '请选主题', trigger: 'change' }],
         regTxt: [{ required: true, message: '注册会员文案', trigger: 'blur' }],
@@ -371,6 +372,17 @@ export default {
      */
     handleChangeBtn (e, type) {
       this.form[type] = e.target.checked
+    },
+    /**
+     * 输入回调
+     */
+    handleInput (type) {
+      const arr = this.answerPage
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].type === type) {
+          arr[i].value = this.form[type]
+        }
+      }
     }
   }
 }

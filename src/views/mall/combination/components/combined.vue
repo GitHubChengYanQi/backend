@@ -18,8 +18,7 @@
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
               <a-select placeholder="请选择" v-model="screenData.haveAdjuvants">
-                <a-select-option value="have">有</a-select-option>
-                <a-select-option value="no">无</a-select-option>
+                <a-select-option v-for="item in haveNoOption" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -36,7 +35,7 @@
               label="疾病分类："
               :labelCol="{lg: {span: 2}}"
               :wrapperCol="{lg: {span: 17}}">
-              <disease-select placeholder="请选择疾病分类" @change="(value) => this.screenData.symptomDiseaseClassify = value" v-model="this.screenData.symptomDiseaseClassify" />
+              <disease-select placeholder="请选择疾病分类" @change="handleChange" v-model="this.screenData.symptomDiseaseClassify" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -121,6 +120,7 @@
 import { combinList, deleteCombin } from '@/api/mall'
 import { deepClone } from '@/utils/util'
 import diseaseSelect from './diseaseSelect'
+import { getDict } from '@/api/common.js'
 export default {
   filters: {
     filterNull: function (text) {
@@ -132,9 +132,11 @@ export default {
   },
   data () {
     return {
+      // 字典：有无用药
+      haveNoOption: [],
       loading: false,
       screenData: {
-        symptomDiseaseClassify: 0
+        symptomDiseaseClassify: []
       },
       columns: [
         {
@@ -217,7 +219,29 @@ export default {
      * 初始化
      */
     initFn () {
+      this.getDict('have_no')
       this.getTableData()
+    },
+    /**
+     * 拉取字典
+     * @param {*} e
+     */
+    getDict (e) {
+      const obj = {
+        dictType: e
+      }
+      getDict(obj).then((res) => {
+        if (e === 'have_no') {
+          this.haveNoOption = res.data
+        }
+      })
+    },
+    /**
+     * 疾病分类回调
+     */
+    handleChange (res) {
+      this.screenData.symptomDiseaseClassifyOneLevel = res[0]
+      this.screenData.symptomDiseaseClassifyTwoLevel = res[1]
     },
     /**
      * 拉取列表
@@ -229,8 +253,16 @@ export default {
         perPage: this.pagination.pageSize,
         ...this.screenData
       }
-      // 是否选择了疾病分类
-      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify : ''
+      // if (params.symptomDiseaseClassifyOneLevel > 0) {
+      //   if (params.symptomDiseaseClassifyTwoLevel > 0) {
+      //     delete params.symptomDiseaseClassifyOneLevel
+      //   } else {
+      //     delete params.symptomDiseaseClassifyTwoLevel
+      //   }
+      // } else {
+      //   delete params.symptomDiseaseClassifyOneLevel
+      //   delete params.symptomDiseaseClassifyTwoLevel
+      // }
       combinList(params).then((res) => {
         this.loading = false
         this.tableData = res.data.list
@@ -253,7 +285,7 @@ export default {
     resetSearch () {
       // this.storeIds = []
       this.screenData = {
-        symptomDiseaseClassify: NaN
+        symptomDiseaseClassify: []
       }
       this.selectedRowKeys = []
       this.selectedRows = []
