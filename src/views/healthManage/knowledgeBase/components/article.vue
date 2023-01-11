@@ -218,20 +218,6 @@ export default {
       this.getGroupList()
     },
     /**
-<<<<<<< HEAD
-     * 获取互动雷达数据
-     */
-    getRanda () {
-      const param = {
-
-      }
-      scrmRadarArticleFind(param).then(res => {
-        console.log(1111, res)
-      })
-    },
-    /**
-=======
->>>>>>> develop
      * 获取字典
      */
     getDict () {
