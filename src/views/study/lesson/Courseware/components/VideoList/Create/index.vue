@@ -148,7 +148,7 @@ export default {
           const data = {
             courseWareType: 'video',
             suffix: 'jpg',
-            size: this.size / 1024,
+            size: this.size,
             ...values
           }
           if (router.history.current.query.id) {

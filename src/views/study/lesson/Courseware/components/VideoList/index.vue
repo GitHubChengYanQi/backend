@@ -61,6 +61,13 @@
               </div>
             </div>
           </div>
+          <div slot="size" slot-scope="text">
+            <template>
+              <div class="statistics">
+                <a-statistic :value="text" suffix="kb" :valueStyle="{fontSize:'14px'}" />
+              </div>
+            </template>
+          </div>
           <div slot="action" slot-scope="text, record">
             <template>
               <div class="my-space">
@@ -157,9 +164,7 @@ export default {
           width: '200px',
           dataIndex: 'size',
           align: 'center',
-          customRender: (text) => {
-            return text + 'kb'
-          }
+          scopedSlots: { customRender: 'size' }
         },
         {
           title: '上传时间',
@@ -456,6 +461,12 @@ export default {
     .weixin {
       color: #86CE76
     }
+  }
+}
+
+.statistics {
+  /deep/ span {
+    font-size: 14px !important;
   }
 }
 </style>
