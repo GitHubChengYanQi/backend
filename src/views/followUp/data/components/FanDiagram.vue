@@ -6,8 +6,9 @@
 
 <script>
 /**
- * @param {Number} type 类型 0 扇形图 1 圆环 2 横柱状图 3 折线图
- * @param {Array} dataArr 数据 扇形图格式  0 ：[[数据名称, 数据]]  1 ：[[数据名称, 数据]] 第一个默认为圆环中心数据 2 [[数据名称, 数据]]
+ * @param {Number} type 类型 0 扇形图 1 圆环 2 横柱状图 3 折线图带范围 4 折线图多条不带范围
+ * @param {Array} dataArr 数据 扇形图格式  0 ：[[数据名称, 数据]]  1 ：[[数据名称, 数据]] 第一个默认为圆环中心数据 2 [[数据名称, 数据]] 3 [[数据名称, 数据]]
+ * @param {Object} dataObj 折线图多条不带范围数据
 
  */
 export default {
@@ -17,16 +18,16 @@ export default {
       type: Number,
       default: 0
     },
-    titleArr: {
+    dataArr: {
       type: Array,
       default: () => {
         return []
       }
     },
-    dataArr: {
-      type: Array,
+    dataObj: {
+      type: Object,
       default: () => {
-        return []
+        return {}
       }
     }
   },
@@ -160,7 +161,7 @@ export default {
               barWidth: 10,
               animationDuration: 1500,
               itemStyle: {
-                color: '#6068DA'
+                color: '#1890ff'
               },
               showBackground: true,
               backgroundStyle: {
@@ -235,20 +236,60 @@ export default {
               data: [['2019-10-10', 200], ['2019-10-11', 500]]
             }
           ]
+        },
+        4: {
+          color: ['#55CB9C', '#1890ff'],
+          tooltip: {
+            trigger: 'axis'
+          },
+          grid: {
+            top: 10,
+            right: 10
+          },
+          xAxis: {
+            type: 'category',
+            axisTick: {
+              show: false
+            },
+            axisLine: {
+              show: false
+            },
+            data: ['111', '222'],
+            offset: 10
+          },
+          yAxis: {
+            type: 'value',
+            boundaryGap: true,
+            min: 0,
+            axisTick: {
+              show: false
+            },
+            axisLine: {
+              show: false
+            },
+            offset: 5
+          },
+          series: [
+            {
+              type: 'line',
+              data: [200, 500]
+            }
+          ]
         }
       }
     }
   },
   watch: {
-    titleArr (val) {
-      console.log(val)
-    },
     dataArr (val) {
       this.setOptions(val)
     }
   },
   created () {
-    this.setOptions(this.dataArr)
+    if (this.type == 4) {
+      this.line(this.dataObj)
+    } else {
+      this.setOptions(this.dataArr)
+    }
   },
   methods: {
     setOptions (arr) {
@@ -288,8 +329,21 @@ export default {
         return Math.max(...dataArr) + 100
       })
     },
-    line (arr) {
-      this.options[this.type].series[0].data = arr
+    line (data = []) {
+      if (this.type == 3) {
+        this.options[this.type].series[0].data = data
+      } else {
+        this.options[this.type].xAxis.data = data.xAxis
+        const arr = []
+        for (const key in data.data) {
+          const obj = {}
+          obj.name = key
+          obj.type = 'line'
+          obj.data = data.data[key]
+          arr.push(obj)
+        }
+        this.options[this.type].series = arr
+      }
     }
   }
 }

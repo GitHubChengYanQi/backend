@@ -1357,7 +1357,7 @@ export default {
             this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
           } else {
             if (this.source) {
-              this.source.cancel()
+              this.source.cancel('上传中，请耐心等待富文本中附件显示')
               this.source = null
             }
             if (this.uploadUrl.length > 0) { this.$refs.editor[0].getEditorData('video', this.uploadUrl) }
@@ -1430,7 +1430,7 @@ export default {
       const resetArr = ['linkImg', 'radarLink', 'linkTitle', 'linkDigest', 'content', 'articleLink']
       if (isState && inputData.shape != 5) {
         if (this.source) {
-          this.source.cancel()
+          this.source.cancel('上传中，请耐心等待富文本中附件显示')
           this.source = null
         }
         resetArr.map(item => {
@@ -1496,7 +1496,7 @@ export default {
         this.medium.pagination.current = 1
         this.medium.pagination.pageSize = 10
         if (this.source) {
-          this.source.cancel()
+          this.source.cancel('上传中，请耐心等待富文本中附件显示')
           this.source = null
         }
       } else if (e == 3) {
