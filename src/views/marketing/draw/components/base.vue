@@ -319,7 +319,7 @@ export default {
       immediate: true,
       deep: true,
       handler (val) {
-        this.form = {...this.form, ...val}
+        this.form = { ...this.form, ...val }
         if (val.startTime) {
           this.form.date = [moment(val.startTime), moment(val.endTime)]
         }
@@ -344,7 +344,7 @@ export default {
     getImg (img, type) {
       this.form[type] = img.fullPath
       // this.$refs['baseForm'].validateField(['content'])
-      let  arr = []
+      let arr = []
       if (type === 'employeeQrcodeImageFullPath') {
         arr = this.answerPage
       } else {

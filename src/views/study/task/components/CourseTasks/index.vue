@@ -74,6 +74,7 @@
             <div class="user-info flex">
               <div class="avatar mr12">
                 <img
+                  v-if="record.courseResult && record.courseResult.coverImageUrl"
                   height="50"
                   :src="(record.courseResult && record.courseResult.coverImageUrl)+'?x-oss-process=image/resize,m_fill,h_50,w_50'"
                 >
@@ -552,6 +553,7 @@ export default {
 }
 
 .user-info {
+  min-height: 50px;
 
   img {
     border-radius: 2px;

@@ -7,7 +7,7 @@
         :row-key="record => record.id"
         :data-source="commonTableData"
         :columns="commonTableColumns"
-        :pagination="commonPagination"
+        :pagination="false"
         class="tableBox"
         :scroll="{ x: 1500}">
         <div slot="options" slot-scope="text, record">
@@ -27,6 +27,7 @@
         :data-source="integralTableData"
         :columns="integralTableColumns"
         :pagination="integralPagination"
+        @change="handleTableChange"
         class="tableBox"
         :scroll="{ x: 1500}">
         <div slot="options" slot-scope="text, record">
@@ -48,35 +49,72 @@
       @cancel="closeCommonValidityModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
-      <a-radio-group class="radioValityGroupDiv" v-model="validityTypeName">
-        <a-radio class="singleRadioDiv" v-for="item in commonValidityTypeList" :value="item.type" :key="item.id">
-          <div v-if="item.type === 'allValidity'" class="singleRadioTitle">{{ item.name }}</div>
-          <div v-if="item.type === 'regularReset'" class="singleRegularTopDiv">
-            <div class="singleRadioTitle">{{ item.name }}</div>
+      <a-radio-group class="radioValityGroupDiv" v-model="commonValidityTypeInfo.restrictionType" @change="changeValidity">
+        <a-radio class="singleRadioDiv" :value="'1'">
+          <div class="singleRadioTitle">永久有效</div>
+        </a-radio>
+        <a-radio class="singleRadioDiv" :value="'2'">
+          <div class="singleRegularTopDiv">
+            <div class="singleRadioTitle">定期清零</div>
             <div class="regularText">可设置清零时间与清零周期，例：每年9月1号，清零去年8月1号到今年7月31号获得的积分。</div>
           </div>
-          <div class="regularContentView" v-if="item.type === 'regularReset'">
+          <div class="regularContentView">
             <div class="singleRegularContent">
               每年
-              <a-date-picker></a-date-picker>
+              <a-date-picker
+                :disabled="commonValidityTypeInfo.restrictionType !== '2'"
+                valueFormat="MM-DD"
+                format="MM-DD"
+                v-model="commonValidityTypeInfo.monthDay"
+              ></a-date-picker>
               定期清零
             </div>
             <div class="singleRegularContent">
               去年
-              <a-date-picker></a-date-picker>
+              <a-date-picker
+                :disabled="commonValidityTypeInfo.restrictionType !== '2' || !commonValidityTypeInfo.monthDay"
+                valueFormat="MM-DD"
+                format="MM-DD"
+                :disabled-date="e => disableBeforeDate(commonValidityTypeInfo.monthDay, e)"
+                v-model="commonValidityTypeInfo.lastYearMonthDay"
+                @change="changePreviousDate"
+              ></a-date-picker>
               至下一年
-              <a-date-picker></a-date-picker>
+              <a-date-picker
+                :disabled="true"
+                valueFormat="MM-DD"
+                format="MM-DD"
+                v-model="commonValidityTypeInfo.nextYearMonthDay"
+              ></a-date-picker>
             </div>
           </div>
-          <div v-if="item.type === 'singleIntegralValidity'" class="singleRadioContent">
-            <div class="singleRadioTitle">{{ item.name + '为' }}</div>
-            <a-input defaultValue="请输入值">
-              <a-select slot="addonAfter" v-model="singlgeIntegralName">
+        </a-radio>
+        <a-radio class="singleRadioDiv" :value="'3'">
+          <!-- <div class="singleRadioTitle">每笔积分有效期</div> -->
+          <div class="singleRadioContent">
+            <div class="singleRadioTitle">每笔积分有效期为</div>
+            <a-input-number
+              v-model="commonValidityTypeInfo.ytdNum"
+              placeholder="请输入"
+              :min="commonValidityTypeInfo.minNumber"
+              :max="commonValidityTypeInfo.maxNumber"
+              :disabled="commonValidityTypeInfo.restrictionType !== '3'"
+              class="inputSelectClass">
+            </a-input-number>
+            <a-select
+              v-model="commonValidityTypeInfo.ytdType"
+              :disabled="commonValidityTypeInfo.restrictionType !== '3'"
+              class="inputSelectClass"
+              @change="changeSingleValidateType">
+              <a-select-option v-for="integralItem in singleIntegralValidityTypeList" :key="integralItem.code" :value="integralItem.code">{{ integralItem.name }}</a-select-option>
+            </a-select>
+            <!-- <a-input-number placeholder="请输入" :disabled="commonValidityTypeInfo.restrictionType !== '3'">
+              <a-select slot="addonAfter" v-model="singlgeIntegralName" :disabled="commonValidityTypeInfo.restrictionType !== '3'">
                 <a-select-option v-for="integralItem in singleIntegralValidityList" :key="integralItem.id" :value="integralItem.name">
                   {{ integralItem.name }}
                 </a-select-option>
               </a-select>
-            </a-input>
+            </a-input-number> -->
           </div>
         </a-radio>
       </a-radio-group>
@@ -96,7 +134,24 @@
       @cancel="closeCommonLimitModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
-      <a-radio-group class="radioLimitGroupDiv" v-model="limitTypeName">
+      <a-radio-group class="radioLimitGroupDiv" v-model="commonValidityTypeInfo.restrictionType" @change="changeLimit">
+        <a-radio class="singleRadioDiv" :value="'4'">
+          <div class="singleRadioTitle">不限制</div>
+        </a-radio>
+        <a-radio class="singleRadioDiv" :value="'5'">
+          <div class="singleRadioContent">
+            <div class="singleRadioTitle">员工每日获取积分上限</div>
+            <a-input-number
+              v-model="commonValidityTypeInfo.integralMaxNum"
+              placeholder="请输入"
+              :min="1"
+              :disabled="commonValidityTypeInfo.restrictionType !== '5'"
+              class="inputSelectClass">
+            </a-input-number>
+          </div>
+        </a-radio>
+      </a-radio-group>
+      <!-- <a-radio-group class="radioLimitGroupDiv" v-model="limitTypeName">
         <a-radio class="singleRadioDiv" v-for="item in commonLimitTypeList" :key="item.id" :value="item.value">
           <div class="singleRadioTitle" v-if="item.value === 'noLimit'">{{ item.name }}</div>
           <div class="singleRadioContent" v-if="item.value === 'limit'">
@@ -104,7 +159,7 @@
             <a-input></a-input>
           </div>
         </a-radio>
-      </a-radio-group>
+      </a-radio-group> -->
       <template slot="footer">
         <a-button
           @click="closeCommonLimitModal()"
@@ -121,7 +176,34 @@
       @cancel="closeCommonRemindModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
-      <a-radio-group class="radioRemindGroupDiv" v-model="remindTypeName">
+      <a-radio-group class="radioRemindGroupDiv" v-model="commonValidityTypeInfo.restrictionType" @change="changeRemind">
+        <a-radio class="singleRadioDiv" :value="'6'">
+          <div class="singleRadioTitle">不提醒</div>
+        </a-radio>
+        <a-radio class="singleRadioDiv" :value="'7'">
+          <div class="singleRadioContent">
+            <div class="singleRadioTitle">到期前</div>
+            <a-input-number
+              v-model="commonValidityTypeInfo.beforeDayNum"
+              placeholder="请输入"
+              :min="1"
+              :disabled="commonValidityTypeInfo.restrictionType !== '7'"
+              class="inputSelectClass">
+            </a-input-number>
+            <div class="singleRadioText">天</div>
+            <a-time-picker
+              v-model="commonValidityTypeInfo.beforeDayTime"
+              :disabled="commonValidityTypeInfo.restrictionType !== '7'"
+              placeholder="请输入时间"
+              class="inputSelectClass"
+              valueFormat="HH:mm"
+              format="HH:mm"
+            ></a-time-picker>
+            <div class="singleRadioText">提醒员工</div>
+          </div>
+        </a-radio>
+      </a-radio-group>
+      <!-- <a-radio-group class="radioRemindGroupDiv" v-model="remindTypeName">
         <a-radio class="singleRadioDiv" v-for="item in commonRemindTypeList" :key="item.id" :value="item.value">
           <div class="singleRadioTitle" v-if="item.value === 'noRemind'">{{ item.name }}</div>
           <div class="singleRadioContent" v-if="item.value === 'remind'">
@@ -132,7 +214,7 @@
             <div class="singleRadioText">提醒员工</div>
           </div>
         </a-radio>
-      </a-radio-group>
+      </a-radio-group> -->
       <template slot="footer">
         <a-button
           @click="closeCommonRemindModal()"
@@ -152,13 +234,25 @@
       <div class="formDivContent">
         <div class="singleFormDiv">
           <div class="singleFormTitle">规则状态</div>
-          <a-switch :checked="true"></a-switch>
-          <div>已启用</div>
+          <a-switch
+            :checked="integralRulesTypeInfo.state === '1' ? true : false"
+            @click="setRules(integralRulesTypeInfo)"
+            checked-children="开"
+            un-checked-children="关"
+          />
+          <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
         </div>
         <div class="singleFormDiv">
           <div class="singleFormTitle">积分规则</div>
           <div class="singleFormText">任务时间内完成朋友圈群发任务，可获得</div>
-          <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+          <a-input-number
+            v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+            placeholder="请选择"
+            class="singleInputClass"
+            :min="1"
+            v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral">
+          </a-input-number>
+          <div class="singleFormText">积分</div>
         </div>
         <div class="singleFormDiv">
           <div class="singleFormTitle">适用员工</div>
@@ -193,15 +287,34 @@
       <div class="formDivContent">
         <div class="singleFormDiv">
           <div class="singleFormTitle">规则状态</div>
-          <a-switch :checked="true"></a-switch>
-          <div>已启用</div>
+          <a-switch
+            :checked="integralRulesTypeInfo.state === '1' ? true : false"
+            @click="setRules(integralRulesTypeInfo)"
+            checked-children="开"
+            un-checked-children="关"
+          />
+          <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
         </div>
         <div class="singleFormDiv">
           <div class="singleFormTitle">积分规则</div>
           <div class="singleFormText">新添加1个好友，且</div>
-          <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
+          <a-input-number
+            class="singleInputClass"
+            :min="1"
+            v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
+              && integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum"
+            v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum">
+          </a-input-number>
+          <div class="singleFormText">天</div>
           <div class="singleFormText">未流失，员工可获得</div>
-          <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+          <a-input-number
+            :min="1"
+            v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
+              && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+            v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+            class="singleInputClass">
+          </a-input-number>
+          <div class="singleFormText">积分</div>
         </div>
         <div class="singleFormDiv">
           <div class="singleFormTitle">适用员工</div>
@@ -237,8 +350,13 @@
       <div class="formDivContent">
         <div class="singleFormDiv">
           <div class="singleFormTitle">规则状态</div>
-          <a-switch :checked="true"></a-switch>
-          <div>已启用</div>
+          <a-switch
+            :checked="integralRulesTypeInfo.state === '1' ? true : false"
+            @click="setRules(integralRulesTypeInfo)"
+            checked-children="开"
+            un-checked-children="关"
+          />
+          <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
         </div>
         <div class="singleFormRulesDiv">
           <div class="singleFormTitle">积分规则</div>
@@ -258,8 +376,13 @@
                 </div>
               </div>
               <div class="singleFormText">后</div>
-              <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
-              <div class="singleFormText">内,购买了</div>
+              <a-input
+                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
+                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
+                placeholder="请输入"
+                class="singleInputClass">
+              </a-input>
+              <div class="singleFormText">天内,购买了</div>
               <!-- <a-button @click="chooseGoods()">+添加商品</a-button> -->
               <div class="goodsContentDiv" @click="chooseGoodsMethod">
                 <div v-if="goodsList.length === 0" class="noGoodsDiv">+商品库</div>
@@ -273,9 +396,20 @@
             </div>
             <div class="singleRulesContent">
               <div class="singleFormText">且</div>
-              <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
-              <div class="singleFormText">内，未退货，员工可获得</div>
-              <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+              <a-input
+                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
+                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
+                placeholder="请输入"
+                class="singleInputClass">
+              </a-input>
+              <div class="singleFormText">天内，未退货，员工可获得</div>
+              <a-input
+                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                placeholder="请输入"
+                class="singleInputClass">
+              </a-input>
+              <div class="singleFormText">积分</div>
             </div>
           </div>
         </div>
@@ -312,8 +446,13 @@
       <div class="formDivContent">
         <div class="singleFormDiv">
           <div class="singleFormTitle">规则状态</div>
-          <a-switch :checked="true"></a-switch>
-          <div>已启用</div>
+          <a-switch
+            :checked="integralRulesTypeInfo.state === '1' ? true : false"
+            @click="setRules(integralRulesTypeInfo)"
+            checked-children="开"
+            un-checked-children="关"
+          />
+          <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
         </div>
         <div class="singleFormRulesDiv">
           <div class="singleFormTitle">积分规则</div>
@@ -333,12 +472,24 @@
                 </div>
               </div>
               <div class="singleFormText">后，员工可获得</div>
-              <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+              <a-input
+                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                placeholder="请输入"
+                class="singleInputClass">
+              </a-input>
+              <div class="singleFormText">积分</div>
             </div>
             <div class="singleRulesContent">
               <div class="singleFormText">每个素材</div>
-              <a-input addon-after="天" default-value="10" class="singleInputClass"></a-input>
-              <div class="singleFormText">内可生效1次</div>
+              <!-- <a-input default-value="10" class="singleInputClass"></a-input> -->
+              <a-input
+                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
+                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
+                placeholder="请输入"
+                class="singleInputClass">
+              </a-input>
+              <div class="singleFormText">天内可生效1次</div>
             </div>
           </div>
         </div>
@@ -375,13 +526,19 @@
 </template>
 
 <script>
+import moment from 'moment'
 import goodsManager from './goodsManager.vue'
 import chooseRadar from './chooseRadar.vue'
-import { getTempCommonData, getTempIntegralData, getValidityTypeData, getSingleIntegralTypeData, getCommonLimitListData, getCommonRemindListData } from '@/api/integralManager'
+import { getDict } from '@/api/common'
+import { getCommonRulesApi, setCommonRulesApi, getIntegralRulesApi, setIntegralRulesApi, getTempCommonData, getTempIntegralData } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralRules',
   data () {
     return {
+      integralRulesTypeDetail: {}, // 积分规则设置详情
+      integralRulesTypeInfo: {}, // 积分规则设置对象
+      commonValidityTypeInfo: {}, // 通用规则设置有效期对象
+      commonRuleTypeList: [], // 通用规则限制类型列表
       radarList: [], // 选中的雷达列表
       goodsList: [], // 选中的商品列表
       // 雷达素材组件显示状态
@@ -407,8 +564,8 @@ export default {
       // 通用规则积分上限单选value值
       limitTypeName: 'noLimit',
       // 通用规则有效期单选value值
-      validityTypeName: 'allValidity',
-      singlgeIntegralName: '年',
+      validityTypeName: '',
+      singleIntegralName: '年',
       // 通用规则设置有效期弹框
       commonValidityShowStatus: false,
       // 通用规则设置有效期选项列表
@@ -418,7 +575,7 @@ export default {
       // 通用规则设置积分上限选项列表
       commonLimitTypeList: [],
       // 通用规则每笔积分有效期维度列表
-      singleIntegralValidityList: [],
+      singleIntegralValidityTypeList: [],
       // 通用规则列表加载动画
       commonTableLoading: false,
       // 通用规则列表数据
@@ -427,19 +584,19 @@ export default {
       commonTableColumns: [
         {
           title: '规则名称',
-          dataIndex: 'rulesName',
+          dataIndex: 'setName',
           align: 'center',
           width: 200
         },
         {
           title: '规则详情',
-          dataIndex: 'rulesDetail',
+          dataIndex: 'setDetail',
           align: 'center',
           width: 300
         },
         {
           title: '更新时间',
-          dataIndex: 'updateDate',
+          dataIndex: 'updatedAt',
           align: 'center',
           width: 200
         },
@@ -469,7 +626,7 @@ export default {
       integralTableColumns: [
         {
           title: '规则名称',
-          dataIndex: 'rulesName',
+          dataIndex: 'ruleName',
           align: 'center',
           width: 200
         },
@@ -481,7 +638,7 @@ export default {
         },
         {
           title: '更新时间',
-          dataIndex: 'updateDate',
+          dataIndex: 'updatedAt',
           align: 'center',
           width: 200
         },
@@ -493,7 +650,7 @@ export default {
         },
         {
           title: '类型',
-          dataIndex: 'typeText',
+          dataIndex: 'sysRuleType',
           align: 'center',
           width: 200
         },
@@ -522,10 +679,205 @@ export default {
     chooseRadar
   },
   created () {
+    this.getIntegralValidateType()
+    // this.getCommonRuleLimitData()
+    // 正式的通用规则数据
+    // this.getCommonRulesData()
+    // 正式的积分规则数据
+    // this.getIntegralRulesData()
+    // 临时获取通用规则
     this.commonTableData = getTempCommonData()
     this.integralTableData = getTempIntegralData()
   },
   methods: {
+    // 切换是否生效
+    setRules (info) {
+      if (info.state === '1') {
+        this.$set(this.integralRulesTypeInfo, 'state', '0')
+      } else {
+        this.$set(this.integralRulesTypeInfo, 'state', '1')
+      }
+    },
+    // 获取积分规则列表
+    async getIntegralRulesData () {
+      this.integralTableLoading = true
+      const params = {
+        page: this.integralPagination.current,
+        perPage: this.integralPagination.pageSize
+      }
+      await getIntegralRulesApi(params).then(response => {
+        this.integralTableLoading = false
+        // console.log(response)
+        this.integralTableData = response.data.list
+        this.$set(this.integralPagination, 'total', Number(response.data.page.total))
+        if (this.integralTableData.length === 0) {
+          // 列表中没有数据
+          if (this.integralPagination.total !== 0) {
+            // 总数据有,但当前页没有
+            // 重新将页码换成1
+            this.$set(this.integralPagination, 'current', 1)
+            this.getIntegralRulesData()
+          } else {
+            // 是真没有数据
+          }
+        }
+      }).catch(() => {
+        this.integralTableLoading = false
+      })
+    },
+    // 积分规则切换页码
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.integralPagination.current = current
+      this.integralPagination.pageSize = pageSize
+      // if (sorter.order) {
+      //   if (sorter.order === 'ascend') {
+      //     this.sorter = 'asc'
+      //   } else {
+      //     this.sorter = 'desc'
+      //   }
+      // } else {
+      //   this.sorter = ''
+      // }
+      this.getIntegralRulesData()
+    },
+    // 通用更新积分规则
+    commonIntegralRulesSend () {
+      setIntegralRulesApi().then(response => {
+        console.log(response, '更新积分规则')
+      })
+    },
+    // 切换到期提醒
+    changeRemind () {
+      if (this.commonValidityTypeInfo.restrictionType === '7') {
+        // 选择的是到期提醒
+        this.$set(this.commonValidityTypeInfo, 'beforeDayNum', '1')
+        this.$set(this.commonValidityTypeInfo, 'beforeDayTime', moment('2022-10-10 10:00:00').format('HH:mm'))
+        debugger
+      } else {
+        // 不提醒
+        this.$set(this.commonValidityTypeInfo, 'beforeDayNum', '')
+        this.$set(this.commonValidityTypeInfo, 'beforeDayTime', '')
+      }
+      this.$set(this.commonValidityTypeInfo, 'isChecked', '1')
+    },
+    // 切换积分上限
+    changeLimit () {
+      if (this.commonValidityTypeInfo.restrictionType === '5') {
+        // 选择的是积分上限
+        this.$set(this.commonValidityTypeInfo, 'integralMaxNum', 10)
+      } else {
+        // 无上限
+        this.$set(this.commonValidityTypeInfo, 'integralMaxNum', '')
+      }
+      this.$set(this.commonValidityTypeInfo, 'isChecked', '1')
+    },
+    // 获取积分有效期类型
+    getIntegralValidateType () {
+      const params = { dictType: 'ytd_type' }
+      getDict(params).then(response => {
+        this.singleIntegralValidityTypeList = response.data
+      })
+    },
+    // 切换每笔积分类型
+    changeSingleValidateType (e) {
+      console.log(e, '切换每笔积分类型')
+      // debugger
+      const tempValue = e
+      if (tempValue === '1') {
+        // 为年,最小值为1,最大值为3,初始值为1
+        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
+        this.$set(this.commonValidityTypeInfo, 'maxNumber', 3)
+        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
+      } else if (tempValue === '2') {
+        // 为月,最小值为1,最大值为18
+        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
+        this.$set(this.commonValidityTypeInfo, 'maxNumber', 18)
+        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
+      } else if (tempValue === '3') {
+        // 为日,最小值为1,最大值为365
+        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
+        this.$set(this.commonValidityTypeInfo, 'maxNumber', 365)
+        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
+      }
+    },
+    // 切换有效期选项
+    changeValidity (e) {
+      console.log(e, '切换有效期选项')
+      const targetValue = e.target.value
+      // 将其他字段清空
+      for (const item in this.commonValidityTypeInfo) {
+        if (item !== 'restrictionType') {
+          this.$set(this.commonValidityTypeInfo, `${item}`, '')
+        }
+      }
+      this.$set(this.commonValidityTypeInfo, 'isChecked', '1')
+      if (targetValue === '3') {
+        // 为3,表示是每笔积分设置
+        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
+        this.$set(this.commonValidityTypeInfo, 'maxNumber', 3)
+        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
+        this.$set(this.commonValidityTypeInfo, 'ytdType', this.singleIntegralValidityTypeList[0].code)
+      }
+      // const targetIndex = this.commonValidityTypeList.findIndex(item => item.restrictionType === targetValue)
+      // const tempArray = this.commonValidityTypeList.map(item => {
+      //   item.isChecked = '0'
+      //   return item
+      // })
+      // this.$set(tempArray[targetIndex], 'isChecked', '1')
+      // this.commonValidityTypeList = Object.assign([], tempArray)
+    },
+    // 切换去年时间
+    changePreviousDate () {
+      console.log('切换去年时间')
+      const tempNextMonthDay = moment(this.commonValidityTypeInfo.monthDay).subtract(1, 'd')
+      this.$set(this.commonValidityTypeInfo, 'nextYearMonthDay', moment(tempNextMonthDay).format('MM-DD'))
+    },
+    disableBeforeDate (targetDate, currentDate) {
+      // targetDate 为固定值,currentDate为变化值
+      // const tempTargetDate = moment().format('YYYY') + '-' + targetDate
+      // const formatCurrentDate = moment(currentDate).format('YYYY-MM-DD')
+      // if (moment(formatCurrentDate).valueOf() <= moment(tempTargetDate).valueOf()) {
+      //   return false
+      // } else {
+      //   return true
+      // }
+      // 当前年
+      // let currentYear = moment().format('YYYY')
+      // debugger
+      const tempCurrentDate = moment(currentDate).format('YYYY-MM-DD')
+      // 去年
+      const previousYear = moment().subtract(1, 'y')
+      // 去年的年份 + 当前的日期
+      const previousTargetDate = moment(previousYear).format('YYYY') + '-' + targetDate
+      // 去年最小的日期
+      const previousMinTarget = moment(previousYear).format('YYYY') + '-01-01'
+      if ((moment(previousMinTarget).valueOf() <= moment(currentDate).valueOf()) && (moment(previousTargetDate).valueOf() >= moment(tempCurrentDate).valueOf())) {
+        // 大于等于最小值,小于等于登录清零时间
+        return false
+      } else {
+        return true
+      }
+    },
+    // 获取规则限制类型数据字典
+    async getCommonRuleLimitData () {
+      const params = { dictType: 'restriction_type' }
+      await getDict(params).then(response => {
+        this.commonRuleTypeList = response.data
+      })
+    },
+    // 获取通用规则设置
+    getCommonRulesData () {
+      getCommonRulesApi().then(response => {
+        console.log(response, '获取通用规则设置')
+        this.commonTableData = response.data
+      })
+    },
+    // 返回选项姓名
+    returnRadioName (info) {
+      // console.log(info, 'info')
+      const index = this.commonRuleTypeList.findIndex(item => item.code === info.restrictionType)
+      return this.commonRuleTypeList[index].name
+    },
     // 选择商品
     chooseGoodsMethod () {
       this.chooseGoodsManagerShowStatus = true
@@ -566,23 +918,73 @@ export default {
     },
     // 通用规则设置
     setCommonMethod (info) {
-      console.log(info, 'info')
-      if (info.type === 'validity') {
+      // console.log(info, 'info')
+      if (info.setType === '1') {
         // 点击的是有效期
         this.commonValidityShowStatus = true
-        this.commonValidityTypeList = getValidityTypeData()
-        this.singleIntegralValidityList = getSingleIntegralTypeData()
-      } else if (info.type === 'limit') {
+        this.$nextTick(() => {
+          // 得到当前生效的对象
+          this.commonValidityTypeInfo = Object.assign({}, info.creditsSetDeatilVo)
+          // 筛选出当前生效的数据
+          // this.validityTypeName = this.commonValidityTypeList.filter(item => item.isChecked === '1')[0].restrictionType
+          // this.singleIntegralValidityList = getSingleIntegralTypeData()
+        })
+        // this.singleIntegralValidityList = getSingleIntegralTypeData()
+      } else if (info.setType === '2') {
+        // 点击的是积分上限
         this.commonLimitShowStatus = true
-        this.commonLimitTypeList = getCommonLimitListData()
-      } else if (info.type === 'remind') {
+        // this.commonLimitTypeList = Object.assign([], info.creditsSetDeatilVoList)
+        this.$nextTick(() => {
+          // this.commonLimitTypeList = Object.assign([], info.creditsSetDeatilVoList)
+          this.commonValidityTypeInfo = Object.assign({}, info.creditsSetDeatilVo)
+        })
+      } else if (info.setType === '3') {
+        // 点击的是到期提醒
         this.commonRemindShowStatus = true
-        this.commonRemindTypeList = getCommonRemindListData()
+        // this.commonRemindTypeList = Object.assign([], info.creditsSetDeatilVoList)
+        this.$nextTick(() => {
+          // this.commonRemindTypeList = Object.assign([], info.creditsSetDeatilVoList)
+          this.commonValidityTypeInfo = Object.assign({}, info.creditsSetDeatilVo)
+        })
       }
+      this.$set(this.commonValidityTypeInfo, 'id', info.id)
     },
     // 通用规则有效期点击确定
     confirmCommonValidity () {
+      const tempType = this.commonValidityTypeInfo.restrictionType
+      if (tempType === '2') {
+        // 选择的为定期清零
+        if (this.commonValidityTypeInfo.monthDay && this.commonValidityTypeInfo.lastYearMonthDay && this.commonValidityTypeInfo.nextYearMonthDay) {
+          // 可以提交
+          console.log(this.commonValidityTypeInfo, '有效期提交对象')
+        } else {
+          // 不可提交
+          this.$message.error('请填写全部数据')
+          return false
+        }
+      } else if (tempType === '3') {
+        // 选择的为每笔积分有效期
+        if (this.commonValidityTypeInfo.ytdType && this.commonValidityTypeInfo.ytdNum) {
+          // 可以提交
+          console.log(this.commonValidityTypeInfo, '有效期提交对象')
+        } else {
+          // 不可提交
+          this.$message.error('请填写全部数据')
+          return false
+        }
+      } else {
+        console.log(this.commonValidityTypeInfo, '有效期提交对象')
+      }
+      // console.log(this.commonValidityTypeInfo, '有效期提交对象')
+      debugger
       this.commonValidityShowStatus = false
+      this.commonRulesSendMethod()
+    },
+    // 通用规则提交方法
+    commonRulesSendMethod () {
+      setCommonRulesApi().then(response => {
+        console.log(response, '设置有效期弹框接口返回')
+      })
     },
     // 通用规则有效期点击取消
     closeCommonValidityModal () {
@@ -590,7 +992,25 @@ export default {
     },
     // 通用规则积分上限点击确定
     confirmCommonLimit () {
+      // this.commonLimitShowStatus = false
+      const tempType = this.commonValidityTypeInfo.restrictionType
+      if (tempType === '5') {
+        // 选择的为积分上限
+        if (this.commonValidityTypeInfo.integralMaxNum) {
+          // 可以提交
+          console.log(this.commonValidityTypeInfo, '积分上限提交对象')
+        } else {
+          // 不可提交
+          this.$message.error('请填写全部数据')
+          return false
+        }
+      } else {
+        console.log(this.commonValidityTypeInfo, '积分上限提交对象')
+      }
+      // console.log(this.commonValidityTypeInfo, '有效期提交对象')
+      debugger
       this.commonLimitShowStatus = false
+      this.commonRulesSendMethod()
     },
     // 通用规则积分上限点击取消
     closeCommonLimitModal () {
@@ -598,7 +1018,25 @@ export default {
     },
     // 通用规则积分到期提醒点击确定
     confirmCommonRemind () {
+      // this.commonRemindShowStatus = false
+      const tempType = this.commonValidityTypeInfo.restrictionType
+      if (tempType === '7') {
+        // 选择的为到期提醒
+        if (this.commonValidityTypeInfo.beforeDayNum && this.commonValidityTypeInfo.beforeDayTime) {
+          // 可以提交
+          console.log(this.commonValidityTypeInfo, '到期提醒提交对象')
+        } else {
+          // 不可提交
+          this.$message.error('请填写全部数据')
+          return false
+        }
+      } else {
+        console.log(this.commonValidityTypeInfo, '到期提醒提交对象')
+      }
+      // console.log(this.commonValidityTypeInfo, '有效期提交对象')
+      debugger
       this.commonRemindShowStatus = false
+      this.commonRulesSendMethod()
     },
     // 通用规则积分过期提醒点击取消
     closeCommonRemindModal () {
@@ -607,19 +1045,29 @@ export default {
     // 积分规则设置
     setIntegralMethod (info) {
       console.log(info, 'info')
-      if (info.type === 'friendCircle') {
+      if (info.ruleType === '1') {
         // 群发朋友圈任务
         this.integralFriendCircleShowStatus = true
-      } else if (info.type === 'addFriend') {
+        // integralRulesTypeDetail
+      } else if (info.ruleType === '2') {
         // 加好友
         this.integralAddFriendShowStatus = true
-      } else if (info.type === 'buy') {
+      } else if (info.ruleType === '3') {
         // 购买商品
         this.integralBuyShowStatus = true
-      } else if (info.type === 'material') {
+      } else if (info.ruleType === '4') {
         // 查看素材
         this.integralMaterialShowStatus = true
       }
+      this.$nextTick(() => {
+        const tempInfo = Object.assign({}, info)
+        if (!tempInfo.creditsRuleJsonDetailVo.integral) {
+          // 积分为空时
+          tempInfo.creditsRuleJsonDetailVo.integral = '10'
+        }
+        this.$set(tempInfo, 'creditsRuleJsonDetailVo', tempInfo.creditsRuleJsonDetailVo)
+        this.integralRulesTypeInfo = Object.assign({}, tempInfo)
+      })
     },
     // 设置朋友圈弹框点击取消
     closeIntegralFriendCircleModal () {
@@ -627,14 +1075,33 @@ export default {
     },
     // 设置朋友圈弹框点击确定
     confirmIntegralFriendCircle () {
-      this.integralFriendCircleShowStatus = false
+      if (this.integralRulesTypeInfo.ruleType === '1') {
+        // 朋友圈
+        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
+          console.log('朋友圈可以提交', this.integralRulesTypeInfo)
+        } else {
+          this.$message.error('请填写全部数据')
+        }
+      }
+      // this.integralFriendCircleShowStatus = false
     },
     // 设置加好友弹框点击取消
     closeIntegralAddFriendModal () {
       this.integralAddFriendShowStatus = false
     },
-    // 设置朋友圈弹框点击确定
+    // 设置加好友弹框点击确定
     confirmIntegralAddFriend () {
+      // debugger
+      if (this.integralRulesTypeInfo.ruleType === '2') {
+        // 加好友
+        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) {
+          console.log('加好友可以提交', this.integralRulesTypeInfo)
+        } else {
+          this.$message.error('请填写全部数据')
+          return
+        }
+      }
       this.integralAddFriendShowStatus = false
     },
     // 设置购买弹框点击取消
@@ -643,6 +1110,17 @@ export default {
     },
     // 设置购买弹框点击确定
     confirmIntegralBuy () {
+      if (this.integralRulesTypeInfo.ruleType === '3') {
+        // 购买
+        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum &&
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) {
+          console.log('购买可以提交', this.integralRulesTypeInfo)
+        } else {
+          this.$message.error('请填写全部数据')
+          return
+        }
+      }
       this.integralBuyShowStatus = false
     },
     // 设置购买弹框点击取消
@@ -651,6 +1129,16 @@ export default {
     },
     // 设置购买弹框点击确定
     confirmIntegralMaterial () {
+      if (this.integralRulesTypeInfo.ruleType === '4') {
+        // 查看素材
+        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum) {
+          console.log('购买可以提交', this.integralRulesTypeInfo)
+        } else {
+          this.$message.error('请填写全部数据')
+          return
+        }
+      }
       this.integralMaterialShowStatus = false
     },
     // 新增商品
