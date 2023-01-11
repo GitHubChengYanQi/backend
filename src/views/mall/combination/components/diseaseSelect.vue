@@ -71,11 +71,11 @@ export default {
         this.val1 = e
         this.val2 = undefined
         this.dataList2 = this.dataList[e].children || []
-        this.$emit('change', [this.dataList[e].id, undefined])
+        this.$emit('change', [this.dataList[this.val1].id, undefined])
       }
       if (type === 2) {
         this.val2 = e
-        this.$emit('change', [this.dataList[e].id, this.dataList2[e].id])
+        this.$emit('change', [this.dataList[this.val1].id, this.dataList2[this.val2].id])
       }
     },
     /**
