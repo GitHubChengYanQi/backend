@@ -37,22 +37,11 @@
             </a-tree-select>
           </a-form-model-item>
           <a-form-model-item label="雷达分类" v-if="selectListMode === '2'">
-            <a-tree-select
-              v-model="radarGroupId"
-              style="width: 100%"
-              :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
-              placeholder="请选择分组"
-              allow-clear
-              tree-default-expand-all
-              :replaceFields="{
-                children: 'children',
-                title: 'name',
-                key: 'id',
-                value: 'id'
-              }"
-              @change="onSearch"
-              :treeData="treeData">
-            </a-tree-select>
+            <a-select style="width: 120px" @change="handleChange">
+              <a-select-option v-for="item in typeArr" :key="item.code" :value="item.code">
+                {{ item.name }}
+              </a-select-option>
+            </a-select>
           </a-form-model-item>
         </a-form-model>
         <a-input-search placeholder="输入患教名称" v-model="searchVal" @search="onSearch" @change="onSearch" />
@@ -164,6 +153,8 @@
 import { Space, Empty } from 'ant-design-vue'
 import { mediumIndex } from '@/api/healthManage'
 import { mediumGroup } from '@/api/mediumGroup'
+import { getDict } from '@/api/common'
+import { scrmRadarArticleFind } from '@/api/setRadar'
 import infiniteScroll from '@/utils/directive'
 export default {
   props: {
@@ -193,7 +184,7 @@ export default {
       spinning: false,
       searchVal: '',
       editGroupId: '',
-      treeData: [],
+      treeData: [], // 素材库树
       currentItem: {},
       busy: false,
       userListPagination: {
@@ -203,21 +194,43 @@ export default {
       },
       // 新增雷达选择列表
       selectListMode: '1',
-      radarGroupId: ''
+      radarGroupId: '',
+      typeArr: [] // 互动雷达分类字典
     }
   },
   created () {
-    this.activeIndex = ''
-    this.userListPagination = {
-      page: 0,
-      total: 0,
-      totalPage: 0
-    }
-    this.getList()
-    this.getGroupList()
+    this.init()
   },
   beforeDestroy () { },
   methods: {
+    /**
+     * 初始化
+     */
+    init () {
+      this.activeIndex = ''
+      this.userListPagination = {
+        page: 0,
+        total: 0,
+        totalPage: 0
+      }
+      this.getDict()
+      this.getList()
+      this.getGroupList()
+    },
+    /**
+     * 获取字典
+     */
+    getDict () {
+      getDict({ dictType: 'radar_type' }).then((res) => {
+        this.typeArr = res.data
+      })
+    },
+    /**
+     * 互动雷达分类回调
+     */
+    handleChange (e) {
+      console.log(1111, e)
+    },
     // 按名称搜索问卷
     onSearch () {
       this.busy = false
@@ -241,11 +254,17 @@ export default {
       }
       this.spinning = true
       try {
-        const { code, data } = await mediumIndex({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
-        if (code == 200) {
+        let res = {}
+        if (this.selectListMode === '1') {
+          res = await mediumIndex({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
+        }
+        if (this.selectListMode === '2') {
+          res = await scrmRadarArticleFind({ searchStr: this.searchVal, type: 0, mediumGroupId: this.editGroupId, ...params })
+        }
+        if (res.code == 200) {
           const arr = this.list
-          this.list = arr.concat(data.list)
-          this.userListPagination.totalPage = data.page.totalPage
+          this.list = arr.concat(res.data.list)
+          this.userListPagination.totalPage = res.data.page.totalPage
         }
         this.spinning = false
       } catch (error) {

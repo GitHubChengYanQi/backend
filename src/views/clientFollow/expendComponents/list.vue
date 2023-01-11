@@ -49,6 +49,7 @@
         :columns="columns"
         :data-source="tableData"
         :pagination="pagination"
+        @change="handleTableChange"
         :scroll="{ x: 1500}">
       </a-table>
     </div>
@@ -172,6 +173,12 @@ export default {
     handleChange (e) {
       this.screenData.startTime = e[0]
       this.screenData.endTime = e[1]
+    },
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      this.filters = filters
+      this.pagination.current = current
+      this.pagination.pageSize = pageSize
+      this.getTableData()
     }
   }
 }
