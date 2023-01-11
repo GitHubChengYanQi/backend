@@ -190,6 +190,7 @@
                 <transition-group>
                   <div class="items" v-show="item.show" v-for="item in answerPage" :key="item.type">
                     <h2>{{ item.typeName }}</h2>
+                    <p v-if="item.value">{{ item.value }}</p>
                     <img :src="item.url" />
                   </div>
                 </transition-group>
@@ -438,12 +439,17 @@ export default {
               left:50%;
               transform: translate(-50%, -50%);
               padding:0px 5px;
-              background:rgba(255, 255, 255, .7);
+              background:rgba(0, 0, 0, .7);
               font-size:14px;
               z-index: 99;
+              color:#fff;
+              border-radius: 2px;
             }
             img{
               width:100%;
+            }
+            p{
+              padding:10px;
             }
             i{
               margin-right:10px;
