@@ -62,8 +62,8 @@
             <div class="singleRegularContent">
               每年
               <a-date-picker
-              :getCalendarContainer="() => $refs['integral_rules_container']"
-              dropdownClassName="dropdownClassName"
+                :getCalendarContainer="() => $refs['integral_rules_container']"
+                dropdownClassName="dropdownClassName"
                 :disabled="commonValidityTypeInfo.restrictionType !== '2'"
                 valueFormat="MM-DD"
                 format="MM-DD"

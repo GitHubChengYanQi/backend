@@ -207,7 +207,7 @@ export default {
     //   this.$set(this.pagination, 'current', 1)
     // }
     // this.getTableData()
-    this.tableData = getTempIntegralManagerData()
+    // this.tableData = getTempIntegralManagerData()
     // 获取正式的数据
     // this.getDataList()
   },
