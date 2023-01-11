@@ -75,7 +75,7 @@
       </div>
     </div>
     <div class="box">
-      <!-- <FanDiagram :type="0" :dataArr="[['北京公司', 3],['北京公', 3],['北京', 3]]" /> -->
+      <FanDiagram :type="0" :dataArr="[['北京公司', 3],['北京公', 3],['北京', 3]]" />
     </div>
   </div>
 </template>
