@@ -344,9 +344,16 @@ export default {
       if (data.customerAttributeSelect === '1') {
         for (let i = 0; i < data.customerRule.length; i++) {
           const item = data.customerRule[i]
-          if (!item.judgmentConditions || !item.val) {
+          if (!item.judgmentConditions) {
             this.$message.error('请选择客户属性')
             return false
+          } else {
+            if (item.judgmentConditions === 'containall' || item.judgmentConditions === 'contain' || item.judgmentConditions === 'nocontain') {
+              if (!item.val) {
+                this.$message.error('请选择客户属性')
+                return false
+              }
+            }
           }
         }
       }
@@ -556,6 +563,7 @@ export default {
 .modalBox{
   .result{
     font-size:17px;
+    text-align: center;
     .success{
       color:#00cb35;
     }

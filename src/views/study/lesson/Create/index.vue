@@ -1,10 +1,12 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','编辑课程']" back back-tip></breadcrumb>
+    <breadcrumb :titles="['课程管理',`${$router.history.current.query.id ? '编辑' : '创建'}课程`]" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
-          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">新建课程</div>
+          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">
+            {{ `${$router.history.current.query.id ? '编辑' : '创建'}课程` }}
+          </div>
           <div>
             <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
           </div>

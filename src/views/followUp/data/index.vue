@@ -41,7 +41,8 @@
           style="width: 300px"
           :maxTagCount="2"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
+        ></a-select>
       </div>
       <div class="searchItem">
         <span class="label">方案状态：</span>
@@ -49,7 +50,8 @@
           v-model="searchObj.status"
           style="width: 200px"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
+        ></a-select>
       </div>
       <div class="searchItem">
         <span class="label">方案分类：</span>
@@ -57,10 +59,15 @@
           v-model="searchObj.classify"
           style="width: 200px"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
+        ></a-select>
       </div>
       <div class="searchItem">
-        <a-radio-group class="chooseDateTypeRadio" v-model="searchObj.dateType" button-style="solid">
+        <a-radio-group
+          class="chooseDateTypeRadio"
+          v-model="searchObj.dateType"
+          button-style="solid"
+        >
           <a-radio-button value="day">日</a-radio-button>
           <a-radio-button value="month">月</a-radio-button>
           <a-radio-button value="year">年</a-radio-button>
@@ -68,9 +75,7 @@
         <a-range-picker v-model="searchObj.date" :disabled-date="disabledSearchDate" />
       </div>
       <div class="searchBtn">
-        <a-button type="primary" @click="handleSearch">
-          查询
-        </a-button>
+        <a-button type="primary" @click="handleSearch">查询</a-button>
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>

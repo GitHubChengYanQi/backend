@@ -34,7 +34,7 @@
           <template>
             <div style="display: flex;justify-content: space-around;">
               <a-button type="link" @click="setIntegralMethod(record)">设置</a-button>
-              <a-button type="link" @click="addGoodsMethod(record)">新增商品</a-button>
+              <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3'">新增商品</a-button>
             </div>
           </template>
         </div>
@@ -49,7 +49,7 @@
       @cancel="closeCommonValidityModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
-      <a-radio-group class="radioValityGroupDiv" v-model="commonValidityTypeInfo.restrictionType" @change="changeValidity">
+      <a-radio-group class="radioValityGroupDiv" v-if="commonRulesInfo.creditsSetDeatilVo && commonRulesInfo.creditsSetDeatilVo.restrictionType" v-model="commonRulesInfo.creditsSetDeatilVo.restrictionType" @change="changeValidity">
         <a-radio class="singleRadioDiv" :value="'1'">
           <div class="singleRadioTitle">永久有效</div>
         </a-radio>
@@ -62,21 +62,34 @@
             <div class="singleRegularContent">
               每年
               <a-date-picker
-                :disabled="commonValidityTypeInfo.restrictionType !== '2'"
+                :getCalendarContainer="() => $refs['integral_rules_container']"
+                dropdownClassName="dropdownClassName"
+                :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2'"
                 valueFormat="MM-DD"
                 format="MM-DD"
-                v-model="commonValidityTypeInfo.monthDay"
+                v-model="commonRulesInfo.creditsSetDeatilVo.monthDay"
+                @change="changeMonthDay"
               ></a-date-picker>
               定期清零
             </div>
             <div class="singleRegularContent">
               去年
-              <a-date-picker
+              <!-- <a-date-picker
                 :disabled="commonValidityTypeInfo.restrictionType !== '2' || !commonValidityTypeInfo.monthDay"
                 valueFormat="MM-DD"
                 format="MM-DD"
                 :disabled-date="e => disableBeforeDate(commonValidityTypeInfo.monthDay, e)"
                 v-model="commonValidityTypeInfo.lastYearMonthDay"
+                @change="changePreviousDate"
+              ></a-date-picker> -->
+              <a-date-picker
+                :getCalendarContainer="() => $refs['integral_rules_container']"
+                dropdownClassName="dropdownClassName"
+                :disabled-date="e => disableBeforeDate(commonRulesInfo.creditsSetDeatilVo.monthDay, e)"
+                :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2'"
+                valueFormat="MM-DD"
+                format="MM-DD"
+                v-model="commonRulesInfo.creditsSetDeatilVo.lastYearMonthDay"
                 @change="changePreviousDate"
               ></a-date-picker>
               至下一年
@@ -84,7 +97,7 @@
                 :disabled="true"
                 valueFormat="MM-DD"
                 format="MM-DD"
-                v-model="commonValidityTypeInfo.nextYearMonthDay"
+                v-model="commonRulesInfo.creditsSetDeatilVo.nextYearMonthDay"
               ></a-date-picker>
             </div>
           </div>
@@ -94,16 +107,16 @@
           <div class="singleRadioContent">
             <div class="singleRadioTitle">每笔积分有效期为</div>
             <a-input-number
-              v-model="commonValidityTypeInfo.ytdNum"
+              v-model="commonRulesInfo.creditsSetDeatilVo.ytdNum"
               placeholder="请输入"
-              :min="commonValidityTypeInfo.minNumber"
-              :max="commonValidityTypeInfo.maxNumber"
-              :disabled="commonValidityTypeInfo.restrictionType !== '3'"
+              :min="commonRulesInfo.creditsSetDeatilVo.minNumber"
+              :max="commonRulesInfo.creditsSetDeatilVo.maxNumber"
+              :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
               class="inputSelectClass">
             </a-input-number>
             <a-select
-              v-model="commonValidityTypeInfo.ytdType"
-              :disabled="commonValidityTypeInfo.restrictionType !== '3'"
+              v-model="commonRulesInfo.creditsSetDeatilVo.ytdType"
+              :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
               class="inputSelectClass"
               @change="changeSingleValidateType">
               <a-select-option v-for="integralItem in singleIntegralValidityTypeList" :key="integralItem.code" :value="integralItem.code">{{ integralItem.name }}</a-select-option>
@@ -134,7 +147,11 @@
       @cancel="closeCommonLimitModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
-      <a-radio-group class="radioLimitGroupDiv" v-model="commonValidityTypeInfo.restrictionType" @change="changeLimit">
+      <a-radio-group
+        v-if="commonRulesInfo.creditsSetDeatilVo && commonRulesInfo.creditsSetDeatilVo.restrictionType"
+        class="radioLimitGroupDiv"
+        v-model="commonRulesInfo.creditsSetDeatilVo.restrictionType"
+        @change="changeLimit">
         <a-radio class="singleRadioDiv" :value="'4'">
           <div class="singleRadioTitle">不限制</div>
         </a-radio>
@@ -142,10 +159,10 @@
           <div class="singleRadioContent">
             <div class="singleRadioTitle">员工每日获取积分上限</div>
             <a-input-number
-              v-model="commonValidityTypeInfo.integralMaxNum"
+              v-model="commonRulesInfo.creditsSetDeatilVo.integralMaxNum"
               placeholder="请输入"
               :min="1"
-              :disabled="commonValidityTypeInfo.restrictionType !== '5'"
+              :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '5'"
               class="inputSelectClass">
             </a-input-number>
           </div>
@@ -176,7 +193,11 @@
       @cancel="closeCommonRemindModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
-      <a-radio-group class="radioRemindGroupDiv" v-model="commonValidityTypeInfo.restrictionType" @change="changeRemind">
+      <a-radio-group
+        v-if="commonRulesInfo.creditsSetDeatilVo && commonRulesInfo.creditsSetDeatilVo.restrictionType"
+        class="radioRemindGroupDiv"
+        v-model="commonRulesInfo.creditsSetDeatilVo.restrictionType"
+        @change="changeRemind">
         <a-radio class="singleRadioDiv" :value="'6'">
           <div class="singleRadioTitle">不提醒</div>
         </a-radio>
@@ -184,16 +205,16 @@
           <div class="singleRadioContent">
             <div class="singleRadioTitle">到期前</div>
             <a-input-number
-              v-model="commonValidityTypeInfo.beforeDayNum"
+              v-model="commonRulesInfo.creditsSetDeatilVo.beforeDayNum"
               placeholder="请输入"
               :min="1"
-              :disabled="commonValidityTypeInfo.restrictionType !== '7'"
+              :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '7'"
               class="inputSelectClass">
             </a-input-number>
             <div class="singleRadioText">天</div>
             <a-time-picker
-              v-model="commonValidityTypeInfo.beforeDayTime"
-              :disabled="commonValidityTypeInfo.restrictionType !== '7'"
+              v-model="commonRulesInfo.creditsSetDeatilVo.beforeDayTime"
+              :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '7'"
               placeholder="请输入时间"
               class="inputSelectClass"
               valueFormat="HH:mm"
@@ -535,7 +556,7 @@ export default {
   name: 'BackendIntegralRules',
   data () {
     return {
-      integralRulesTypeDetail: {}, // 积分规则设置详情
+      commonRulesInfo: {}, // 通用规则设置对象
       integralRulesTypeInfo: {}, // 积分规则设置对象
       commonValidityTypeInfo: {}, // 通用规则设置有效期对象
       commonRuleTypeList: [], // 通用规则限制类型列表
@@ -690,6 +711,15 @@ export default {
     this.integralTableData = getTempIntegralData()
   },
   methods: {
+    // 切换每次清空时间
+    changeMonthDay (e) {
+      console.log(e, '切换每次清空时间')
+      // this.$set(this.commonValidityTypeInfo, 'lastYearMonthDay', '')
+      // this.$set(this.commonValidityTypeInfo, 'nextYearMonthDay', '')
+      // commonRulesInfo.creditsSetDeatilVo
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'lastYearMonthDay', '')
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'nextYearMonthDay', '')
+    },
     // 切换是否生效
     setRules (info) {
       if (info.state === '1') {
@@ -750,26 +780,28 @@ export default {
     changeRemind () {
       if (this.commonValidityTypeInfo.restrictionType === '7') {
         // 选择的是到期提醒
-        this.$set(this.commonValidityTypeInfo, 'beforeDayNum', '1')
-        this.$set(this.commonValidityTypeInfo, 'beforeDayTime', moment('2022-10-10 10:00:00').format('HH:mm'))
+        // this.$set(this.commonValidityTypeInfo, 'beforeDayNum', '1')
+        // this.$set(this.commonValidityTypeInfo, 'beforeDayTime', moment('2022-10-10 10:00:00').format('HH:mm'))
+        // commonRulesInfo.creditsSetDeatilVo
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', '1')
         debugger
       } else {
         // 不提醒
-        this.$set(this.commonValidityTypeInfo, 'beforeDayNum', '')
-        this.$set(this.commonValidityTypeInfo, 'beforeDayTime', '')
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', '')
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayTime', '')
       }
-      this.$set(this.commonValidityTypeInfo, 'isChecked', '1')
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'isChecked', '1')
     },
     // 切换积分上限
     changeLimit () {
-      if (this.commonValidityTypeInfo.restrictionType === '5') {
+      if (this.commonRulesInfo.creditsSetDeatilVo.restrictionType === '5') {
         // 选择的是积分上限
-        this.$set(this.commonValidityTypeInfo, 'integralMaxNum', 10)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', 10)
       } else {
         // 无上限
-        this.$set(this.commonValidityTypeInfo, 'integralMaxNum', '')
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', '')
       }
-      this.$set(this.commonValidityTypeInfo, 'isChecked', '1')
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'isChecked', '1')
     },
     // 获取积分有效期类型
     getIntegralValidateType () {
@@ -785,19 +817,19 @@ export default {
       const tempValue = e
       if (tempValue === '1') {
         // 为年,最小值为1,最大值为3,初始值为1
-        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
-        this.$set(this.commonValidityTypeInfo, 'maxNumber', 3)
-        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'minNumber', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'maxNumber', 3)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', 1)
       } else if (tempValue === '2') {
         // 为月,最小值为1,最大值为18
-        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
-        this.$set(this.commonValidityTypeInfo, 'maxNumber', 18)
-        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'minNumber', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'maxNumber', 18)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', 1)
       } else if (tempValue === '3') {
         // 为日,最小值为1,最大值为365
-        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
-        this.$set(this.commonValidityTypeInfo, 'maxNumber', 365)
-        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'minNumber', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'maxNumber', 365)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', 1)
       }
     },
     // 切换有效期选项
@@ -805,18 +837,18 @@ export default {
       console.log(e, '切换有效期选项')
       const targetValue = e.target.value
       // 将其他字段清空
-      for (const item in this.commonValidityTypeInfo) {
+      for (const item in this.commonRulesInfo.creditsSetDeatilVo) {
         if (item !== 'restrictionType') {
-          this.$set(this.commonValidityTypeInfo, `${item}`, '')
+          this.$set(this.commonRulesInfo.creditsSetDeatilVo, `${item}`, '')
         }
       }
-      this.$set(this.commonValidityTypeInfo, 'isChecked', '1')
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'isChecked', '1')
       if (targetValue === '3') {
         // 为3,表示是每笔积分设置
-        this.$set(this.commonValidityTypeInfo, 'minNumber', 1)
-        this.$set(this.commonValidityTypeInfo, 'maxNumber', 3)
-        this.$set(this.commonValidityTypeInfo, 'ytdNum', 1)
-        this.$set(this.commonValidityTypeInfo, 'ytdType', this.singleIntegralValidityTypeList[0].code)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'minNumber', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'maxNumber', 3)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', 1)
+        this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdType', this.singleIntegralValidityTypeList[0].code)
       }
       // const targetIndex = this.commonValidityTypeList.findIndex(item => item.restrictionType === targetValue)
       // const tempArray = this.commonValidityTypeList.map(item => {
@@ -829,30 +861,21 @@ export default {
     // 切换去年时间
     changePreviousDate () {
       console.log('切换去年时间')
-      const tempNextMonthDay = moment(this.commonValidityTypeInfo.monthDay).subtract(1, 'd')
-      this.$set(this.commonValidityTypeInfo, 'nextYearMonthDay', moment(tempNextMonthDay).format('MM-DD'))
+      const tempNextMonthDay = moment(this.commonRulesInfo.creditsSetDeatilVo.monthDay).subtract(1, 'd')
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'nextYearMonthDay', moment(tempNextMonthDay).format('MM-DD'))
     },
+    // 判断日期是否可选
     disableBeforeDate (targetDate, currentDate) {
       // targetDate 为固定值,currentDate为变化值
-      // const tempTargetDate = moment().format('YYYY') + '-' + targetDate
-      // const formatCurrentDate = moment(currentDate).format('YYYY-MM-DD')
-      // if (moment(formatCurrentDate).valueOf() <= moment(tempTargetDate).valueOf()) {
-      //   return false
-      // } else {
-      //   return true
-      // }
-      // 当前年
-      // let currentYear = moment().format('YYYY')
-      // debugger
-      const tempCurrentDate = moment(currentDate).format('YYYY-MM-DD')
-      // 去年
-      const previousYear = moment().subtract(1, 'y')
-      // 去年的年份 + 当前的日期
-      const previousTargetDate = moment(previousYear).format('YYYY') + '-' + targetDate
-      // 去年最小的日期
-      const previousMinTarget = moment(previousYear).format('YYYY') + '-01-01'
-      if ((moment(previousMinTarget).valueOf() <= moment(currentDate).valueOf()) && (moment(previousTargetDate).valueOf() >= moment(tempCurrentDate).valueOf())) {
-        // 大于等于最小值,小于等于登录清零时间
+      const tempTargetDate = moment(targetDate).format('MM-DD')
+      const tempTargetAllDate = '2023-' + tempTargetDate
+      const tempCurrentDate = moment(currentDate).format('MM-DD')
+      const tempCurrentAllDate = '2023-' + tempCurrentDate
+      const targetMinDate = moment('2023-01-01').format('YYYY-MM-DD')
+      if (moment(targetMinDate).valueOf() <= moment(tempCurrentAllDate).valueOf() &&
+        moment(tempTargetAllDate).valueOf() >= moment(tempCurrentAllDate).valueOf()
+      ) {
+        // 大于当年最小时间,小于等于设置的时间
         return false
       } else {
         return true
@@ -922,58 +945,44 @@ export default {
       if (info.setType === '1') {
         // 点击的是有效期
         this.commonValidityShowStatus = true
-        this.$nextTick(() => {
-          // 得到当前生效的对象
-          this.commonValidityTypeInfo = Object.assign({}, info.creditsSetDeatilVo)
-          // 筛选出当前生效的数据
-          // this.validityTypeName = this.commonValidityTypeList.filter(item => item.isChecked === '1')[0].restrictionType
-          // this.singleIntegralValidityList = getSingleIntegralTypeData()
-        })
-        // this.singleIntegralValidityList = getSingleIntegralTypeData()
       } else if (info.setType === '2') {
         // 点击的是积分上限
         this.commonLimitShowStatus = true
-        // this.commonLimitTypeList = Object.assign([], info.creditsSetDeatilVoList)
-        this.$nextTick(() => {
-          // this.commonLimitTypeList = Object.assign([], info.creditsSetDeatilVoList)
-          this.commonValidityTypeInfo = Object.assign({}, info.creditsSetDeatilVo)
-        })
       } else if (info.setType === '3') {
         // 点击的是到期提醒
         this.commonRemindShowStatus = true
-        // this.commonRemindTypeList = Object.assign([], info.creditsSetDeatilVoList)
-        this.$nextTick(() => {
-          // this.commonRemindTypeList = Object.assign([], info.creditsSetDeatilVoList)
-          this.commonValidityTypeInfo = Object.assign({}, info.creditsSetDeatilVo)
-        })
       }
-      this.$set(this.commonValidityTypeInfo, 'id', info.id)
+      this.$nextTick(() => {
+        this.commonRulesInfo = Object.assign({}, info)
+      })
+      // this.$set(this.commonValidityTypeInfo, 'id', info.id)
     },
     // 通用规则有效期点击确定
     confirmCommonValidity () {
-      const tempType = this.commonValidityTypeInfo.restrictionType
-      if (tempType === '2') {
+      const tempInfo = this.commonRulesInfo.creditsSetDeatilVo
+      // const tempType = this.commonRulesInfo.creditsSetDeatilVo.restrictionType
+      if (tempInfo.restrictionType === '2') {
         // 选择的为定期清零
-        if (this.commonValidityTypeInfo.monthDay && this.commonValidityTypeInfo.lastYearMonthDay && this.commonValidityTypeInfo.nextYearMonthDay) {
+        if (tempInfo.monthDay && tempInfo.lastYearMonthDay && tempInfo.nextYearMonthDay) {
           // 可以提交
-          console.log(this.commonValidityTypeInfo, '有效期提交对象')
+          console.log(this.commonRulesInfo, '有效期提交对象')
         } else {
           // 不可提交
           this.$message.error('请填写全部数据')
           return false
         }
-      } else if (tempType === '3') {
+      } else if (tempInfo.restrictionType === '3') {
         // 选择的为每笔积分有效期
-        if (this.commonValidityTypeInfo.ytdType && this.commonValidityTypeInfo.ytdNum) {
+        if (tempInfo.ytdType && tempInfo.ytdNum) {
           // 可以提交
-          console.log(this.commonValidityTypeInfo, '有效期提交对象')
+          console.log(this.commonRulesInfo, '每笔积分提交对象')
         } else {
           // 不可提交
           this.$message.error('请填写全部数据')
           return false
         }
       } else {
-        console.log(this.commonValidityTypeInfo, '有效期提交对象')
+        console.log(this.commonRulesInfo, '有效期提交对象')
       }
       // console.log(this.commonValidityTypeInfo, '有效期提交对象')
       debugger
@@ -993,19 +1002,20 @@ export default {
     // 通用规则积分上限点击确定
     confirmCommonLimit () {
       // this.commonLimitShowStatus = false
-      const tempType = this.commonValidityTypeInfo.restrictionType
-      if (tempType === '5') {
+      const tempInfo = this.commonRulesInfo.creditsSetDeatilVo
+      // const tempType = this.commonValidityTypeInfo.restrictionType
+      if (tempInfo.restrictionType === '5') {
         // 选择的为积分上限
-        if (this.commonValidityTypeInfo.integralMaxNum) {
+        if (tempInfo.integralMaxNum) {
           // 可以提交
-          console.log(this.commonValidityTypeInfo, '积分上限提交对象')
+          console.log(this.commonRulesInfo, '积分上限提交对象')
         } else {
           // 不可提交
           this.$message.error('请填写全部数据')
           return false
         }
       } else {
-        console.log(this.commonValidityTypeInfo, '积分上限提交对象')
+        console.log(this.commonRulesInfo, '积分上限提交对象')
       }
       // console.log(this.commonValidityTypeInfo, '有效期提交对象')
       debugger
@@ -1019,19 +1029,20 @@ export default {
     // 通用规则积分到期提醒点击确定
     confirmCommonRemind () {
       // this.commonRemindShowStatus = false
-      const tempType = this.commonValidityTypeInfo.restrictionType
-      if (tempType === '7') {
+      const tempInfo = this.commonRulesInfo.creditsSetDeatilVo
+      // const tempType = this.commonValidityTypeInfo.restrictionType
+      if (tempInfo.restrictionType === '7') {
         // 选择的为到期提醒
-        if (this.commonValidityTypeInfo.beforeDayNum && this.commonValidityTypeInfo.beforeDayTime) {
+        if (this.commonRulesInfo.creditsSetDeatilVo.beforeDayNum && this.commonRulesInfo.creditsSetDeatilVo.beforeDayTime) {
           // 可以提交
-          console.log(this.commonValidityTypeInfo, '到期提醒提交对象')
+          console.log(this.commonRulesInfo, '到期提醒提交对象')
         } else {
           // 不可提交
           this.$message.error('请填写全部数据')
           return false
         }
       } else {
-        console.log(this.commonValidityTypeInfo, '到期提醒提交对象')
+        console.log(this.commonRulesInfo, '到期提醒提交对象')
       }
       // console.log(this.commonValidityTypeInfo, '有效期提交对象')
       debugger
@@ -1048,7 +1059,6 @@ export default {
       if (info.ruleType === '1') {
         // 群发朋友圈任务
         this.integralFriendCircleShowStatus = true
-        // integralRulesTypeDetail
       } else if (info.ruleType === '2') {
         // 加好友
         this.integralAddFriendShowStatus = true
