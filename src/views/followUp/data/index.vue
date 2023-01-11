@@ -74,6 +74,25 @@
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>
+    <div class="chartBox">
+      <ChartContainer width="49%" name="方案占比" style="margin-right: 1%;">
+        <template #rightTop>rightTop</template>
+        <template #searchTab>
+          <a-radio-group default-value="1" button-style="solid" @change="({target: {value}}) => handleChartItemChange(value, 'key')">
+            <a-radio-button value="1">
+              使用情况
+            </a-radio-button>
+            <a-radio-button value="2">
+              完成情况
+            </a-radio-button>
+            <a-radio-button value="3">
+              预警情况
+            </a-radio-button>
+          </a-radio-group>
+        </template>
+      </ChartContainer>
+      <ChartContainer width="50%" extra="123" name="启用方案TOP5" rightTop="用户总人数  1867" />
+    </div>
     <!-- <div class="box" style="width:500px;height:285px;">
       <FanDiagram :type="0" :dataArr="[['北京公司', 3],['北京公', 3],['北京', 3]]" />
     </div> -->
@@ -83,6 +102,7 @@
 <script>
 import moment from 'moment'
 import FanDiagram from './components/FanDiagram'
+import ChartContainer from './components/chartContainer.vue'
 const defaultSearchObj = {
   name: [],
   status: '',
@@ -92,7 +112,8 @@ const defaultSearchObj = {
 }
 export default {
   components: {
-    FanDiagram
+    FanDiagram,
+    ChartContainer
   },
   data () {
     return {
@@ -142,6 +163,9 @@ export default {
     },
     handleSearch () {
       console.log(this.searchObj)
+    },
+    handleChartItemChange (value, key) {
+      console.log(value, key, this.searchObj)
     }
   }
 }
