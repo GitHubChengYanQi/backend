@@ -104,6 +104,7 @@ export default {
     }
   },
   created () {
+    console.log(1111111, this.$route.query.combinedId)
     if (this.$route.query.combinedId) {
       this.id = this.$route.query.combinedId
       this.getCombined(this.id)
