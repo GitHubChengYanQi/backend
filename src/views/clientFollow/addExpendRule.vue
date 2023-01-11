@@ -563,6 +563,7 @@ export default {
 .modalBox{
   .result{
     font-size:17px;
+    text-align: center;
     .success{
       color:#00cb35;
     }
