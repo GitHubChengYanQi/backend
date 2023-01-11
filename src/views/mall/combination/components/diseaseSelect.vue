@@ -35,7 +35,9 @@ export default {
     },
     value: {
       type: Array,
-      default: 0
+      default: () => {
+        return []
+      }
     }
   },
   data () {
