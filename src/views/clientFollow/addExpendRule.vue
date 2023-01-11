@@ -442,6 +442,7 @@ export default {
      * 打开验证窗口
      */
     openValid () {
+      this.validateRes = undefined
       const data = this.formatSaveData()
       // 检验属性数据
       for (let i = 0; i < data.consumeRule.length; i++) {
