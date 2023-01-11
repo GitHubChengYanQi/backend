@@ -226,7 +226,7 @@ export default {
      * 拉取字典
      * @param {*} e
      */
-     getDict (e) {
+    getDict (e) {
       const obj = {
         dictType: e
       }

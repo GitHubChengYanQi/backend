@@ -82,7 +82,7 @@
 
 <script>
 import moment from 'moment'
-import FanDiagram from './components/fanDiagram'
+// import FanDiagram from './components/fanDiagram'
 const defaultSearchObj = {
   name: [],
   status: '',
@@ -92,7 +92,7 @@ const defaultSearchObj = {
 }
 export default {
   components: {
-    FanDiagram
+    // FanDiagram
   },
   data () {
     return {
