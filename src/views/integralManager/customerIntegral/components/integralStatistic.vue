@@ -13,19 +13,19 @@
           <div class="cardTopClass">
             <div class="cardTopTitle">可用积分总额</div>
           </div>
-          <div class="cardNumberClass">2,290</div>
+          <div class="cardNumberClass">{{ totalInfo.integralTotal }}</div>
         </div>
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">发放积分</div>
           </div>
-          <div class="cardNumberClass">5,700</div>
+          <div class="cardNumberClass">{{ totalInfo.allIntegralTotal }}</div>
         </div>
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">消耗积分</div>
           </div>
-          <div class="cardNumberClass">3,410</div>
+          <div class="cardNumberClass">{{ totalInfo.consumptionIntegralTotal }}</div>
         </div>
       </div>
     </div>
@@ -56,9 +56,13 @@
         </div>
       </div>
       <div class="searchButtonLine">
-        <a-button>查询</a-button>
-        <a-button>重置</a-button>
-        <a-button>导出</a-button>
+        <a-button
+          type="primary"
+          style="margin: 0 10px;">查询</a-button>
+        <a-button
+          style="margin-right: 10px;"
+        >重置</a-button>
+        <a-button type="primary">导出</a-button>
       </div>
       <a-table
         :loading="tableLoading"
@@ -82,10 +86,17 @@
 
 <script>
 import goodsManager from './goodsManager.vue'
+import { totalIntegralStatisticApi, integralDetailListApi, exportIntegralDetailListApi } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralStatistic',
   data () {
     return {
+      // 总体数据统计
+      totalInfo: {
+        integralTotal: '2,290',
+        allIntegralTotal: '5,700',
+        consumptionIntegralTotal: '3,410'
+      },
       chooseGoodsManagerShowStatus: false,
       employeeIds: [],
       // 表格加载效果
@@ -95,71 +106,57 @@ export default {
       tableColumns: [
         {
           title: '员工名称',
-          dataIndex: 'managerName',
+          dataIndex: 'employeeIdName',
           align: 'center',
           width: 200
         },
         {
           title: '交易时间',
-          dataIndex: 'buyDate',
+          dataIndex: 'grantTime',
           align: 'center',
-          sortDirections: ['descend', 'ascend'],
-          sorter: true,
           width: 200
         },
         {
           title: '交易类型',
-          dataIndex: 'buyType',
+          dataIndex: 'tradeTypeName',
           align: 'center',
-          sortDirections: ['descend', 'ascend'],
-          sorter: true,
           width: 200
         },
         {
           title: '交易积分',
-          dataIndex: 'buyIntegral',
+          dataIndex: 'realityTradeIntegral',
           align: 'center',
-          sortDirections: ['descend', 'ascend'],
-          sorter: true,
           width: 200
         },
         {
           title: '变动原因',
           dataIndex: 'changeReason',
           align: 'center',
-          sortDirections: ['descend', 'ascend'],
-          sorter: true,
           width: 200
         },
         {
           title: '交易前积分',
-          dataIndex: 'buyBeforeIntegral',
+          dataIndex: 'changeCauseName',
           align: 'center',
-          sortDirections: ['descend', 'ascend'],
-          sorter: true,
           width: 200
         },
         {
           title: '交易后积分',
-          dataIndex: 'buyAfterIntegral',
+          dataIndex: 'afterIntegral',
           align: 'center',
-          sortDirections: ['descend', 'ascend'],
-          sorter: true,
           width: 200
         },
         {
           title: '理由',
-          dataIndex: 'reason',
+          dataIndex: 'adjustCause',
           align: 'center',
-          sortDirections: ['descend', 'ascend'],
-          sorter: true,
           width: 200
         },
         {
           title: '操作人',
-          dataIndex: 'operator',
+          dataIndex: 'createdEmployeeName',
           align: 'center',
-          width: 250
+          width: 200
         }
       ],
       // 模板页面分页对象
@@ -187,39 +184,53 @@ export default {
     submitGoodsConfirm (e) {
       console.log(e, '选择商品库返回')
     },
-    // // 获取数据
-    // async getTableData () {
-    //   this.tableLoading = true
-    //   const params = {
-    //     sopName: this.searchInfo.sopName,
-    //     idsStr: this.searchInfo.employeeIds.join(','),
-    //     page: this.pagination.current,
-    //     perPage: this.pagination.pageSize,
-    //     sort: this.sorter
-    //   }
-    //   // console.log(params, '查询数据提交接口的对象')
-    //   await getSopTemplateListMethod(params).then(response => {
-    //     this.tableLoading = false
-    //     console.log(response, '获取群SOP模板信息')
-    //     this.tableData = response.data.list
-    //     this.$set(this.pagination, 'total', Number(response.data.page.total))
-    //     if (this.tableData.length === 0) {
-    //       // 列表中没有数据
-    //       if (this.pagination.total !== 0) {
-    //         // 总数据有,但当前页没有
-    //         // 重新将页码换成1
-    //         this.$set(this.pagination, 'current', 1)
-    //         this.getTableData()
-    //       } else {
-    //         // 是真没有数据
-    //       }
-    //     }
-    //   }).catch(() => {
-    //     this.tableLoading = false
-    //   })
-    //   // 临时接收假数据
-    //   // this.tableData = getTempSopList()
-    // },
+    // 获取积分统计总体数据
+    getIntegralTotalData () {
+      totalIntegralStatisticApi().then(response => {
+        this.totalInfo = response.data
+      })
+    },
+    // 获取积分统计列表数据
+    async getTableData () {
+      this.tableLoading = true
+      const params = {
+        employeeIdList: [],
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize,
+        ...this.searchInfo
+      }
+      // console.log(params, '查询数据提交接口的对象')
+      await integralDetailListApi(params).then(response => {
+        this.tableLoading = false
+        console.log(response, '获取群SOP模板信息')
+        this.tableData = response.data.list
+        this.$set(this.pagination, 'total', Number(response.data.page.total))
+        if (this.tableData.length === 0) {
+          // 列表中没有数据
+          if (this.pagination.total !== 0) {
+            // 总数据有,但当前页没有
+            // 重新将页码换成1
+            this.$set(this.pagination, 'current', 1)
+            this.getTableData()
+          } else {
+            // 是真没有数据
+          }
+        }
+      }).catch(() => {
+        this.tableLoading = false
+      })
+      // 临时接收假数据
+      // this.tableData = getTempSopList()
+    },
+    // 导出数据
+    exportData () {
+      const params = {
+        ...this.searchInfo
+      }
+      exportIntegralDetailListApi(params).then(response => {
+        console.log(response)
+      })
+    },
     // 群SOP模板切换页码
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.pagination.current = current

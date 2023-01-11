@@ -112,7 +112,7 @@
 <script>
 import { departmentEmp } from '@/api/common.js'
 import SelectModal from '@/components/SelectPersonnel/components/modal'
-import { getCustomerIntegralApi, getTempIntegralManagerData } from '@/api/integralManager'
+import { getCustomerIntegralApi, exportCustomerIntegralApi, batchCustomerIntegralApi } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralManager',
   components: {
@@ -244,6 +244,23 @@ export default {
       })
       // 临时接收假数据
       // this.tableData = getTempSopList()
+    },
+    // 导出员工积分
+    exportIntegralManagerData () {
+      const params = {
+        ...this.screenData
+      }
+      exportCustomerIntegralApi(params).then(response => {
+        console.log(response, '导出成功')
+      })
+    },
+    // 批量调整积分
+    batchIntegralMethod () {
+      console.log(this.batchInfo, '批量调整对象')
+      debugger
+      batchCustomerIntegralApi().then(response => {
+        console.log(response, '批量调整积分')
+      })
     },
     // 表格监听事件
     handleTableChange ({ current, pageSize }, filters, sorter) {

@@ -80,6 +80,47 @@ export function getCustomerIntegralApi (params) {
     params
   })
 }
+// 导出员工积分
+export function exportCustomerIntegralApi (params) {
+  return fileRequest({
+    url: '/creditsEmployee/creditsEmployeePage',
+    method: 'get',
+    responseType: 'blob',
+    params
+  })
+}
+// 批量调整员工积分
+export function batchCustomerIntegralApi (params) {
+  return request({
+    url: '/creditsEmployee/updateCreditsEmployee',
+    method: 'get',
+    params
+  })
+}
+// 总体积分统计
+export function totalIntegralStatisticApi (params) {
+  return request({
+    url: '/creditsEmployeeLog/employeeIntegralAll',
+    method: 'get',
+    params
+  })
+}
+// 积分明细列表
+export function integralDetailListApi (params) {
+  return request({
+    url: '/creditsEmployeeLog/employeeIntegralPage',
+    method: 'get',
+    params
+  })
+}
+// 积分明细导出
+export function exportIntegralDetailListApi (params) {
+  return request({
+    url: '/creditsEmployeeLog/employeeIntegralExcel',
+    method: 'get',
+    params
+  })
+}
 // 临时获取有效期类型数据
 export function getValidityTypeData () {
   return [
