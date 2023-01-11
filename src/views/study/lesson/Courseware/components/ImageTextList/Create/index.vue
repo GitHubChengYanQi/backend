@@ -19,6 +19,7 @@
         >
           <a-form-item label="标题">
             <a-input
+              class="suffixInput"
               :maxLength="50"
               :suffix="`${form.getFieldValue('title') ? form.getFieldValue('title').length : 0} / 50`"
               placeholder="请输入标题"
@@ -269,6 +270,12 @@ export default {
   }
 }
 
+.suffixInput {
+  /deep/ input {
+    padding-right: 70px !important;
+  }
+}
+
 .my-modal {
   .ant-modal-footer {
     padding: 24px;
@@ -284,6 +291,7 @@ export default {
     }
   }
 }
+
 .content {
   border-radius: 8px;
   padding: 24px;

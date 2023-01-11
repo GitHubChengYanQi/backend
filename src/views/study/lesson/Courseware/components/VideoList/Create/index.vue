@@ -21,6 +21,7 @@
           <a-form-item label="标题">
             <a-input
               :maxLength="50"
+              class="suffixInput"
               placeholder="请输入标题"
               :suffix="`${form.getFieldValue('title') ? form.getFieldValue('title').length : 0} / 50`"
               v-decorator="['title', { rules: [{ required: true, message: '请输入标题!' }] }]"
@@ -299,6 +300,12 @@ export default {
     .ant-modal-footer button + button {
       margin-left: 24px;
     }
+  }
+}
+
+.suffixInput {
+  /deep/ input {
+    padding-right: 70px !important;
   }
 }
 
