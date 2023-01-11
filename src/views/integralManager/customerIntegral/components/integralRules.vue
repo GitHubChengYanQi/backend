@@ -62,20 +62,33 @@
             <div class="singleRegularContent">
               每年
               <a-date-picker
+                :getCalendarContainer="() => $refs['integral_rules_container']"
+                dropdownClassName="dropdownClassName"
                 :disabled="commonValidityTypeInfo.restrictionType !== '2'"
                 valueFormat="MM-DD"
                 format="MM-DD"
                 v-model="commonValidityTypeInfo.monthDay"
+                @change="changeMonthDay"
               ></a-date-picker>
               定期清零
             </div>
             <div class="singleRegularContent">
               去年
-              <a-date-picker
+              <!-- <a-date-picker
                 :disabled="commonValidityTypeInfo.restrictionType !== '2' || !commonValidityTypeInfo.monthDay"
                 valueFormat="MM-DD"
                 format="MM-DD"
                 :disabled-date="e => disableBeforeDate(commonValidityTypeInfo.monthDay, e)"
+                v-model="commonValidityTypeInfo.lastYearMonthDay"
+                @change="changePreviousDate"
+              ></a-date-picker> -->
+              <a-date-picker
+                :getCalendarContainer="() => $refs['integral_rules_container']"
+                dropdownClassName="dropdownClassName"
+                :disabled-date="e => disableBeforeDate(commonValidityTypeInfo.monthDay, e)"
+                :disabled="commonValidityTypeInfo.restrictionType !== '2'"
+                valueFormat="MM-DD"
+                format="MM-DD"
                 v-model="commonValidityTypeInfo.lastYearMonthDay"
                 @change="changePreviousDate"
               ></a-date-picker>
@@ -690,6 +703,12 @@ export default {
     this.integralTableData = getTempIntegralData()
   },
   methods: {
+    // 切换每次清空时间
+    changeMonthDay (e) {
+      console.log(e, '切换每次清空时间')
+      this.$set(this.commonValidityTypeInfo, 'lastYearMonthDay', '')
+      this.$set(this.commonValidityTypeInfo, 'nextYearMonthDay', '')
+    },
     // 切换是否生效
     setRules (info) {
       if (info.state === '1') {
@@ -834,25 +853,15 @@ export default {
     },
     disableBeforeDate (targetDate, currentDate) {
       // targetDate 为固定值,currentDate为变化值
-      // const tempTargetDate = moment().format('YYYY') + '-' + targetDate
-      // const formatCurrentDate = moment(currentDate).format('YYYY-MM-DD')
-      // if (moment(formatCurrentDate).valueOf() <= moment(tempTargetDate).valueOf()) {
-      //   return false
-      // } else {
-      //   return true
-      // }
-      // 当前年
-      // let currentYear = moment().format('YYYY')
-      // debugger
-      const tempCurrentDate = moment(currentDate).format('YYYY-MM-DD')
-      // 去年
-      const previousYear = moment().subtract(1, 'y')
-      // 去年的年份 + 当前的日期
-      const previousTargetDate = moment(previousYear).format('YYYY') + '-' + targetDate
-      // 去年最小的日期
-      const previousMinTarget = moment(previousYear).format('YYYY') + '-01-01'
-      if ((moment(previousMinTarget).valueOf() <= moment(currentDate).valueOf()) && (moment(previousTargetDate).valueOf() >= moment(tempCurrentDate).valueOf())) {
-        // 大于等于最小值,小于等于登录清零时间
+      const tempTargetDate = moment(targetDate).format('MM-DD')
+      const tempTargetAllDate = '2023-' + tempTargetDate
+      const tempCurrentDate = moment(currentDate).format('MM-DD')
+      const tempCurrentAllDate = '2023-' + tempCurrentDate
+      const targetMinDate = moment('2023-01-01').format('YYYY-MM-DD')
+      if (moment(targetMinDate).valueOf() <= moment(tempCurrentAllDate).valueOf() &&
+        moment(tempTargetAllDate).valueOf() >= moment(tempCurrentAllDate).valueOf()
+      ) {
+        // 大于当年最小时间,小于等于设置的时间
         return false
       } else {
         return true
