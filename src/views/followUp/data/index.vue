@@ -17,9 +17,8 @@
         class="tab"
         :style="tab_header == index ? { color: 'rgba(2, 125, 180, 0.86)', textDecoration: 'underline' } : {}"
         v-for="(item,index) in tabArr.header"
-        @click="() => { tab_header = index }"
-        :key="index"
-      >{{ item }}</div>
+        @click="handleCutTabIndex(index)"
+        :key="index">{{ item }}</div>
     </div>
     <div class="conten_box">
       <div class="info_header">
@@ -80,37 +79,40 @@
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>
-    <div class="chartBox">
-      <ChartContainer width="49%" name="方案占比" style="margin-right: 1%;">
-        <template #rightTop>rightTop</template>
-        <template #searchTab>
-          <a-radio-group
-            default-value="1"
-            button-style="solid"
-            @change="({target: {value}}) => handleChartItemChange(value, 'key')"
-          >
-            <a-radio-button value="1">使用情况</a-radio-button>
-            <a-radio-button value="2">完成情况</a-radio-button>
-            <a-radio-button value="3">预警情况</a-radio-button>
-          </a-radio-group>
-        </template>
-      </ChartContainer>
-      <ChartContainer width="50%" extra="123" name="启用方案TOP5" rightTop="用户总人数  1867" />
+    <div class="chartBox" :is="tab_header === 0 ? 'scheme-chart' : 'task-chart'" :data="{ a: 1 }">
     </div>
-    <div class="box" style="width:100%;height:300px;">
-      <FanDiagram
-        :type="4"
-        :dataObj="{xAxis: ['2021-1', '2021-2'],data:{'A片区': [200, 300, 400 ],'B片区': [230, 330, 430 ]}
-        }"
-      />
+    <div class="tableBox" style="margin-top: 20px;">
+      <SelfTable
+        :tableColunms="tableColunms"
+        :tableData="tableData"
+        :colunmsSlots="['name']"
+        :titleSlots="['customName']"
+        @getTableList="(params) => getTableList(false, params)"
+        @exportTableList="(params) => getTableList(true, params)">
+        <template #name="{ text }">
+          <div class="btns" style="color: #2589FF;cursor: pointer;" @click="goTableDetail(1, 3)">
+            {{ text }}
+          </div>
+        </template>
+        <template #customName>
+          <div
+            class="btns"
+            style="color: #2589FF;cursor: pointer;"
+            @click="goTableDetail(2, 4)">
+            使用方案员工数
+          </div>
+        </template>
+      </SelfTable>
     </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
-import FanDiagram from './components/FanDiagram'
-import ChartContainer from './components/chartContainer.vue'
+
+import SchemeChart from './components/schemeChart.vue'
+import TaskChart from './components/taskChart.vue'
+import SelfTable from './components/selfTable.vue'
 const defaultSearchObj = {
   name: [],
   status: '',
@@ -120,8 +122,9 @@ const defaultSearchObj = {
 }
 export default {
   components: {
-    FanDiagram,
-    ChartContainer
+    SchemeChart,
+    TaskChart,
+    SelfTable
   },
   data () {
     return {
@@ -151,10 +154,65 @@ export default {
         time: '2022-09-22 05:00',
         card: [0, 1, 3, 3, 4, 5, 6]
       },
-      searchObj: { ...defaultSearchObj }
+      searchObj: { ...defaultSearchObj },
+      tableColunms: [
+        {
+          title: '时间',
+          width: 120,
+          dataIndex: 'date',
+          align: 'center'
+        },
+        {
+          title: '随访方案名称',
+          width: 150,
+          align: 'center',
+          dataIndex: 'ownerName',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          slots: { title: 'customName' },
+          width: 120,
+          align: 'center',
+          dataIndex: 'departName'
+        },
+        {
+          title: '使用方案用户数',
+          width: 120,
+          align: 'center',
+          dataIndex: 'parentDepart'
+        },
+        {
+          title: '方案使用次数',
+          width: 180,
+          align: 'center',
+          dataIndex: 'createTime'
+        },
+        {
+          title: '方案预警次数',
+          width: 200,
+          align: 'center',
+          dataIndex: 'tagList'
+        },
+        {
+          title: '方案完成次数',
+          width: 120,
+          align: 'center',
+          dataIndex: 'memberNum'
+        }
+      ],
+      tableData: [{
+        ownerName: '12'
+      }]
     }
   },
+  created () {
+    this.tab_header = this.$route.query.tab || 0
+  },
   methods: {
+    handleCutTabIndex (index) {
+      this.tab_header = index
+      history.replaceState(null, '', `/followUp/data/index?tab=${index}`)
+    },
     disabledSearchDate (current) {
       let num = 90
       let type = 'days'
@@ -174,6 +232,23 @@ export default {
     },
     handleChartItemChange (value, key) {
       console.log(value, key, this.searchObj)
+    },
+    async getTableList (isExport, { pagination, ids }) {
+      if (isExport) {
+        // const data = await groupListExportReq(this.handleParam(obj))
+        // callDownLoadByBlob(data, '群列表')
+      } else {
+        // const { data } = await workRoomList(this.handleParam(obj))
+        // this.tableData = data.list
+        // this.pagination.total = data.page.total
+      }
+      console.log('getTableList', isExport, pagination, ids)
+    },
+    goTableDetail (one, two) {
+      this.$router.push({
+        path: `/followUp/data/tableItemDetail`,
+        query: { type: this.tab_header === 0 ? one : two, tab: this.tab_header }
+      })
     }
   }
 }

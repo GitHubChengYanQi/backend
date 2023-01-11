@@ -428,6 +428,13 @@ export const routeList = {
     component: () => import('@/views/followUp/data/index'),
     meta: { title: '随访数据' }
   },
+  '/followUp/data/tableItemDetail': {
+    path: '/followUp/data/tableItemDetail',
+    name: 'tableItemDetail',
+    component: () => import('@/views/followUp/data/tableItemDetail'),
+    hidden: true,
+    meta: { title: '方案数据' }
+  },
   '/followUp/group': {
     path: '/followUp/group',
     name: 'group',

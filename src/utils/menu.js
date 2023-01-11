@@ -140,6 +140,10 @@ export function setBreadcrumb (path, data) {
     21: {
       path: ['/interactionRadar/setRadar', '/interactionRadar/radarInfo'],
       returnPath: '/interactionRadar/index'
+    },
+    22: {
+      path: ['/followUp/data/tableItemDetail'],
+      returnPath: '/followUp/data/index'
     }
   }
 
@@ -208,6 +212,8 @@ export function setBreadcrumb (path, data) {
               returnPath = value.returnPath + '?id=' + data.id
             } else if (key == 5) {
               returnPath = value.returnPath + '?type=' + data.type
+            } else if (key == 22) {
+              returnPath = value.returnPath + '?tab=' + data.tab
             } else {
               returnPath = value.returnPath
             }
