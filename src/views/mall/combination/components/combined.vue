@@ -35,7 +35,7 @@
               label="疾病分类："
               :labelCol="{lg: {span: 2}}"
               :wrapperCol="{lg: {span: 17}}">
-              <disease-select placeholder="请选择疾病分类" @change="(value) => this.screenData.symptomDiseaseClassify = value" v-model="this.screenData.symptomDiseaseClassify" />
+              <disease-select placeholder="请选择疾病分类" @change="handleChange" v-model="this.screenData.symptomDiseaseClassify" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -136,7 +136,7 @@ export default {
       haveNoOption: [],
       loading: false,
       screenData: {
-        symptomDiseaseClassify: 0
+        symptomDiseaseClassify: []
       },
       columns: [
         {
@@ -237,6 +237,13 @@ export default {
       })
     },
     /**
+     * 疾病分类回调
+     */
+    handleChange (res) {
+      this.screenData.symptomDiseaseClassifyOneLevel = res[0]
+      this.screenData.symptomDiseaseClassifyTwoLevel = res[1]
+    },
+    /**
      * 拉取列表
      */
     getTableData () {
@@ -246,8 +253,16 @@ export default {
         perPage: this.pagination.pageSize,
         ...this.screenData
       }
-      // 是否选择了疾病分类
-      params.symptomDiseaseClassify = params.symptomDiseaseClassify ? params.symptomDiseaseClassify : ''
+      // if (params.symptomDiseaseClassifyOneLevel > 0) {
+      //   if (params.symptomDiseaseClassifyTwoLevel > 0) {
+      //     delete params.symptomDiseaseClassifyOneLevel
+      //   } else {
+      //     delete params.symptomDiseaseClassifyTwoLevel
+      //   }
+      // } else {
+      //   delete params.symptomDiseaseClassifyOneLevel
+      //   delete params.symptomDiseaseClassifyTwoLevel
+      // }
       combinList(params).then((res) => {
         this.loading = false
         this.tableData = res.data.list
@@ -270,7 +285,7 @@ export default {
     resetSearch () {
       // this.storeIds = []
       this.screenData = {
-        symptomDiseaseClassify: NaN
+        symptomDiseaseClassify: []
       }
       this.selectedRowKeys = []
       this.selectedRows = []

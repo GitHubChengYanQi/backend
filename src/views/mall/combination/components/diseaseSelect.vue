@@ -34,7 +34,7 @@ export default {
       default: ''
     },
     value: {
-      type: Number,
+      type: Array,
       default: 0
     }
   },
@@ -48,7 +48,7 @@ export default {
   },
   watch: {
     value (nVal) {
-      if (!nVal) {
+      if (nVal.length === 0) {
         this.val1 = undefined
         this.val2 = undefined
         this.dataList2 = []
@@ -69,11 +69,11 @@ export default {
         this.val1 = e
         this.val2 = undefined
         this.dataList2 = this.dataList[e].children || []
-        this.$emit('change', this.dataList[e].id)
+        this.$emit('change', [this.dataList[e].id, undefined])
       }
       if (type === 2) {
         this.val2 = e
-        this.$emit('change', this.dataList2[e].id)
+        this.$emit('change', [this.dataList[e].id, this.dataList2[e].id])
       }
     },
     /**
