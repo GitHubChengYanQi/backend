@@ -39,13 +39,18 @@ export default {
             }
           },
           legend: {
-            orient: 'vertical',
-            bottom: 'left',
-            data: []
+            icon: 'circle',
+            orient: 'horizontal',
+            itemHeight: 10,
+            data: [],
+            x: 'center',
+            y: 'bottom'
           },
           series: [
             {
+              avoidLabelOverlap: true,
               type: 'pie',
+              radius: '50%',
               data: []
             }
           ]
@@ -74,7 +79,7 @@ export default {
         obj.label = {
           color: '#444444',
           fontSize: 14,
-          formatter: '{b}({d}%)'
+          formatter: '{d}%'
         }
         return obj
       })
@@ -89,5 +94,11 @@ export default {
 .fanDiagram {
   width: 100%;
   height: 100%;
+  .chart {
+    min-width: 200px;
+    min-height: 100px;
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

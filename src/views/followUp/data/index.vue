@@ -74,9 +74,9 @@
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>
-    <div class="box">
+    <!-- <div class="box" style="width:500px;height:285px;">
       <FanDiagram :type="0" :dataArr="[['北京公司', 3],['北京公', 3],['北京', 3]]" />
-    </div>
+    </div> -->
   </div>
 </template>
 
