@@ -488,7 +488,7 @@
               <div class="video" v-for="(item,index) in previewArr" :key="index">
                 <div
                   class="title"
-                  :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat 0px 0px`,backgroundSize:'100% 100%'}"
+                  :style="setData.inputData.bgImg == '0' ? {}:{background: `url(${setData.inputData.uploadTitleBorderImg}) no-repeat center center`}"
                 >{{ item.title }}</div>
                 <div
                   class="content"
