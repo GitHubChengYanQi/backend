@@ -1,10 +1,12 @@
 <template>
   <div>
-    <breadcrumb :titles="['考试管理','编辑考试']" back back-tip></breadcrumb>
+    <breadcrumb :titles="['考试管理',`${$router.history.current.query.id ? '编辑' : '新建'}考试`]" back back-tip></breadcrumb>
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
-          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">新建考试</div>
+          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">
+            {{ `${$router.history.current.query.id ? '编辑' : '新建'}考试` }}
+          </div>
         </div>
 
         <a-form

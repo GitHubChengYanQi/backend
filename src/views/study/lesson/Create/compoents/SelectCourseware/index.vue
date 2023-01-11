@@ -115,7 +115,7 @@
       :footer="null"
       destroyOnClose
       :width="1200"
-      title="选择考试"
+      title="选择课件"
       :visible="visible"
       @cancel="visible = false"
     >
