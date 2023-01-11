@@ -18,7 +18,8 @@
         :style="tab_header == index ? { color: 'rgba(2, 125, 180, 0.86)', textDecoration: 'underline' } : {}"
         v-for="(item,index) in tabArr.header"
         @click="() => { tab_header = index }"
-        :key="index">{{ item }}</div>
+        :key="index"
+      >{{ item }}</div>
     </div>
     <div class="conten_box">
       <div class="info_header">
@@ -41,7 +42,8 @@
           style="width: 300px"
           :maxTagCount="2"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
+        ></a-select>
       </div>
       <div class="searchItem">
         <span class="label">方案状态：</span>
@@ -49,7 +51,8 @@
           v-model="searchObj.status"
           style="width: 200px"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
+        ></a-select>
       </div>
       <div class="searchItem">
         <span class="label">方案分类：</span>
@@ -57,10 +60,15 @@
           v-model="searchObj.classify"
           style="width: 200px"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
+        ></a-select>
       </div>
       <div class="searchItem">
-        <a-radio-group class="chooseDateTypeRadio" v-model="searchObj.dateType" button-style="solid">
+        <a-radio-group
+          class="chooseDateTypeRadio"
+          v-model="searchObj.dateType"
+          button-style="solid"
+        >
           <a-radio-button value="day">日</a-radio-button>
           <a-radio-button value="month">月</a-radio-button>
           <a-radio-button value="year">年</a-radio-button>
@@ -68,9 +76,7 @@
         <a-range-picker v-model="searchObj.date" :disabled-date="disabledSearchDate" />
       </div>
       <div class="searchBtn">
-        <a-button type="primary" @click="handleSearch">
-          查询
-        </a-button>
+        <a-button type="primary" @click="handleSearch">查询</a-button>
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>
@@ -78,23 +84,25 @@
       <ChartContainer width="49%" name="方案占比" style="margin-right: 1%;">
         <template #rightTop>rightTop</template>
         <template #searchTab>
-          <a-radio-group default-value="1" button-style="solid" @change="({target: {value}}) => handleChartItemChange(value, 'key')">
-            <a-radio-button value="1">
-              使用情况
-            </a-radio-button>
-            <a-radio-button value="2">
-              完成情况
-            </a-radio-button>
-            <a-radio-button value="3">
-              预警情况
-            </a-radio-button>
+          <a-radio-group
+            default-value="1"
+            button-style="solid"
+            @change="({target: {value}}) => handleChartItemChange(value, 'key')"
+          >
+            <a-radio-button value="1">使用情况</a-radio-button>
+            <a-radio-button value="2">完成情况</a-radio-button>
+            <a-radio-button value="3">预警情况</a-radio-button>
           </a-radio-group>
         </template>
       </ChartContainer>
       <ChartContainer width="50%" extra="123" name="启用方案TOP5" rightTop="用户总人数  1867" />
     </div>
-    <div class="box" style="width:612px;height:100px;">
-      <FanDiagram :type="3" :dataArr="[['北京公司', 20],['北京', 100],['北京1', 50]]" />
+    <div class="box" style="width:100%;height:300px;">
+      <FanDiagram
+        :type="4"
+        :dataObj="{xAxis: ['2021-1', '2021-2'],data:{'A片区': [200, 300, 400 ],'B片区': [230, 330, 430 ]}
+        }"
+      />
     </div>
   </div>
 </template>
