@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  name: 'FanDiagram',
   props: {
     type: {
       type: Number,
@@ -17,7 +18,7 @@ export default {
         return []
       }
     },
-    dataArr: {
+    dataArr: { // ["北京公司", 3]
       type: Array,
       default: () => {
         return []
@@ -31,18 +32,20 @@ export default {
           color: ['#5CCDA1', '#5D8CEA', '#6F60DA', '#E8B520', '#5F708F'],
           tooltip: {
             trigger: 'item',
-            formatter: '{a} <br/>{b}: {c} ({d}%)'
+            formatter: (params) => {
+              const { data = {}, marker, percent } = params
+              const { name, value } = data
+              return `${marker}${name}:${value}(${percent})%`
+            }
           },
           legend: {
             orient: 'vertical',
-            bottom: 'bottom',
+            bottom: 'left',
             data: []
           },
           series: [
             {
               type: 'pie',
-              radius: ['40%', '70%'],
-              tadius: ['50%', '60%'],
               data: []
             }
           ]
@@ -64,11 +67,19 @@ export default {
   },
   methods: {
     setOptions (arr, key) {
-      if (key == 'titleArr') {
-        this.options[this.type].legend.data = arr
-      } else if (key == 'dataArr') {
-        this.options[this.type].series.data = arr
-      }
+      const newArr = arr.map((item) => {
+        const obj = {}
+        obj.name = item[0]
+        obj.value = item[1]
+        obj.label = {
+          color: '#444444',
+          fontSize: 14,
+          formatter: '{b}({d}%)'
+        }
+        return obj
+      })
+      this.options[this.type].legend.data = newArr.map(item => { return item.name })
+      this.options[this.type].series[0].data = newArr
     }
   }
 }

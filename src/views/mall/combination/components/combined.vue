@@ -18,8 +18,7 @@
               :labelCol="{lg: {span: 7} }"
               :wrapperCol="{lg: {span: 17} }">
               <a-select placeholder="请选择" v-model="screenData.haveAdjuvants">
-                <a-select-option value="have">有</a-select-option>
-                <a-select-option value="no">无</a-select-option>
+                <a-select-option v-for="item in haveNoOption" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -121,6 +120,7 @@
 import { combinList, deleteCombin } from '@/api/mall'
 import { deepClone } from '@/utils/util'
 import diseaseSelect from './diseaseSelect'
+import { getDict } from '@/api/common.js'
 export default {
   filters: {
     filterNull: function (text) {
@@ -132,6 +132,8 @@ export default {
   },
   data () {
     return {
+      // 字典：有无用药
+      haveNoOption: [],
       loading: false,
       screenData: {
         symptomDiseaseClassify: 0
@@ -217,7 +219,22 @@ export default {
      * 初始化
      */
     initFn () {
+      this.getDict('have_no')
       this.getTableData()
+    },
+    /**
+     * 拉取字典
+     * @param {*} e
+     */
+    getDict (e) {
+      const obj = {
+        dictType: e
+      }
+      getDict(obj).then((res) => {
+        if (e === 'have_no') {
+          this.haveNoOption = res.data
+        }
+      })
     },
     /**
      * 拉取列表

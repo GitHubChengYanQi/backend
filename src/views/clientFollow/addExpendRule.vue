@@ -297,7 +297,7 @@ export default {
                 }
               }
             }
-          }).catch(err => {
+          }).catch(() => {
             this.loading = false
           })
         }
@@ -323,7 +323,7 @@ export default {
                 }
               }
             }
-          }).catch(err => {
+          }).catch(() => {
             this.loading = false
           })
         }

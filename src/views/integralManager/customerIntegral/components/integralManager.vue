@@ -57,8 +57,8 @@
           <div class="singleFormTitle">调整积分</div>
           <div class="singleFormContent">
             <div class="singleRulesContent">
-              <a-select class="singleInputClass" placeholder="请选择"></a-select>
-              <a-input addon-after="积分" default-value="10" class="singleInputClass"></a-input>
+              <a-select class="singleInputClass" placeholder="请选择" v-model="batchInfo.changeType"></a-select>
+              <a-input addon-after="积分" v-model="batchInfo.integral" default-value="10" class="singleInputClass"></a-input>
               <!-- <div class="singleFormText">好友查看了</div> -->
               <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
             </div>
@@ -69,7 +69,7 @@
           <div class="singleFormTitle">调整原因</div>
           <div class="singleFormContent">
             <div class="singleRulesContent">
-              <a-textarea placeholder="请输入原因" class="rasonTextareaDiv"></a-textarea>
+              <a-textarea placeholder="请输入原因" class="rasonTextareaDiv" v-model="batchInfo.changeCause"></a-textarea>
               <div class="len">0/18</div>
             </div>
             <div class="singleReasonContent">
@@ -112,7 +112,7 @@
 <script>
 import { departmentEmp } from '@/api/common.js'
 import SelectModal from '@/components/SelectPersonnel/components/modal'
-import { getTempIntegralManagerData } from '@/api/integralManager'
+import { getCustomerIntegralApi, getTempIntegralManagerData } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralManager',
   components: {
@@ -130,22 +130,24 @@ export default {
       rows: [],
       treeData: [],
       integralBatchShowStatus: false,
-      searchInfo: {},
+      screenData: {},
       employeeIds: [],
       // 表格加载效果
       tableLoading: false,
       // 表格数据
       tableData: [],
+      // 批量处理对象
+      batchInfo: {},
       tableColumns: [
         {
           title: '员工名称',
-          dataIndex: 'managerName',
+          dataIndex: 'employeeName',
           align: 'center',
           width: 200
         },
         {
           title: '积分余额',
-          dataIndex: 'integralTotal',
+          dataIndex: 'integral',
           align: 'center',
           sortDirections: ['descend', 'ascend'],
           sorter: true,
@@ -153,7 +155,7 @@ export default {
         },
         {
           title: '已发放积分',
-          dataIndex: 'integralSend',
+          dataIndex: 'allIntegral',
           align: 'center',
           sortDirections: ['descend', 'ascend'],
           sorter: true,
@@ -161,7 +163,7 @@ export default {
         },
         {
           title: '已消耗积分',
-          dataIndex: 'integralUse',
+          dataIndex: 'consumptionIntegral',
           align: 'center',
           sortDirections: ['descend', 'ascend'],
           sorter: true,
@@ -169,7 +171,7 @@ export default {
         },
         {
           title: '已过期积分',
-          dataIndex: 'integralOver',
+          dataIndex: 'overdueIntegral',
           align: 'center',
           sortDirections: ['descend', 'ascend'],
           sorter: true,
@@ -206,9 +208,78 @@ export default {
     // }
     // this.getTableData()
     this.tableData = getTempIntegralManagerData()
+    // 获取正式的数据
+    // this.getDataList()
   },
 
   methods: {
+    // 获取数据
+    async getDataList () {
+      this.tableLoading = true
+      const params = {
+        idsStr: this.screenData.employeeIds.join(','),
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize,
+        ...this.screenData
+      }
+      // console.log(params, '查询数据提交接口的对象')
+      await getCustomerIntegralApi(params).then(response => {
+        this.tableLoading = false
+        console.log(response, '获取群SOP模板信息')
+        this.tableData = response.data.list
+        this.$set(this.pagination, 'total', Number(response.data.page.total))
+        if (this.tableData.length === 0) {
+          // 列表中没有数据
+          if (this.pagination.total !== 0) {
+            // 总数据有,但当前页没有
+            // 重新将页码换成1
+            this.$set(this.pagination, 'current', 1)
+            this.getTableData()
+          } else {
+            // 是真没有数据
+          }
+        }
+      }).catch(() => {
+        this.tableLoading = false
+      })
+      // 临时接收假数据
+      // this.tableData = getTempSopList()
+    },
+    // 表格监听事件
+    handleTableChange ({ current, pageSize }, filters, sorter) {
+      let currentTypeText = ''
+      if (sorter.order) {
+        // 获取点击的是那一列排序
+        currentTypeText = sorter.column.dataIndex
+        // this.$set(this.screenData, 'orderBySortCode', currentTypeText)
+        if (sorter.order === 'ascend') {
+          // 正序
+          this.$set(this.screenData, `${currentTypeText}`, 'asc')
+        } else {
+          // 逆序
+          this.$set(this.screenData, `${currentTypeText}`, 'desc')
+        }
+      } else {
+        // 无需排序
+        this.$delete(this.screenData, `${currentTypeText}`)
+      }
+      this.pagination.current = current
+      this.pagination.pageSize = pageSize
+      this.getTableData()
+      // this.pagination.current = current
+      // this.pagination.pageSize = pageSize
+      // console.log(sorter, 'sorter')
+      // if (sorter.order) {
+      //   if (sorter.order === 'ascend') {
+      //     this.sorter = 'asc'
+      //   } else {
+      //     this.sorter = 'desc'
+      //   }
+      // } else {
+      //   this.sorter = ''
+      // }
+      // this.getTableData()
+    },
     goBatchChangeIntegral () {
       this.$refs.SelectPersonnel.modalShow = true
       departmentEmp().then(res => {
@@ -256,7 +327,7 @@ export default {
     // 点击调整积分
     setIntegral () {
       this.integralBatchShowStatus = true
-    },
+    }
     // // 获取数据
     // async getTableData () {
     //   this.tableLoading = true
@@ -290,22 +361,6 @@ export default {
     //   // 临时接收假数据
     //   // this.tableData = getTempSopList()
     // },
-    // 群SOP模板切换页码
-    handleTableChange ({ current, pageSize }, filters, sorter) {
-      this.pagination.current = current
-      this.pagination.pageSize = pageSize
-      console.log(sorter, 'sorter')
-      if (sorter.order) {
-        if (sorter.order === 'ascend') {
-          this.sorter = 'asc'
-        } else {
-          this.sorter = 'desc'
-        }
-      } else {
-        this.sorter = ''
-      }
-      // this.getTableData()
-    }
     // // 搜索
     // goSearch () {
     //   // 重新将页码换成1
