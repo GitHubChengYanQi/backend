@@ -33,23 +33,23 @@
     </a-card>
     <div class="my-table-wrapper">
       <div v-if="!select" class="btn">
-        <div v-permission="'uploadFile'" >
+        <div v-permission="'uploadFile'">
           <a-tooltip>
             <template slot="title">
               上传文件支持格式: jpg、png、ppt、pptx、pdf、doc、docx文件大小不超过100M
             </template>
-            <a-icon type="question-circle"/>
+            <a-icon type="question-circle" />
           </a-tooltip>
+          <upload
+            :max-size="100"
+            @upload="upload"
+            @on-percent="onPercent"
+            :default-file-type-list="['jpg','png','ppt','pptx','pdf','doc','docx']"
+            style="display: inline-block"
+            @success="uploadSuccess"
+            :file-type="1" />
         </div>
-        <upload
-          v-permission="'uploadFile'"
-          :max-size="100"
-          @upload="upload"
-          @on-percent="onPercent"
-          :default-file-type-list="['jpg','png','ppt','pptx','pdf','doc','docx']"
-          style="display: inline-block"
-          @success="uploadSuccess"
-          :file-type="1" />
+
         <a-button v-permission="'bathDownload'" type="primary" ghost @click="download(checkedRows)">
           批量下载
         </a-button>

@@ -253,16 +253,6 @@ export default {
         perPage: this.pagination.pageSize,
         ...this.screenData
       }
-      // if (params.symptomDiseaseClassifyOneLevel > 0) {
-      //   if (params.symptomDiseaseClassifyTwoLevel > 0) {
-      //     delete params.symptomDiseaseClassifyOneLevel
-      //   } else {
-      //     delete params.symptomDiseaseClassifyTwoLevel
-      //   }
-      // } else {
-      //   delete params.symptomDiseaseClassifyOneLevel
-      //   delete params.symptomDiseaseClassifyTwoLevel
-      // }
       combinList(params).then((res) => {
         this.loading = false
         this.tableData = res.data.list
