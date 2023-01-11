@@ -1,10 +1,16 @@
 <template>
   <div>
-    <breadcrumb :titles="['课程管理','课件管理','编辑图文']" back back-tip></breadcrumb>
+    <breadcrumb
+      :titles="['课程管理','课件管理',`${$router.history.current.query.id ? '编辑' : '创建'}图文`]"
+      back
+      back-tip
+    />
     <a-spin :spinning="detailLoading">
       <div class="content">
         <div style="padding-bottom: 16px;display: flex">
-          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">编辑图文</div>
+          <div style="font-size: 16px;font-weight: bold;flex-grow: 1">
+            {{ `${$router.history.current.query.id ? '编辑' : '创建'}图文` }}
+          </div>
           <div>
             <a-button style="border-radius: 8px" type="primary" @click="openPreview">预览</a-button>
           </div>
@@ -19,6 +25,7 @@
         >
           <a-form-item label="标题">
             <a-input
+              class="suffixInput"
               :maxLength="50"
               :suffix="`${form.getFieldValue('title') ? form.getFieldValue('title').length : 0} / 50`"
               placeholder="请输入标题"
@@ -269,6 +276,12 @@ export default {
   }
 }
 
+.suffixInput {
+  /deep/ input {
+    padding-right: 70px !important;
+  }
+}
+
 .my-modal {
   .ant-modal-footer {
     padding: 24px;
@@ -284,6 +297,7 @@ export default {
     }
   }
 }
+
 .content {
   border-radius: 8px;
   padding: 24px;

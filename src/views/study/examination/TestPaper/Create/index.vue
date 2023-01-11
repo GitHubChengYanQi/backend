@@ -1,6 +1,6 @@
 <template>
   <div class="create">
-    <breadcrumb :titles="['考试管理','试卷管理','编辑试卷']" back back-tip></breadcrumb>
+    <breadcrumb :titles="['考试管理','试卷管理',`${$router.history.current.query.id ? '编辑' : '创建'}试卷`]" back back-tip />
 
     <a-spin :spinning="detailLoading">
       <div>
