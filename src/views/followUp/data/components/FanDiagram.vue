@@ -1,6 +1,6 @@
 <template>
   <div class="fanDiagram">
-    <v-chart class="chart" :options="options[type]"></v-chart>
+    <v-chart class="chart" :options="options[type]" @click="getLink"></v-chart>
   </div>
 </template>
 
@@ -15,7 +15,7 @@
             'B片区': [230, 330, 430 ]
           }
         }
-
+   @param {Function} getClick // 获取点击事件数据
  */
 
 export default {
@@ -315,7 +315,7 @@ export default {
             {
               type: 'category',
               axisTick: { show: false },
-              data: ['2012', '2013', '2014', '2015', '2016']
+              data: []
             }
           ],
           yAxis: [
@@ -369,11 +369,31 @@ export default {
   watch: {
     dataArr (val) {
       this.setOptions(val)
+    },
+    dataObj (val) {
+      if (this.type == 4) {
+        this.line(this.dataObj)
+      } else {
+        this.columnar(this.dataObj)
+      }
+    },
+    type (val) {
+      if (this.type == 4) {
+        this.line(this.dataObj)
+      } else if (this.type == 5) {
+        this.columnar(this.dataObj)
+      } else {
+        this.setOptions(this.dataArr)
+      }
     }
   },
   created () {
-    if (this.type == 4) {
-      this.line(this.dataObj)
+    if (this.type == 4 || this.type == 5) {
+      if (this.type == 4) {
+        this.line(this.dataObj)
+      } else {
+        this.columnar(this.dataObj)
+      }
     } else {
       this.setOptions(this.dataArr)
     }
@@ -431,6 +451,30 @@ export default {
         }
         this.options[this.type].series = arr
       }
+    },
+    columnar (data) {
+      this.options[this.type].xAxis.data = data.xAxis
+      this.options[this.type].xAxis.data = data.xAxis
+      const arr = []
+      const titleArr = []
+      for (const key in data.data) {
+        const obj = {}
+        obj.name = key
+        obj.type = 'bar'
+        obj.barGap = 0
+        obj.barWidth = 20
+        obj.emphasis = {
+          focus: 'series'
+        }
+        obj.data = data.data[key]
+        titleArr.push(key)
+        arr.push(obj)
+      }
+      this.options[this.type].legend.data = titleArr
+      this.options[this.type].series = arr
+    },
+    getLink (e) {
+      this.$emit('getClick', e)
     }
   }
 }
