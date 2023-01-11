@@ -295,10 +295,11 @@
         </div>
         <div class="model_content">
           <div class="upload_box" v-if="modelTab == 0">
-            <div v-if="uploadUrl.length == 0" class="upload_btn" @click="getLink">
+            <div v-if="uploadUrl.length == 0 && !isUpload" class="upload_btn" @click="getLink">
               <img class="upload_icon" :src="require('@/assets/upload.svg')" alt />
               <span class="upload_text">{{ modalTitle }}</span>
             </div>
+            <a-spin class="spin" v-else-if="isUpload"/>
             <div class="show" v-else @click="getLink">
               <img v-if="medium.type == 2" class="upload_image" :src="uploadUrl" alt />
               <video v-else-if="medium.type == 5" :src="uploadUrl" class="upload_image"></video>
@@ -629,6 +630,7 @@ export default {
             {
               type: 'button',
               btnText: '从素材库中引用',
+              hide: true,
               key: 'linkImg'
             }
           ],
@@ -920,6 +922,7 @@ export default {
       isShowKey: null,
       selectIndex: 0,
       source: null,
+      isUpload: false,
       previewArr: []
     }
   },
@@ -1285,13 +1288,15 @@ export default {
       } else {
         tempFormData.append('file', fileInfo)
         this.source = source
+        this.isUpload = true
       }
       ossUpload(tempFormData, source.token).then(res => {
         if (shape == 5) {
-          this.setData.inputData.uploadVideo[index].video = `${info.host}/${info.key}`
+          this.setData.inputData.uploadVideo[index].video = `${info.host}/${info.key}` + '?1=1'
           this.setData.inputData.uploadVideo[index].isUpload = false
         } else {
-          this.uploadUrl = `${info.host}/${info.key}`
+          this.uploadUrl = `${info.host}/${info.key}` + '?1=1'
+          this.isUpload = false
         }
       }).catch(() => {
         if (shape == 5 && this.setData.inputData.uploadVideo[index].source) {
@@ -1357,7 +1362,7 @@ export default {
             this.setData.inputData.uploadVideo[this.selectIndex].video = this.uploadUrl
           } else {
             if (this.source) {
-              this.source.cancel('上传中，请耐心等待富文本中附件显示')
+              this.source.cancel()
               this.source = null
             }
             if (this.uploadUrl.length > 0) { this.$refs.editor[0].getEditorData('video', this.uploadUrl) }
@@ -1430,7 +1435,7 @@ export default {
       const resetArr = ['linkImg', 'radarLink', 'linkTitle', 'linkDigest', 'content', 'articleLink']
       if (isState && inputData.shape != 5) {
         if (this.source) {
-          this.source.cancel('上传中，请耐心等待富文本中附件显示')
+          this.source.cancel()
           this.source = null
         }
         resetArr.map(item => {
@@ -1468,6 +1473,7 @@ export default {
     },
     setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0) {
       this.isEditor = isEditor
+      this.isUpload = false
       const title = {
         2: {
           title: '上传图片'
@@ -1496,7 +1502,7 @@ export default {
         this.medium.pagination.current = 1
         this.medium.pagination.pageSize = 10
         if (this.source) {
-          this.source.cancel('上传中，请耐心等待富文本中附件显示')
+          this.source.cancel()
           this.source = null
         }
       } else if (e == 3) {
@@ -2099,6 +2105,10 @@ export default {
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      .span {
+        width: 200px;
+        height: 200px;
+      }
 
       .hint {
         margin-top: 90px;
