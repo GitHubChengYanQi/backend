@@ -14,7 +14,8 @@
           <slot name="rightTop" v-else></slot>
         </div>
       </div>
-      <slot name="searchTab" class="searchTab"></slot>
+      <slot name="searchTab" />
+      <slot class="chartBox" />
     </div>
   </div>
 </template>
@@ -24,7 +25,7 @@
  * @param {String} width 宽度
  * @param {String} extra 描述
  * @param {String} name 名称
- * @param {String} rightTop 右侧内容 有限props，其次slot
+ * @param {String} rightTop 右侧内容 优先props，其次slot
  *
  * @slot rightTop 右上侧内容
  * @slot searchTab 名称下搜索tab占位
@@ -52,22 +53,10 @@ export default {
   data () {
     return {}
   },
-  computed: {},
-  watch: {},
-  beforeCreate () { },
   created () { },
-  beforeMount () { },
-  mounted () { },
-  methods: {},
-  beforeUpdate () { },
-  updated () { },
-  beforeUnmount () { },
-  unmounted () { }
+  methods: {}
 }
 </script>
-<style lang='less'>
-
-</style>
 <style lang='less' scoped>
 .chartContainer_Comoonent {
   height: auto;
@@ -86,10 +75,6 @@ export default {
         display: flex;
         align-items: center;
       }
-    }
-
-    .searchTab {
-      margin-top: 5px;
     }
   }
 }
