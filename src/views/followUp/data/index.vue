@@ -93,9 +93,9 @@
       </ChartContainer>
       <ChartContainer width="50%" extra="123" name="启用方案TOP5" rightTop="用户总人数  1867" />
     </div>
-    <!-- <div class="box" style="width:500px;height:285px;">
-      <FanDiagram :type="0" :dataArr="[['北京公司', 3],['北京公', 3],['北京', 3]]" />
-    </div> -->
+    <div class="box" style="width:612px;height:100px;">
+      <FanDiagram :type="3" :dataArr="[['北京公司', 20],['北京', 100],['北京1', 50]]" />
+    </div>
   </div>
 </template>
 
