@@ -147,7 +147,7 @@
                     @click="()=>{
                       preview = true
                       previewArr = setData.inputData.uploadVideo.filter(item => {
-                        return item.video.length > 0 || item.title.length > 0
+                        return item.video.length > 0
                       })
                     }"
                   >预览</a-button>
