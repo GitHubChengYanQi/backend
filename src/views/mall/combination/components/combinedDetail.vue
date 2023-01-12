@@ -110,18 +110,6 @@ export default {
     }
     this.getCommonNameList()
   },
-  watch: {
-    '$route.query.combinedId': {
-      handler (newVal) {
-        if (newVal) {
-          this.id = newVal
-          this.getCombined(this.id)
-          this.getCommonNameList()
-        }
-      }
-    },
-    deep: true
-  },
   methods: {
     deepClonev2,
     /**
