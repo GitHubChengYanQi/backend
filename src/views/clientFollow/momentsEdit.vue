@@ -69,7 +69,7 @@
               <div
                 v-if="isDisabled"
                 class="disabledBox"
-                :style="mediaType ? {height: '100px',top:'-10px'} : {}"
+                :style="mediaType ? { height: '100px', top: '-10px' } : {}"
                 @click="disabledClickHandle" />
               <div class="pics" v-if="mediaType === 'photo'">
                 <div class="picItem" v-for="(item, index) in photos" :key="index">
@@ -144,11 +144,15 @@
       <div class="rigPhone">
         <span class="txt">朋友圈预览图</span>
         <div class="phoneBox">
-          <img :src="userInfo ? userInfo.employeeThumbAvatar : ''" alt="" class="face" v-if="content || mediaType">
+          <img
+            :src="userInfo ? userInfo.employeeThumbAvatar : ''"
+            alt=""
+            class="face"
+            v-if="content || mediaType">
           <div class="flexBox" v-if="content || mediaType">
             <div class="topLine">
               <div class="name">
-                <span class="employName">员工姓名</span>@{{ userInfo ? userInfo.corpName : '' }}
+                <span class="employName">员工姓名</span>@{{ userInfo? userInfo.corpName : '' }}
               </div>
               <a-icon type="down" class="icon" />
             </div>
@@ -164,7 +168,8 @@
                 <video :src="videoUrl.url" alt />
               </div>
               <div class="linkBox" v-else-if="mediaType === 'link'">
-                <img :src="modalLinkObj.pic.url" alt="" class="pic">
+                <img v-if="modalLinkObj.pic.url" :src="modalLinkObj.pic.url" alt="" class="pic">
+                <!-- <div class="pic" v-else></div> -->
                 <div class="rig">
                   <div class="title clamp">{{ modalLinkObj.title }}</div>
                   <div class="desc clamp">{{ modalLinkObj.desc }}</div>
