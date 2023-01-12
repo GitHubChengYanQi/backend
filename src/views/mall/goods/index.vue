@@ -716,9 +716,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
-/deep/.ant-table-tbody .clickRowStyle {
-  background-color: #e6f7ff !important;
-}
+// /deep/.ant-table-tbody .clickRowStyle {
+//   background-color: #e6f7ff !important;
+// }
 .alter {
   width: 80%;
   height: 50px;
@@ -794,7 +794,9 @@ export default {
     }
   }
   /deep/.ant-table-tbody .clickRowStyle {
-    background-color: yellow !important;
+    td:nth-child(2){
+      background-color: yellow !important;
+    }
   }
 }
 .box {
