@@ -103,13 +103,15 @@ export default {
       }
     }
   },
-  mounted () {
-    console.log(1111111, this.$route.query.combinedId)
+  created () {
+    console.log(1111111)
     if (this.$route.query.combinedId) {
+      console.log(22222222, this.$route.query.combinedId)
       this.id = this.$route.query.combinedId
       this.getCombined(this.id)
     }
     this.getCommonNameList()
+    console.log(3333333)
   },
   methods: {
     deepClonev2,
