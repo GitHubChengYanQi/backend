@@ -441,7 +441,7 @@ export default {
       }
       if (state == 2) {
         this.taskList[this.currentIndex].article = {
-          name: item.content.title,
+          name: item.content.title || item.title,
           formId: item.id
         }
       }

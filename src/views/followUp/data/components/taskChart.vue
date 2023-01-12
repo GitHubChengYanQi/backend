@@ -65,7 +65,7 @@
     <ChartContainer name="任务各类型数据情况">
       <template #searchTab>
         <a-radio-group
-          default-value="1"
+          v-model="chart4Value"
           button-style="solid"
           @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')"
         >
@@ -84,7 +84,7 @@
               'B片区': [230, 330, 430 ]
             }
           }"
-          @getClick="showModel"
+          @getClick="e => chart4Value === '1' && showModel(e)"
         />
       </div>
     </ChartContainer>
@@ -142,6 +142,7 @@ export default {
   data () {
     return {
       isShow: false,
+      chart4Value: '1',
       columns: [{
         align: 'center',
         title: '片区名称',
