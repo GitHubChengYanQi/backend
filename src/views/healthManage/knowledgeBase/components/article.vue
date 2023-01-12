@@ -106,7 +106,7 @@
             </a-col>
           </a-row>
         </div>
-        <div class="r-detail-content">
+        <div class="r-detail-content" v-if="selectListMode === '1'">
           <template v-if="`${activeIndex}`">
             <!-- 文本-->
             <template v-if="currentItem.type_id == 1">
@@ -152,6 +152,24 @@
             <template v-if="currentItem.type_id == 7">
               <div class="typeId3">
                 <a :href="currentItem.content.fileFullPath" target="_blank">{{ currentItem.content.fileName }}</a>
+              </div>
+            </template>
+          </template>
+          <Empty class="emptyCenter" v-else description="请选择患教" />
+        </div>
+        <div class="r-detail-content" v-if="selectListMode === '2'">
+          <template v-if="`${activeIndex}`">
+            <!-- 图文-->
+            <template v-if="currentItem.type_id == 3">
+              <div class="typeId3">
+                <img :src="currentItem.linkImg" />
+                <a :href="currentItem.radarLink" target="_blank">{{ currentItem.linkTitle }}</a>
+              </div>
+            </template>
+            <!-- 文件-->
+            <template v-if="currentItem.type_id == 7">
+              <div class="typeId3">
+                <a :href="currentItem.radarPDF" target="_blank">{{ currentItem.linkTitle }}</a>
               </div>
             </template>
           </template>
@@ -265,6 +283,8 @@ export default {
     },
     // 按名称搜索问卷
     onSearch () {
+      this.currentItem = {}
+      this.activeIndex = ''
       this.busy = false
       this.list = []
       this.userListPagination.page = 0
@@ -297,7 +317,7 @@ export default {
         }
         if (this.selectListMode === '2') {
           res = await scrmRadarArticleFind({ title: this.searchVal,
-            shape: 0,
+            shape: this.radarType,
             unitId: this.editGroupId,
             ...{
               current: params.page,
@@ -322,8 +342,17 @@ export default {
         this.currentItem = item
       }
       if (this.selectListMode === '2') {
-        this.currentItem = item.entry
-        console.log(11111, item.entry)
+        if (item.shape === '链接' || item.shape === '图文' || item.shape === '自定义视频' || item.shape === '模板视频') {
+          item.entry.type_id = '3'
+        }
+        if (item.shape === 'PDF') {
+          item.entry.type_id = '7'
+        }
+        this.currentItem = {
+          ...item.entry,
+          id: item.id,
+          title: item.title
+        }
       }
     },
     // 获取分组列表
