@@ -61,7 +61,7 @@
 import { combinDetail, searchSalesGuidance, getCommonNameList, combinUpdate, combinAdd } from '@/api/mall'
 import diseaseCascader from './diseaseCascader'
 import selectDrug from './selectDrug.vue'
-import { deepClonev2 } from '@/utils/util'
+import { deepClonev2, getParams } from '@/utils/util'
 export default {
   components: {
     selectDrug,
@@ -104,9 +104,10 @@ export default {
     }
   },
   mounted () {
-    if (this.$route.query.combinedId) {
-      this.id = this.$route.query.combinedId
-      this.getCombined(this.id)
+    const id = getParams('combinedId')
+    if (id) {
+      this.id = id
+      this.getCombined(id)
     }
     this.getCommonNameList()
   },

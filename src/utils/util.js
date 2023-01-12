@@ -216,3 +216,12 @@ export const isObjectValueEqual = (a, b) => {
   }
   return true
 }
+
+/**
+ * 获取Url参数
+ */
+export const getParams = (params) => {
+  const url = window.location.search
+  var res = new RegExp('(?:&|/?)' + params + '=([^&$]+)').exec(url)
+  return res ? res[1] : ''
+}
