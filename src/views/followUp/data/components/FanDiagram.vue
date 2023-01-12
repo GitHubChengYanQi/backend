@@ -322,18 +322,14 @@ export default {
               saveAsImage: { show: true }
             }
           },
-          xAxis: [
-            {
-              type: 'category',
-              axisTick: { show: false },
-              data: []
-            }
-          ],
-          yAxis: [
-            {
-              type: 'value'
-            }
-          ],
+          xAxis: {
+            type: 'category',
+            axisTick: { show: false },
+            data: []
+          },
+          yAxis: {
+            type: 'value'
+          },
           series: [
             {
               name: '任务总数',
@@ -483,6 +479,7 @@ export default {
       }
       this.options[this.type].legend.data = titleArr
       this.options[this.type].series = arr
+      console.log(this.options[this.type])
     },
     sum (arr) {
       var s = 0

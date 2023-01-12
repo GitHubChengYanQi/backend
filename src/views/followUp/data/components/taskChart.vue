@@ -24,19 +24,12 @@
         <a-radio-group
           default-value="1"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')">
-          <a-radio-button value="1">
-            总任务
-          </a-radio-button>
-          <a-radio-button value="2">
-            已发送任务
-          </a-radio-button>
-          <a-radio-button value="3">
-            超时发送任务
-          </a-radio-button>
-          <a-radio-button value="4">
-            未发送任务
-          </a-radio-button>
+          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')"
+        >
+          <a-radio-button value="1">总任务</a-radio-button>
+          <a-radio-button value="2">已发送任务</a-radio-button>
+          <a-radio-button value="3">超时发送任务</a-radio-button>
+          <a-radio-button value="4">未发送任务</a-radio-button>
         </a-radio-group>
       </template>
       <div style="height: 400px;">
@@ -48,19 +41,12 @@
         <a-radio-group
           default-value="1"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')">
-          <a-radio-button value="1">
-            任务数
-          </a-radio-button>
-          <a-radio-button value="2">
-            发送数
-          </a-radio-button>
-          <a-radio-button value="3">
-            超时发送数
-          </a-radio-button>
-          <a-radio-button value="4">
-            未发送数
-          </a-radio-button>
+          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')"
+        >
+          <a-radio-button value="1">任务数</a-radio-button>
+          <a-radio-button value="2">发送数</a-radio-button>
+          <a-radio-button value="3">超时发送数</a-radio-button>
+          <a-radio-button value="4">未发送数</a-radio-button>
         </a-radio-group>
       </template>
       <div style="height: 250px;">
@@ -72,7 +58,8 @@
               'A片区': [200, 300, 400],
               'B片区': [230, 330, 430]
             }
-          }" />
+          }"
+        />
       </div>
     </ChartContainer>
     <ChartContainer name="任务各类型数据情况">
@@ -80,28 +67,24 @@
         <a-radio-group
           default-value="1"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')">
-          <a-radio-button value="1">
-            问卷
-          </a-radio-button>
-          <a-radio-button value="2">
-            患教
-          </a-radio-button>
-          <a-radio-button value="3">
-            嘱托
-          </a-radio-button>
+          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')"
+        >
+          <a-radio-button value="1">问卷</a-radio-button>
+          <a-radio-button value="2">患教</a-radio-button>
+          <a-radio-button value="3">嘱托</a-radio-button>
         </a-radio-group>
       </template>
       <div style="height: 250px;">
         <FanDiagram
           :type="5"
           :dataObj="{
-            xAxis: ['2021-1', '2021-2'],
+            xAxis: ['2021-1', '2021-2','2021-3'],
             data:{
               'A片区': [200, 300, 400 ],
               'B片区': [230, 330, 430 ]
             }
-          }" />
+          }"
+        />
       </div>
     </ChartContainer>
   </div>
