@@ -84,9 +84,43 @@
               'B片区': [230, 330, 430 ]
             }
           }"
+          @getClick="showModel"
         />
       </div>
     </ChartContainer>
+    <a-modal
+      width="700px"
+      class="viewModal"
+      :visible="isShow"
+      :closable="false"
+      :footer="null"
+      @cancel="()=>{
+        isShow = false
+      }"
+    >
+      <template slot="title">
+        <div class="header">
+          <div>问卷任务情况明细</div>
+          <a-button
+            @click="()=>{
+              isShow = false
+            }"
+            key="back">返回</a-button>
+        </div>
+      </template>
+      <div class="modal_box">
+        <div class="table_box">
+          <a-table
+            :row-key="record => record.id"
+            :columns="columns"
+            :data-source="tableData"
+            :pagination="pagination"
+            @change="handleTableChange"
+            class="table"
+          ></a-table>
+        </div>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -107,6 +141,52 @@ export default {
   },
   data () {
     return {
+      isShow: false,
+      columns: [{
+        align: 'center',
+        title: '片区名称',
+        dataIndex: 'contactNick',
+        width: 110
+      },
+      {
+        align: 'center',
+        title: '应发任务量',
+        dataIndex: 'contactExist',
+        width: 110
+      },
+      {
+        align: 'center',
+        title: '实际发送量',
+        dataIndex: 'createdAt',
+        width: 110
+      },
+      {
+        align: 'center',
+        title: '用户完成量',
+        dataIndex: 'viewingChannels',
+        width: 110
+      },
+      {
+        align: 'center',
+        title: '任务发送率',
+        dataIndex: 'viewingNumber',
+        width: 110
+      },
+      {
+        align: 'center',
+        title: '任务完成率',
+        dataIndex: 'viewingDuration',
+        width: 110
+      }],
+      pagination: {
+        total: 0,
+        current: 1,
+        pageSize: 10,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        pageSizeOptions: ['10', '20', '30', '50']
+      },
+      tableData: [{ id: 1 }]
     }
   },
   computed: {},
@@ -117,7 +197,17 @@ export default {
     // item级搜索
     handleChartItemChange (value, key) {
       this.$parent.handleChartItemChange(value, key)
-    }
+    },
+    showModel (e) {
+      console.log(e.dataIndex)
+      this.isShow = true
+    },
+    handleTableChange ({ current, pageSize }) {
+      this.pagination.current = current
+      this.pagination.pageSize = pageSize
+      this.getTableData()
+    },
+    getTableData () {}
   }
 }
 </script>
@@ -135,5 +225,34 @@ export default {
 
 .circleItem:last-child {
   margin-right: 0;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #333333;
+  font-family: 'Arial Normal', 'Arial', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+::v-deep(.ant-modal-body) {
+  padding: 0;
+}
+.modal_box {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 370px;
+  .table_box {
+    min-width: 600px;
+    min-height: 370px;
+    .table {
+      min-height: 370px;
+    }
+  }
 }
 </style>

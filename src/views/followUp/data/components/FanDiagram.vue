@@ -479,7 +479,6 @@ export default {
       }
       this.options[this.type].legend.data = titleArr
       this.options[this.type].series = arr
-      console.log(this.options[this.type])
     },
     sum (arr) {
       var s = 0
