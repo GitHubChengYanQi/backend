@@ -301,6 +301,8 @@ export default {
         message.success('修改成功！')
         this.getTableData()
         this.visible = false
+      }).finally(() => {
+        this.updateLoading = false
       })
     },
     deleteAttribute (id) {

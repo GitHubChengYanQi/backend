@@ -160,9 +160,6 @@
                         <div class="right" v-if="record.entry.linkImg">
                           <img class="img" :src="record.entry.linkImg" alt />
                         </div>
-                        <div class="right" v-else>
-                          <img class="img" :src="require('@/assets/default_linkImg.png')" alt />
-                        </div>
                       </div>
                     </div>
                   </template>
