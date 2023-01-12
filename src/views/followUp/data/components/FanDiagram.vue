@@ -207,11 +207,14 @@ export default {
             trigger: 'axis'
           },
           grid: {
-            top: 10,
-            right: 10
+            top: '10%',
+            left: '5%',
+            right: '5%',
+            bottom: '20%'
           },
           xAxis: {
             type: 'category',
+            boundaryGap: false,
             axisTick: {
               show: false
             },
@@ -250,13 +253,14 @@ export default {
             trigger: 'axis'
           },
           grid: {
+            top: '10%',
             left: '5%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
+            right: '5%',
+            bottom: '20%'
           },
           xAxis: {
             type: 'category',
+            boundaryGap: false,
             axisTick: {
               show: false
             },
@@ -291,6 +295,12 @@ export default {
             axisPointer: {
               type: 'shadow'
             }
+          },
+          grid: {
+            top: '10%',
+            left: '5%',
+            right: '5%',
+            bottom: '20%'
           },
           legend: {
             icon: 'rect',
