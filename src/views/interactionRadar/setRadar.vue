@@ -1177,12 +1177,14 @@ export default {
           return item.video.length > 0
         })
         obj.entry.uploadVideo = uploadVideo
+        obj.entry.linkImg = obj.entry.linkImg.length == 0 ? 'https://yfscrm.oss-cn-beijing.aliyuncs.com/upload/16734956389240028712.png?Expires=1829034062&OSSAccessKeyId=LTAIAX24MUz7rbXu&Signature=T5uHInepozbFoYfL2bMajwt%2BMWg%3D' : obj.entry.linkImg
       }
       if (!this.isUrl(obj.entry.radarLink) && obj.shape == 1) return this.$message.warn('请检查雷达链接')
       console.log(obj)
       if (this.tableId != -1) {
         obj.id = this.tableId
       }
+
       scrmRadarArticleSave(obj).then((res) => {
         console.log(res)
         this.$router.push('/interactionRadar/index')

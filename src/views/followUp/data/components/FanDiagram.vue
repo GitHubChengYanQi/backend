@@ -483,7 +483,7 @@ export default {
     sum (arr) {
       var s = 0
       arr.forEach(val => {
-        s += val
+        s += Number(val)
       }, 0)
       return s
     },
