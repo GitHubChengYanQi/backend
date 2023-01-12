@@ -104,14 +104,23 @@ export default {
     }
   },
   mounted () {
-    alert(11111)
     if (this.$route.query.combinedId) {
-      console.log(22222222, this.$route.query.combinedId)
       this.id = this.$route.query.combinedId
       this.getCombined(this.id)
     }
     this.getCommonNameList()
-    alert(22222)
+  },
+  watch: {
+    '$route.query.combinedId': {
+      handler (newVal) {
+        if (newVal) {
+          this.id = newVal
+          this.getCombined(this.id)
+          this.getCommonNameList()
+        }
+      }
+    },
+    deep: true
   },
   methods: {
     deepClonev2,
