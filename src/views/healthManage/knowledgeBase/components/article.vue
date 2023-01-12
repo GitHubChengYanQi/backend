@@ -16,8 +16,8 @@
 
         <!-- nav -->
         <a-radio-group v-model="selectListMode" @change="handleRadio" class="selectListModeBox">
-          <a-radio-button value="1">素材库</a-radio-button>
-          <a-radio-button value="2">互动雷达</a-radio-button>
+          <a-radio-button value="1" :disabled="spinning">素材库</a-radio-button>
+          <a-radio-button value="2" :disabled="spinning">互动雷达</a-radio-button>
         </a-radio-group>
         <!-- end nav -->
 
@@ -83,6 +83,7 @@
                     style="width: 112px;"
                     v-model="item.selectChannel"
                     placeholder="请选择渠道"
+                    @change="handleChannel"
                   >
                     <a-select-option v-for="items in item.ditch" :key="items.id" :value="items.id">
                       {{ items.name }}
@@ -272,6 +273,8 @@ export default {
      * 素材库/互动雷达 切换回调
      */
     handleRadio () {
+      this.searchVal = ''
+      this.editGroupId = ''
       this.onSearch()
     },
     /**
@@ -280,6 +283,12 @@ export default {
      */
     handleChange (type) {
       this.onSearch()
+    },
+    /**
+     * 切换渠道回调
+     */
+    handleChannel (e) {
+      this.currentItem.radarDitchId = e
     },
     // 按名称搜索问卷
     onSearch () {
@@ -350,6 +359,7 @@ export default {
         }
         this.currentItem = {
           ...item.entry,
+          radarDitchId: item.selectChannel,
           id: item.id,
           title: item.title
         }
@@ -373,6 +383,12 @@ export default {
       if (!keys.length && state) {
         this.$message.error('请选择患教')
         return
+      }
+      if (this.selectListMode === '1') {
+        this.currentItem.secondType = 'M'
+      }
+      if (this.selectListMode === '2') {
+        this.currentItem.secondType = 'R'
       }
       this.$emit('close', keys.length ? this.currentItem : '', 2)
     }
