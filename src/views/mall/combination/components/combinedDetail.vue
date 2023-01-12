@@ -103,7 +103,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     alert(11111)
     if (this.$route.query.combinedId) {
       console.log(22222222, this.$route.query.combinedId)
