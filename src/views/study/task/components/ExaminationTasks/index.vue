@@ -91,7 +91,7 @@
           </div>
           <div slot="tag" slot-scope="text,row">
             <template>
-              <a-popover title="试用员工" v-if="row.applicableObject === 2">
+              <a-popover title="适用员工" v-if="row.applicableObject === 2">
                 <template slot="content">
                   <div class="myLabelBox">
                     <a-tag v-for="(item, index) in row.bindEmpList" :key="index">{{ item.name }}</a-tag>

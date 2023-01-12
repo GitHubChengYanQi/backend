@@ -33,7 +33,7 @@
           <h2>规则设置：共 {{ info.rule ? info.rule.ruleNum : 0 }} 条规则</h2>
           <p>
             <span>商品范围：</span>
-            <a-button v-if="info.rule && info.rule.goodBounds === '0'" type="primary">全部商品</a-button>
+            <a-button v-if="info.rule && info.rule.goodBounds === '0'" disabled type="primary">全部商品</a-button>
             <a-button v-else type="primary" @click="showGoods">查看商品</a-button>
           </p>
           <ul v-if="info.rule">

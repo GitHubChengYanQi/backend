@@ -27,7 +27,13 @@
         <div class="card_box">
           <a-card class="card" v-for="(item, index) in tabArr.cardArr[tab_header]" :key="index">
             <div class="number">{{ infoData.card[item.key] }}</div>
-            <div class="title">{{ item.title }}</div>
+            <div class="title">{{ item.title }}
+              <a-tooltip v-if="item.extra">
+                <template slot="title">
+                  {{ item.extra }}
+                </template><img src="./components/question.svg" alt="" style="margin-left: 5px;width: 15px;">
+              </a-tooltip>
+            </div>
           </a-card>
         </div>
       </div>
@@ -41,33 +47,59 @@
           style="width: 300px"
           :maxTagCount="2"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
-        ></a-select>
+          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
       </div>
-      <div class="searchItem">
+      <div class="searchItem" v-if="tab_header === 0">
         <span class="label">方案状态：</span>
         <a-select
           v-model="searchObj.status"
           style="width: 200px"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
-        ></a-select>
+          :options="shemeStatusSelectOptions"></a-select>
       </div>
-      <div class="searchItem">
+      <div class="searchItem" v-else>
+        <span class="label">选择范围：</span>
+        <a-select
+          v-model="searchObj.range1"
+          style="width: 150px"
+          placeholder="请选择"
+          :options="taskRange1SelectOptions"></a-select>
+        <SelectDepartment
+          v-if="searchObj.range1 !== '3'"
+          class="input"
+          :treeCheckStrictly="true"
+          placeholder="请选择"
+          v-model="searchObj.range2"
+          style="width: 150px"
+        />
+        <selectPersonnel
+          v-if="searchObj.range1 === '3'"
+          class="input"
+          v-model="searchObj.range2"
+          :changeId="true"
+          :num="1"
+          :type="'selector'"
+          style="width: 150px"
+        />
+      </div>
+      <div class="searchItem" v-if="tab_header === 0">
         <span class="label">方案分类：</span>
         <a-select
           v-model="searchObj.classify"
           style="width: 200px"
           placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"
-        ></a-select>
+          :options="shemeClassifySelectOptions"></a-select>
+      </div>
+      <div class="searchItem" v-else>
+        <span class="label">任务状态：</span>
+        <a-select
+          v-model="searchObj.status"
+          style="width: 150px"
+          placeholder="请选择"
+          :options="taskStatusSelectOptions"></a-select>
       </div>
       <div class="searchItem">
-        <a-radio-group
-          class="chooseDateTypeRadio"
-          v-model="searchObj.dateType"
-          button-style="solid"
-        >
+        <a-radio-group class="chooseDateTypeRadio" v-model="searchObj.dateType" button-style="solid">
           <a-radio-button value="day">日</a-radio-button>
           <a-radio-button value="month">月</a-radio-button>
           <a-radio-button value="year">年</a-radio-button>
@@ -81,9 +113,9 @@
     </div>
     <div class="chartBox" :is="tab_header === 0 ? 'scheme-chart' : 'task-chart'" :data="{ a: 1 }">
     </div>
-    <div class="tableBox" style="margin-top: 20px;">
+    <!-- <div class="tableBox" style="margin-top: 20px;">
       <SelfTable
-        :tableColunms="tableColunms"
+        :tableColunms="tab_header === 0 ? tableColunms1 : tableColunms2"
         :tableData="tableData"
         :colunmsSlots="['name']"
         :titleSlots="['customName']"
@@ -95,15 +127,12 @@
           </div>
         </template>
         <template #customName>
-          <div
-            class="btns"
-            style="color: #2589FF;cursor: pointer;"
-            @click="goTableDetail(2, 4)">
-            使用方案员工数
+          <div class="btns" style="color: #2589FF;cursor: pointer;" @click="goTableDetail(2, 4)">
+            {{ tab_header === 0 ? '使用方案员工数' : '任务数' }}
           </div>
         </template>
       </SelfTable>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -113,13 +142,8 @@ import moment from 'moment'
 import SchemeChart from './components/schemeChart.vue'
 import TaskChart from './components/taskChart.vue'
 import SelfTable from './components/selfTable.vue'
-const defaultSearchObj = {
-  name: [],
-  status: '',
-  classify: '',
-  dateType: 'day',
-  date: []
-}
+
+import { defaultSearchObj, defaultSearchObj2, shemeStatusSelectOptions, tableColunms1, tableColunms2, taskRange1SelectOptions, taskStatusSelectOptions } from './defaultData'
 export default {
   components: {
     SchemeChart,
@@ -140,7 +164,7 @@ export default {
             { title: '累计触达用户的预警数', key: '5' }
           ],
           1: [
-            { title: '随访任务总数', key: '0' },
+            { title: '随访任务总数', key: '0', extra: '本模块的任务总数是指应发任务总数' },
             { title: '新增任务数', key: '1' },
             { title: '进行中任务数', key: '2' },
             { title: '完成任务数', key: '3' },
@@ -155,58 +179,28 @@ export default {
         card: [0, 1, 3, 3, 4, 5, 6]
       },
       searchObj: { ...defaultSearchObj },
-      tableColunms: [
-        {
-          title: '时间',
-          width: 120,
-          dataIndex: 'date',
-          align: 'center'
-        },
-        {
-          title: '随访方案名称',
-          width: 150,
-          align: 'center',
-          dataIndex: 'ownerName',
-          scopedSlots: { customRender: 'name' }
-        },
-        {
-          slots: { title: 'customName' },
-          width: 120,
-          align: 'center',
-          dataIndex: 'departName'
-        },
-        {
-          title: '使用方案用户数',
-          width: 120,
-          align: 'center',
-          dataIndex: 'parentDepart'
-        },
-        {
-          title: '方案使用次数',
-          width: 180,
-          align: 'center',
-          dataIndex: 'createTime'
-        },
-        {
-          title: '方案预警次数',
-          width: 200,
-          align: 'center',
-          dataIndex: 'tagList'
-        },
-        {
-          title: '方案完成次数',
-          width: 120,
-          align: 'center',
-          dataIndex: 'memberNum'
-        }
-      ],
+      shemeStatusSelectOptions,
+      shemeClassifySelectOptions: [],
+      taskRange1SelectOptions,
+      taskRange2SelectOptions: [],
+      taskStatusSelectOptions,
+      tableColunms1,
+      tableColunms2,
       tableData: [{
         ownerName: '12'
       }]
     }
   },
   created () {
-    this.tab_header = this.$route.query.tab || 0
+    this.tab_header = +this.$route.query.tab || 0
+  },
+  watch: {
+    tab_header () {
+      this.resetSearch()
+    },
+    'searchObj.range1' () {
+      this.searchObj.range2 = []
+    }
   },
   methods: {
     handleCutTabIndex (index) {
@@ -226,6 +220,13 @@ export default {
       const targetDate = moment().subtract(num, type).valueOf()
       const currentDate = current.valueOf()
       return (current > moment().endOf('day')) || (currentDate < targetDate)
+    },
+    resetSearch () {
+      if (this.tab_header === 0) {
+        this.searchObj = { ...defaultSearchObj }
+      } else {
+        this.searchObj = { ...defaultSearchObj2 }
+      }
     },
     handleSearch () {
       console.log(this.searchObj)

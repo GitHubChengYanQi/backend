@@ -441,8 +441,10 @@ export default {
       }
       if (state == 2) {
         this.taskList[this.currentIndex].article = {
-          name: item.content.title,
-          formId: item.id
+          name: item.content.title || item.title,
+          formId: item.id,
+          radarDitchId: item.radarDitchId,
+          secondType: item.secondType
         }
       }
       if (state == 3) {

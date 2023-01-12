@@ -6,9 +6,9 @@
 
 <script>
 /**
- * @param {Number} type 类型 0 扇形图 1 圆环 2 横柱状图 3 折线图带范围 4 折线图多条不带范围
- * @param {Array} dataArr 数据 扇形图格式  0 ：[[数据名称, 数据]]  1 ：[[数据名称, 数据]] 第一个默认为圆环中心数据 2 [[数据名称, 数据]] 3 [[数据名称, 数据]]
- * @param {Object} dataObj 折线图多条不带范围数据 {
+ * @param {Number} type 类型 0 扇形图 1 圆环 2 横柱状图 3 折线图带范围 4 折线图多条不带范围 5 多条柱状图
+ * @param {Array} dataArr 数据 扇形图格式  0 ：[[数据名称, 数据]]  1 ：[[数据名称, 数据],[数据名称, 数据]] 第一个默认为圆环中心数据 2 [[数据名称, 数据]] 3 [[数据名称, 数据]]
+ * @param {Object} dataObj 4,5 折线图多条不带范围数据 {
           xAxis: ['2021-1', '2021-2'],
           data:{
             'A片区': [200, 300, 400 ],
@@ -207,11 +207,14 @@ export default {
             trigger: 'axis'
           },
           grid: {
-            top: 10,
-            right: 10
+            top: '10%',
+            left: '5%',
+            right: '5%',
+            bottom: '20%'
           },
           xAxis: {
             type: 'category',
+            boundaryGap: false,
             axisTick: {
               show: false
             },
@@ -250,11 +253,14 @@ export default {
             trigger: 'axis'
           },
           grid: {
-            top: 10,
-            right: 10
+            top: '10%',
+            left: '5%',
+            right: '5%',
+            bottom: '20%'
           },
           xAxis: {
             type: 'category',
+            boundaryGap: false,
             axisTick: {
               show: false
             },
@@ -266,7 +272,6 @@ export default {
           },
           yAxis: {
             type: 'value',
-            boundaryGap: true,
             min: 0,
             axisTick: {
               show: false
@@ -291,6 +296,12 @@ export default {
               type: 'shadow'
             }
           },
+          grid: {
+            top: '10%',
+            left: '5%',
+            right: '5%',
+            bottom: '20%'
+          },
           legend: {
             icon: 'rect',
             itemHeight: 14,
@@ -311,18 +322,14 @@ export default {
               saveAsImage: { show: true }
             }
           },
-          xAxis: [
-            {
-              type: 'category',
-              axisTick: { show: false },
-              data: []
-            }
-          ],
-          yAxis: [
-            {
-              type: 'value'
-            }
-          ],
+          xAxis: {
+            type: 'category',
+            axisTick: { show: false },
+            data: []
+          },
+          yAxis: {
+            type: 'value'
+          },
           series: [
             {
               name: '任务总数',
@@ -433,7 +440,7 @@ export default {
       this.options[this.type].yAxis[2].data = titleArr
       this.options[this.type].series[0].data = dataArr
       this.options[this.type].series[1].data = arr.map(item => {
-        return Math.max(...dataArr) + 100
+        return this.sum(dataArr)
       })
     },
     line (data = []) {
@@ -472,6 +479,13 @@ export default {
       }
       this.options[this.type].legend.data = titleArr
       this.options[this.type].series = arr
+    },
+    sum (arr) {
+      var s = 0
+      arr.forEach(val => {
+        s += Number(val)
+      }, 0)
+      return s
     },
     getLink (e) {
       this.$emit('getClick', e)

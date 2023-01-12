@@ -13,7 +13,7 @@
             <a-select-option v-for="items in option" :key="items.code" :value="items.code">{{ items.name }}</a-select-option>
           </a-select>
         </span>
-        <span class="label"><LabelSelect v-model="item.val" :addState="true" style="width:300px" /></span>
+        <span v-if="item.judgmentConditions !== 'empty' && item.judgmentConditions !== 'noempty'" class="label"><LabelSelect v-model="item.val" :addState="true" style="width:300px" /></span>
         <span class="btn">
           <a-icon @click="handleAdd" type="plus-circle" />
           <a-icon v-if="index > 0" @click="handleDel(index)" type="minus-circle" />
