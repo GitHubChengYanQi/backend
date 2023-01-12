@@ -47,7 +47,7 @@
     </ChartContainer>
     <ChartContainer name="启用方案TOP5">
       <div style="height: 450px;">
-        <FanDiagram :type="2" :dataArr="[['北京公司', 3], ['北京公', 4], ['北京', 5]]" />
+        <FanDiagram :type="2" :dataArr="[['北京公司', '3'], ['北京公', 4], ['北京', 5]]" />
       </div>
     </ChartContainer>
     <ChartContainer extra="所选时间范围内，使用方案的用户总人数" name="使用方案用户总人数" :rightTop="`用户总人数 ${1867}`">

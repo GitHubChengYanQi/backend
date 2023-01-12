@@ -328,7 +328,7 @@ export default {
       modalRadarObj: {
 
       },
-      sendDateType: 2,
+      sendDateType: 1,
       chooseSendDate: '',
       disabledBeforeDate,
       likeAddLabel: [],
