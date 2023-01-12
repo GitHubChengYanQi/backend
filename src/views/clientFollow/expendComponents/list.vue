@@ -63,6 +63,7 @@ import { consumeAutoLabelRuleDetailIndex } from '@/api/clientFollow.js'
 export default {
   data () {
     return {
+      id: '',
       loading: false,
       date: [],
       screenData: {
@@ -111,6 +112,7 @@ export default {
        * 初始化
        */
     initFn () {
+      this.id = this.$route.query.label
       this.getTableData()
     },
     /**
@@ -121,6 +123,7 @@ export default {
       const params = {
         page: this.pagination.current,
         perPage: this.pagination.pageSize,
+        id: this.id,
         ...this.screenData
       }
       consumeAutoLabelRuleDetailIndex(params).then((res) => {
@@ -146,7 +149,8 @@ export default {
       this.screenData = {
         nickName: '',
         startTime: '',
-        endTime: ''
+        endTime: '',
+        id: this.id
       }
       this.date = ''
       this.search()

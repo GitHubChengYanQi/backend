@@ -15,7 +15,7 @@
           :infinite-scroll-disabled="busy"
           :infinite-scroll-distance="10"
         >
-          <a-radio-group v-model="currentId" style="width: 100%">
+          <a-radio-group v-model="currentId" @change="handleRadio" style="width: 100%">
             <a-list :data-source="list" v-if="type == 1">
               <a-list-item slot="renderItem" slot-scope="item" :key="item.planId">
                 <a-list-item-meta :description="item.planName"></a-list-item-meta>
@@ -36,17 +36,20 @@
           <Empty v-if="!list.length" />
         </div>
       </a-spin>
+      <span class="tip" v-if="isTip">此患者已经添加 高血压一组 方案</span>
     </a-modal>
   </div>
 </template>
 
 <script>
+import { Empty } from 'ant-design-vue'
 import { planPlanList, planBindAddBatch, diagnosisCareQuestionnaireList, taskAdd } from '@/api/healthManage'
 import infiniteScroll from '@/utils/directive'
 import moment from 'moment'
 export default {
   // eslint-disable-next-line
   props: ['contactId'],
+  components: { Empty },
   directives: { infiniteScroll },
   data () {
     return {
@@ -67,7 +70,8 @@ export default {
         page: 0,
         total: 0,
         totalPage: 0
-      }
+      },
+      isTip: false
     }
   },
   methods: {
@@ -166,7 +170,11 @@ export default {
         this.loading = false
       }
     },
-
+    // 选择回调
+    handleRadio (e) {
+      console.log(11111, e)
+      this.isTip = true
+    },
     // 确定
     handleOk () {
       if (this.type == 1) {
@@ -216,6 +224,9 @@ export default {
 </script>
 
 <style lang="less">
+.tip{
+  color:#ff6600;
+}
 .dateContent {
   margin-bottom: 10px;
   display: flex;
