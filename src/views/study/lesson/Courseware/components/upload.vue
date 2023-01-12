@@ -13,11 +13,9 @@
     :before-upload="beforeUpload"
     @change="handleChange"
   >
-    <slot>
-      <a-button :loading="loading" type="primary">
-        上传文件
-      </a-button>
-    </slot>
+    <a-button :loading="loading" type="primary">
+      上传文件
+    </a-button>
   </a-upload>
 </template>
 <script>
