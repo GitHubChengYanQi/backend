@@ -415,7 +415,9 @@ export default {
         if (this.type == 1 && index == 0) {
           obj.label = {
             show: true, // 单独显示该数据项
-            formatter: '{b}:{c}\n{d}%'
+            formatter: '{b}:{c}\n{d}%',
+            fontSize: 16,
+            lineHeight: 30
           }
         }
         return obj
