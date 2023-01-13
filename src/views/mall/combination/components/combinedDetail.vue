@@ -23,6 +23,7 @@
         </a-form-model-item>
         <a-form-model-item label="选择分类" prop="symptomDiseaseClassifyId">
           <disease-cascader placeholder="请选择疾病分类" @change="onChange" v-model="form.symptomDiseaseClassifyId" />
+          <a-input v-show="false" v-model="form.symptomDiseaseClassifyId" />
         </a-form-model-item>
 
         <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
@@ -86,7 +87,7 @@ export default {
           { required: true, message: '请填写联合用药名称', trigger: 'blur' }
         ],
         symptomDiseaseClassifyId: [
-          { required: true, message: '请选择疾病分类', trigger: 'select' }
+          { required: true, message: '请选择疾病分类', trigger: 'change' }
         ]
       },
       numMap: {
@@ -156,7 +157,8 @@ export default {
      * 选择分类回调
      */
     onChange (e) {
-      this.form.symptomDiseaseClassifyId = e
+      console.log(11111, e)
+      this.$set(this.form, 'symptomDiseaseClassifyId', e)
       this.searchSalesGuidance(e)
     },
     addDrug () {
