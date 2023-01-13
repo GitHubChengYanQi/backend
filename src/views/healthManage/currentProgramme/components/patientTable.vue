@@ -146,7 +146,7 @@
         :infinite-scroll-disabled="busy"
         :infinite-scroll-distance="10">
         <a-spin :spinning="userListLoading">
-          <a-checkbox-group v-model="userIdList" style="width: 100%">
+          <a-checkbox-group v-model="userIdList" @change="handleCheckbox" style="width: 100%">
             <a-list :data-source="userData">
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta :description="item.mobile">
@@ -164,6 +164,7 @@
           </a-checkbox-group>
         </a-spin>
       </div>
+      <span class="tip" v-if="isTip">李晓玲、张三、李四  已经添加此方案</span>
     </a-modal>
     <a-modal :visible="visible1" title="选择分组" @ok="handleOk1" :width="450" @cancel="visible1 = false">
       <div style="height: 450px;overflow-y: auto;padding: 0 10px">
@@ -297,7 +298,8 @@ export default {
       categoryIds: [],
       isAllCategory: true,
       currentId: '',
-      archives: false
+      archives: false,
+      isTip: false // 是否显示选人提示
     }
   },
   watch: {
@@ -322,6 +324,13 @@ export default {
      */
     initFn () {
       this.getTableData()
+    },
+    /**
+     * 选人回调
+     */
+    handleCheckbox (e) {
+      console.log(111111, e)
+      this.isTip = true
     },
     /**
      * 拉取列表
@@ -578,6 +587,9 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.tip{
+  color:#ff6600;
+}
 .flex-row-center {
   display: flex;
   flex-direction: row;

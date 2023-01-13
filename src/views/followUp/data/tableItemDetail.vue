@@ -1,5 +1,5 @@
 <template>
-  <div class="TableItemDetail_Page_Container">
+  <div class="TableItemDetail_Page_Container">111
     <SelfTable
       :tableColunms="['1', '3'].includes(type) ? tableColunms : type === '2' ? type2Colunms : type4Colunms"
       :tableData="tableData"
