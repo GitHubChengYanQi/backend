@@ -609,6 +609,7 @@ export default {
 }
 
 .user-info {
+  min-height: 50px;
 
   img {
     border-radius: 2px;
