@@ -1,35 +1,31 @@
 export const defaultSearchObj = {
-  name: [],
-  status: '0',
-  classify: '0',
-  dateType: 'day',
-  date: []
+  planId: [],
+  planStatus: '',
+  planType: '',
+  reportIndex: '7',
+  reportTrack: []
 }
 export const defaultSearchObj2 = {
-  name: [],
+  planId: [],
   range1: '1',
   range2: [],
   status: '0',
-  dateType: 'day',
-  date: []
+  reportIndex: '7',
+  reportTrack: []
 }
 
 export const shemeStatusSelectOptions = [
   {
-    label: '全部',
+    label: '待启用',
     value: '0'
   },
   {
-    label: '待启用',
+    label: '执行中',
     value: '1'
   },
   {
-    label: '执行中',
-    value: '2'
-  },
-  {
     label: '已删除',
-    value: '3'
+    value: '2'
   }
 ]
 
@@ -165,15 +161,15 @@ export const tableColunms2 = [
 export const taskRange1SelectOptions = [
   {
     label: '机构',
-    value: '1'
+    value: 'pieAgency'
   },
   {
     label: '门店',
-    value: '2'
+    value: 'pieOutlet'
   },
   {
     label: '员工',
-    value: '3'
+    value: 'pieEmployee'
   }
 ]
 

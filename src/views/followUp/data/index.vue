@@ -26,7 +26,7 @@
         <div class="time">{{ '更新时间：' + infoData.time }}</div>
         <div class="card_box">
           <a-card class="card" v-for="(item, index) in tabArr.cardArr[tab_header]" :key="index">
-            <div class="number">{{ infoData.card[item.key] }}</div>
+            <div class="number">{{ infoData.card[item.key] || '-' }}</div>
             <div class="title">{{ item.title }}
               <a-tooltip v-if="item.extra">
                 <template slot="title">
@@ -42,18 +42,22 @@
       <div class="searchItem">
         <span class="label">方案名称：</span>
         <a-select
-          v-model="searchObj.name"
+          v-model="searchObj.planId"
           mode="multiple"
           style="width: 300px"
           :maxTagCount="2"
-          placeholder="请选择"
-          :options="[...Array(10)].map((_, i) => ({ value: i, label: 'name' + i }))"></a-select>
+          placeholder="请选择">
+          <a-select-option v-for="item in searchSchemeNameSelectOptions" :key="item.planId" :value="item.planId">
+            {{ item.planName }}
+          </a-select-option>
+        </a-select>
       </div>
       <div class="searchItem" v-if="tab_header === 0">
         <span class="label">方案状态：</span>
         <a-select
-          v-model="searchObj.status"
+          v-model="searchObj.planStatus"
           style="width: 200px"
+          allowClear
           placeholder="请选择"
           :options="shemeStatusSelectOptions"></a-select>
       </div>
@@ -85,10 +89,12 @@
       <div class="searchItem" v-if="tab_header === 0">
         <span class="label">方案分类：</span>
         <a-select
-          v-model="searchObj.classify"
+          v-model="searchObj.planType"
           style="width: 200px"
-          placeholder="请选择"
-          :options="shemeClassifySelectOptions"></a-select>
+          placeholder="请选择">
+          <a-select-option v-for="item in shemeClassifySelectOptions" :key="item.code" :value="item.code">
+            {{ item.name }}
+          </a-select-option></a-select>
       </div>
       <div class="searchItem" v-else>
         <span class="label">任务状态：</span>
@@ -99,19 +105,19 @@
           :options="taskStatusSelectOptions"></a-select>
       </div>
       <div class="searchItem">
-        <a-radio-group class="chooseDateTypeRadio" v-model="searchObj.dateType" button-style="solid">
-          <a-radio-button value="day">日</a-radio-button>
-          <a-radio-button value="month">月</a-radio-button>
-          <a-radio-button value="year">年</a-radio-button>
+        <a-radio-group class="chooseDateTypeRadio" v-model="searchObj.reportIndex" button-style="solid">
+          <a-radio-button value="10">日</a-radio-button>
+          <a-radio-button value="7">月</a-radio-button>
+          <a-radio-button value="4">年</a-radio-button>
         </a-radio-group>
-        <a-range-picker v-model="searchObj.date" :disabled-date="disabledSearchDate" />
+        <a-range-picker v-model="searchObj.reportTrack" valueFormat="YYYY-MM-DD" :disabled-date="disabledSearchDate" />
       </div>
       <div class="searchBtn">
         <a-button type="primary" @click="handleSearch">查询</a-button>
         <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
       </div>
     </div>
-    <div class="chartBox" :is="tab_header === 0 ? 'scheme-chart' : 'task-chart'" :data="{ a: 1 }">
+    <div class="chartBox" :is="tab_header === 0 ? 'scheme-chart' : 'task-chart'" :data="chartsDataObj">
     </div>
     <!-- <div class="tableBox" style="margin-top: 20px;">
       <SelfTable
@@ -144,6 +150,9 @@ import TaskChart from './components/taskChart.vue'
 import SelfTable from './components/selfTable.vue'
 
 import { defaultSearchObj, defaultSearchObj2, shemeStatusSelectOptions, tableColunms1, tableColunms2, taskRange1SelectOptions, taskStatusSelectOptions } from './defaultData'
+import { getSearchSchemeNameSelectOptionsReq, getDataDetailItemsReq, getChartsDataReq } from '@/api/followData'
+import { getDict } from '@/api/common'
+import { deepClonev2 } from '@/utils/util'
 export default {
   components: {
     SchemeChart,
@@ -179,8 +188,10 @@ export default {
         card: [0, 1, 3, 3, 4, 5, 6]
       },
       searchObj: { ...defaultSearchObj },
+      searchSchemeNameSelectOptions: [],
       shemeStatusSelectOptions,
       shemeClassifySelectOptions: [],
+      chartsDataObj: {},
       taskRange1SelectOptions,
       taskRange2SelectOptions: [],
       taskStatusSelectOptions,
@@ -193,6 +204,7 @@ export default {
   },
   created () {
     this.tab_header = +this.$route.query.tab || 0
+    this.init()
   },
   watch: {
     tab_header () {
@@ -203,6 +215,19 @@ export default {
     }
   },
   methods: {
+    init () {
+      getDataDetailItemsReq({}).then(res => {
+        const data = this.tab_header === 0 ? res.data.fateContact : res.data.fateProject
+        this.infoData.card = data
+      })
+      getSearchSchemeNameSelectOptionsReq({}).then(res => {
+        this.searchSchemeNameSelectOptions = res.data.datas
+      })
+      getDict({ dictType: 'diagnosis_care_plan_template_type' }).then(res => {
+        this.shemeClassifySelectOptions = res.data
+      })
+      this.handleSearch()
+    },
     handleCutTabIndex (index) {
       this.tab_header = index
       history.replaceState(null, '', `/followUp/data/index?tab=${index}`)
@@ -210,10 +235,10 @@ export default {
     disabledSearchDate (current) {
       let num = 90
       let type = 'days'
-      if (this.searchObj.dateType === 'month') {
+      if (this.searchObj.reportIndex === '7') {
         num = 36
         type = 'months'
-      } else if (this.searchObj.dateType === 'year') {
+      } else if (this.searchObj.reportIndex === '4') {
         num = 3
         type = 'years'
       }
@@ -228,11 +253,26 @@ export default {
         this.searchObj = { ...defaultSearchObj2 }
       }
     },
-    handleSearch () {
-      console.log(this.searchObj)
+    handleSearch (otherObj = {}) {
+      const newSearchObj = deepClonev2(this.searchObj)
+      newSearchObj.planId = newSearchObj.planId.join(',')
+      const allSearchObj = { ...newSearchObj, ...otherObj }
+      // 处理默认值
+      if (this.tab_header === 0) {
+        if (!allSearchObj.pieField) {
+          allSearchObj.pieField = 'fate_together'
+        }
+      } else {
+
+      }
+      getChartsDataReq(allSearchObj).then(res => {
+        console.log(res, 'res')
+        const data = { ...res.data }
+        this.chartsDataObj = data
+      })
     },
     handleChartItemChange (value, key) {
-      console.log(value, key, this.searchObj)
+      this.handleSearch({ ...value, reportKagi: key })
     },
     async getTableList (isExport, { pagination, ids }) {
       if (isExport) {

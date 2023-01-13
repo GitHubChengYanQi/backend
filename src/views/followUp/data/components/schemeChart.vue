@@ -8,14 +8,14 @@
             <a-select v-model="chart1RangeSelect" style="width: 80px" :options="taskRange1SelectOptions">
             </a-select>
             <SelectDepartment
-              v-if="chart1RangeSelect !== '3'"
+              v-if="chart1RangeSelect && chart1RangeSelect !== 'pieEmployee'"
               class="input"
               :treeCheckStrictly="true"
               placeholder="请选择"
               v-model="chart1RangeDetailSelect"
               style="width: 150px" />
             <selectPersonnel
-              v-if="chart1RangeSelect === '3'"
+              v-if="chart1RangeSelect === 'pieEmployee'"
               class="input"
               v-model="chart1RangeDetailSelect"
               :changeId="true"
@@ -27,13 +27,13 @@
       </template>
       <template #searchTab>
         <a-radio-group
-          default-value="1"
+          default-value="fate_together"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')">
-          <a-radio-button value="1">
+          @change="({ target: { value } }) => handleChartItemChange({ pieField: value }, 'pieRate')">
+          <a-radio-button value="fate_together">
             使用情况
           </a-radio-button>
-          <a-radio-button value="2">
+          <a-radio-button value="fate_contact">
             完成情况
           </a-radio-button>
           <a-radio-button value="3">
@@ -47,7 +47,7 @@
     </ChartContainer>
     <ChartContainer name="启用方案TOP5">
       <div style="height: 450px;">
-        <FanDiagram :type="2" :dataArr="[['北京公司', 3], ['北京公', 4], ['北京', 5]]" />
+        <FanDiagram :type="2" :dataArr="data.rowRank || []" />
       </div>
     </ChartContainer>
     <ChartContainer extra="所选时间范围内，使用方案的用户总人数" name="使用方案用户总人数" :rightTop="`用户总人数 ${1867}`">
@@ -103,21 +103,21 @@ export default {
   },
   data () {
     return {
-      chart1RangeSelect: '1',
+      chart1RangeSelect: '',
       chart1RangeDetailSelect: [],
       taskRange1SelectOptions
     }
   },
   computed: {},
   watch: {
-    chart1RangeSelect (e) {
+    chart1RangeSelect () {
       this.chart1RangeDetailSelect = []
-      this.handleChartItemChange({ chart1RangeSelect: e, chart1RangeDetailSelect: [] }, 'key')
+      // this.handleChartItemChange({ [e]: '' }, 'pieRate')
     },
     chart1RangeDetailSelect (e) {
-      if (e.length) {
-        this.handleChartItemChange({ chart1RangeDetailSelect: e }, 'key')
-      }
+      // if (e.length) {
+      this.handleChartItemChange({ [this.chart1RangeSelect]: e.map(it => it.value || it).join(',') }, 'pieRate')
+      // }
     }
   },
   created () {
