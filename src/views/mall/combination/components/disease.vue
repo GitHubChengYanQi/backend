@@ -10,6 +10,7 @@
             :expanded-keys="expandedKeys"
             :auto-expand-parent="autoExpandParent"
             :blockNode="true"
+            :selectedKeys="selectedKeys"
             @select="handleSelect"
             :tree-data="policiesAndRegulationss"
             @expand="onExpand">
@@ -112,6 +113,7 @@ export default {
       show: false, // 是否显示右侧详情
       type: '', // 选中树操作类型 add,edit,del,up,down
       cur: '', // 选中树数据
+      selectedKeys: [],
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       title: '',
@@ -156,17 +158,20 @@ export default {
      * @param {*} data
      */
     handleSelect (key, data) {
-      const node = data.selectedNodes[0].data.props
-      if (node.leaf === '1') {
-        const param = {
-          id: key[0]
+      if (key.length > 0) {
+        this.selectedKeys = key
+        const node = data.selectedNodes[0].data.props
+        if (node.leaf === '1') {
+          const param = {
+            id: key[0]
+          }
+          searchSalesGuidance(param).then(res => {
+            this.show = true
+            this.info = { id: key[0], ...res.data }
+          })
+        } else {
+          this.show = false
         }
-        searchSalesGuidance(param).then(res => {
-          this.show = true
-          this.info = { id: key[0], ...res.data }
-        })
-      } else {
-        this.show = false
       }
     },
     /**
