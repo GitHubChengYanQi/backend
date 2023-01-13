@@ -16,7 +16,7 @@
         <a-form-item
           label="创建人">
           <div style="width: 200px">
-            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
+            <SelectEmployee v-model="screenData.userName" placeholder="请输入创建人" />
           </div>
         </a-form-item>
 

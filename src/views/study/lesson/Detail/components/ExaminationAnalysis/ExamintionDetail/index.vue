@@ -46,7 +46,7 @@
 
         <a-form-item
           label="员工姓名：">
-          <SelectEmployee v-model="screenData.employeeId" placeholder="请选择员工" />
+          <SelectEmployee v-model="screenData.userName" placeholder="请输入员工" />
         </a-form-item>
 
         <a-form-item

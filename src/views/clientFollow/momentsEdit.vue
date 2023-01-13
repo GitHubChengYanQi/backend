@@ -785,7 +785,8 @@ export default {
       }
       const target = list[0]
       const content = target.entry
-      const startLen = process.env.NODE_ENV === 'development' ? 43 : 44
+      const isDev = content.linkImg.indexOf('https://yfscrm.oss-cn-beijing.aliyuncs.com') !== -1
+      const startLen = isDev ? 43 : 44
       this.modalLinkObj = {
         title: content.linkTitle,
         url: target.link,
