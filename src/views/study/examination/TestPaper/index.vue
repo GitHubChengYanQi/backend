@@ -13,7 +13,7 @@
         </a-form-item>
 
         <a-form-item v-if="!select" label="创建人">
-          <SelectEmployee v-model="screenData.employeeId" placeholder="请选择创建人" />
+          <SelectEmployee v-model="screenData.userName" placeholder="请输入创建人" />
         </a-form-item>
 
         <a-form-item>
