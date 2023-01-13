@@ -96,14 +96,6 @@ export default {
           ]
         },
         2: {
-          grid: {
-            left: '5%',
-            right: '2%',
-            width: '80%',
-            bottom: '2%',
-            top: '8%',
-            containLabel: true
-          },
           xAxis: {
             show: false,
             type: 'value'
