@@ -104,7 +104,10 @@ export const getMediaData = (reqType, { data = {}, mediaType, photos = [], video
     return JSON.stringify({ type, files, ...link })
   } else if (reqType === 'from') {
     const { type, files = [], ...link } = data
-    const isDev = files[0] && files[0].indexOf('https://yfscrm.oss-cn-beijing.aliyuncs.com') !== -1
+    let isDev = true
+    if (files[0]) {
+      isDev = files[0].indexOf('https://yfscrm.oss-cn-beijing.aliyuncs.com') !== -1
+    }
     const startLen = isDev ? 43 : 44
     let mediaType, mediaData, target
     if (type === 1) {

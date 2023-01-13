@@ -175,7 +175,7 @@ export default {
   methods: {
     async getTableList (isExport, params) {
       console.log(params, 'params')
-      const { pagination, ids } = params
+      // const { pagination, ids } = params
       if (isExport) {
         // const data = await groupListExportReq(this.handleParam(obj))
         // callDownLoadByBlob(data, '群列表')

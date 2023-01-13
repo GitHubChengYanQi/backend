@@ -210,11 +210,13 @@ export default {
       this.excelLoading = true
       const data = {
         ...this.screenData,
-        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
-        courseId: router.history.current.query.courseId
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam
       }
       if (this.task) {
-        courseTaskBindDetailExcelExport(data, {
+        courseTaskBindDetailExcelExport({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId
+        }, {
           limit: 6500,
           page: 1
         }).then((res) => {
@@ -224,7 +226,10 @@ export default {
           this.excelLoading = false
         })
       } else {
-        courseWareBindExcelExport(data, {
+        courseWareBindExcelExport({
+          ...data,
+          courseId: router.history.current.query.courseId
+        }, {
           limit: 6500,
           page: 1
         }).then((res) => {
@@ -239,8 +244,7 @@ export default {
       this.loading = true
       const data = {
         ...this.screenData,
-        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
-        courseId: router.history.current.query.courseId
+        haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam
       }
       const params = {
         limit: this.pagination.pageSize,
@@ -252,9 +256,15 @@ export default {
       }
       let res = {}
       if (this.task) {
-        res = await courseTaskBindDetailList(data, params)
+        res = await courseTaskBindDetailList({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId
+        }, params)
       } else {
-        res = await courseWareBindList(data, params)
+        res = await courseWareBindList({
+          ...data,
+          courseId: router.history.current.query.courseId
+        }, params)
       }
       this.tableData = res.data
       this.pagination.total = res.count
