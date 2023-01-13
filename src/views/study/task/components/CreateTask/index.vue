@@ -9,7 +9,7 @@
     >
       <a-form-item label="选择员工">
         <Employee
-          v-decorator="['applicableObject', { rules: [{ required: true, message: '请选择员工!' }],initialValue:['all'] }]"
+          v-decorator="['applicableObject', { rules: [{ required: true, message: '请输入员工!' }],initialValue:['all'] }]"
         >
         </Employee>
       </a-form-item>
