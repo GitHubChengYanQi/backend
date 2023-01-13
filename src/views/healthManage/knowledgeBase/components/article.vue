@@ -327,7 +327,7 @@ export default {
         if (this.selectListMode === '2') {
           res = await scrmRadarArticleFind({ title: this.searchVal,
             shape: this.radarType,
-            unitId: this.editGroupId,
+            unitId: this.radarGroupId,
             ...{
               current: params.page,
               size: params.perPage

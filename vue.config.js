@@ -141,6 +141,7 @@ const vueConfig = {
         // target: 'http://192.168.50.109:6007/', // 娄
         // target: 'http://192.168.31.18:6007/',
         // target: 'http://192.168.31.43:6007/',
+        // target: 'http://192.168.31.15:6007/',
         ws: false,
         changeOrigin: true,
         pathRewrite: {
