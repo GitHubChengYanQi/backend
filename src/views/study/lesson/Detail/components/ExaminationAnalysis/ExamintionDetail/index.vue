@@ -197,7 +197,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
-            return record.examCount > 0 ? value : '-'
+            return record.examCount > 0 ? value : '--'
           }
         },
         {
@@ -205,7 +205,7 @@ export default {
           dataIndex: 'status',
           align: 'center',
           customRender (value, record) {
-            return record.examCount > 0 ? (value === 1 ? '通过' : '未通过') : '-'
+            return record.examCount > 0 ? (value === 1 ? '通过' : '未通过') : '--'
           }
         },
         {
@@ -213,7 +213,7 @@ export default {
           dataIndex: 'examCount',
           align: 'center',
           customRender (value, record) {
-            return record.examCount > 0 ? value : '-'
+            return record.examCount > 0 ? value : '--'
           }
         },
         {
@@ -222,7 +222,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
-            return record.examCount > 0 ? value : '-'
+            return record.examCount > 0 ? value : '--'
           }
         },
         {
@@ -231,7 +231,7 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
-            return (record.examCount > 0 && value) ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '-'
+            return (record.examCount > 0 && value) ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '--'
           }
         }
       ],
