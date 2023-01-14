@@ -2,7 +2,7 @@
   <div class="selectBox">
     <p>
       <a-button size="small" @click="handleAdd" icon="plus">添加</a-button>&nbsp;
-      <a-select
+      <!-- <a-select
         v-if="show"
         show-search
         placeholder="请选择药品"
@@ -11,7 +11,23 @@
         :filter-option="filterOption"
         @change="handleChange"
       >
-        <a-select-option v-for="(item, index) in drugList" :key="index" :value="item.id">
+        <a-select-option v-for="(item, index) in (drugList)" :key="index" :value="item.id">
+          {{ item.name }}
+        </a-select-option>
+      </a-select> -->
+      <a-select
+        mode="multiple"
+        v-if="show"
+        :value="value"
+        placeholder="请选择药品"
+        style="width: 300px"
+        :filter-option="false"
+        :not-found-content="fetching ? undefined : null"
+        @search="fetchUser"
+        @change="handleChange"
+      >
+        <a-spin v-if="fetching" slot="notFoundContent" size="small" />
+        <a-select-option v-for="item in drugList" :key="item.id">
           {{ item.name }}
         </a-select-option>
       </a-select>
@@ -25,6 +41,7 @@
 </template>
 
 <script>
+import { getCommonNameList } from '@/api/mall'
 export default {
   props: {
     data: {
@@ -47,28 +64,36 @@ export default {
       handler (val) {
         this.list = val
       }
-    },
-    drug: {
-      immediate: true,
-      deep: true,
-      handler (val) {
-        this.drugList = val
-      }
     }
   },
   data () {
     return {
       show: false,
+      value: [],
       list: [],
-      drugList: []
+      drugList: [],
+      fetching: false
     }
   },
   methods: {
+    /**
+     * 获取通用名列表
+     * @param {*} id
+     */
+    //  getCommonNameList (name) {
+    //   const param = {
+    //     name
+    //   }
+    //   getCommonNameList(param).then(res => {
+    //     console.log(11111, res.data)
+    //     this.drugList = res.data
+    //   })
+    // },
     handleChange (value, e) {
       const arr = this.list
       let flag = false
       for (let i = 0; i < arr.length; i++) {
-        if (value === arr[i].id) {
+        if (value[0] === arr[i].id) {
           flag = true
           break
         }
@@ -76,15 +101,21 @@ export default {
       if (!flag) {
         this.show = false
         this.list.push({
-          id: value,
-          name: e.componentOptions.children[0].text
+          id: value[0],
+          name: e[0].componentOptions.children[0].text
         })
       }
     },
-    filterOption (input, option) {
-      return (
-        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      )
+    fetchUser (value) {
+      this.drugList = []
+      this.fetching = true
+      const param = {
+        name: value
+      }
+      getCommonNameList(param).then(res => {
+        this.drugList = res.data
+        this.fetching = false
+      })
     },
     handleAdd () {
       this.show = true

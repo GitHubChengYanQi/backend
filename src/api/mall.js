@@ -77,6 +77,13 @@ export function getCommonNameList (params) {
     params
   })
 }
+export function getListByNameAllowBlank (params) {
+  return request({
+    url: '/commonName/getListByNameAllowBlank',
+    method: 'get',
+    params
+  })
+}
 /**
  * 症状疾病分类
  */
