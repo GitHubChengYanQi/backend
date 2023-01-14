@@ -146,7 +146,7 @@
         :infinite-scroll-disabled="busy"
         :infinite-scroll-distance="10">
         <a-spin :spinning="userListLoading">
-          <a-checkbox-group v-model="userIdList" @change="handleCheckbox" style="width: 100%">
+          <a-checkbox-group v-model="userIdList" @change="handleCheckbox" :disabled="loading" style="width: 100%">
             <a-list :data-source="userData">
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta :description="item.mobile">
@@ -164,7 +164,7 @@
           </a-checkbox-group>
         </a-spin>
       </div>
-      <span class="tip" v-if="isTip">李晓玲、张三、李四  已经添加此方案</span>
+      <span class="tip" v-if="isTip">{{ tipTxt }}已经添加此方案</span>
     </a-modal>
     <a-modal :visible="visible1" title="选择分组" @ok="handleOk1" :width="450" @cancel="visible1 = false">
       <div style="height: 450px;overflow-y: auto;padding: 0 10px">
@@ -197,7 +197,7 @@
 
 <script>
 import { Empty } from 'ant-design-vue'
-import { planBindAddBatch, planBindList, planBindEdit, planBindDelete, categoryList, workContactList } from '@/api/healthManage'
+import { planBindAddBatch, planBindList, planBindEdit, planBindDelete, categoryList, workContactList, validatePlanTemplateBind } from '@/api/healthManage'
 import infiniteScroll from '@/utils/directive'
 // import Archives from '../archives'
 import moment from 'moment'
@@ -299,7 +299,8 @@ export default {
       isAllCategory: true,
       currentId: '',
       archives: false,
-      isTip: false // 是否显示选人提示
+      isTip: false, // 是否显示选人提示
+      tipTxt: '' // 提示人
     }
   },
   watch: {
@@ -329,8 +330,26 @@ export default {
      * 选人回调
      */
     handleCheckbox (e) {
-      console.log(111111, e)
-      this.isTip = true
+      if (e.length > 0) {
+        const param = {
+          contactIds: e.join(','),
+          planId: this.planId
+        }
+        this.loading = true
+        validatePlanTemplateBind(param).then(res => {
+          this.loading = false
+          if (res.code === 200) {
+            if (res.data.havaProblem === '0') {
+              this.isTip = false
+            } else {
+              this.isTip = true
+              this.tipTxt = (res.data.contactName).join('、')
+            }
+          }
+        }).catch(() => {
+          this.loading = false
+        })
+      }
     },
     /**
      * 拉取列表

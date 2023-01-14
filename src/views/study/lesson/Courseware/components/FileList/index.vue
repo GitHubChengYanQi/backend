@@ -14,7 +14,7 @@
 
         <a-form-item :label="select ? '' : '上传人'">
           <div style="width: 200px">
-            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择上传人" />
+            <SelectEmployee v-model="screenData.userName" placeholder="请输入上传人" />
           </div>
         </a-form-item>
         <a-form-item>
@@ -68,10 +68,14 @@
           <div slot="fileName" slot-scope="text,record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" width="50" v-if="['jpg','png'].includes(record.suffix)" :src="record.mediaUrl">
-                <a-icon v-if="['doc','docx'].includes(record.suffix)" type="file-word" style="font-size: 24px" />
-                <a-icon v-if="['ppt','pptx'].includes(record.suffix)" type="file-ppt" style="font-size: 24px" />
-                <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />
+                <img height="50" width="50" v-if="['jpg','png'].includes((record.suffix || '').toLowerCase())"
+                     :src="record.mediaUrl">
+                <a-icon v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())" type="file-word"
+                        style="font-size: 24px" />
+                <a-icon v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())" type="file-ppt"
+                        style="font-size: 24px" />
+                <a-icon v-if="['pdf'].includes((record.suffix || '').toLowerCase())" type="file-pdf"
+                        style="font-size: 24px" />
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">
@@ -94,7 +98,7 @@
             <template>
               <div class="my-space">
                 <a-button class="warnButton" @click="setVisible(record)">重命名</a-button>
-                <a-button class="successButton" disabled>预览</a-button>
+                <a-button class="successButton" @click="openPreview(record)">预览</a-button>
                 <a-button class="linkButton" @click="download([record])">下载</a-button>
                 <a-button @click="deleteAttribute(record.courseWareId)" class="delButton">删除</a-button>
               </div>
@@ -104,6 +108,23 @@
       </a-spin>
     </div>
 
+    <Preview
+      :title="previewTitle"
+      :preview="preview"
+      @close="preview = false"
+      :content="content"
+    >
+      <div>
+        <iframe
+          v-if="previewType === 'file'"
+          style="border: none;height: 527px"
+          :class="{'iframe1': true, 'iframe2' : false}"
+          :src="`https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
+        >
+        </iframe>
+        <img v-if="previewType === 'img'" class="img" :src="url" alt="avatar" width="283" />
+      </div>
+    </Preview>
     <a-modal
       centered
       v-model="visible"
@@ -129,6 +150,7 @@
 
 <script>
 
+import Preview from '../../../../components/Preview/index'
 import upload from '../upload'
 import { message } from 'ant-design-vue'
 import {
@@ -154,6 +176,11 @@ export default {
   },
   data () {
     return {
+      content: '',
+      url: '',
+      previewType: '',
+      previewTitle: '',
+      preview: false,
       selectedRowKeys: [],
       checkedRows: [],
       rowSelection: {
@@ -248,6 +275,16 @@ export default {
     this.getTableData()
   },
   methods: {
+    openPreview (record) {
+      if (['jpg', 'png'].includes((record.suffix || '').toLowerCase())) {
+        this.previewType = 'img'
+      } else {
+        this.previewType = 'file'
+      }
+      this.preview = true
+      this.previewTitle = record.fileName
+      this.url = record.mediaUrl
+    },
     onChangeRows (rows) {
       this.selectedRowKeys = rows.map(item => item[this.rowKey])
       this.checkedRows = rows
@@ -365,7 +402,7 @@ export default {
       this.getTableData()
     }
   },
-  components: { upload, FilePreview, SelectEmployee }
+  components: { upload, FilePreview, SelectEmployee, Preview }
 }
 </script>
 

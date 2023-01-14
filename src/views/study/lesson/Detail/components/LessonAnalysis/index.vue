@@ -77,7 +77,7 @@
         <a-form-item
           label="员工姓名：">
           <div style="width: 200px">
-            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择员工" />
+            <SelectEmployee v-model="screenData.userName" placeholder="请输入员工" />
           </div>
         </a-form-item>
 
@@ -268,10 +268,10 @@ export default {
         },
         {
           title: '考试状态',
-          dataIndex: 'haveCourseExam',
+          dataIndex: 'score',
           align: 'center',
           customRender (value) {
-            return value !== 0 ? '是' : '否'
+            return value ? '是' : '否'
           }
         },
         {
@@ -304,12 +304,14 @@ export default {
       this.excelLoading = true
       const data = {
         ...this.screenData,
-        courseId: router.history.current.query.courseId,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
       if (this.task) {
-        courseTaskBindExcelExport(data, {
+        courseTaskBindExcelExport({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId
+        }, {
           limit: 6500,
           page: 1
         }).then((res) => {
@@ -319,7 +321,10 @@ export default {
           this.excelLoading = false
         })
       } else {
-        courseEmployeeBindExcelExport(data, {
+        courseEmployeeBindExcelExport({
+          ...data,
+          courseId: router.history.current.query.courseId
+        }, {
           limit: 6500,
           page: 1
         }).then((res) => {
@@ -365,7 +370,6 @@ export default {
       this.loading = true
       const data = {
         ...this.screenData,
-        courseId: router.history.current.query.courseId,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
@@ -379,9 +383,15 @@ export default {
       }
       let res = {}
       if (this.task) {
-        res = await courseTaskBindList(data, params)
+        res = await courseTaskBindList({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId
+        }, params)
       } else {
-        res = await courseEmployeeBindList(data, params)
+        res = await courseEmployeeBindList({
+          ...data,
+          courseId: router.history.current.query.courseId
+        }, params)
       }
       if (res.code === 0) {
         this.tableData = res.data.map((item, index) => ({ ...item, key: index }))

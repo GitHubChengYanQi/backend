@@ -13,7 +13,7 @@
 
         <a-form-item :label="select ? '' : '上传人'">
           <div style="width: 200px">
-            <SelectEmployee v-model="screenData.employeeId" placeholder="请选择上传人" />
+            <SelectEmployee v-model="screenData.userName" placeholder="请输入上传人" />
           </div>
         </a-form-item>
         <a-form-item>

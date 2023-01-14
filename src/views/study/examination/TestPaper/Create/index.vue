@@ -28,6 +28,10 @@
             分
           </div>
 
+          <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">
+            保存
+          </a-button>
+
         </div>
 
         <div class="content">
@@ -162,10 +166,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="submit">
-              <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存
-              </a-button>
             </div>
           </a-form>
         </div>
@@ -335,7 +335,6 @@ export default {
     },
     handleSubmit () {
       this.form.validateFields((err, values) => {
-        console.log(values)
         const questions = []
         this.questions.forEach(item => {
           questions.push(values.questions[item.index])
@@ -355,11 +354,13 @@ export default {
                 answerResults: item.type === 'judge' ? [{
                   answerContent: 'true',
                   isTrue: item.answer === 'true' ? 1 : 0,
-                  sort: 0
+                  sort: 0,
+                  prefix: 'A'
                 }, {
                   answerContent: 'false',
                   isTrue: item.answer === 'false' ? 1 : 0,
-                  sort: 1
+                  sort: 1,
+                  prefix: 'B'
                 }] : this.questions[index].options.map((optionItem, optionIndex) => {
                   let answer = false
                   switch (item.type) {
@@ -373,7 +374,8 @@ export default {
                   return {
                     answerContent: item.options[optionItem.label],
                     isTrue: answer ? 1 : 0,
-                    sort: optionIndex
+                    sort: optionIndex,
+                    prefix: String.fromCharCode(65 + optionIndex)
                   }
                 })
               }

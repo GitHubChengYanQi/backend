@@ -41,12 +41,15 @@
             <div class="avatar mr12">
               <img
                 height="50"
-                v-if="['jpg','png'].includes(record.suffix)"
+                v-if="['jpg','png'].includes((record.suffix || '').toLowerCase())"
                 :src="record.coverImageUrl || record.mediaUrl"
               >
-              <a-icon v-if="['doc','docx'].includes(record.suffix)" type="file-word" style="font-size: 24px" />
-              <a-icon v-if="['ppt','pptx'].includes(record.suffix)" type="file-ppt" style="font-size: 24px" />
-              <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />
+              <a-icon v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())" type="file-word"
+                      style="font-size: 24px" />
+              <a-icon v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())" type="file-ppt"
+                      style="font-size: 24px" />
+              <a-icon v-if="['pdf'].includes((record.suffix || '').toLowerCase())" type="file-pdf"
+                      style="font-size: 24px" />
             </div>
             <div class="nickname">
               <a-tooltip overlayClassName="myTooltip">
@@ -79,7 +82,7 @@
         <div slot="actions" slot-scope="text, record">
           <div style="display: inline-block">
             <div class="my-space" style="cursor: pointer">
-              <a-button class="linkButton" :disabled="record.courseWareType === 'file'" @click="openPreview(record)">
+              <a-button class="linkButton" @click="openPreview(record)">
                 预览
               </a-button>
               <a-button class="delButton" @click="remove(record)">删除</a-button>
@@ -108,6 +111,13 @@
       <div>
         <img v-if="previewType === 'text'" class="img" :src="url" alt="avatar" width="283" />
         <video v-if="previewType === 'video'" :src="url" style="width: 100%" controls></video>
+        <iframe
+          v-if="previewType === 'file'"
+          style="border: none;height: 527px"
+          :class="{'iframe1': true, 'iframe2' : false}"
+          :src="`https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
+        >
+        </iframe>
       </div>
     </Preview>
 
@@ -230,9 +240,13 @@ export default {
   },
   methods: {
     openPreview (record) {
-      this.previewType = record.courseWareType
+      if (record.courseWareType === 'file' && ['jpg', 'png'].includes((record.suffix || '').toLowerCase())) {
+        this.previewType = 'text'
+      } else {
+        this.previewType = record.courseWareType
+      }
+      this.previewTitle = record.fileName || record.title
       this.preview = true
-      this.previewTitle = record.title
       this.content = record.note
       this.url = record.mediaUrl || record.coverImageUrl
     },
