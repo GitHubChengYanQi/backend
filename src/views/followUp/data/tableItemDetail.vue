@@ -1,5 +1,5 @@
 <template>
-  <div class="TableItemDetail_Page_Container">111
+  <div class="TableItemDetail_Page_Container">
     <SelfTable
       :tableColunms="['1', '3'].includes(type) ? tableColunms : type === '2' ? type2Colunms : type4Colunms"
       :tableData="tableData"
@@ -175,7 +175,7 @@ export default {
   methods: {
     async getTableList (isExport, params) {
       console.log(params, 'params')
-      const { pagination, ids } = params
+      // const { pagination, ids } = params
       if (isExport) {
         // const data = await groupListExportReq(this.handleParam(obj))
         // callDownLoadByBlob(data, '群列表')
