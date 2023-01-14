@@ -422,3 +422,11 @@ export function diagnosisCareQuestionnaireUpdateByExcel (data) {
     data: data
   })
 }
+// 检测患者是否已有方案
+export function validatePlanTemplateBind (params) {
+  return request({
+    url: '/planBind/validatePlanTemplateBind',
+    method: 'GET',
+    params
+  })
+}

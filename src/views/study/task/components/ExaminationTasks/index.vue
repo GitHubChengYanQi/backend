@@ -160,7 +160,10 @@ export default {
           dataIndex: 'examResult',
           align: 'center',
           customRender (value) {
-            return (value && value.timeLimit) >= 0 ? (value.timeLimit) + '分钟' : '不限定时长'
+            if (!value) {
+              return ''
+            }
+            return value.timeLimit >= 0 ? (value.timeLimit) + '分钟' : '不限定时长'
           }
         },
         {

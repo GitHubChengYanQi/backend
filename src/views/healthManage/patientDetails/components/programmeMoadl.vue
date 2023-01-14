@@ -15,7 +15,7 @@
           :infinite-scroll-disabled="busy"
           :infinite-scroll-distance="10"
         >
-          <a-radio-group v-model="currentId" @change="handleRadio" style="width: 100%">
+          <a-radio-group v-model="currentId" @change="handleRadio" :disabled="loading" style="width: 100%">
             <a-list :data-source="list" v-if="type == 1">
               <a-list-item slot="renderItem" slot-scope="item" :key="item.planId">
                 <a-list-item-meta :description="item.planName"></a-list-item-meta>
@@ -36,14 +36,14 @@
           <Empty v-if="!list.length" />
         </div>
       </a-spin>
-      <span class="tip" v-if="isTip">此患者已经添加 高血压一组 方案</span>
+      <span class="tip" v-if="isTip">此患者已经添加 {{ tipTxt }} 方案</span>
     </a-modal>
   </div>
 </template>
 
 <script>
 import { Empty } from 'ant-design-vue'
-import { planPlanList, planBindAddBatch, diagnosisCareQuestionnaireList, taskAdd } from '@/api/healthManage'
+import { planPlanList, planBindAddBatch, diagnosisCareQuestionnaireList, taskAdd, validatePlanTemplateBind } from '@/api/healthManage'
 import infiniteScroll from '@/utils/directive'
 import moment from 'moment'
 export default {
@@ -71,7 +71,8 @@ export default {
         total: 0,
         totalPage: 0
       },
-      isTip: false
+      isTip: false, // 是否显示选人提示
+      tipTxt: '' // 提示人
     }
   },
   methods: {
@@ -170,10 +171,39 @@ export default {
         this.loading = false
       }
     },
+    // 根据Id取name
+    getName (id) {
+      const arr = this.list
+      for (let i = 0; i < arr.length; i++) {
+        if (id === arr[i].planId) {
+          return arr[i].planName
+        }
+      }
+    },
     // 选择回调
     handleRadio (e) {
-      console.log(11111, e)
-      this.isTip = true
+      const planId = e.target.value
+      const planName = this.getName(planId)
+      if (planName.length > 0) {
+        const param = {
+          contactIds: this.id,
+          planId
+        }
+        this.loading = true
+        validatePlanTemplateBind(param).then(res => {
+          this.loading = false
+          if (res.code === 200) {
+            if (res.data.havaProblem === '0') {
+              this.isTip = false
+            } else {
+              this.isTip = true
+              this.tipTxt = planName
+            }
+          }
+        }).catch(() => {
+          this.loading = false
+        })
+      }
     },
     // 确定
     handleOk () {

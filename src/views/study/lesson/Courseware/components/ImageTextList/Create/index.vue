@@ -11,7 +11,8 @@
           <div style="font-size: 16px;font-weight: bold;flex-grow: 1">
             {{ `${$router.history.current.query.id ? '编辑' : '创建'}图文` }}
           </div>
-          <div>
+          <div class="my-space">
+            <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
             <a-button style="border-radius: 8px" type="primary" @click="openPreview">预览</a-button>
           </div>
         </div>
@@ -54,10 +55,6 @@
             </div>
           </a-form-item>
         </a-form>
-
-        <div style="text-align: center">
-          <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
-        </div>
       </div>
     </a-spin>
 

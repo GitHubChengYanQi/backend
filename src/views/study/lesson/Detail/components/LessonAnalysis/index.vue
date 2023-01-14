@@ -268,10 +268,10 @@ export default {
         },
         {
           title: '考试状态',
-          dataIndex: 'haveCourseExam',
+          dataIndex: 'score',
           align: 'center',
           customRender (value) {
-            return value !== 0 ? '是' : '否'
+            return value ? '是' : '否'
           }
         },
         {
