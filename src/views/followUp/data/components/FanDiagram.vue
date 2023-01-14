@@ -62,7 +62,7 @@ export default {
           series: [
             {
               type: 'pie',
-              radius: '40%',
+              radius: '60%',
               minAngle: 5,
               avoidLabelOverlap: true,
               data: [],
