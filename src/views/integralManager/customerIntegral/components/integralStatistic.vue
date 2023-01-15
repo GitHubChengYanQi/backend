@@ -4,9 +4,13 @@
       <div class="allStatisticTitle">总体统计</div>
       <div class="searchLine">
         <div class="searchTitle">选择时间</div>
-        <a-range-picker class="pickTimeClass"></a-range-picker>
-        <a-button>查询</a-button>
-        <a-button>重置</a-button>
+        <a-range-picker class="pickTimeClass" v-model="totalDateArray" :format="dateFormatList"></a-range-picker>
+        <a-button
+          type="primary"
+          style="margin: 0 10px;"
+          @click="goSearchTotalData"
+        >查询</a-button>
+        <a-button @click="goResetTotalData">重置</a-button>
       </div>
       <div class="statisticCardDiv">
         <div class="singleStatisticCard">
@@ -39,30 +43,45 @@
             name="请选择员工"
             :changeId="true"
             :num="1"
-            v-model="employeeIds"
+            v-model="searchDetailInfo.employeeIdList"
           />
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">选择时间</div>
-          <a-range-picker class="pickTimeClass"></a-range-picker>
+          <a-range-picker class="pickTimeClass" v-model="detailDateArray" :format="dateFormatList" @change="changeDetailDate"></a-range-picker>
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">变动原因</div>
-          <a-select class="pickSelectClass" placeholder="请选择"></a-select>
+          <a-select class="pickSelectClass" placeholder="请选择" mode="multiple" v-model="searchDetailInfo.changeCauseList">
+            <a-select-option v-for="item in reasonList" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
+          </a-select>
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">商品名称</div>
-          <div class="noGoodsClass">请选择商品</div>
+          <!-- <div class="noGoodsClass" @click="chooseGoods">请选择商品</div> -->
+          <div class="goodsContentDiv" @click="chooseGoods">
+            <div v-if="goodsList.length === 0" class="noGoodsDiv">请选择商品</div>
+            <div v-else class="tagDiv">
+              <div v-for="item in goodsList.slice(0,1)" :key="item.id" class="singleTagDiv">
+                {{ item.name }}
+                <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
+              </div>
+              <div v-if="goodsList.length > 1" class="singleTagDiv">{{ `+${goodsList.length - 1}` }}</div>
+              <div v-if="goodsList.length !== 0" class="clearTagDiv" @click.stop="clearTagMethod">X</div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="searchButtonLine">
         <a-button
           type="primary"
-          style="margin: 0 10px;">查询</a-button>
+          style="margin: 0 10px;"
+          @click="searchDetailMethod">查询</a-button>
         <a-button
           style="margin-right: 10px;"
+          @click="resetDetailMethod"
         >重置</a-button>
-        <a-button type="primary">导出</a-button>
+        <a-button type="primary" @click="exportDetailData">导出</a-button>
       </div>
       <a-table
         :loading="tableLoading"
@@ -70,6 +89,7 @@
         :data-source="tableData"
         :columns="tableColumns"
         :pagination="pagination"
+        :row-selection="{ selectedRowKeys: selectedKeyList, onChange: onSelectionChange }"
         class="tableBox"
         :scroll="{ x: 1500}"
         @change="handleTableChange">
@@ -85,18 +105,37 @@
 </template>
 
 <script>
+import { deepClonev2 } from '@/utils/util'
+import moment from 'moment'
 import goodsManager from './goodsManager.vue'
+import { getDict } from '@/api/common'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
 import { totalIntegralStatisticApi, integralDetailListApi, exportIntegralDetailListApi } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralStatistic',
   data () {
     return {
+      // 商品库选择后显示标签数组
+      goodsList: [],
+      selectedKeyList: [],
+      deepClonev2,
+      // 总体时间组件绑定数组
+      totalDateArray: [],
+      // 积分明细时间组件绑定数组
+      detailDateArray: [],
+      // 变动原因列表
+      reasonList: [],
+      dateFormatList: ['YYYY-MM-DD', 'YYYY-MM-DD'],
       // 总体数据统计
       totalInfo: {
         integralTotal: '2,290',
         allIntegralTotal: '5,700',
         consumptionIntegralTotal: '3,410'
       },
+      // 查询总体数据对象
+      searchTotalInfo: {},
+      // 查询积分明细数据对象
+      searchDetailInfo: {},
       chooseGoodsManagerShowStatus: false,
       employeeIds: [],
       // 表格加载效果
@@ -130,13 +169,13 @@ export default {
         },
         {
           title: '变动原因',
-          dataIndex: 'changeReason',
+          dataIndex: 'changeCauseName',
           align: 'center',
           width: 200
         },
         {
           title: '交易前积分',
-          dataIndex: 'changeCauseName',
+          dataIndex: 'beforeIntegral',
           align: 'center',
           width: 200
         },
@@ -173,36 +212,74 @@ export default {
   components: {
     goodsManager
   },
-  mounted () {
+  created () {
     console.log('积分统计数据')
+    this.getIntegralTotalData()
+    this.getChangeCauseList()
+    this.$set(this.searchDetailInfo, 'employeeIdList', [])
+    this.$set(this.searchDetailInfo, 'changeCauseList', [])
+    this.detailDateArray = []
+    this.goodsList = []
+    // this.$set(this.searchDetailInfo, 'changeCauseList', [])
+    // this.$set(this.searchDetailInfo, 'goodsIdList', [])
+    this.getTableData()
   },
   methods: {
-    chooseGoods () {
-      console.log('点击添加商品')
-      this.chooseGoodsManagerShowStatus = true
-    },
-    submitGoodsConfirm (e) {
-      console.log(e, '选择商品库返回')
+    // 单击某一行的回调
+    onSelectionChange (selectedRowKeys) {
+      console.log(selectedRowKeys, '单击某一行的回调')
+      // this.sendArray = record.listTaskInfo
+      // const tempIdArray = []
+      // tempIdArray.push(record.id)
+      // this.selectedList = Object.assign([], tempIdArray)
+      this.selectedKeyList = selectedRowKeys
     },
     // 获取积分统计总体数据
     getIntegralTotalData () {
-      totalIntegralStatisticApi().then(response => {
+      if (this.totalDateArray.length === 0) {
+        console.log('无搜索日期', this.searchTotalInfo)
+      } else {
+        this.$set(this.searchTotalInfo, 'beginTime', moment(this.totalDateArray[0]._d).format('YYYY-MM-DD'))
+        this.$set(this.searchTotalInfo, 'endTime', moment(this.totalDateArray[1]._d).format('YYYY-MM-DD'))
+      }
+      totalIntegralStatisticApi(this.searchTotalInfo).then(response => {
         this.totalInfo = response.data
+      })
+    },
+    // 获取变动原因列表 integra_change_cause
+    getChangeCauseList () {
+      const params = { dictType: 'integra_change_cause' }
+      getDict(params).then(response => {
+        this.reasonList = response.data
       })
     },
     // 获取积分统计列表数据
     async getTableData () {
       this.tableLoading = true
+      // 设置时间段字段
+      if (this.detailDateArray.length === 0) {
+        this.$delete(this.searchDetailInfo, 'beginTime')
+        this.$delete(this.searchDetailInfo, 'endTime')
+      } else {
+        this.$set(this.searchDetailInfo, 'beginTime', moment(this.detailDateArray[0]._d).format('YYYY-MM-DD'))
+        this.$set(this.searchDetailInfo, 'endTime', moment(this.detailDateArray[1]._d).format('YYYY-MM-DD'))
+      }
+      if (this.goodsList.length === 0) {
+        this.$set(this.searchDetailInfo, 'goodsIdList', [])
+      } else {
+        this.$set(this.searchDetailInfo, 'goodsIdList', this.goodsList.map(item => item.id))
+      }
       const params = {
-        employeeIdList: [],
         page: this.pagination.current,
         perPage: this.pagination.pageSize,
-        ...this.searchInfo
+        ...this.searchDetailInfo
       }
+      console.log(params, '提交前查看传值是否准确')
+      // debugger
       // console.log(params, '查询数据提交接口的对象')
       await integralDetailListApi(params).then(response => {
         this.tableLoading = false
-        console.log(response, '获取群SOP模板信息')
+        console.log(response, '获取积分明细列表')
         this.tableData = response.data.list
         this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
@@ -222,16 +299,7 @@ export default {
       // 临时接收假数据
       // this.tableData = getTempSopList()
     },
-    // 导出数据
-    exportData () {
-      const params = {
-        ...this.searchInfo
-      }
-      exportIntegralDetailListApi(params).then(response => {
-        console.log(response)
-      })
-    },
-    // 群SOP模板切换页码
+    // 数据统计切换页码
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
@@ -246,6 +314,88 @@ export default {
         this.sorter = ''
       }
       // this.getTableData()
+    },
+    // 改变积分明细查询数据时间段
+    changeDetailDate (e) {
+      // console.log(e[0], e[1], '总体时间段回调')
+      // let tempArray = this.deepClonev2(e)
+      console.log(this.detailDateArray, '积分明细时间段改变回调')
+    },
+    // 清空商品库选择
+    clearTagMethod () {
+      this.goodsList = []
+    },
+    // 删除商品库选择单个标签
+    deleteSingleTag (item) {
+      const deleteIndex = this.goodsList.findIndex(info => info.id === item.id)
+      this.goodsList.splice(deleteIndex, 1)
+    },
+    // 点击总体数据查询按钮
+    goSearchTotalData () {
+      console.log('点击总体数据查询按钮')
+      this.getIntegralTotalData()
+    },
+    // 点击总体数据重置按钮
+    goResetTotalData () {
+      console.log('点击总体数据重置按钮')
+      this.totalDateArray = []
+      this.getIntegralTotalData()
+    },
+    // 点击添加商品
+    chooseGoods () {
+      console.log('点击添加商品')
+      this.chooseGoodsManagerShowStatus = true
+    },
+    // 商品库回调
+    submitGoodsConfirm (e) {
+      console.log(e, '选择商品库返回')
+      for (const item of e) {
+        if (this.goodsList.length !== 0) {
+          const tempIndex = this.goodsList.findIndex(info => info.id === item.id)
+          if (tempIndex === -1) {
+            this.goodsList.push(item)
+          }
+        } else {
+          this.goodsList.push(item)
+        }
+      }
+      // this.goodsList = this.deepClonev2(e)
+    },
+    // 点击搜索积分明细
+    searchDetailMethod () {
+      this.$set(this.pagination, 'current', 1)
+      console.log(this.searchDetailInfo, '点击搜索积分明细')
+      this.getTableData()
+    },
+    // 点击重置积分明细搜索
+    resetDetailMethod () {
+      this.$set(this.pagination, 'current', 1)
+      this.$set(this.searchDetailInfo, 'employeeIdList', [])
+      this.$set(this.searchDetailInfo, 'changeCauseList', [])
+      this.detailDateArray = []
+      this.goodsList = []
+      console.log(this.searchDetailInfo, '点击重置积分明细搜索')
+      this.getTableData()
+    },
+    // 导出积分明细数据
+    exportDetailData () {
+      // this.searchDetailInfo
+      // selectedKeyList
+      this.checkedIncreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '1' ||
+        item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5')
+      this.checkedDecreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '6' ||
+        item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9')
+      this.$set(this.searchDetailInfo, 'checkedIncreaseIdList', this.checkedIncreaseIdList)
+      this.$set(this.searchDetailInfo, 'checkedDecreaseIdList', this.checkedDecreaseIdList)
+      const params = {
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize,
+        ...this.searchDetailInfo
+      }
+      exportIntegralDetailListApi(params).then(response => {
+        console.log(response)
+        callDownLoadByBlob(response, '积分明细')
+      })
     }
   }
 }

@@ -50,6 +50,7 @@
             font-size: 18px;
         }
         .searchLine {
+            margin-top: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -68,23 +69,74 @@
                     margin-left: 8px;
                 }
                 .pickTimeClass {
-                    width: 400px;
+                    width: 300px;
                     margin-left: 8px;
                 }
                 .pickSelectClass {
-                    width: 200px;
+                    width: 300px;
                     margin-left: 8px;
                 }
-                .noGoodsClass {
-                    display: flex;
-                    align-items: center;
-                    padding: 0px 4px;
-                    height: 38px;
-                    width: 200px;
+                .goodsContentDiv {
+                    width: 300px;
                     margin-left: 8px;
                     background-color: white;
-                    border: 1px solid rgba(0, 0, 0, 0.3);
+                    // min-width: 120px;
+                    // max-width: 180px;
+                    border: 1px solid #dddddd;
+                    border-radius: 4px;
+                    .noGoodsDiv {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        height: 36px;
+                        font-size: 12px;
+                    }
+                    .tagDiv {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 6px 4px;
+                        height: 36px;
+                        .singleTagDiv {
+                            display: flex;
+                            align-items: center;
+                            margin-left: 4px;
+                            padding: 2px 4px;
+                            border: 1px dashed #4e4e4e;
+                            border-radius: 4px;
+                            font-size: 14px;
+                            .delete {
+                                font-size: 16px;
+                                transform: rotate(45deg);
+                                margin-left: 2px;
+                            }
+                        }
+                        .singleTagDiv:nth-child(1) {
+                            margin-left: 0px;
+                        }
+                        .clearTagDiv {  
+                            font-size: 16px;
+                            visibility: hidden;
+                        }
+                    }
+                    &:hover {
+                        .tagDiv {
+                            .clearTagDiv {
+                                visibility: visible;
+                            }
+                        }
+                    }
                 }
+                // .noGoodsClass {
+                //     display: flex;
+                //     align-items: center;
+                //     padding: 0px 4px;
+                //     height: 38px;
+                //     width: 300px;
+                //     margin-left: 8px;
+                //     background-color: white;
+                //     border: 1px solid rgba(0, 0, 0, 0.3);
+                // }
             }
         }
         .searchButtonLine {

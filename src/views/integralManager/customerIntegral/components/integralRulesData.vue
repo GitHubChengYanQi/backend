@@ -189,24 +189,25 @@
                 <div class="singleFormText">好友查看了</div>
                 <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
                 <div class="radarContentDiv" @click="chooseRadarMethod">
-                  <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
+                  <div v-if="buyRadarList.length === 0" class="noRadarDiv">+互动雷达</div>
                   <div v-else class="tagDiv">
-                    <div v-for="item in radarList.slice(0,1)" :key="item.id" class="singleTagDiv">
-                      {{ item.title }}
-                      <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
+                    <div v-for="item in buyRadarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
+                      {{ item.radarArticleTitle }}
+                      <div class="delete" @click.stop="deleteBuySingleTag(item)">+</div>
                     </div>
-                    <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
-                    <div v-if="radarList.length !== 0" class="clearTagDiv" @click.stop="clearTagMethod">X</div>
+                    <div v-if="buyRadarList.length > 1" class="singleTagDiv">{{ `+${buyRadarList.length - 1}` }}</div>
+                    <div v-if="buyRadarList.length !== 0" class="clearTagDiv" @click.stop="clearBuyTagMethod">X</div>
                   </div>
                 </div>
                 <div class="singleFormText">后</div>
-                <a-input
+                <a-input-number
+                  :min="1"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum) : ''"
                   placeholder="请输入"
                   class="singleInputClass"
                   @change="changeBuyLookAfterDayNumber">
-                </a-input>
+                </a-input-number>
                 <div class="singleFormText">天内,购买了</div>
                 <!-- <a-button @click="chooseGoods()">+添加商品</a-button> -->
                 <div class="goodsContentDiv" @click="chooseGoodsMethod">
@@ -221,21 +222,23 @@
               </div>
               <div class="singleRulesContent">
                 <div class="singleFormText">且</div>
-                <a-input
+                <a-input-number
+                  :min="1"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) : ''"
                   placeholder="请输入"
                   class="singleInputClass"
                   @change="changeBuySalesReturnDayNumber">
-                </a-input>
+                </a-input-number>
                 <div class="singleFormText">天内，未退货，员工可获得</div>
-                <a-input
+                <a-input-number
+                  :min="1"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : ''"
                   placeholder="请输入"
                   class="singleInputClass"
                   @change="changeBuyIntegralNumber">
-                </a-input>
+                </a-input-number>
                 <div class="singleFormText">积分</div>
               </div>
             </div>
@@ -267,6 +270,7 @@
       title="好友查看素材"
       :maskCloseable="false"
       :width="700"
+      :zIndex="600"
       :visible="integralMaterialShowStatus"
       class="materialModalClass"
       @cancel="closeIntegralMaterialModal()"
@@ -293,8 +297,8 @@
                 <div class="radarContentDiv" @click="chooseRadarMethod">
                   <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
                   <div v-else class="tagDiv">
-                    <div v-for="item in radarList.slice(0,1)" :key="item.id" class="singleTagDiv">
-                      {{ item.title }}
+                    <div v-for="item in radarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
+                      {{ item.radarArticleTitle }}
                       <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
                     </div>
                     <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
@@ -357,9 +361,8 @@
       :permissionText="''"
       @submitConfirm="submitGoodsConfirm">
     </goodsManager>
-    <chooseRadar :zIndex="1200" :isRadioStatus="false" v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk"></chooseRadar>
+    <chooseRadar v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk"></chooseRadar>
   </div>
-
 </template>
 
 <script>
@@ -367,11 +370,12 @@ import { deepClonev2 } from '@/utils/util'
 import goodsManager from './goodsManager.vue'
 import chooseRadar from './chooseRadar.vue'
 import { getDict } from '@/api/common'
-import { getIntegralRulesApi, setIntegralRulesApi } from '@/api/integralManager'
+import { getIntegralRulesApi, setIntegralRulesApi, addGoodsRulesApi, deleteGoodsRulesApi } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralRulesData',
   data () {
     return {
+      buyModalType: '',
       deepClonev2,
       // 积分规则列表数据
       integralTableData: [],
@@ -439,6 +443,7 @@ export default {
       // 商品库组件显示状态
       chooseGoodsManagerShowStatus: false,
       radarList: [], // 选中的雷达列表
+      buyRadarList: [], // 选中的购买模式的雷达列表
       goodsList: [], // 选中的商品列表
       employeeIds: [],
       treeData: [],
@@ -526,6 +531,7 @@ export default {
       } else if (info.ruleType === '3') {
         // 购买商品
         this.integralBuyShowStatus = true
+        this.buyModalType = 'set'
       } else if (info.ruleType === '4') {
         // 查看素材
         this.integralMaterialShowStatus = true
@@ -535,6 +541,19 @@ export default {
         if (!tempInfo.creditsRuleJsonDetailVo.integral) {
           // 积分为空时
           tempInfo.creditsRuleJsonDetailVo.integral = '10'
+        }
+        if (!tempInfo.employeeId || (tempInfo.employeeId && (tempInfo.employeeId.length === 0))) {
+          // 没有选择员工
+          this.$set(tempInfo, 'employeeIds', [])
+        } else if (tempInfo.employeeId.length === 1) {
+          // 有一个员工
+          const employeeIdList = []
+          employeeIdList.push(tempInfo.employeeId)
+          this.$set(tempInfo, 'employeeIds', employeeIdList)
+        } else {
+          // 有一个以上
+          const tempArray = tempInfo.employeeId.split(',')
+          this.$set(tempInfo, 'employeeIds', tempArray)
         }
         this.$set(tempInfo, 'creditsRuleJsonDetailVo', tempInfo.creditsRuleJsonDetailVo)
         this.integralRulesTypeInfo = this.deepClonev2(tempInfo)
@@ -564,6 +583,13 @@ export default {
         // 朋友圈
         if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
           console.log('朋友圈可以提交', this.integralRulesTypeInfo)
+          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+            if (key === 'integral') {
+              // 无需处理
+            } else {
+              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+            }
+          }
         } else {
           this.$message.error('请填写全部数据')
           return false
@@ -575,9 +601,19 @@ export default {
     },
     // 公共的积分规则提交
     commonIntegralRulesSend () {
+      const tempInfo = {}
+      for (const key in this.integralRulesTypeInfo) {
+        if (key === 'id' || key === 'state' || key === 'creditsRuleJsonDetailVo' || key === 'employeeId') {
+          this.$set(tempInfo, `${key}`, this.integralRulesTypeInfo[key])
+        }
+      }
+      this.integralRulesTypeInfo = Object.assign({}, tempInfo)
+      console.log(this.integralRulesTypeInfo)
+      debugger
       this.integralAddFriendLoading = true
       this.integralFriendCircleLoading = true
       this.integralBuyLoading = true
+      this.integralMaterialLoading = true
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
         if (response.code === 200) {
           this.integralFriendCircleLoading = false
@@ -586,6 +622,8 @@ export default {
           this.integralAddFriendShowStatus = false
           this.integralBuyLoading = false
           this.integralBuyShowStatus = false
+          this.integralMaterialLoading = false
+          this.integralMaterialShowStatus = false
           // this.integralPagination.current
           this.$set(this.integralPagination, 'current', 1)
           this.$set(this.integralPagination, 'pageSize', 10)
@@ -595,6 +633,7 @@ export default {
         this.integralFriendCircleLoading = false
         this.integralAddFriendLoading = false
         this.integralBuyLoading = false
+        this.integralMaterialLoading = false
       })
     },
     // 选择组织机构
@@ -625,6 +664,13 @@ export default {
         if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
           this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) {
           console.log('加好友可以提交', this.integralRulesTypeInfo)
+          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+            if (key === 'integral' || key === 'friendDayNum') {
+              // 无需处理
+            } else {
+              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+            }
+          }
           debugger
           this.commonIntegralRulesSend()
         } else {
@@ -684,16 +730,46 @@ export default {
     handleAddRadarOk (e) {
       console.log(e, '选择雷达素材回调')
       this.radarVisible = false
-      this.radarList = Object.assign([], e)
+      // this.radarList = Object.assign([], e)
+      // item.title  // item.id  // item.ditch[0].id // item.selectChannel
+      for (const item of e) {
+        console.log(this.radarList, '现在选择的列表')
+        const tempInfo = {}
+        tempInfo.radarArticleId = item.id
+        tempInfo.radarArticleTitle = item.title
+        tempInfo.ditchId = item.selectChannel ? item.selectChannel : item.ditch[0].id
+        if (this.integralRulesTypeInfo.ruleType === '4') {
+          const tempIndex = this.radarList.findIndex(info => info.radarArticleId === item.id)
+          // debugger
+          if (tempIndex === -1) {
+            this.radarList.push(tempInfo)
+          }
+        } else if (this.integralRulesTypeInfo.ruleType === '3' || this.buyModalType === 'add') {
+          const tempIndex = this.buyRadarList.findIndex(info => info.radarArticleId === item.id)
+          // debugger
+          if (tempIndex === -1) {
+            this.buyRadarList.push(tempInfo)
+          }
+        }
+      }
     },
-    // 清空雷达选择
+    // 查看雷达模式清空雷达选择
     clearTagMethod () {
       this.radarList = []
     },
-    // 删除单个标签
+    // 查看雷达模式删除单个标签
     deleteSingleTag (item) {
-      const deleteIndex = this.radarList.findIndex(info => info.id === item.id)
+      const deleteIndex = this.radarList.findIndex(info => info.radarArticleId === item.radarArticleId)
       this.radarList.splice(deleteIndex, 1)
+    },
+    // 购买模式清空雷达选择
+    clearBuyTagMethod () {
+      this.buyRadarList = []
+    },
+    // 查看雷达模式删除单个标签
+    deleteBuySingleTag (item) {
+      const deleteIndex = this.buyRadarList.findIndex(info => info.radarArticleId === item.radarArticleId)
+      this.buyRadarList.splice(deleteIndex, 1)
     },
     // 设置购买弹框点击取消
     closeIntegralBuyModal () {
@@ -703,20 +779,43 @@ export default {
     },
     // 设置购买弹框点击确定
     confirmIntegralBuy () {
-      if (this.integralRulesTypeInfo.ruleType === '3') {
-        // 购买
-        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
-          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum &&
-          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) {
-          console.log('购买可以提交', this.integralRulesTypeInfo)
-          debugger
-          this.commonIntegralRulesSend()
-        } else {
-          this.$message.error('请填写全部数据')
-          return
+      // 购买
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
+        this.integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum &&
+        this.integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum &&
+        this.buyRadarList.length !== 0 && this.goodsList.length !== 0) {
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'goodId', this.goodsList[0].id)
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'radarArticleJsonVoList', this.buyRadarList)
+        console.log('购买可以提交', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'integral' || key === 'lookAfterDayNum' || key === 'salesReturnDayNum' || key === 'radarArticleJsonVoList' || key === 'goodId') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+          }
         }
+        // debugger
+        if (this.buyModalType === 'set') {
+          this.commonIntegralRulesSend()
+        } else if (this.buyModalType === 'add') {
+          this.addIntegralBuyRules()
+        }
+      } else {
+        this.$message.error('请填写全部数据')
       }
-      this.integralBuyShowStatus = false
+      // this.integralBuyShowStatus = false
+    },
+    // 新增商品规则方法
+    addIntegralBuyRules () {
+      this.integralBuyLoading = true
+      addGoodsRulesApi(this.integralRulesTypeInfo).then(response => {
+        if (response.code === 200) {
+          this.integralBuyLoading = false
+          this.integralBuyShowStatus = false
+        }
+      }).catch(() => {
+        this.integralBuyLoading = false
+      })
     },
     // 设置查看素材弹框点击取消
     closeIntegralMaterialModal () {
@@ -731,8 +830,16 @@ export default {
         if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
           this.integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum &&
           this.radarList.length !== 0) {
+          this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'radarArticleJsonVoList', this.radarList)
           console.log('查看素材可以提交', this.integralRulesTypeInfo)
-          debugger
+          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+            if (key === 'integral' || key === 'validDayNum' || key === 'radarArticleJsonVoList') {
+              // 无需处理
+            } else {
+              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+            }
+          }
+          // debugger
           this.commonIntegralRulesSend()
         } else {
           this.$message.error('请填写全部数据')
@@ -743,6 +850,32 @@ export default {
     // 新增商品
     addGoodsMethod (info) {
       console.log(info, '新增商品')
+      this.buyModalType = 'add'
+      this.integralBuyShowStatus = true
+      this.$nextTick(() => {
+        this.$set(this.integralRulesTypeInfo, 'state', '0')
+        this.$set(this.integralRulesTypeInfo, 'employeeId', [])
+        this.$set(this.integralRulesTypeInfo, 'creditsRuleJsonDetailVo', {})
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', '10')
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', '1')
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', '1')
+        this.buyRadarList = []
+        this.goodsList = []
+      })
+    },
+    // 删除商品规则
+    deleteGoodsMethod (info) {
+      this.integralTableLoading = true
+      const tempInfo = { id: info.id }
+      deleteGoodsRulesApi(tempInfo).then(response => {
+        if (response.code === 200) {
+          // this.integralPagination.current
+          this.$set(this.integralPagination, 'current', 1)
+          this.getIntegralRulesData()
+        }
+      }).catch(() => {
+        this.integralTableLoading = false
+      })
     }
   }
 }

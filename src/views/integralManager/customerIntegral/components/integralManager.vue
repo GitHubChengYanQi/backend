@@ -93,7 +93,8 @@
                   <div class="reasonEditButton">编辑</div>
                 </div>
                 <div class="reasonTagDiv">
-                  <div class="singleReasonTag">显示历史调整原因</div>
+                  <div class="singleReasonTag" v-for="item in historyReasonList" :key="item">{{ item }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -127,10 +128,11 @@
 </template>
 
 <script>
+import { deepClonev2 } from '@/utils/util'
 import { departmentEmp, getDict } from '@/api/common.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 import SelectModal from '@/components/SelectPersonnel/components/modal'
-import { getCustomerIntegralApi, exportCustomerIntegralApi, batchCustomerIntegralApi } from '@/api/integralManager'
+import { getCustomerIntegralApi, exportCustomerIntegralApi, batchCustomerIntegralApi, getHistoryReasonApi, deleteHistoryReasonApi } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralManager',
   components: {
@@ -144,6 +146,8 @@ export default {
   },
   data () {
     return {
+      historyReasonList: [],
+      deepClonev2,
       // 批量处理积分弹框加载动画
       batchInfoModalLoading: false,
       // 调整类型列表
@@ -237,6 +241,21 @@ export default {
   },
 
   methods: {
+    // 获取历史调整原因
+    getHistoryList () {
+      getHistoryReasonApi().then(response => {
+        this.historyReasonList = response.data.causeName
+      })
+    },
+    // 删除历史原因
+    deleteHistory (text) {
+      const params = { causeName: text }
+      deleteHistoryReasonApi(params).then(response => {
+        if (response.code === 200) {
+          this.getHistoryReasonApi()
+        }
+      })
+    },
     // 获取数据
     async getDataList () {
       this.tableLoading = true
@@ -296,13 +315,14 @@ export default {
       })
     },
     // 获取调整类型字典数据(发放,增加)
-    getChangeType () {
+    async getChangeType () {
       const params = { dictType: 'integral_change_type' }
-      getDict(params).then(response => {
+      await getDict(params).then(response => {
         console.log(response)
         this.changeTypeList = response.data
         this.$set(this.batchInfo, 'changeType', this.changeTypeList[0].code)
       })
+      this.getHistoryList()
     },
     // 改变积分数字
     changeIntegralNumber (e) {
@@ -406,6 +426,7 @@ export default {
         this.$nextTick(() => {
           this.$set(this.batchInfo, 'checkedRuleIdList', this.selectedKeyList)
           this.$set(this.batchInfo, 'employeeIdList', [])
+          this.$set(this.batchInfo, 'integral', '10')
         })
       } else {
         // 无选项,先弹组织架构
@@ -441,57 +462,16 @@ export default {
     },
     getKeys (e, type) {
       console.log(e, type, '选中回调')
-    },
-    selectEmployeeChange (e) {
-      console.log(e, '批量处理选择')
+      this.$refs.SelectPersonnel.modalShow = false
+      this.integralBatchShowStatus = true
+      this.getChangeType()
+      this.$nextTick(() => {
+        const tempArray = this.deepClonev2(e)
+        this.$set(this.batchInfo, 'employeeIdList', tempArray)
+        this.$set(this.batchInfo, 'checkedRuleIdList', [])
+        this.$set(this.batchInfo, 'integral', '10')
+      })
     }
-    // // 获取数据
-    // async getTableData () {
-    //   this.tableLoading = true
-    //   const params = {
-    //     sopName: this.searchInfo.sopName,
-    //     idsStr: this.searchInfo.employeeIds.join(','),
-    //     page: this.pagination.current,
-    //     perPage: this.pagination.pageSize,
-    //     sort: this.sorter
-    //   }
-    //   // console.log(params, '查询数据提交接口的对象')
-    //   await getSopTemplateListMethod(params).then(response => {
-    //     this.tableLoading = false
-    //     console.log(response, '获取群SOP模板信息')
-    //     this.tableData = response.data.list
-    //     this.$set(this.pagination, 'total', Number(response.data.page.total))
-    //     if (this.tableData.length === 0) {
-    //       // 列表中没有数据
-    //       if (this.pagination.total !== 0) {
-    //         // 总数据有,但当前页没有
-    //         // 重新将页码换成1
-    //         this.$set(this.pagination, 'current', 1)
-    //         this.getTableData()
-    //       } else {
-    //         // 是真没有数据
-    //       }
-    //     }
-    //   }).catch(() => {
-    //     this.tableLoading = false
-    //   })
-    //   // 临时接收假数据
-    //   // this.tableData = getTempSopList()
-    // },
-    // // 搜索
-    // goSearch () {
-    //   // 重新将页码换成1
-    //   this.$set(this.pagination, 'current', 1)
-    //   this.getTableData()
-    // },
-    // // 重置
-    // goReset () {
-    //   // 重新将页码换成1
-    //   this.$set(this.pagination, 'current', 1)
-    //   this.searchInfo = {}
-    //   this.$set(this.searchInfo, 'employeeIds', [])
-    //   this.getTableData()
-    // }
   }
 }
 </script>

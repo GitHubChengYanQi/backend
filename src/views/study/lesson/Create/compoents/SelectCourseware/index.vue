@@ -44,12 +44,18 @@
                 v-if="['jpg','png'].includes((record.suffix || '').toLowerCase())"
                 :src="record.coverImageUrl || record.mediaUrl"
               >
-              <a-icon v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())" type="file-word"
-                      style="font-size: 24px" />
-              <a-icon v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())" type="file-ppt"
-                      style="font-size: 24px" />
-              <a-icon v-if="['pdf'].includes((record.suffix || '').toLowerCase())" type="file-pdf"
-                      style="font-size: 24px" />
+              <a-icon
+                v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())"
+                type="file-word"
+                style="font-size: 24px" />
+              <a-icon
+                v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())"
+                type="file-ppt"
+                style="font-size: 24px" />
+              <a-icon
+                v-if="['pdf'].includes((record.suffix || '').toLowerCase())"
+                type="file-pdf"
+                style="font-size: 24px" />
             </div>
             <div class="nickname">
               <a-tooltip overlayClassName="myTooltip">

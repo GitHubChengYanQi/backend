@@ -147,9 +147,10 @@ export function integralDetailListApi (data) {
 }
 // 积分明细导出
 export function exportIntegralDetailListApi (data) {
-  return request({
+  return fileRequest({
     url: '/creditsEmployeeLog/employeeIntegralExcel',
     method: 'post',
+    responseType: 'blob',
     data
   })
 }

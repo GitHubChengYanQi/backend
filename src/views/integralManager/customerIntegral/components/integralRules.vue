@@ -518,6 +518,15 @@ export default {
     },
     // 通用规则提交方法
     commonRulesSendMethod () {
+      const tempInfo = {}
+      for (const key in this.integralRulesTypeInfo) {
+        if (key === 'id' || key === 'state' || key === 'creditsRuleJsonDetailVo' || key === 'employeeId') {
+          this.$set(tempInfo, `${key}`, this.integralRulesTypeInfo[key])
+        }
+      }
+      this.integralRulesTypeInfo = Object.assign({}, tempInfo)
+      console.log(this.integralRulesTypeInfo)
+      debugger
       this.commonRulesRemindLoading = true
       this.commonRulesValidityLoading = true
       this.commonRulesLimitLoading = true
