@@ -1,6 +1,10 @@
 <template>
   <div>
-    <a-button style="width: 200px;border-radius: 8px" class="add" @click="visible = true">
+    <a-button
+      style="width: 200px;border-radius: 8px"
+      class="add"
+      @click="visible = true;courseWares = {...checkCourseWares}"
+    >
       <a-icon type="plus" />
       添加
     </a-button>
@@ -47,11 +51,13 @@
               <a-icon
                 v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())"
                 type="file-word"
-                style="font-size: 24px" />
+                style="font-size: 24px"
+              />
               <a-icon
                 v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())"
                 type="file-ppt"
-                style="font-size: 24px" />
+                style="font-size: 24px"
+              />
               <a-icon
                 v-if="['pdf'].includes((record.suffix || '').toLowerCase())"
                 type="file-pdf"
@@ -142,19 +148,19 @@
       </a-tabs>
 
       <FileList
-        :selectRows="courseWares['fileList']"
+        :selectRows="checkCourseWares['fileList']"
         select
         v-if="key === '1'"
         @selectRows="(rows)=>selectRows('fileList',rows)"
       />
       <VideoList
-        :selectRows="courseWares['videoList']"
+        :selectRows="checkCourseWares['videoList']"
         select
         v-if="key === '2'"
         @selectRows="(rows)=>selectRows('videoList',rows)"
       />
       <ImageTextList
-        :selectRows="courseWares['imageTextList']"
+        :selectRows="checkCourseWares['imageTextList']"
         select
         v-if="key === '3'"
         @selectRows="(rows)=>selectRows('imageTextList',rows)"
@@ -200,6 +206,7 @@ export default {
       preview: false,
       previewType: '',
       courseWares: {},
+      checkCourseWares: {},
       key: '1',
       tableData: [],
       name: '',
@@ -216,7 +223,7 @@ export default {
       ...(item.courseWareResult || {}),
       exam: item.examResult
     }))
-    this.courseWares = {
+    this.checkCourseWares = {
       fileList: tableView.filter(item => item.courseWareType === 'file'),
       videoList: tableView.filter(item => item.courseWareType === 'video'),
       imageTextList: tableView.filter(item => item.courseWareType === 'text')
@@ -257,10 +264,10 @@ export default {
       this.url = record.mediaUrl || record.coverImageUrl
     },
     remove (row) {
-      this.courseWares = {
-        fileList: (this.courseWares.fileList || []).filter(item => item.courseWareId !== row.courseWareId),
-        videoList: (this.courseWares.videoList || []).filter(item => item.courseWareId !== row.courseWareId),
-        imageTextList: (this.courseWares.imageTextList || []).filter(item => item.courseWareId !== row.courseWareId)
+      this.checkCourseWares = {
+        fileList: (this.checkCourseWares.fileList || []).filter(item => item.courseWareId !== row.courseWareId),
+        videoList: (this.checkCourseWares.videoList || []).filter(item => item.courseWareId !== row.courseWareId),
+        imageTextList: (this.checkCourseWares.imageTextList || []).filter(item => item.courseWareId !== row.courseWareId)
       }
       this.tableView = this.tableView.filter(item => item.courseWareId !== row.courseWareId)
     },
@@ -273,10 +280,11 @@ export default {
       }))
     },
     submit () {
+      this.checkCourseWares = { ...this.courseWares }
       this.tableView = [
-        ...(this.courseWares.fileList || []),
-        ...(this.courseWares.videoList || []),
-        ...(this.courseWares.imageTextList || [])
+        ...(this.checkCourseWares.fileList || []),
+        ...(this.checkCourseWares.videoList || []),
+        ...(this.checkCourseWares.imageTextList || [])
       ]
       this.visible = false
     },
