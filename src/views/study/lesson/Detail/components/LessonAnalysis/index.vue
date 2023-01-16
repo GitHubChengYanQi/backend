@@ -229,14 +229,11 @@ export default {
         },
         {
           title: '学习进度',
-          dataIndex: 'doneStatusDetail',
+          dataIndex: 'rate',
           align: 'center',
           sorter: true,
-          customRender (value, record) {
-            const doneStatusDetail = record.doneStatusDetail || 0
-            const statusDetail = record.statusDetail || 0
-            const num = Math.round((doneStatusDetail / statusDetail) * 100) || 0
-            return num + '%'
+          customRender (value) {
+            return (value || 0) + '%'
           }
         },
         {
