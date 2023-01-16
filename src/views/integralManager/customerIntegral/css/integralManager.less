@@ -32,6 +32,7 @@
                 margin-top: 20px;
                 .singleFormTitle {
                     font-size: 14px;
+                    flex-shrink: 0;
                 }
                 .singleFormContent {
                     .singleRulesContent {
@@ -41,10 +42,17 @@
                         .singleInputClass {
                             width: 120px;
                             margin-left: 10px;
+                            height: 38px;
                         }
                         .rasonTextareaDiv {
-                            width: 300px;
+                            width: 100%;
                             margin-left: 10px;
+                            resize: none;
+                            height: 100px;
+                        }
+                        .singleRulesContentText {
+                            font-size: 12px;
+                            margin-left: 4px;
                         }
                         .len {
                             font-size: 12px;
@@ -74,15 +82,16 @@
                             margin-top: 10px;
                             display: flex;
                             flex-wrap: wrap;
-                            .singleReasonTag {
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 12px;
-                                border-radius: 2px;
-                                padding: 2px;
-                                border: 1px solid #dedede;
-                                margin-right: 4px;
+                            .ant-tag {
+                                // display: flex;
+                                // align-items: center;
+                                // justify-content: center;
+                                // font-size: 12px;
+                                // border-radius: 2px;
+                                // padding: 2px;
+                                // border: 1px solid #dedede;
+                                margin-right: 8px;
+                                margin-top: 8px;
                             }
                         }
                     }

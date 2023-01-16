@@ -8,22 +8,32 @@
           name="请选择员工"
           :changeId="true"
           :num="1"
-          v-model="employeeIds"
+          v-model="screenData.employeeIdList"
         />
       </div>
       <a-button
         type="primary"
         style="margin: 0 10px;"
+        @click="goSearchData"
+        v-permission="'/creditsEmployee/creditsEmployeePage@post'"
       >查询</a-button>
       <a-button
         style="margin-right: 10px;"
+        @click="goResetData"
+        v-permission="'/creditsEmployee/creditsEmployeePage@post'"
       >重置</a-button>
       <a-button
         style="margin-right: 10px;"
+        @click="exportData"
+        v-permission="'/creditsEmployee/creditsEmployeeExcel@post'"
       >导出</a-button>
     </div>
     <div class="searchLine">
-      <a-button class="batchButtonDiv" @click="goBatchChangeIntegral">批量调整积分</a-button>
+      <a-button
+        class="batchButtonDiv"
+        @click="goBatchChangeIntegral"
+        v-permission="'/creditsEmployee/updateCreditsEmployee@post'"
+      >批量调整积分</a-button>
     </div>
     <a-table
       :loading="tableLoading"
@@ -31,13 +41,14 @@
       :data-source="tableData"
       :columns="tableColumns"
       :pagination="pagination"
+      :row-selection="{ selectedRowKeys: selectedKeyList, onChange: onSelectionChange }"
       class="tableBox"
       :scroll="{ x: 1500}"
       @change="handleTableChange">
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
-            <a-button type="link" @click="setIntegral(record)">调整积分</a-button>
+            <a-button type="link" @click="setIntegral(record)" v-permission="'/creditsEmployee/updateCreditsEmployee@post'">调整积分</a-button>
           </div>
         </template>
       </div>
@@ -45,50 +56,70 @@
     <a-modal
       title="批量调整积分"
       :maskCloseable="false"
-      :width="1000"
+      :width="600"
       :visible="integralBatchShowStatus"
       class="batchModalClass"
       @cancel="closeIntegralBatchModal()"
       :getContainer="() => $refs['integral_manager_container']"
     >
-      <div class="formDivContent">
-        <div class="formDivText">将给 1 位员工调整积分，员工可在积分统计查看相应调整记录</div>
-        <div class="singleFormRulesDiv">
-          <div class="singleFormTitle">调整积分</div>
-          <div class="singleFormContent">
-            <div class="singleRulesContent">
-              <a-select class="singleInputClass" placeholder="请选择" v-model="batchInfo.changeType"></a-select>
-              <a-input addon-after="积分" v-model="batchInfo.integral" default-value="10" class="singleInputClass"></a-input>
+      <a-spin :spinning="batchInfoModalLoading">
+        <div class="formDivContent">
+          <div class="formDivText" v-if="batchInfo.employeeIdList && batchInfo.employeeIdList.length !== 0">{{ `将给${batchInfo.employeeIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}</div>
+          <div class="formDivText" v-if="batchInfo.checkedRuleIdList && batchInfo.checkedRuleIdList.length !== 0">{{ `将给${batchInfo.checkedRuleIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}</div>
+          <div class="singleFormRulesDiv">
+            <div class="singleFormTitle">调整积分</div>
+            <div class="singleFormContent">
+              <div class="singleRulesContent">
+                <a-select class="singleInputClass" placeholder="请选择" v-model="batchInfo.changeType">
+                  <a-select-option v-for="item in changeTypeList" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
+                </a-select>
+                <a-input-number
+                  placeholder="请输入积分"
+                  :min="1"
+                  :value="batchInfo.integral ? Number(batchInfo.integral) : 1"
+                  class="singleInputClass"
+                  @change="changeIntegralNumber">
+                </a-input-number>
+                <div class="singleRulesContentText">积分</div>
               <!-- <div class="singleFormText">好友查看了</div> -->
               <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
-            </div>
-            <div class="singleRulesText">当扣减的积分大于员工积分余额时，员工积分将会直接调整为0</div>
-          </div>
-        </div>
-        <div class="singleFormRulesDiv">
-          <div class="singleFormTitle">调整原因</div>
-          <div class="singleFormContent">
-            <div class="singleRulesContent">
-              <a-textarea placeholder="请输入原因" class="rasonTextareaDiv" v-model="batchInfo.changeCause"></a-textarea>
-              <div class="len">0/18</div>
-            </div>
-            <div class="singleReasonContent">
-              <div class="reasonTopDiv">
-                <div class="reasonTitle">历史调整原因</div>
-                <div class="reasonEditButton">编辑</div>
               </div>
-              <div class="reasonTagDiv">
-                <div class="singleReasonTag">显示历史调整原因</div>
-              </div>
+              <div class="singleRulesText">当扣减的积分大于员工积分余额时，员工积分将会直接调整为0</div>
             </div>
           </div>
+          <div class="singleFormRulesDiv">
+            <div class="singleFormTitle">调整原因</div>
+            <div class="singleFormContent">
+              <div class="singleRulesContent">
+                <a-textarea placeholder="请输入原因" class="rasonTextareaDiv" v-model="batchInfo.adjustCause"></a-textarea>
+                <div class="len">{{ `${ batchInfo.adjustCause && batchInfo.adjustCause.length ? batchInfo.adjustCause.length : '0' }/50` }}</div>
+              </div>
+              <div class="singleReasonContent">
+                <div class="reasonTopDiv">
+                  <div class="reasonTitle">历史调整原因</div>
+                  <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">编辑</div>
+                </div>
+                <div class="reasonTagDiv">
+                  <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @close="deleteHistoryTag($event, item)">{{ returnReasonText(item) }}</a-tag>
+                  <!-- <div class="singleReasonTag" v-for="item in historyReasonList" :key="item">{{ item }}
+                    <div class="singleDelete">X</div>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </a-spin>
       <template slot="footer">
         <a-button
+          :disabled="batchInfoModalLoading === true"
           @click="closeIntegralBatchModal"
         >取消</a-button>
-        <a-button type="primary" @click="confirmIntegralBatch">确定</a-button>
+        <a-button
+          :disabled="batchInfoModalLoading === true"
+          type="primary"
+          @click="confirmIntegralBatch"
+          v-permission="'/creditsEmployee/updateCreditsEmployee@post'">确定</a-button>
       </template>
     </a-modal>
     <!-- <SelectModal
@@ -110,13 +141,22 @@
 </template>
 
 <script>
-import { departmentEmp } from '@/api/common.js'
+import { deepClonev2 } from '@/utils/util'
+import { departmentEmp, getDict } from '@/api/common.js'
+import { callDownLoadByBlob } from '@/utils/downloadUtil'
 import SelectModal from '@/components/SelectPersonnel/components/modal'
-import { getCustomerIntegralApi, exportCustomerIntegralApi, batchCustomerIntegralApi } from '@/api/integralManager'
+import { getCustomerIntegralApi, exportCustomerIntegralApi, batchCustomerIntegralApi, getHistoryReasonApi, deleteHistoryReasonApi } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralManager',
   components: {
     SelectModal
+  },
+  watch: {
+    'batchInfo.adjustCause' (e) {
+      if (e && e.length > 50) {
+        this.batchInfo.adjustCause = e.slice(0, 50)
+      }
+    }
   },
   props: {
     multiple: {
@@ -126,6 +166,15 @@ export default {
   },
   data () {
     return {
+      isCloseReason: false, // 历史调整原因是否可删除
+      historyReasonList: [],
+      deepClonev2,
+      // 批量处理积分弹框加载动画
+      batchInfoModalLoading: false,
+      // 调整类型列表
+      changeTypeList: [],
+      // 选中的表格数据
+      selectedKeyList: [],
       keys: [],
       rows: [],
       treeData: [],
@@ -200,7 +249,7 @@ export default {
   created () {
     // // 获取缓存中的页码
     // const tempPage = sessionStorage.getItem('sopIntegralManagerPage')
-    // this.$set(this.searchInfo, 'employeeIds', [])
+    // this.$set(this.screenData, 'employeeIdList', [])
     // if (tempPage) {
     //   this.$set(this.pagination, 'current', Number(tempPage))
     // } else {
@@ -209,23 +258,54 @@ export default {
     // this.getTableData()
     // this.tableData = getTempIntegralManagerData()
     // 获取正式的数据
-    // this.getDataList()
+    this.getDataList()
   },
 
   methods: {
+    // 返回调整原因(最多显示10个字)
+    returnReasonText (text) {
+      if (text.length > 10) {
+        return text.slice(0, 10)
+      } else {
+        return text
+      }
+    },
+    // 去删除原因
+    goDeleteReason () {
+      this.isCloseReason = !this.isCloseReason
+    },
+    // 获取历史调整原因
+    getHistoryList () {
+      getHistoryReasonApi().then(response => {
+        this.historyReasonList = response.data.causeName.slice(0, 10)
+      })
+    },
+    // 删除历史原因
+    deleteHistoryTag (e, text) {
+      const params = { causeName: text }
+      // debugger
+      e.preventDefault()
+      deleteHistoryReasonApi(params).then(response => {
+        if (response.code === 200) {
+          this.getHistoryList()
+        }
+      })
+    },
     // 获取数据
     async getDataList () {
       this.tableLoading = true
       const params = {
-        idsStr: this.screenData.employeeIds.join(','),
         page: this.pagination.current,
         perPage: this.pagination.pageSize,
-        ...this.screenData
+        ...this.screenData,
+        employeeIdList: this.screenData.employeeIdList && this.screenData.employeeIdList.length !== 0
+          ? this.screenData.employeeIdList : []
       }
+      // debugger
       // console.log(params, '查询数据提交接口的对象')
       await getCustomerIntegralApi(params).then(response => {
         this.tableLoading = false
-        console.log(response, '获取群SOP模板信息')
+        console.log(response, '获取员工积分列表')
         this.tableData = response.data.list
         this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
@@ -245,29 +325,52 @@ export default {
       // 临时接收假数据
       // this.tableData = getTempSopList()
     },
+    // 查询数据
+    goSearchData () {
+      this.$set(this.pagination, 'current', 1)
+      this.getDataList()
+    },
+    // 重置数据
+    goResetData () {
+      this.$set(this.pagination, 'current', 1)
+      this.$set(this.screenData, 'employeeIdList', [])
+      this.getDataList()
+    },
     // 导出员工积分
-    exportIntegralManagerData () {
+    exportData () {
       const params = {
-        ...this.screenData
+        ...this.screenData,
+        page: this.pagination.current,
+        perPage: this.pagination.pageSize,
+        checkedRuleIdList: this.selectedKeyList.length !== 0 ? this.selectedKeyList : []
       }
       exportCustomerIntegralApi(params).then(response => {
-        console.log(response, '导出成功')
+        // console.log(response, '导出成功')
+        callDownLoadByBlob(response, '员工积分')
       })
     },
-    // 批量调整积分
-    batchIntegralMethod () {
-      console.log(this.batchInfo, '批量调整对象')
-      debugger
-      batchCustomerIntegralApi().then(response => {
-        console.log(response, '批量调整积分')
+    // 获取调整类型字典数据(发放,增加)
+    async getChangeType () {
+      const params = { dictType: 'integral_change_type' }
+      await getDict(params).then(response => {
+        console.log(response)
+        this.changeTypeList = response.data
+        this.$set(this.batchInfo, 'changeType', this.changeTypeList[0].code)
       })
+      this.getHistoryList()
+    },
+    // 改变积分数字
+    changeIntegralNumber (e) {
+      this.$set(this.batchInfo, 'integral', e ? String(e) : '1')
     },
     // 表格监听事件
     handleTableChange ({ current, pageSize }, filters, sorter) {
       let currentTypeText = ''
+      console.log(sorter, 'sorter')
+      // 获取点击的是那一列排序
+      currentTypeText = sorter.columnKey + 'Sort'
+      // debugger
       if (sorter.order) {
-        // 获取点击的是那一列排序
-        currentTypeText = sorter.column.dataIndex
         // this.$set(this.screenData, 'orderBySortCode', currentTypeText)
         if (sorter.order === 'ascend') {
           // 正序
@@ -282,7 +385,7 @@ export default {
       }
       this.pagination.current = current
       this.pagination.pageSize = pageSize
-      this.getTableData()
+      this.getDataList()
       // this.pagination.current = current
       // this.pagination.pageSize = pageSize
       // console.log(sorter, 'sorter')
@@ -297,16 +400,84 @@ export default {
       // }
       // this.getTableData()
     },
-    goBatchChangeIntegral () {
-      this.$refs.SelectPersonnel.modalShow = true
-      departmentEmp().then(res => {
-        // this.treeData = res.data
-        // this.loading = false
-        this.treeData = this.formatTree(res.data)
-        // this.rows = this.getNodes(this.treeData, this.value)[0]
-        // sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
-        // this.$refs.SelectPersonnel.modalShow = !state
+    // 单击某一行的回调
+    onSelectionChange (selectedRowKeys) {
+      console.log(selectedRowKeys, '单击某一行的回调')
+      // this.sendArray = record.listTaskInfo
+      // const tempIdArray = []
+      // tempIdArray.push(record.id)
+      // this.selectedList = Object.assign([], tempIdArray)
+      this.selectedKeyList = selectedRowKeys
+    },
+    // 调整积分弹框点击取消
+    closeIntegralBatchModal () {
+      if (!this.batchInfoModalLoading) {
+        this.integralBatchShowStatus = false
+      }
+    },
+    // 调整积分弹框点击确定
+    confirmIntegralBatch () {
+      if (!this.batchInfo.integral) {
+        this.$message.error('请输入调整的积分值')
+        return false
+      }
+      if (!this.batchInfo.adjustCause) {
+        this.$message.error('请输入调整原因')
+        return false
+      }
+      console.log(this.batchInfo, 'batchInfo')
+      this.batchInfoModalLoading = true
+      debugger
+      batchCustomerIntegralApi(this.batchInfo).then(response => {
+        console.log(response)
+        if (response.code === 200) {
+          this.$message.success('批量处理成功')
+          this.integralBatchShowStatus = false
+          this.batchInfoModalLoading = false
+          this.$set(this.pagination, 'current', 1)
+          this.getDataList()
+        }
+      }).catch(() => {
+        this.batchInfoModalLoading = false
       })
+    },
+    // 点击调整积分
+    setIntegral (record) {
+      this.batchInfo = {}
+      this.integralBatchShowStatus = true
+      this.getChangeType()
+      this.$nextTick(() => {
+        const tempArray = []
+        tempArray.push(record.id)
+        this.$set(this.batchInfo, 'checkedRuleIdList', tempArray)
+        this.$set(this.batchInfo, 'employeeIdList', [])
+        this.$set(this.batchInfo, 'integral', '10')
+      })
+    },
+    // 点击批量调整按钮
+    goBatchChangeIntegral () {
+      this.batchInfo = {}
+      if (this.selectedKeyList.length !== 0) {
+        // 有选项,直接弹出调整弹框
+        this.integralBatchShowStatus = true
+        this.getChangeType()
+        this.$nextTick(() => {
+          this.$set(this.batchInfo, 'checkedRuleIdList', this.selectedKeyList)
+          this.$set(this.batchInfo, 'employeeIdList', [])
+          this.$set(this.batchInfo, 'integral', '10')
+        })
+      } else {
+        // 无选项,先弹组织架构
+        this.$refs.SelectPersonnel.modalShow = true
+        departmentEmp().then(res => {
+          // this.treeData = res.data
+          // this.loading = false
+          this.treeData = this.formatTree(res.data)
+          // this.rows = this.getNodes(this.treeData, this.value)[0]
+          // sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
+          // this.$refs.SelectPersonnel.modalShow = !state
+        })
+      }
       // this.$refs.selectEmployee.$show([])
     },
     formatTree (data) {
@@ -329,69 +500,18 @@ export default {
     },
     getKeys (e, type) {
       console.log(e, type, '选中回调')
-    },
-    selectEmployeeChange (e) {
-      console.log(e, '批量处理选择')
-    },
-    // 调整积分弹框点击取消
-    closeIntegralBatchModal () {
-      this.integralBatchShowStatus = false
-    },
-    // 调整积分弹框点击确定
-    confirmIntegralBatch () {
-      this.integralBatchShowStatus = false
-    },
-    // 点击调整积分
-    setIntegral () {
-      this.integralBatchShowStatus = true
+      if (e && e.length !== 0) {
+        this.$refs.SelectPersonnel.modalShow = false
+        this.integralBatchShowStatus = true
+        this.getChangeType()
+        this.$nextTick(() => {
+          const tempArray = this.deepClonev2(e)
+          this.$set(this.batchInfo, 'employeeIdList', tempArray)
+          this.$set(this.batchInfo, 'checkedRuleIdList', [])
+          this.$set(this.batchInfo, 'integral', '10')
+        })
+      }
     }
-    // // 获取数据
-    // async getTableData () {
-    //   this.tableLoading = true
-    //   const params = {
-    //     sopName: this.searchInfo.sopName,
-    //     idsStr: this.searchInfo.employeeIds.join(','),
-    //     page: this.pagination.current,
-    //     perPage: this.pagination.pageSize,
-    //     sort: this.sorter
-    //   }
-    //   // console.log(params, '查询数据提交接口的对象')
-    //   await getSopTemplateListMethod(params).then(response => {
-    //     this.tableLoading = false
-    //     console.log(response, '获取群SOP模板信息')
-    //     this.tableData = response.data.list
-    //     this.$set(this.pagination, 'total', Number(response.data.page.total))
-    //     if (this.tableData.length === 0) {
-    //       // 列表中没有数据
-    //       if (this.pagination.total !== 0) {
-    //         // 总数据有,但当前页没有
-    //         // 重新将页码换成1
-    //         this.$set(this.pagination, 'current', 1)
-    //         this.getTableData()
-    //       } else {
-    //         // 是真没有数据
-    //       }
-    //     }
-    //   }).catch(() => {
-    //     this.tableLoading = false
-    //   })
-    //   // 临时接收假数据
-    //   // this.tableData = getTempSopList()
-    // },
-    // // 搜索
-    // goSearch () {
-    //   // 重新将页码换成1
-    //   this.$set(this.pagination, 'current', 1)
-    //   this.getTableData()
-    // },
-    // // 重置
-    // goReset () {
-    //   // 重新将页码换成1
-    //   this.$set(this.pagination, 'current', 1)
-    //   this.searchInfo = {}
-    //   this.$set(this.searchInfo, 'employeeIds', [])
-    //   this.getTableData()
-    // }
   }
 }
 </script>

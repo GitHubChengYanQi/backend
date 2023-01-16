@@ -26,9 +26,9 @@
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
-              <a-button type="link" @click="setIntegralMethod(record)">设置</a-button>
-              <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst">新增商品</a-button>
-              <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst">删除</a-button>
+              <a-button type="link" @click="setIntegralMethod(record)" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button>
+              <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst" v-permission="'/creditsRule/addGoodsCreditsRule@post'">新增商品</a-button>
+              <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst" v-permission="'/creditsRule/delGoodsCreditsRule@delete'">删除</a-button>
             </div>
           </template>
         </div>
@@ -63,8 +63,8 @@
               placeholder="请选择"
               class="singleInputClass"
               :min="1"
-              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : ''"
-              @change="changeIntegralNumber">
+              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
+              @change="changeFriendCircleIntegralNumber">
             </a-input-number>
             <div class="singleFormText">积分</div>
           </div>
@@ -88,7 +88,11 @@
           :disabled="integralFriendCircleLoading === true"
           @click="closeIntegralFriendCircleModal()"
         >取消</a-button>
-        <a-button type="primary" :disabled="integralFriendCircleLoading === true" @click="confirmIntegralFriendCircle">确定</a-button>
+        <a-button
+          type="primary"
+          :disabled="integralFriendCircleLoading === true"
+          @click="confirmIntegralFriendCircle"
+          v-permission="'/creditsRule/setCreditsRule@post'">确定</a-button>
       </template>
     </a-modal>
     <a-modal
@@ -120,7 +124,9 @@
               :min="1"
               v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
                 && integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum"
-              v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum">
+              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum ?
+                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) : 1"
+              @change="changeFriendDayNumber">
             </a-input-number>
             <div class="singleFormText">天</div>
             <div class="singleFormText">未流失，员工可获得</div>
@@ -128,8 +134,10 @@
               :min="1"
               v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
                 && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-              v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-              class="singleInputClass">
+              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ?
+                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
+              class="singleInputClass"
+              @change="changeAddFriendIntegral">
             </a-input-number>
             <div class="singleFormText">积分</div>
           </div>
@@ -153,7 +161,12 @@
           :disabled="integralAddFriendLoading === true"
           @click="closeIntegralAddFriendModal()"
         >取消</a-button>
-        <a-button type="primary" :disabled="integralAddFriendLoading === true" @click="confirmIntegralAddFriend">确定</a-button>
+        <a-button
+          type="primary"
+          :disabled="integralAddFriendLoading === true"
+          @click="confirmIntegralAddFriend"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+        >确定</a-button>
       </template>
     </a-modal>
     <a-modal
@@ -164,173 +177,208 @@
       :visible="integralBuyShowStatus"
       class="buyModalClass"
       @cancel="closeIntegralBuyModal()"
-      :getContainer="() => $refs['integral_rules_container']"
+      :getContainer="() => $refs['integral_data_container']"
     >
-      <div class="formDivContent">
-        <div class="singleFormDiv">
-          <div class="singleFormTitle">规则状态</div>
-          <a-switch
-            :checked="integralRulesTypeInfo.state === '1' ? true : false"
-            @click="setRules(integralRulesTypeInfo)"
-            checked-children="开"
-            un-checked-children="关"
-          />
-          <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
-        </div>
-        <div class="singleFormRulesDiv">
-          <div class="singleFormTitle">积分规则</div>
-          <div class="singleFormContent">
-            <div class="singleRulesContent">
-              <div class="singleFormText">好友查看了</div>
-              <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
-              <div class="radarContentDiv" @click="chooseRadarMethod">
-                <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
-                <div v-else class="tagDiv">
-                  <div v-for="item in radarList.slice(0,1)" :key="item.id" class="singleTagDiv">
-                    {{ item.title }}
-                    <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
-                  </div>
-                  <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
-                  <div v-if="radarList.length !== 0" class="clearTagDiv" @click.stop="clearTagMethod">X</div>
-                </div>
-              </div>
-              <div class="singleFormText">后</div>
-              <a-input
-                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
-                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
-                placeholder="请输入"
-                class="singleInputClass">
-              </a-input>
-              <div class="singleFormText">天内,购买了</div>
-              <!-- <a-button @click="chooseGoods()">+添加商品</a-button> -->
-              <div class="goodsContentDiv" @click="chooseGoodsMethod">
-                <div v-if="goodsList.length === 0" class="noGoodsDiv">+商品库</div>
-                <div v-else class="tagDiv">
-                  <div v-for="item in goodsList" :key="item.id" class="singleTagDiv">
-                    {{ item.name }}
-                    <div class="delete" @click.stop="deleteSingleGoods(item)">+</div>
+      <a-spin :spinning="integralBuyLoading">
+        <div class="formDivContent">
+          <div class="singleFormDiv">
+            <div class="singleFormTitle">规则状态</div>
+            <a-switch
+              :checked="integralRulesTypeInfo.state === '1' ? true : false"
+              @click="setRules(integralRulesTypeInfo)"
+              checked-children="开"
+              un-checked-children="关"
+            />
+            <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
+          </div>
+          <div class="singleFormRulesDiv">
+            <div class="singleFormTitle">积分规则</div>
+            <div class="singleFormContent">
+              <div class="singleRulesContent">
+                <div class="singleFormText">好友查看了</div>
+                <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
+                <div class="radarContentDiv" @click="chooseRadarMethod">
+                  <div v-if="buyRadarList.length === 0" class="noRadarDiv">+互动雷达</div>
+                  <div v-else class="tagDiv">
+                    <div v-for="item in buyRadarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
+                      {{ item.radarArticleTitle }}
+                      <div class="delete" @click.stop="deleteBuySingleTag(item)">+</div>
+                    </div>
+                    <div v-if="buyRadarList.length > 1" class="singleTagDiv">{{ `+${buyRadarList.length - 1}` }}</div>
+                    <div v-if="buyRadarList.length !== 0" class="clearTagDiv" @click.stop="clearBuyTagMethod">X</div>
                   </div>
                 </div>
+                <div class="singleFormText">后</div>
+                <a-input-number
+                  :min="1"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum) : 1"
+                  placeholder="请输入"
+                  class="singleInputClass"
+                  @change="changeBuyLookAfterDayNumber">
+                </a-input-number>
+                <div class="singleFormText">天内,购买了</div>
+                <!-- <a-button @click="chooseGoods()">+添加商品</a-button> -->
+                <div class="goodsContentDiv" @click="chooseGoodsMethod">
+                  <div v-if="goodsList.length === 0" class="noGoodsDiv">+商品库</div>
+                  <div v-else class="tagDiv">
+                    <div v-for="item in goodsList" :key="item.id" class="singleTagDiv">
+                      {{ item.name }}
+                      <div class="delete" @click.stop="deleteSingleGoods(item)">+</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="singleRulesContent">
-              <div class="singleFormText">且</div>
-              <a-input
-                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
-                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
-                placeholder="请输入"
-                class="singleInputClass">
-              </a-input>
-              <div class="singleFormText">天内，未退货，员工可获得</div>
-              <a-input
-                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-                placeholder="请输入"
-                class="singleInputClass">
-              </a-input>
-              <div class="singleFormText">积分</div>
+              <div class="singleRulesContent">
+                <div class="singleFormText">且</div>
+                <a-input-number
+                  :min="1"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) : ''"
+                  placeholder="请输入"
+                  class="singleInputClass"
+                  @change="changeBuySalesReturnDayNumber">
+                </a-input-number>
+                <div class="singleFormText">天内，未退货，员工可获得</div>
+                <a-input-number
+                  :min="1"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
+                  placeholder="请输入"
+                  class="singleInputClass"
+                  @change="changeBuyIntegralNumber">
+                </a-input-number>
+                <div class="singleFormText">积分</div>
+              </div>
             </div>
           </div>
+          <div class="singleFormDiv">
+            <div class="singleFormCustomerTitle">适用员工</div>
+            <selectPersonnel
+              v-if="treeData"
+              :record="treeData"
+              class="selectPersonnelCom"
+              type="button"
+              name="添加员工"
+              v-model="integralRulesTypeInfo.employeeIds"
+              @getVal="employeeIdsChange"
+            />
+          </div>
+          <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
         </div>
-        <div class="singleFormDiv">
-          <div class="singleFormTitle">适用员工</div>
-          <selectPersonnel
-            v-if="treeData"
-            :record="treeData"
-            class="selectPersonnelCom"
-            type="button"
-            name="添加员工"
-            v-model="employeeIds"
-            @getVal="employeeIdsChange"
-          />
-        </div>
-        <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
-      </div>
+      </a-spin>
       <template slot="footer">
         <a-button
+          :disabled="integralBuyLoading === true"
           @click="closeIntegralBuyModal()"
         >取消</a-button>
-        <a-button type="primary" @click="confirmIntegralBuy">确定</a-button>
+        <a-button
+          v-if="buyModalType === 'set'"
+          :disabled="integralBuyLoading === true"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+          type="primary"
+          @click="confirmIntegralBuy"
+        >确定</a-button>
+        <a-button
+          v-if="buyModalType === 'add'"
+          :disabled="integralBuyLoading === true"
+          v-permission="'/creditsRule/addGoodsCreditsRule@post'"
+          type="primary"
+          @click="confirmIntegralBuy"
+        >确定</a-button>
       </template>
     </a-modal>
     <a-modal
       title="好友查看素材"
       :maskCloseable="false"
-      :width="1000"
+      :width="700"
+      :zIndex="600"
       :visible="integralMaterialShowStatus"
       class="materialModalClass"
       @cancel="closeIntegralMaterialModal()"
-      :getContainer="() => $refs['integral_rules_container']"
+      :getContainer="() => $refs['integral_data_container']"
     >
-      <div class="formDivContent">
-        <div class="singleFormDiv">
-          <div class="singleFormTitle">规则状态</div>
-          <a-switch
-            :checked="integralRulesTypeInfo.state === '1' ? true : false"
-            @click="setRules(integralRulesTypeInfo)"
-            checked-children="开"
-            un-checked-children="关"
-          />
-          <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
-        </div>
-        <div class="singleFormRulesDiv">
-          <div class="singleFormTitle">积分规则</div>
-          <div class="singleFormContent">
-            <div class="singleRulesContent">
-              <div class="singleFormText">好友查看了</div>
-              <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
-              <div class="radarContentDiv" @click="chooseRadarMethod">
-                <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
-                <div v-else class="tagDiv">
-                  <div v-for="item in radarList.slice(0,1)" :key="item.id" class="singleTagDiv">
-                    {{ item.title }}
-                    <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
+      <a-spin :spinning="integralMaterialLoading">
+        <div class="formDivContent">
+          <div class="singleFormDiv">
+            <div class="singleFormTitle">规则状态</div>
+            <a-switch
+              :checked="integralRulesTypeInfo.state === '1' ? true : false"
+              @click="setRules(integralRulesTypeInfo)"
+              checked-children="开"
+              un-checked-children="关"
+            />
+            <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
+          </div>
+          <div class="singleFormRulesDiv">
+            <div class="singleFormTitle">积分规则</div>
+            <div class="singleFormContent singleFormContentDiv">
+              <div class="singleRulesContent">
+                <div class="singleFormText">好友查看了</div>
+                <!-- <a-input placeholder="请选择互动雷达"></a-input> -->
+                <div class="radarContentDiv" @click="chooseRadarMethod">
+                  <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
+                  <div v-else class="tagDiv">
+                    <div v-for="item in radarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
+                      {{ item.radarArticleTitle }}
+                      <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
+                    </div>
+                    <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
+                    <div v-if="radarList.length !== 0" class="clearTagDiv" @click.stop="clearTagMethod">X</div>
                   </div>
-                  <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
-                  <div v-if="radarList.length !== 0" class="clearTagDiv" @click.stop="clearTagMethod">X</div>
                 </div>
+                <div class="singleFormText">后，员工可获得</div>
+                <a-input-number
+                  :min="1"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
+                  placeholder="请输入"
+                  class="singleInputClass"
+                  @change="changeMaterialIntergralNumber">
+                </a-input-number>
+                <div class="singleFormText">积分</div>
               </div>
-              <div class="singleFormText">后，员工可获得</div>
-              <a-input
-                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-                placeholder="请输入"
-                class="singleInputClass">
-              </a-input>
-              <div class="singleFormText">积分</div>
-            </div>
-            <div class="singleRulesContent">
-              <div class="singleFormText">每个素材</div>
-              <!-- <a-input default-value="10" class="singleInputClass"></a-input> -->
-              <a-input
-                v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
-                v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
-                placeholder="请输入"
-                class="singleInputClass">
-              </a-input>
-              <div class="singleFormText">天内可生效1次</div>
+              <div class="singleRulesContent">
+                <div class="singleFormText">每个素材</div>
+                <!-- <a-input default-value="10" class="singleInputClass"></a-input> -->
+                <a-input-number
+                  :min="1"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum) : 1"
+                  placeholder="请输入"
+                  class="singleInputClass"
+                  @change="changeMaterialValidDayNumber">
+                </a-input-number>
+                <div class="singleFormText">天内可生效1次</div>
+              </div>
             </div>
           </div>
+          <div class="singleFormDiv">
+            <div class="singleFormCustomerTitle">适用员工</div>
+            <selectPersonnel
+              v-if="treeData"
+              :record="treeData"
+              class="selectPersonnelCom"
+              type="button"
+              name="添加员工"
+              v-model="integralRulesTypeInfo.employeeIds"
+              @getVal="employeeIdsChange"
+            />
+          </div>
+          <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
         </div>
-        <div class="singleFormDiv">
-          <div class="singleFormTitle">适用员工</div>
-          <selectPersonnel
-            v-if="treeData"
-            :record="treeData"
-            class="selectPersonnelCom"
-            type="button"
-            name="添加员工"
-            v-model="employeeIds"
-            @getVal="employeeIdsChange"
-          />
-        </div>
-        <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
-      </div>
+      </a-spin>
       <template slot="footer">
         <a-button
+          :disabled="integralMaterialLoading === true"
           @click="closeIntegralMaterialModal()"
         >取消</a-button>
-        <a-button type="primary" @click="confirmIntegralMaterial">确定</a-button>
+        <a-button
+          :disabled="integralMaterialLoading === true"
+          type="primary"
+          @click="confirmIntegralMaterial"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+        >确定</a-button>
       </template>
     </a-modal>
     <goodsManager
@@ -340,9 +388,8 @@
       :permissionText="''"
       @submitConfirm="submitGoodsConfirm">
     </goodsManager>
-    <chooseRadar :zIndex="800" :isRadioStatus="false" v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk"></chooseRadar>
+    <chooseRadar v-model="radarVisible" @handleAddRadarOk="handleAddRadarOk"></chooseRadar>
   </div>
-
 </template>
 
 <script>
@@ -350,11 +397,12 @@ import { deepClonev2 } from '@/utils/util'
 import goodsManager from './goodsManager.vue'
 import chooseRadar from './chooseRadar.vue'
 import { getDict } from '@/api/common'
-import { getIntegralRulesApi, setIntegralRulesApi } from '@/api/integralManager'
+import { getIntegralRulesApi, setIntegralRulesApi, addGoodsRulesApi, deleteGoodsRulesApi } from '@/api/integralManager'
 export default {
   name: 'BackendIntegralRulesData',
   data () {
     return {
+      buyModalType: '',
       deepClonev2,
       // 积分规则列表数据
       integralTableData: [],
@@ -409,16 +457,21 @@ export default {
       integralAddFriendLoading: false,
       // 积分规则设置加好友任务弹框
       integralAddFriendShowStatus: false,
+      // 积分规则设置购买任务弹框
+      integralBuyShowStatus: false,
+      // 积分规则购买弹框加载动画
+      integralBuyLoading: false,
+      // 积分规则设置好友查看素材任务弹框
+      integralMaterialShowStatus: false,
+      // 积分规则好友查看素材弹框加载动画
+      integralMaterialLoading: false,
       // 雷达素材组件显示状态
       radarVisible: false,
       // 商品库组件显示状态
       chooseGoodsManagerShowStatus: false,
-      // 积分规则设置好友查看素材任务弹框
-      integralMaterialShowStatus: false,
       radarList: [], // 选中的雷达列表
+      buyRadarList: [], // 选中的购买模式的雷达列表
       goodsList: [], // 选中的商品列表
-      // 积分规则设置购买任务弹框
-      integralBuyShowStatus: false,
       employeeIds: [],
       treeData: [],
       integralRulesTypeInfo: {}, // 积分规则设置对象
@@ -505,6 +558,7 @@ export default {
       } else if (info.ruleType === '3') {
         // 购买商品
         this.integralBuyShowStatus = true
+        this.buyModalType = 'set'
       } else if (info.ruleType === '4') {
         // 查看素材
         this.integralMaterialShowStatus = true
@@ -514,6 +568,19 @@ export default {
         if (!tempInfo.creditsRuleJsonDetailVo.integral) {
           // 积分为空时
           tempInfo.creditsRuleJsonDetailVo.integral = '10'
+        }
+        if (!tempInfo.employeeId || (tempInfo.employeeId && (tempInfo.employeeId.length === 0))) {
+          // 没有选择员工
+          this.$set(tempInfo, 'employeeIds', [])
+        } else if (tempInfo.employeeId.length === 1) {
+          // 有一个员工
+          const employeeIdList = []
+          employeeIdList.push(tempInfo.employeeId)
+          this.$set(tempInfo, 'employeeIds', employeeIdList)
+        } else {
+          // 有一个以上
+          const tempArray = tempInfo.employeeId.split(',')
+          this.$set(tempInfo, 'employeeIds', tempArray)
         }
         this.$set(tempInfo, 'creditsRuleJsonDetailVo', tempInfo.creditsRuleJsonDetailVo)
         this.integralRulesTypeInfo = this.deepClonev2(tempInfo)
@@ -527,9 +594,9 @@ export default {
         this.$set(this.integralRulesTypeInfo, 'state', '1')
       }
     },
-    // 改变积分数值
-    changeIntegralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(e))
+    // 改变朋友圈积分数值
+    changeFriendCircleIntegralNumber (e) {
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
     },
     // 设置朋友圈弹框点击取消
     closeIntegralFriendCircleModal () {
@@ -543,8 +610,16 @@ export default {
         // 朋友圈
         if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
           console.log('朋友圈可以提交', this.integralRulesTypeInfo)
+          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+            if (key === 'integral') {
+              // 无需处理
+            } else {
+              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+            }
+          }
         } else {
           this.$message.error('请填写全部数据')
+          return false
         }
         debugger
         this.commonIntegralRulesSend()
@@ -553,14 +628,29 @@ export default {
     },
     // 公共的积分规则提交
     commonIntegralRulesSend () {
+      const tempInfo = {}
+      for (const key in this.integralRulesTypeInfo) {
+        if (key === 'id' || key === 'state' || key === 'creditsRuleJsonDetailVo' || key === 'employeeId') {
+          this.$set(tempInfo, `${key}`, this.integralRulesTypeInfo[key])
+        }
+      }
+      this.integralRulesTypeInfo = Object.assign({}, tempInfo)
+      console.log(this.integralRulesTypeInfo)
+      debugger
       this.integralAddFriendLoading = true
       this.integralFriendCircleLoading = true
+      this.integralBuyLoading = true
+      this.integralMaterialLoading = true
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
         if (response.code === 200) {
           this.integralFriendCircleLoading = false
           this.integralFriendCircleShowStatus = false
           this.integralAddFriendLoading = false
           this.integralAddFriendShowStatus = false
+          this.integralBuyLoading = false
+          this.integralBuyShowStatus = false
+          this.integralMaterialLoading = false
+          this.integralMaterialShowStatus = false
           // this.integralPagination.current
           this.$set(this.integralPagination, 'current', 1)
           this.$set(this.integralPagination, 'pageSize', 10)
@@ -569,12 +659,23 @@ export default {
       }).catch(() => {
         this.integralFriendCircleLoading = false
         this.integralAddFriendLoading = false
+        this.integralBuyLoading = false
+        this.integralMaterialLoading = false
       })
     },
     // 选择组织机构
     employeeIdsChange (e) {
     //   console.log(e, 'eeee', this.integralRulesTypeInfo.employeeIds)
       this.$set(this.integralRulesTypeInfo, 'employeeId', e.join(','))
+    },
+    // 改变新增好友弹框未流失天数
+    changeFriendDayNumber (e) {
+      // this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', e ? String(e) : '1')
+    },
+    // 改变新增好友弹框积分
+    changeAddFriendIntegral (e) {
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
     },
     // 设置加好友弹框点击取消
     closeIntegralAddFriendModal () {
@@ -590,6 +691,13 @@ export default {
         if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
           this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) {
           console.log('加好友可以提交', this.integralRulesTypeInfo)
+          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+            if (key === 'integral' || key === 'friendDayNum') {
+              // 无需处理
+            } else {
+              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+            }
+          }
           debugger
           this.commonIntegralRulesSend()
         } else {
@@ -597,6 +705,27 @@ export default {
         }
       }
     //   this.integralAddFriendShowStatus = false
+    },
+    // 改变购买弹框看素材后购买天数
+    changeBuyLookAfterDayNumber (e) {
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', e ? String(e) : '1')
+    },
+    // 改变购买弹框未退换天数
+    changeBuySalesReturnDayNumber (e) {
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', e ? String(e) : '1')
+    },
+    // 改变购买弹框积分数
+    changeBuyIntegralNumber (e) {
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+    },
+    // 改变查看素材弹框积分
+    changeMaterialIntergralNumber (e) {
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+    },
+    // 改变查看素材弹框生效一次天数
+    changeMaterialValidDayNumber (e) {
+      // integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', e ? String(e) : '1')
     },
     // 获取规则限制类型数据字典
     async getCommonRuleLimitData () {
@@ -628,57 +757,166 @@ export default {
     handleAddRadarOk (e) {
       console.log(e, '选择雷达素材回调')
       this.radarVisible = false
-      this.radarList = Object.assign([], e)
+      // this.radarList = Object.assign([], e)
+      // item.title  // item.id  // item.ditch[0].id // item.selectChannel
+      for (const item of e) {
+        console.log(this.radarList, '现在选择的列表')
+        const tempInfo = {}
+        tempInfo.radarArticleId = item.id
+        tempInfo.radarArticleTitle = item.title
+        tempInfo.ditchId = item.selectChannel ? item.selectChannel : item.ditch[0].id
+        if (this.integralRulesTypeInfo.ruleType === '4') {
+          const tempIndex = this.radarList.findIndex(info => info.radarArticleId === item.id)
+          // debugger
+          if (tempIndex === -1) {
+            this.radarList.push(tempInfo)
+          }
+        } else if (this.integralRulesTypeInfo.ruleType === '3' || this.buyModalType === 'add') {
+          const tempIndex = this.buyRadarList.findIndex(info => info.radarArticleId === item.id)
+          // debugger
+          if (tempIndex === -1) {
+            this.buyRadarList.push(tempInfo)
+          }
+        }
+      }
     },
-    // 清空雷达选择
+    // 查看雷达模式清空雷达选择
     clearTagMethod () {
       this.radarList = []
     },
-    // 删除单个标签
+    // 查看雷达模式删除单个标签
     deleteSingleTag (item) {
-      const deleteIndex = this.radarList.findIndex(info => info.id === item.id)
+      const deleteIndex = this.radarList.findIndex(info => info.radarArticleId === item.radarArticleId)
       this.radarList.splice(deleteIndex, 1)
+    },
+    // 购买模式清空雷达选择
+    clearBuyTagMethod () {
+      this.buyRadarList = []
+    },
+    // 查看雷达模式删除单个标签
+    deleteBuySingleTag (item) {
+      const deleteIndex = this.buyRadarList.findIndex(info => info.radarArticleId === item.radarArticleId)
+      this.buyRadarList.splice(deleteIndex, 1)
     },
     // 设置购买弹框点击取消
     closeIntegralBuyModal () {
-      this.integralBuyShowStatus = false
+      if (!this.integralBuyLoading) {
+        this.integralBuyShowStatus = false
+      }
     },
     // 设置购买弹框点击确定
     confirmIntegralBuy () {
-      if (this.integralRulesTypeInfo.ruleType === '3') {
-        // 购买
-        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
-          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum &&
-          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) {
-          console.log('购买可以提交', this.integralRulesTypeInfo)
-        } else {
-          this.$message.error('请填写全部数据')
-          return
+      // 购买
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
+        this.integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum &&
+        this.integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum &&
+        this.buyRadarList.length !== 0 && this.goodsList.length !== 0) {
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'goodId', this.goodsList[0].id)
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'radarArticleJsonVoList', this.buyRadarList)
+        console.log('购买可以提交', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'integral' || key === 'lookAfterDayNum' || key === 'salesReturnDayNum' || key === 'radarArticleJsonVoList' || key === 'goodId') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+          }
         }
+        // debugger
+        if (this.buyModalType === 'set') {
+          this.commonIntegralRulesSend()
+        } else if (this.buyModalType === 'add') {
+          this.addIntegralBuyRules()
+        }
+      } else {
+        this.$message.error('请填写全部数据')
       }
-      this.integralBuyShowStatus = false
+      // this.integralBuyShowStatus = false
     },
-    // 设置购买弹框点击取消
+    // 新增商品规则方法
+    addIntegralBuyRules () {
+      this.integralBuyLoading = true
+      addGoodsRulesApi(this.integralRulesTypeInfo).then(response => {
+        if (response.code === 200) {
+          this.integralBuyLoading = false
+          this.integralBuyShowStatus = false
+          this.$set(this.integralPagination, 'current', 1)
+          this.$set(this.integralPagination, 'pageSize', 10)
+          this.getIntegralRulesData()
+        }
+      }).catch(() => {
+        this.integralBuyLoading = false
+      })
+    },
+    // 设置查看素材弹框点击取消
     closeIntegralMaterialModal () {
-      this.integralMaterialShowStatus = false
+      if (!this.integralMaterialLoading) {
+        this.integralMaterialShowStatus = false
+      }
     },
-    // 设置购买弹框点击确定
+    // 设置查看素材弹框点击确定
     confirmIntegralMaterial () {
       if (this.integralRulesTypeInfo.ruleType === '4') {
         // 查看素材
         if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
-          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum) {
-          console.log('购买可以提交', this.integralRulesTypeInfo)
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum &&
+          this.radarList.length !== 0) {
+          this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'radarArticleJsonVoList', this.radarList)
+          console.log('查看素材可以提交', this.integralRulesTypeInfo)
+          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+            if (key === 'integral' || key === 'validDayNum' || key === 'radarArticleJsonVoList') {
+              // 无需处理
+            } else {
+              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+            }
+          }
+          // debugger
+          this.commonIntegralRulesSend()
         } else {
           this.$message.error('请填写全部数据')
-          return
         }
       }
-      this.integralMaterialShowStatus = false
+      // this.integralMaterialShowStatus = false
     },
     // 新增商品
     addGoodsMethod (info) {
       console.log(info, '新增商品')
+      this.buyModalType = 'add'
+      this.integralBuyShowStatus = true
+      this.$nextTick(() => {
+        this.$set(this.integralRulesTypeInfo, 'id', info.id)
+        this.$set(this.integralRulesTypeInfo, 'state', '0')
+        this.$set(this.integralRulesTypeInfo, 'employeeId', [])
+        this.$set(this.integralRulesTypeInfo, 'creditsRuleJsonDetailVo', {})
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', '10')
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', '1')
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', '1')
+        this.buyRadarList = []
+        this.goodsList = []
+      })
+    },
+    // 删除商品规则
+    deleteGoodsMethod (info) {
+      const that = this
+      this.$confirm({
+        title: '确定删除所选内容?',
+        // content: 'Some descriptions',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          that.integralTableLoading = true
+          const tempInfo = { id: info.id }
+          deleteGoodsRulesApi(tempInfo).then(response => {
+            if (response.code === 200) {
+              // this.integralPagination.current
+              that.$set(that.integralPagination, 'current', 1)
+              that.getIntegralRulesData()
+            }
+          }).catch(() => {
+            that.integralTableLoading = false
+          })
+        }
+      })
     }
   }
 }

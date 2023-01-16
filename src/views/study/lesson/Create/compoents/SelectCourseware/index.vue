@@ -1,6 +1,10 @@
 <template>
   <div>
-    <a-button style="width: 200px;border-radius: 8px" class="add" @click="visible = true">
+    <a-button
+      style="width: 200px;border-radius: 8px"
+      class="add"
+      @click="visible = true;courseWares = {...checkCourseWares}"
+    >
       <a-icon type="plus" />
       添加
     </a-button>
@@ -41,12 +45,23 @@
             <div class="avatar mr12">
               <img
                 height="50"
-                v-if="['jpg','png'].includes(record.suffix)"
+                v-if="['jpg','png'].includes((record.suffix || '').toLowerCase())"
                 :src="record.coverImageUrl || record.mediaUrl"
               >
-              <a-icon v-if="['doc','docx'].includes(record.suffix)" type="file-word" style="font-size: 24px" />
-              <a-icon v-if="['ppt','pptx'].includes(record.suffix)" type="file-ppt" style="font-size: 24px" />
-              <a-icon v-if="['pdf'].includes(record.suffix)" type="file-pdf" style="font-size: 24px" />
+              <a-icon
+                v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())"
+                type="file-word"
+                style="font-size: 24px"
+              />
+              <a-icon
+                v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())"
+                type="file-ppt"
+                style="font-size: 24px"
+              />
+              <a-icon
+                v-if="['pdf'].includes((record.suffix || '').toLowerCase())"
+                type="file-pdf"
+                style="font-size: 24px" />
             </div>
             <div class="nickname">
               <a-tooltip overlayClassName="myTooltip">
@@ -79,7 +94,7 @@
         <div slot="actions" slot-scope="text, record">
           <div style="display: inline-block">
             <div class="my-space" style="cursor: pointer">
-              <a-button class="linkButton" :disabled="record.courseWareType === 'file'" @click="openPreview(record)">
+              <a-button class="linkButton" @click="openPreview(record)">
                 预览
               </a-button>
               <a-button class="delButton" @click="remove(record)">删除</a-button>
@@ -108,6 +123,13 @@
       <div>
         <img v-if="previewType === 'text'" class="img" :src="url" alt="avatar" width="283" />
         <video v-if="previewType === 'video'" :src="url" style="width: 100%" controls></video>
+        <iframe
+          v-if="previewType === 'file'"
+          style="border: none;height: 527px"
+          :class="{'iframe1': true, 'iframe2' : false}"
+          :src="`https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
+        >
+        </iframe>
       </div>
     </Preview>
 
@@ -126,19 +148,19 @@
       </a-tabs>
 
       <FileList
-        :selectRows="courseWares['fileList']"
+        :selectRows="checkCourseWares['fileList']"
         select
         v-if="key === '1'"
         @selectRows="(rows)=>selectRows('fileList',rows)"
       />
       <VideoList
-        :selectRows="courseWares['videoList']"
+        :selectRows="checkCourseWares['videoList']"
         select
         v-if="key === '2'"
         @selectRows="(rows)=>selectRows('videoList',rows)"
       />
       <ImageTextList
-        :selectRows="courseWares['imageTextList']"
+        :selectRows="checkCourseWares['imageTextList']"
         select
         v-if="key === '3'"
         @selectRows="(rows)=>selectRows('imageTextList',rows)"
@@ -184,6 +206,7 @@ export default {
       preview: false,
       previewType: '',
       courseWares: {},
+      checkCourseWares: {},
       key: '1',
       tableData: [],
       name: '',
@@ -200,7 +223,7 @@ export default {
       ...(item.courseWareResult || {}),
       exam: item.examResult
     }))
-    this.courseWares = {
+    this.checkCourseWares = {
       fileList: tableView.filter(item => item.courseWareType === 'file'),
       videoList: tableView.filter(item => item.courseWareType === 'video'),
       imageTextList: tableView.filter(item => item.courseWareType === 'text')
@@ -230,17 +253,21 @@ export default {
   },
   methods: {
     openPreview (record) {
-      this.previewType = record.courseWareType
+      if (record.courseWareType === 'file' && ['jpg', 'png'].includes((record.suffix || '').toLowerCase())) {
+        this.previewType = 'text'
+      } else {
+        this.previewType = record.courseWareType
+      }
+      this.previewTitle = record.fileName || record.title
       this.preview = true
-      this.previewTitle = record.title
       this.content = record.note
       this.url = record.mediaUrl || record.coverImageUrl
     },
     remove (row) {
-      this.courseWares = {
-        fileList: (this.courseWares.fileList || []).filter(item => item.courseWareId !== row.courseWareId),
-        videoList: (this.courseWares.videoList || []).filter(item => item.courseWareId !== row.courseWareId),
-        imageTextList: (this.courseWares.imageTextList || []).filter(item => item.courseWareId !== row.courseWareId)
+      this.checkCourseWares = {
+        fileList: (this.checkCourseWares.fileList || []).filter(item => item.courseWareId !== row.courseWareId),
+        videoList: (this.checkCourseWares.videoList || []).filter(item => item.courseWareId !== row.courseWareId),
+        imageTextList: (this.checkCourseWares.imageTextList || []).filter(item => item.courseWareId !== row.courseWareId)
       }
       this.tableView = this.tableView.filter(item => item.courseWareId !== row.courseWareId)
     },
@@ -253,10 +280,11 @@ export default {
       }))
     },
     submit () {
+      this.checkCourseWares = { ...this.courseWares }
       this.tableView = [
-        ...(this.courseWares.fileList || []),
-        ...(this.courseWares.videoList || []),
-        ...(this.courseWares.imageTextList || [])
+        ...(this.checkCourseWares.fileList || []),
+        ...(this.checkCourseWares.videoList || []),
+        ...(this.checkCourseWares.imageTextList || [])
       ]
       this.visible = false
     },

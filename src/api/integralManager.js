@@ -1,45 +1,4 @@
 import request, { fileRequest } from '@/utils/request'
-// 临时获取通用规则数据
-export function getTempCommonData () {
-  return [
-    {
-      id: '1',
-      setName: '积分有效期',
-      setDetail: '永久有效',
-      updatedAt: '2022-07-21 17:27',
-      setType: '1',
-      creditsSetDeatilVo: {
-        restrictionType: '2',
-        isChecked: '1',
-        monthDay: '10-10',
-        lastYearMonthDay: '05-10',
-        nextYearMonthDay: '10-09'
-      }
-    },
-    {
-      id: '2',
-      setName: '积分上限',
-      setDetail: '无上限',
-      updatedAt: '2022-07-21 17:27',
-      setType: '2',
-      creditsSetDeatilVo: {
-        restrictionType: '4',
-        isChecked: '1'
-      }
-    },
-    {
-      id: '3',
-      setName: '到期提醒',
-      setDetail: '不提醒',
-      updatedAt: '2022-07-21 17:27',
-      setType: '3',
-      creditsSetDeatilVo: {
-        restrictionType: '6',
-        isChecked: '1'
-      }
-    }
-  ]
-}
 // 获取通用规则数据
 export function getCommonRulesApi (params) {
   return request({
@@ -67,34 +26,66 @@ export function getIntegralRulesApi (params) {
 // 更新积分规则数据
 export function setIntegralRulesApi (data) {
   return request({
-    url: '/creditsRule/creditsRuleList',
+    url: '/creditsRule/setCreditsRule',
     method: 'post',
     data
   })
 }
+// 增加商品规则数据
+export function addGoodsRulesApi (data) {
+  return request({
+    url: '/creditsRule/addGoodsCreditsRule',
+    method: 'post',
+    data
+  })
+}
+// 删除商品规则数据
+export function deleteGoodsRulesApi (data) {
+  return request({
+    url: '/creditsRule/delGoodsCreditsRule',
+    method: 'delete',
+    data
+  })
+}
 // 获取员工积分列表
-export function getCustomerIntegralApi (params) {
+export function getCustomerIntegralApi (data) {
   return request({
     url: '/creditsEmployee/creditsEmployeePage',
-    method: 'get',
-    params
+    method: 'post',
+    data
   })
 }
 // 导出员工积分
-export function exportCustomerIntegralApi (params) {
+export function exportCustomerIntegralApi (data) {
   return fileRequest({
-    url: '/creditsEmployee/creditsEmployeePage',
-    method: 'get',
+    url: '/creditsEmployee/creditsEmployeeExcel',
+    method: 'post',
     responseType: 'blob',
-    params
+    data
   })
 }
 // 批量调整员工积分
-export function batchCustomerIntegralApi (params) {
+export function batchCustomerIntegralApi (data) {
   return request({
     url: '/creditsEmployee/updateCreditsEmployee',
+    method: 'post',
+    data
+  })
+}
+// 获取历史调整原因
+export function getHistoryReasonApi (params) {
+  return request({
+    url: '/creditsChangeCause/getCauseName',
     method: 'get',
     params
+  })
+}
+// 删除历史调整原因
+export function deleteHistoryReasonApi (data) {
+  return request({
+    url: '/creditsChangeCause/delete',
+    method: 'post',
+    data
   })
 }
 // 总体积分统计
@@ -106,19 +97,20 @@ export function totalIntegralStatisticApi (params) {
   })
 }
 // 积分明细列表
-export function integralDetailListApi (params) {
+export function integralDetailListApi (data) {
   return request({
     url: '/creditsEmployeeLog/employeeIntegralPage',
-    method: 'get',
-    params
+    method: 'post',
+    data
   })
 }
 // 积分明细导出
-export function exportIntegralDetailListApi (params) {
-  return request({
+export function exportIntegralDetailListApi (data) {
+  return fileRequest({
     url: '/creditsEmployeeLog/employeeIntegralExcel',
-    method: 'get',
-    params
+    method: 'post',
+    responseType: 'blob',
+    data
   })
 }
 // 临时获取有效期类型数据

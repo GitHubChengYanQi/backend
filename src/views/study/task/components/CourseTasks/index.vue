@@ -100,7 +100,7 @@
           </div>
           <div slot="tag" slot-scope="text,row">
             <template>
-              <a-popover title="适用员工" v-if="row.applicableObject === 2">
+              <a-popover title="考核员工" v-if="row.applicableObject === 2">
                 <template slot="content">
                   <div class="myLabelBox">
                     <a-tag v-for="(item, index) in row.bindEmpList" :key="index">{{ item.name }}</a-tag>
@@ -299,8 +299,10 @@ export default {
     async excel () {
       this.excelLoading = true
       const time = this.screenData.time || []
+      const order = this.sorter.order === 'ascend' ? 'asc' : 'desc'
       const data = {
         ...this.screenData,
+        sorter: (this.sorter.field && this.sorter.order) ? this.sorter.field + ' ' + order : null,
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
         haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,

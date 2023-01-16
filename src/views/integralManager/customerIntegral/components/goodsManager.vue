@@ -12,6 +12,14 @@
       :getContainer="() => $refs['goods_manager_container']"
     >
       <a-spin :spinning="modalLoadingStatus">
+        <div class="searchLine">
+          <a-input v-model="screenData.name" placeholder="请输入商品名称" class="inputClass"></a-input>
+          <a-button
+            style="margin-left: 10px"
+            type="primary"
+            @click="search"
+          >查询</a-button>
+        </div>
         <a-table
           :row-key="record => record.id"
           :columns="columns"
@@ -39,7 +47,7 @@
           :disabled="modalLoadingStatus"
           @click="closeGoodsManager()"
         >取消</a-button>
-        <a-button type="primary" :disabled="modalLoadingStatus" @click="confirmGoodsManager">确定</a-button>
+        <a-button type="primary" :disabled="modalLoadingStatus || selectedRowKeys.length === 0" @click="confirmGoodsManager">确定</a-button>
       </template>
     </a-modal>
   </div>
@@ -205,6 +213,14 @@ export default {
   },
 
   methods: {
+    /**
+     * 查询
+     */
+    search () {
+      this.goodsManagerPagination.current = 1
+      this.screenData.erpOrderNos = ''
+      this.getTableData()
+    },
     getData () {
       const params = {
         page: this.goodsManagerPagination.current,
@@ -268,11 +284,21 @@ export default {
       this.goodsManagerShowStatus = false
       this.$emit('update:showStatus', this.goodsManagerShowStatus)
       this.$emit('submitConfirm', this.selectRowArray)
+      this.selectedRowKeys = []
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="less" scoped>
+.goodsManagerClass {
+  .searchLine {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    .inputClass {
+      width: 200px;
+    }
+  }
+}
 </style>

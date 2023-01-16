@@ -85,7 +85,7 @@
           {{ text | filterNull }}
         </div>
         <div slot="mainDrugList" slot-scope="text">
-          <a-popover title="主要用药" v-if="text.length > 0">
+          <a-popover title="主要用药" v-if="text && text.length > 0">
             <template slot="content">
               <div class="labelBox">
                 <a-tag v-for="(item, index) in text" :key="index">{{ item }}</a-tag>

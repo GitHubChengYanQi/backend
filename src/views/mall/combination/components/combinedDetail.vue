@@ -36,13 +36,13 @@
 
         <a-form-model-item class="drugItem">
           <template slot="label"><span class="formTitle"></span>主药</template>
-          <selectDrug :data="form.mainDrug" :drug="drugList"></selectDrug>
+          <selectDrug :data="form.mainDrug"></selectDrug>
         </a-form-model-item>
 
         <a-form-model-item class="drugItem" v-for="(item,index) in form.adjuvants" :key="index">
           <template slot="label"><span class="formTitle"></span>{{ `辅助用药${numMap[index+1]}` }}</template>
           <a-button class="del" type="danger" @click="delFn(index)">删除</a-button>
-          <selectDrug :data="item.drugs" :drug="drugList"></selectDrug>
+          <selectDrug :data="item.drugs"></selectDrug>
         </a-form-model-item>
 
         <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { combinDetail, searchSalesGuidance, getCommonNameList, combinUpdate, combinAdd } from '@/api/mall'
+import { combinDetail, searchSalesGuidance, combinUpdate, combinAdd } from '@/api/mall'
 import diseaseCascader from './diseaseCascader'
 import selectDrug from './selectDrug.vue'
 import { deepClonev2, getParams } from '@/utils/util'
@@ -110,22 +110,9 @@ export default {
       this.id = id
       this.getCombined(id)
     }
-    this.getCommonNameList()
   },
   methods: {
     deepClonev2,
-    /**
-     * 获取通用名列表
-     * @param {*} id
-     */
-    getCommonNameList (name) {
-      const param = {
-        name
-      }
-      getCommonNameList(param).then(res => {
-        this.drugList = res.data
-      })
-    },
     /**
      * 获取用药推荐
      * @param {*} id

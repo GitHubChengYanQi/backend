@@ -42,7 +42,7 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" width="50" :src="record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50'">
+                <img height="50" width="50" :src="record.coverImageUrl ? record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50' : require('@/assets/study/examImg.png')">
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">
@@ -59,7 +59,7 @@
               <div>
                 <a-button
                   class="successButton"
-                  @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?examId=${record.examId}&courseId=${$router.history.current.query.courseId}&examCount=${record.examCount || 0}&passExamCount=${record.passExamCount || 0}&noPassExamCount=${record.noPassExamCount || 0}&inExamCount=${record.inExamCount || 0}`)"
+                  @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?examId=${record.examId}&courseTaskId=${$router.history.current.query.courseTaskId || ''}&courseId=${$router.history.current.query.courseId}&examCount=${record.examCount || 0}&passExamCount=${record.passExamCount || 0}&noPassExamCount=${record.noPassExamCount || 0}&inExamCount=${record.inExamCount || 0}`)"
                 >
                   查看详情
                 </a-button>

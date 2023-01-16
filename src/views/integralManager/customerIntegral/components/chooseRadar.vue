@@ -1,7 +1,6 @@
 <template>
   <div class="radarChooseToast_Component_Container" ref="radarChooseToast_Component_Ref">
     <a-modal
-      :zIndex="zIndex"
       :visible="visible"
       centered
       @ok="handleAddRadarOk"
@@ -38,87 +37,53 @@
               :columns="columns"
               :data-source="tableData"
               :pagination="pagination"
-              :row-selection="{ type: isRadioStatus ? 'radio' : 'checkbox' ,selectedRowKeys:rowSelection,onChange: onSelectChange}"
+              :row-selection="{ selectedRowKeys: rowSelection, onChange: onSelectChange }"
               @change="handleTableChange"
               class="table"
-              ref="table"
-            >
-              <div
-                slot="ditch"
-                slot-scope="list, record"
-              >
-                <a-select
-                  style="width: 100px;"
-                  v-model="record.selectChannel"
-                  placeholder="请选择..."
-                >
-                  <a-select-option v-for="item in list" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
+              ref="table">
+              <div slot="ditch" slot-scope="list, record">
+                <a-select style="width: 100px;" :getPopupContainer="() => $refs['radarChooseToast_Component_Ref']" v-model="record.selectChannel" placeholder="请选择...">
+                  <a-select-option v-for="item in list" :key="item.id" :value="item.id">{{ item.name
+                  }}</a-select-option>
                 </a-select>
               </div>
-              <div
-                slot="example"
-                slot-scope="text,record"
-              >
+              <div slot="example" slot-scope="text,record">
                 <template>
                   <div class="example">
-                    <div
-                      v-if="record.type == 2"
-                      class="pdf"
-                    >
+                    <div v-if="record.type == 2" class="pdf">
                       <div class="title">{{ record.entry.linkTitle }}</div>
                       <div class="icon_box">
-                        <img
-                          class="icon"
-                          :src="require('@/assets/pdf.png')"
-                          alt=""
-                        >
+                        <img class="icon" :src="require('@/assets/pdf.png')" alt="">
                       </div>
                     </div>
-                    <div
-                      v-else
-                      class="example_box"
-                    >
+                    <div v-else class="example_box">
                       <div class="left">
                         <div class="title">{{ record.entry.linkTitle }}</div>
                         <div class="content">{{ record.entry.linkDigest }}</div>
                       </div>
                       <div class="right">
-                        <img
-                          class="img"
-                          :src="record.entry.linkImg"
-                          alt=""
-                        />
+                        <img v-if="record.entry.linkImg" class="img" :src="record.entry.linkImg" alt="" />
                       </div>
                     </div>
 
                   </div>
                 </template>
               </div>
-              <div
-                slot="radarTab"
-                slot-scope="text,record"
-              >
+              <div slot="radarTab" slot-scope="text,record">
                 <template>
                   <a-popover
                     title="标签"
-                    v-if="record.track && record.track.linkState && record.track.linkState.length > 0"
-                  >
+                    v-if="record.track && record.track.linkState && record.track.linkState.length > 0">
                     <template slot="content">
                       <div class="labelBox">
-                        <a-tag
-                          v-for="(item, index) in record.track.linkState"
-                          :key="index"
-                        >{{ item.name }}</a-tag>
+                        <a-tag v-for="(item, index) in record.track.linkState" :key="index">{{ item.name }}</a-tag>
                       </div>
                     </template>
                     <a-tag type="button">
                       查看
                     </a-tag>
                   </a-popover>
-                  <span
-                    class="nolabel"
-                    v-else
-                  >无标签</span>
+                  <span class="nolabel" v-else>无标签</span>
                 </template>
               </div>
             </a-table>
@@ -131,24 +96,16 @@
 
 <script>
 /**
-   * @param v-model 控制是否显示  由于需要判断点击确定后的数量，类型是否允许展示，所以取消展示由父组件判断，内部不主动关闭
-   * @function handleAddRadarOk 点击确定后展示items
-   *
-   */
+ * @param v-model 控制是否显示  由于需要判断点击确定后的数量，类型是否允许展示，所以取消展示由父组件判断，内部不主动关闭
+ * @function handleAddRadarOk 点击确定后展示items
+ *
+ */
 import { getDict } from '@/api/common'
 import { scrmRadarArticleFind, scrmRadarShiftSend } from '@/api/setRadar'
 
 export default {
   name: 'RadarChoose',
   props: {
-    zIndex: {
-      type: Number,
-      default: 1000
-    },
-    isRadioStatus: {
-      type: Boolean,
-      default: false
-    },
     visible: {
       default: false,
       type: Boolean
@@ -291,7 +248,7 @@ export default {
             return items.name == item.shape
           })
           item.type = typeArr.length == 0 ? 3 : typeArr[0].code
-          item.selectChannel = undefined
+          item.selectChannel = item.ditch.length === 1 ? item.ditch[0].id : undefined
           return item
         })
         this.pagination.total = res.data.total
@@ -328,125 +285,125 @@ export default {
   }
 }
 </script>
-  <style lang='less'>
-  .radarChooseToast_Component_Container {
-    .interactionRadar_table_box {
-      flex-grow: 1;
-      box-sizing: border-box;
-      padding: 5px 10px;
-      min-width: 650px;
+<style lang='less'>
+.radarChooseToast_Component_Container {
+  .interactionRadar_table_box {
+    flex-grow: 1;
+    box-sizing: border-box;
+    padding: 5px 10px;
+    min-width: 650px;
 
-      .hearder {
-        width: 100%;
+    .hearder {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      .rigBox {
+        display: flex;
+        height: 45px;
+        margin-right: 20px;
+      }
+
+      .search_box {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
-        .rigBox{
-          display: flex;
-          height: 45px;
-          margin-right: 20px;
-        }
+        align-items: center;
 
-        .search_box {
+        .search {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
+          margin-right: 15px;
+          margin-bottom: 25px;
 
-          .search {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-right: 15px;
-            margin-bottom: 25px;
-
-            .title {
-              white-space: nowrap;
-            }
-
-            .input_box {
-              .date {
-                width: 200px;
-              }
-            }
+          .title {
+            white-space: nowrap;
           }
-        }
 
-        .button_box {
-          .button {
-            margin-left: 10px;
+          .input_box {
+            .date {
+              width: 200px;
+            }
           }
         }
       }
 
-      .content {
+      .button_box {
+        .button {
+          margin-left: 10px;
+        }
+      }
+    }
+
+    .content {
+      width: 100%;
+
+      .table_box {
         width: 100%;
 
-        .table_box {
+        .table {
           width: 100%;
 
-          .table {
+          .example {
             width: 100%;
+            height: 100%;
 
-            .example {
-              width: 100%;
-              height: 100%;
+            .example_box {
+              width: 178px;
+              height: 79px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              box-sizing: border-box;
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 10px;
 
-              .example_box {
-                width: 178px;
-                height: 79px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                box-sizing: border-box;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 10px;
+              .left {
+                width: 90px;
+                font-size: 12px;
+                color: #7f7f7f;
 
-                .left {
-                  width: 90px;
-                  font-size: 12px;
-                  color: #7f7f7f;
-
-                  .title {
-                    white-space: nowrap;
-                    text-align: start;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                  }
-
-                  .content {
-                    white-space: nowrap;
-                    text-align: start;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                  }
+                .title {
+                  white-space: nowrap;
+                  text-align: start;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
                 }
 
-                .img {
-                  width: 57px;
-                  height: 44px;
+                .content {
+                  white-space: nowrap;
+                  text-align: start;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
                 }
               }
 
-              .pdf {
-                width: 178px;
-                height: 87px;
-                display: flex;
-                justify-content: space-between;
-                box-sizing: border-box;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 10px;
+              .img {
+                width: 57px;
+                height: 44px;
+              }
+            }
 
-                .title {
-                  flex-grow: 1;
-                  text-align: start;
-                }
+            .pdf {
+              width: 178px;
+              height: 87px;
+              display: flex;
+              justify-content: space-between;
+              box-sizing: border-box;
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 10px;
 
-                .icon {
-                  width: 70px;
-                  height: auto;
-                }
+              .title {
+                flex-grow: 1;
+                text-align: start;
+              }
+
+              .icon {
+                width: 70px;
+                height: auto;
               }
             }
           }
@@ -454,7 +411,10 @@ export default {
       }
     }
   }
-  </style>
-  <style lang='less' scoped>
-
-  </style>
+}
+</style>
+<style lang='less' scoped>
+/deep/.ant-select-dropdown {
+  z-index: 3000;
+}
+</style>

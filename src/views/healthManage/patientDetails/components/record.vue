@@ -8,7 +8,7 @@
               {{ item.planName }}
             </a-select-option>
           </a-select>
-          <a-button type="primary" :disabled="!planList.length" @click="openMoadl" v-permission="'/healthManage/patientDetails/addTask#post'"> 添加随访任务 </a-button>
+          <a-button type="primary" :disabled="!planList.length || planList[0].isDefault === 2" @click="openMoadl" v-permission="'/healthManage/patientDetails/addTask#post'"> 添加随访任务 </a-button>
         </Space>
       </a-form-item>
       <a-form-item label="分类查看：">
@@ -64,7 +64,7 @@
                       <div class="btns flex-row-center">
                         <div class="edit" v-if="obj.type == 1 && obj.status == 1" @click="getQuestionResults(obj, true)">编辑
                         </div>
-                        <div class="del" @click="delTask(obj)">删除</div>
+                        <div class="del" v-if="planList[0].isDefault !== 2" @click="delTask(obj)">删除</div>
                       </div>
                     </div>
                   </div>
@@ -222,7 +222,6 @@ export default {
       // // unzip
       var _data = pako.inflate(binData, { to: 'string' })
       this.taskObj = JSON.parse(_data)
-      console.log(this.taskObj)
       this.loading = false
     },
     /**

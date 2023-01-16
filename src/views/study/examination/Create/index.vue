@@ -7,6 +7,9 @@
           <div style="font-size: 16px;font-weight: bold;flex-grow: 1">
             {{ `${$router.history.current.query.id ? '编辑' : '新建'}考试` }}
           </div>
+          <div class="my-space">
+            <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
+          </div>
         </div>
 
         <a-form
@@ -103,9 +106,6 @@
               </div>
             </div>
           </a-form-item>
-          <div style="text-align: center">
-            <a-button :loading="loading" style="border-radius: 8px" type="primary" @click="handleSubmit">保存</a-button>
-          </div>
         </a-form>
       </div>
     </a-spin>
