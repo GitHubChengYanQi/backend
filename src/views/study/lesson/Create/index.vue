@@ -40,7 +40,7 @@
           <a-form-item
             label="选择课件"
             :label-col="{ span: 3 }"
-            :wrapper-col="{ span: 19 }"
+            :wrapper-col="{ span: 21 }"
           >
             <selectCourseware
               v-if="!detailLoading"
