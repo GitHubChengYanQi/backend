@@ -2,29 +2,29 @@
   <div class="TaskChart_Component_Container">
     <ChartContainer name="任务发送情况占比" :width="'60%'" style="margin-right: 1%;">
       <template #searchTab>
-        <span style="font-weight: bold;">任务总数 1682</span>
+        <span style="font-weight: bold;">任务总数 {{ (data.tasksend_reports && data.tasksend_reports.totalnum) || '-' }}</span>
       </template>
       <div style="height: 410px;display: flex;justify-content: space-around;">
         <div class="circleItem">
-          <FanDiagram :type="1" :dataArr="[['北京公司', 3], ['', 30]]" />
+          <FanDiagram :type="1" :dataArr="data.tasksendChart1" />
         </div>
         <div class="circleItem">
-          <FanDiagram :type="1" :dataArr="[['北京公', 3], ['', 30]]" />
+          <FanDiagram :type="1" :dataArr="data.tasksendChart2" />
         </div>
         <div class="circleItem">
-          <FanDiagram :type="1" :dataArr="[['北京', 3], ['', 30]]" />
+          <FanDiagram :type="1" :dataArr="data.tasksendChart3" />
         </div>
       </div>
     </ChartContainer>
-    <ChartContainer width="39%" name="启用方案TOP5">
+    <ChartContainer width="39%" name="任务类型占比情况">
       <template #rightTop>
-        <span style="font-weight: bold;">未发送任务总量：122</span>
+        <span style="font-weight: bold;">未发送任务总量：{{ (data.tasktab_reports && data.tasktab_reports.num) || '-' }}</span>
       </template>
       <template #searchTab>
         <a-radio-group
           default-value="1"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')"
+          @change="({ target: { value } }) => handleChartItemChange({tasktab: value, targetdata: 2}, 'tasktab_reports')"
         >
           <a-radio-button value="1">总任务</a-radio-button>
           <a-radio-button value="2">已发送任务</a-radio-button>
@@ -32,8 +32,8 @@
           <a-radio-button value="4">未发送任务</a-radio-button>
         </a-radio-group>
       </template>
-      <div style="height: 400px;">
-        <FanDiagram :type="0" :dataArr="[['北京', 3], ['北京q', 30]]" />
+      <div style="height: 400px;" v-if="data.tasktab_reports">
+        <FanDiagram :type="0" :dataArr="data.tasktab_reports.chartData" />
       </div>
     </ChartContainer>
     <ChartContainer name="任务数据对比情况">
@@ -41,7 +41,7 @@
         <a-radio-group
           default-value="1"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')"
+          @change="({ target: { value } }) => handleChartItemChange({taskpertab: value, targetdata: 3}, 'taskpertab_reports')"
         >
           <a-radio-button value="1">任务数</a-radio-button>
           <a-radio-button value="2">发送数</a-radio-button>
@@ -49,15 +49,12 @@
           <a-radio-button value="4">未发送数</a-radio-button>
         </a-radio-group>
       </template>
-      <div style="height: 250px;">
+      <div style="height: 250px;" v-if="data.taskpertab_reports">
         <FanDiagram
           :type="4"
           :dataObj="{
-            xAxis: ['2021-1', '2021-2'],
-            data: {
-              'A片区': [200, 300, 400],
-              'B片区': [230, 330, 430]
-            }
+            xAxis: data.taskpertab_reports.xaxis,
+            data: data.taskpertab_reports.data
           }"
         />
       </div>
@@ -67,22 +64,19 @@
         <a-radio-group
           v-model="chart4Value"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({ value }, 'key')"
+          @change="({ target: { value } }) => handleChartItemChange({tasktype: value, targetdata: 4}, 'tasktype_reports')"
         >
           <a-radio-button value="1">问卷</a-radio-button>
           <a-radio-button value="2">患教</a-radio-button>
           <a-radio-button value="3">嘱托</a-radio-button>
         </a-radio-group>
       </template>
-      <div style="height: 250px;">
+      <div style="height: 250px;" v-if="data.tasktype_reports">
         <FanDiagram
           :type="5"
           :dataObj="{
-            xAxis: ['2021-1', '2021-2','2021-3'],
-            data:{
-              'A片区': [200, 300, 400 ],
-              'B片区': [230, 330, 430 ]
-            }
+            xAxis: data.tasktype_reports.xaxis,
+            data:data.tasktype_reports.data
           }"
           @getClick="e => chart4Value === '1' && showModel(e)"
         />
@@ -127,6 +121,9 @@
 <script>
 import FanDiagram from './FanDiagram'
 import ChartContainer from './chartContainer.vue'
+import { getChartItemTableDataReq } from '@/api/followData'
+import { deepClonev2 } from '@/utils/util'
+import { fixTaskSearchObj } from '../defaultData'
 export default {
   name: 'TaskChart',
   components: {
@@ -135,6 +132,10 @@ export default {
   },
   props: {
     data: {
+      type: Object,
+      default: () => { }
+    },
+    searchParams: {
       type: Object,
       default: () => { }
     }
@@ -146,37 +147,37 @@ export default {
       columns: [{
         align: 'center',
         title: '片区名称',
-        dataIndex: 'contactNick',
+        dataIndex: 'name',
         width: 110
       },
       {
         align: 'center',
         title: '应发任务量',
-        dataIndex: 'contactExist',
+        dataIndex: 'num',
         width: 110
       },
       {
         align: 'center',
         title: '实际发送量',
-        dataIndex: 'createdAt',
+        dataIndex: 'num_send',
         width: 110
       },
       {
         align: 'center',
         title: '用户完成量',
-        dataIndex: 'viewingChannels',
+        dataIndex: 'num_finish',
         width: 110
       },
       {
         align: 'center',
         title: '任务发送率',
-        dataIndex: 'viewingNumber',
+        dataIndex: 'send_per',
         width: 110
       },
       {
         align: 'center',
         title: '任务完成率',
-        dataIndex: 'viewingDuration',
+        dataIndex: 'finish_per',
         width: 110
       }],
       pagination: {
@@ -187,7 +188,8 @@ export default {
         showSizeChanger: true,
         pageSizeOptions: ['10', '20', '30', '50']
       },
-      tableData: [{ id: 1 }]
+      tableData: [],
+      chart4Name: ''
     }
   },
   computed: {},
@@ -196,11 +198,12 @@ export default {
   },
   methods: {
     // item级搜索
-    handleChartItemChange (value, key) {
-      this.$parent.handleChartItemChange(value, key)
+    handleChartItemChange (params, key) {
+      this.$parent.handleChartItemChange(params, key)
     },
-    showModel (e) {
-      console.log(e.dataIndex)
+    showModel ({ name }) {
+      this.chart4Name = name
+      this.getTableData()
       this.isShow = true
     },
     handleTableChange ({ current, pageSize }) {
@@ -208,7 +211,25 @@ export default {
       this.pagination.pageSize = pageSize
       this.getTableData()
     },
-    getTableData () {}
+    getTableData () {
+      const newSearchObj = deepClonev2(this.searchParams)
+      newSearchObj.planids = newSearchObj.planids.join(',')
+      newSearchObj[newSearchObj.range1] = newSearchObj.range2
+      newSearchObj.starttime = this.chart4Name
+      newSearchObj.endtime = this.chart4Name
+      delete newSearchObj.range1
+      delete newSearchObj.range2
+      delete newSearchObj.reportTrack
+      const { pageSize, current } = this.pagination
+      newSearchObj.size = pageSize
+      newSearchObj.current = current
+      const allSearchObj = fixTaskSearchObj(newSearchObj)
+      getChartItemTableDataReq(allSearchObj).then(res => {
+        console.log(res, 'res')
+        this.tableData = res.data.datas
+        this.pagination.total = res.data.total
+      })
+    }
   }
 }
 </script>

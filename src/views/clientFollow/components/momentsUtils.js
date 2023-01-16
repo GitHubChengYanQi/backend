@@ -186,7 +186,7 @@ export const chartDefaultOptions = {
   },
   series: [
     {
-      name: '新增成员',
+      name: '朋友圈发表量',
       type: 'line',
       lineStyle: {
         color: 'rgb(43 111 253)'

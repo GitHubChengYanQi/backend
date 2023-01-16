@@ -10,6 +10,7 @@
       </div>
     </div>
     <a-table
+      :rowKey="record => record.id || record.day"
       :columns="tableColunms"
       :data-source="tableData"
       :scroll="{ x: 1300 }"
@@ -19,7 +20,7 @@
       <!-- 表头 -->
       <slot v-for="key in titleSlots" :name="key" :slot="key"></slot>
       <!-- 表格 -->
-      <slot v-for="key in colunmsSlots" :name="key" :slot="key" slot-scope="text" :text="text"></slot>
+      <slot v-for="key in colunmsSlots" :name="key" :slot="key" slot-scope="text, record" :text="{text, record}"></slot>
     </a-table>
   </div>
 </template>
@@ -44,12 +45,16 @@ export default {
     titleSlots: {
       type: Array,
       default: () => []
+    },
+    tableTotal: {
+      type: Number,
+      default: 0
     }
   },
   data () {
     return {
       pagination: {
-        total: 0,
+        total: this.tableTotal,
         current: 1,
         pageSize: 10,
         showSizeChanger: true,
@@ -61,9 +66,6 @@ export default {
   },
   computed: {},
   watch: {},
-  created () {
-    this.getTableList()
-  },
   methods: {
     onSelectTableItemChange (rows) {
       this.selectedTableRowKeys = rows
