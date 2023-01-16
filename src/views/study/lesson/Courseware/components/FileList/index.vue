@@ -436,8 +436,7 @@ export default {
       this.screenData = {}
       this.getTableData()
     }
-  }
-  ,
+  },
   components: {
     upload, FilePreview, SelectEmployee, Preview
   }
