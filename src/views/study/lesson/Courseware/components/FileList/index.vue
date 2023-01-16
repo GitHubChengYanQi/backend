@@ -68,14 +68,24 @@
           <div slot="fileName" slot-scope="text,record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" width="50" v-if="['jpg','png'].includes((record.suffix || '').toLowerCase())"
-                     :src="record.mediaUrl">
-                <a-icon v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())" type="file-word"
-                        style="font-size: 24px" />
-                <a-icon v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())" type="file-ppt"
-                        style="font-size: 24px" />
-                <a-icon v-if="['pdf'].includes((record.suffix || '').toLowerCase())" type="file-pdf"
-                        style="font-size: 24px" />
+                <img
+                  height="50"
+                  width="50"
+                  v-if="['jpg','png'].includes((record.suffix || '').toLowerCase())"
+                  :src="record.mediaUrl"
+                >
+                <a-icon
+                  v-if="['doc','docx'].includes((record.suffix || '').toLowerCase())"
+                  type="file-word"
+                  style="font-size: 24px" />
+                <a-icon
+                  v-if="['ppt','pptx'].includes((record.suffix || '').toLowerCase())"
+                  type="file-ppt"
+                  style="font-size: 24px" />
+                <a-icon
+                  v-if="['pdf'].includes((record.suffix || '').toLowerCase())"
+                  type="file-pdf"
+                  style="font-size: 24px" />
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">
@@ -133,7 +143,12 @@
       @ok="handleOk"
       class="my-modal"
     >
-      <a-input v-model="fileName"></a-input>
+      <a-input
+        class="suffixInput"
+        v-model="fileName"
+        :maxLength="20"
+        :suffix="`${fileName.length || 0} / 20`"
+      ></a-input>
     </a-modal>
 
     <a-modal
@@ -296,15 +311,30 @@ export default {
     },
     onPercent (percent) {
       if (percent > this.percent) {
-        this.percent = percent
+        this.percent = parseInt(percent)
       }
     },
     download (records = []) {
       if (records.length === 0) {
         message.warn('请选择想要下载的文件！')
       } else {
-        records.forEach(item => {
-          window.open(item.mediaUrl)
+        var main = document.getElementById('app')// 随便获取一个页面上的div，Id要与括号内相同
+        records.forEach((item, index) => {
+          // 使用了闭包，返回的函数能够使用外部的path
+          const timer1 = setTimeout(() => {
+            const path = item.mediaUrl
+            // 定义一个看不见的iframe
+            const iframe = document.createElement('iframe')
+            iframe.style.display = 'none' // 防止影响页面设置不可见
+            iframe.style.height = '0' // 防止影响页面高度设置为0
+            iframe.src = path
+            main.appendChild(iframe)// 这一行必须，iframe挂在到dom树上才会发请求
+            var timer2 = setTimeout(function () {
+              iframe.remove()
+              clearTimeout(timer2)
+            }, 5000)
+            clearTimeout(timer1)
+          }, 1000 * index)
         })
       }
     },
@@ -328,13 +358,18 @@ export default {
       this.imgName = file.name
     },
     setVisible (record) {
-      this.fileName = record.fileName
+      const lastIndex = record.fileName.lastIndexOf('.')
+      this.fileName = record.fileName.substring(0, lastIndex === -1 ? record.fileName.length : lastIndex)
+      this.suffix = record.suffix
       this.fileId = record.courseWareId
       this.visible = true
     },
     handleOk () {
       this.updateLoading = true
-      courseWarEdit({ fileName: this.fileName, courseWareId: this.fileId }).then(() => {
+      courseWarEdit({
+        fileName: (this.fileName || '') + '.' + (this.suffix || ''),
+        courseWareId: this.fileId
+      }).then(() => {
         message.success('修改成功！')
         this.getTableData()
         this.visible = false
@@ -401,8 +436,11 @@ export default {
       this.screenData = {}
       this.getTableData()
     }
-  },
-  components: { upload, FilePreview, SelectEmployee, Preview }
+  }
+  ,
+  components: {
+    upload, FilePreview, SelectEmployee, Preview
+  }
 }
 </script>
 
@@ -581,6 +619,12 @@ export default {
 .statistics {
   /deep/ span {
     font-size: 14px !important;
+  }
+}
+
+.suffixInput {
+  /deep/ input {
+    padding-right: 70px !important;
   }
 }
 </style>

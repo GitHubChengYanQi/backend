@@ -134,7 +134,7 @@ import breadcrumb from '../../../../../components/Breadcrumd/index'
 import router from '@/router'
 import {
   courseExamBindExamBindPageExcelExport,
-  courseExamBindExamBindPageList, examTaskBindList
+  courseExamBindExamBindPageList, examTaskBindExamExcelExport, examTaskBindList
 } from '@/api/study/course'
 import moment from 'moment'
 import SelectEmployee from '../../../../../components/SelectEmployee/index'
@@ -263,19 +263,37 @@ export default {
         examStatus: this.screenData.examStatus === 'all' ? null : this.screenData.examStatus,
         examIsPass: this.screenData.examIsPass === 'all' ? null : this.screenData.examIsPass,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
-        storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null,
-        courseId: router.history.current.query.courseId,
-        examId: router.history.current.query.examId
+        storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
-      courseExamBindExamBindPageExcelExport(data, {
-        limit: 6500,
-        page: 1
-      }).then((res) => {
-        excelExport(res, '考试详情数据导出.xlsx')
-        message.success('导出成功!')
-      }).finally(() => {
-        this.excelLoading = false
-      })
+      if (this.task) {
+        examTaskBindExamExcelExport({
+          ...data,
+          examTaskId: router.history.current.query.id
+        }, {
+          limit: 6500,
+          page: 1
+        }).then((res) => {
+          excelExport(res, '考试详情数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      } else {
+        courseExamBindExamBindPageExcelExport({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId || null,
+          courseId: router.history.current.query.courseId,
+          examId: router.history.current.query.examId
+        }, {
+          limit: 6500,
+          page: 1
+        }).then((res) => {
+          excelExport(res, '考试详情数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      }
     },
     async getTableData () {
       this.loading = true
