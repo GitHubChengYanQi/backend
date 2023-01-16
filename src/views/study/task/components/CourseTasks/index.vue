@@ -310,7 +310,11 @@ export default {
       }
       courseTaskExcelExport(data, {
         limit: 6500,
-        page: 1
+        page: 1,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then((res) => {
         excelExport(res, '课程任务列表数据导出.xlsx')
         message.success('导出成功!')

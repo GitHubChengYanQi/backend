@@ -218,7 +218,11 @@ export default {
           courseTaskId: router.history.current.query.courseTaskId
         }, {
           limit: 6500,
-          page: 1
+          page: 1,
+          sorter: {
+            field: this.sorter.field,
+            order: this.sorter.order
+          }
         }).then((res) => {
           excelExport(res, '课件分析数据导出.xlsx')
           message.success('导出成功!')
@@ -231,7 +235,11 @@ export default {
           courseId: router.history.current.query.courseId
         }, {
           limit: 6500,
-          page: 1
+          page: 1,
+          sorter: {
+            field: this.sorter.field,
+            order: this.sorter.order
+          }
         }).then((res) => {
           excelExport(res, '课件分析数据导出.xlsx')
           message.success('导出成功!')
