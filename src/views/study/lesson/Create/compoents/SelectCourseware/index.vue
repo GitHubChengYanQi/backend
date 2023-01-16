@@ -3,7 +3,7 @@
     <a-button
       style="width: 200px;border-radius: 8px"
       class="add"
-      @click="visible = true;courseWares = {...checkCourseWares}"
+      @click="visible = true;courseWares = {...checkCourseWares};key='1'"
     >
       <a-icon type="plus" />
       添加
