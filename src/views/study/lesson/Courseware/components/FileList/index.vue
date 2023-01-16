@@ -324,13 +324,19 @@ export default {
           const timer1 = setTimeout(() => {
             const path = item.mediaUrl
             // 定义一个看不见的iframe
-            const iframe = document.createElement('iframe')
-            iframe.style.display = 'none' // 防止影响页面设置不可见
-            iframe.style.height = '0' // 防止影响页面高度设置为0
-            iframe.src = path
-            main.appendChild(iframe)// 这一行必须，iframe挂在到dom树上才会发请求
+            const a = document.createElement('a')
+            a.href = path
+            a.setAttribute('download', '123')
+            a.style.display = 'none'
+            a.click()
+            //
+            // const iframe = document.createElement('iframe')
+            // iframe.style.display = 'none' // 防止影响页面设置不可见
+            // iframe.style.height = '0' // 防止影响页面高度设置为0
+            // iframe.src = path
+            main.appendChild(a)// 这一行必须，iframe挂在到dom树上才会发请求
             var timer2 = setTimeout(function () {
-              iframe.remove()
+              a.remove()
               clearTimeout(timer2)
             }, 5000)
             clearTimeout(timer1)

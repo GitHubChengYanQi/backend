@@ -35,7 +35,7 @@
       <div class="box">
         <img :src="require('@/assets/study/examDetail05.png')">
         <div>
-          <div class="num">{{ passingRate }}</div>
+          <div class="num">{{ passingRate }} %</div>
           通过率
         </div>
       </div>
@@ -271,7 +271,11 @@ export default {
           examTaskId: router.history.current.query.id
         }, {
           limit: 6500,
-          page: 1
+          page: 1,
+          sorter: {
+            field: this.sorter.field,
+            order: this.sorter.order
+          }
         }).then((res) => {
           excelExport(res, '考试详情数据导出.xlsx')
           message.success('导出成功!')
@@ -286,7 +290,11 @@ export default {
           examId: router.history.current.query.examId
         }, {
           limit: 6500,
-          page: 1
+          page: 1,
+          sorter: {
+            field: this.sorter.field,
+            order: this.sorter.order
+          }
         }).then((res) => {
           excelExport(res, '考试详情数据导出.xlsx')
           message.success('导出成功!')
