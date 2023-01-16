@@ -436,7 +436,7 @@ export default {
         this.count()
       }, 0)
     },
-    addOption (value, key) {
+    addOption (value, key, target) {
       const updateFileds = {}
       const question = this.form.getFieldValue(`questions[${key}]`)
       this.questions = this.questions.map((item, index) => {
@@ -465,6 +465,8 @@ export default {
         return item
       })
       setTimeout(() => {
+        const textArea = document.getElementsByClassName(target).item(0)
+        textArea.focus()
         this.form.setFieldsValue({
           ...updateFileds,
           [`questions[${key}].options.${String.fromCharCode(65 + value + 1)}`]: '',
