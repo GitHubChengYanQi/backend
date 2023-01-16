@@ -1,45 +1,4 @@
 import request, { fileRequest } from '@/utils/request'
-// 临时获取通用规则数据
-export function getTempCommonData () {
-  return [
-    {
-      id: '1',
-      setName: '积分有效期',
-      setDetail: '永久有效',
-      updatedAt: '2022-07-21 17:27',
-      setType: '1',
-      creditsSetDeatilVo: {
-        restrictionType: '2',
-        isChecked: '1',
-        monthDay: '10-10',
-        lastYearMonthDay: '05-10',
-        nextYearMonthDay: '10-09'
-      }
-    },
-    {
-      id: '2',
-      setName: '积分上限',
-      setDetail: '无上限',
-      updatedAt: '2022-07-21 17:27',
-      setType: '2',
-      creditsSetDeatilVo: {
-        restrictionType: '4',
-        isChecked: '1'
-      }
-    },
-    {
-      id: '3',
-      setName: '到期提醒',
-      setDetail: '不提醒',
-      updatedAt: '2022-07-21 17:27',
-      setType: '3',
-      creditsSetDeatilVo: {
-        restrictionType: '6',
-        isChecked: '1'
-      }
-    }
-  ]
-}
 // 获取通用规则数据
 export function getCommonRulesApi (params) {
   return request({
@@ -122,11 +81,11 @@ export function getHistoryReasonApi (params) {
   })
 }
 // 删除历史调整原因
-export function deleteHistoryReasonApi (params) {
+export function deleteHistoryReasonApi (data) {
   return request({
     url: '/creditsChangeCause/delete',
     method: 'post',
-    params
+    data
   })
 }
 // 总体积分统计

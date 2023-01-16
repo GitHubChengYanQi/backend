@@ -15,18 +15,25 @@
         type="primary"
         style="margin: 0 10px;"
         @click="goSearchData"
+        v-permission="'/creditsEmployee/creditsEmployeePage@post'"
       >查询</a-button>
       <a-button
         style="margin-right: 10px;"
         @click="goResetData"
+        v-permission="'/creditsEmployee/creditsEmployeePage@post'"
       >重置</a-button>
       <a-button
         style="margin-right: 10px;"
         @click="exportData"
+        v-permission="'/creditsEmployee/creditsEmployeeExcel@post'"
       >导出</a-button>
     </div>
     <div class="searchLine">
-      <a-button class="batchButtonDiv" @click="goBatchChangeIntegral">批量调整积分</a-button>
+      <a-button
+        class="batchButtonDiv"
+        @click="goBatchChangeIntegral"
+        v-permission="'/creditsEmployee/updateCreditsEmployee@post'"
+      >批量调整积分</a-button>
     </div>
     <a-table
       :loading="tableLoading"
@@ -41,7 +48,7 @@
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
-            <a-button type="link" @click="setIntegral(record)">调整积分</a-button>
+            <a-button type="link" @click="setIntegral(record)" v-permission="'/creditsEmployee/updateCreditsEmployee@post'">调整积分</a-button>
           </div>
         </template>
       </div>
@@ -69,7 +76,7 @@
                 <a-input-number
                   placeholder="请输入积分"
                   :min="1"
-                  :value="batchInfo.integral ? Number(batchInfo.integral) : ''"
+                  :value="batchInfo.integral ? Number(batchInfo.integral) : 1"
                   class="singleInputClass"
                   @change="changeIntegralNumber">
                 </a-input-number>
@@ -85,16 +92,18 @@
             <div class="singleFormContent">
               <div class="singleRulesContent">
                 <a-textarea placeholder="请输入原因" class="rasonTextareaDiv" v-model="batchInfo.adjustCause"></a-textarea>
-                <div class="len">0/18</div>
+                <div class="len">{{ `${ batchInfo.adjustCause && batchInfo.adjustCause.length ? batchInfo.adjustCause.length : '0' }/50` }}</div>
               </div>
               <div class="singleReasonContent">
                 <div class="reasonTopDiv">
                   <div class="reasonTitle">历史调整原因</div>
-                  <div class="reasonEditButton">编辑</div>
+                  <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">编辑</div>
                 </div>
                 <div class="reasonTagDiv">
-                  <div class="singleReasonTag" v-for="item in historyReasonList" :key="item">{{ item }}
-                  </div>
+                  <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @close="deleteHistoryTag($event, item)">{{ returnReasonText(item) }}</a-tag>
+                  <!-- <div class="singleReasonTag" v-for="item in historyReasonList" :key="item">{{ item }}
+                    <div class="singleDelete">X</div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -106,7 +115,11 @@
           :disabled="batchInfoModalLoading === true"
           @click="closeIntegralBatchModal"
         >取消</a-button>
-        <a-button :disabled="batchInfoModalLoading === true" type="primary" @click="confirmIntegralBatch">确定</a-button>
+        <a-button
+          :disabled="batchInfoModalLoading === true"
+          type="primary"
+          @click="confirmIntegralBatch"
+          v-permission="'/creditsEmployee/updateCreditsEmployee@post'">确定</a-button>
       </template>
     </a-modal>
     <!-- <SelectModal
@@ -138,6 +151,13 @@ export default {
   components: {
     SelectModal
   },
+  watch: {
+    'batchInfo.adjustCause' (e) {
+      if (e && e.length > 50) {
+        this.batchInfo.adjustCause = e.slice(0, 50)
+      }
+    }
+  },
   props: {
     multiple: {
       type: Boolean,
@@ -146,6 +166,7 @@ export default {
   },
   data () {
     return {
+      isCloseReason: false, // 历史调整原因是否可删除
       historyReasonList: [],
       deepClonev2,
       // 批量处理积分弹框加载动画
@@ -241,18 +262,32 @@ export default {
   },
 
   methods: {
+    // 返回调整原因(最多显示10个字)
+    returnReasonText (text) {
+      if (text.length > 10) {
+        return text.slice(0, 10)
+      } else {
+        return text
+      }
+    },
+    // 去删除原因
+    goDeleteReason () {
+      this.isCloseReason = !this.isCloseReason
+    },
     // 获取历史调整原因
     getHistoryList () {
       getHistoryReasonApi().then(response => {
-        this.historyReasonList = response.data.causeName
+        this.historyReasonList = response.data.causeName.slice(0, 10)
       })
     },
     // 删除历史原因
-    deleteHistory (text) {
+    deleteHistoryTag (e, text) {
       const params = { causeName: text }
+      // debugger
+      e.preventDefault()
       deleteHistoryReasonApi(params).then(response => {
         if (response.code === 200) {
-          this.getHistoryReasonApi()
+          this.getHistoryList()
         }
       })
     },
@@ -326,7 +361,7 @@ export default {
     },
     // 改变积分数字
     changeIntegralNumber (e) {
-      this.$set(this.batchInfo, 'integral', String(e))
+      this.$set(this.batchInfo, 'integral', e ? String(e) : '1')
     },
     // 表格监听事件
     handleTableChange ({ current, pageSize }, filters, sorter) {
@@ -408,6 +443,7 @@ export default {
     },
     // 点击调整积分
     setIntegral (record) {
+      this.batchInfo = {}
       this.integralBatchShowStatus = true
       this.getChangeType()
       this.$nextTick(() => {
@@ -415,10 +451,12 @@ export default {
         tempArray.push(record.id)
         this.$set(this.batchInfo, 'checkedRuleIdList', tempArray)
         this.$set(this.batchInfo, 'employeeIdList', [])
+        this.$set(this.batchInfo, 'integral', '10')
       })
     },
     // 点击批量调整按钮
     goBatchChangeIntegral () {
+      this.batchInfo = {}
       if (this.selectedKeyList.length !== 0) {
         // 有选项,直接弹出调整弹框
         this.integralBatchShowStatus = true
@@ -462,15 +500,17 @@ export default {
     },
     getKeys (e, type) {
       console.log(e, type, '选中回调')
-      this.$refs.SelectPersonnel.modalShow = false
-      this.integralBatchShowStatus = true
-      this.getChangeType()
-      this.$nextTick(() => {
-        const tempArray = this.deepClonev2(e)
-        this.$set(this.batchInfo, 'employeeIdList', tempArray)
-        this.$set(this.batchInfo, 'checkedRuleIdList', [])
-        this.$set(this.batchInfo, 'integral', '10')
-      })
+      if (e && e.length !== 0) {
+        this.$refs.SelectPersonnel.modalShow = false
+        this.integralBatchShowStatus = true
+        this.getChangeType()
+        this.$nextTick(() => {
+          const tempArray = this.deepClonev2(e)
+          this.$set(this.batchInfo, 'employeeIdList', tempArray)
+          this.$set(this.batchInfo, 'checkedRuleIdList', [])
+          this.$set(this.batchInfo, 'integral', '10')
+        })
+      }
     }
   }
 }

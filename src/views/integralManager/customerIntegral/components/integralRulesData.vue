@@ -26,9 +26,9 @@
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
-              <a-button type="link" @click="setIntegralMethod(record)">设置</a-button>
-              <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst">新增商品</a-button>
-              <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst">删除</a-button>
+              <a-button type="link" @click="setIntegralMethod(record)" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button>
+              <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst" v-permission="'/creditsRule/addGoodsCreditsRule@post'">新增商品</a-button>
+              <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst" v-permission="'/creditsRule/delGoodsCreditsRule@delete'">删除</a-button>
             </div>
           </template>
         </div>
@@ -63,7 +63,7 @@
               placeholder="请选择"
               class="singleInputClass"
               :min="1"
-              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : ''"
+              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
               @change="changeFriendCircleIntegralNumber">
             </a-input-number>
             <div class="singleFormText">积分</div>
@@ -88,7 +88,11 @@
           :disabled="integralFriendCircleLoading === true"
           @click="closeIntegralFriendCircleModal()"
         >取消</a-button>
-        <a-button type="primary" :disabled="integralFriendCircleLoading === true" @click="confirmIntegralFriendCircle">确定</a-button>
+        <a-button
+          type="primary"
+          :disabled="integralFriendCircleLoading === true"
+          @click="confirmIntegralFriendCircle"
+          v-permission="'/creditsRule/setCreditsRule@post'">确定</a-button>
       </template>
     </a-modal>
     <a-modal
@@ -121,7 +125,7 @@
               v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
                 && integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum ?
-                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) : ''"
+                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) : 1"
               @change="changeFriendDayNumber">
             </a-input-number>
             <div class="singleFormText">天</div>
@@ -131,7 +135,7 @@
               v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
                 && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ?
-                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : ''"
+                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
               class="singleInputClass"
               @change="changeAddFriendIntegral">
             </a-input-number>
@@ -157,7 +161,12 @@
           :disabled="integralAddFriendLoading === true"
           @click="closeIntegralAddFriendModal()"
         >取消</a-button>
-        <a-button type="primary" :disabled="integralAddFriendLoading === true" @click="confirmIntegralAddFriend">确定</a-button>
+        <a-button
+          type="primary"
+          :disabled="integralAddFriendLoading === true"
+          @click="confirmIntegralAddFriend"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+        >确定</a-button>
       </template>
     </a-modal>
     <a-modal
@@ -203,7 +212,7 @@
                 <a-input-number
                   :min="1"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
-                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum) : ''"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
                   @change="changeBuyLookAfterDayNumber">
@@ -234,7 +243,7 @@
                 <a-input-number
                   :min="1"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : ''"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
                   @change="changeBuyIntegralNumber">
@@ -263,7 +272,20 @@
           :disabled="integralBuyLoading === true"
           @click="closeIntegralBuyModal()"
         >取消</a-button>
-        <a-button :disabled="integralBuyLoading === true" type="primary" @click="confirmIntegralBuy">确定</a-button>
+        <a-button
+          v-if="buyModalType === 'set'"
+          :disabled="integralBuyLoading === true"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+          type="primary"
+          @click="confirmIntegralBuy"
+        >确定</a-button>
+        <a-button
+          v-if="buyModalType === 'add'"
+          :disabled="integralBuyLoading === true"
+          v-permission="'/creditsRule/addGoodsCreditsRule@post'"
+          type="primary"
+          @click="confirmIntegralBuy"
+        >确定</a-button>
       </template>
     </a-modal>
     <a-modal
@@ -309,7 +331,7 @@
                 <a-input-number
                   :min="1"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
-                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : ''"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
                   @change="changeMaterialIntergralNumber">
@@ -322,7 +344,7 @@
                 <a-input-number
                   :min="1"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
-                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum) : ''"
+                  :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
                   @change="changeMaterialValidDayNumber">
@@ -351,7 +373,12 @@
           :disabled="integralMaterialLoading === true"
           @click="closeIntegralMaterialModal()"
         >取消</a-button>
-        <a-button :disabled="integralMaterialLoading === true" type="primary" @click="confirmIntegralMaterial">确定</a-button>
+        <a-button
+          :disabled="integralMaterialLoading === true"
+          type="primary"
+          @click="confirmIntegralMaterial"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+        >确定</a-button>
       </template>
     </a-modal>
     <goodsManager
@@ -569,7 +596,7 @@ export default {
     },
     // 改变朋友圈积分数值
     changeFriendCircleIntegralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
     },
     // 设置朋友圈弹框点击取消
     closeIntegralFriendCircleModal () {
@@ -644,11 +671,11 @@ export default {
     // 改变新增好友弹框未流失天数
     changeFriendDayNumber (e) {
       // this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', e ? String(e) : '1')
     },
     // 改变新增好友弹框积分
     changeAddFriendIntegral (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
     },
     // 设置加好友弹框点击取消
     closeIntegralAddFriendModal () {
@@ -681,24 +708,24 @@ export default {
     },
     // 改变购买弹框看素材后购买天数
     changeBuyLookAfterDayNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', e ? String(e) : '1')
     },
     // 改变购买弹框未退换天数
     changeBuySalesReturnDayNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', e ? String(e) : '1')
     },
     // 改变购买弹框积分数
     changeBuyIntegralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
     },
     // 改变查看素材弹框积分
     changeMaterialIntergralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
     },
     // 改变查看素材弹框生效一次天数
     changeMaterialValidDayNumber (e) {
       // integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', String(e))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', e ? String(e) : '1')
     },
     // 获取规则限制类型数据字典
     async getCommonRuleLimitData () {
@@ -812,6 +839,9 @@ export default {
         if (response.code === 200) {
           this.integralBuyLoading = false
           this.integralBuyShowStatus = false
+          this.$set(this.integralPagination, 'current', 1)
+          this.$set(this.integralPagination, 'pageSize', 10)
+          this.getIntegralRulesData()
         }
       }).catch(() => {
         this.integralBuyLoading = false
@@ -853,6 +883,7 @@ export default {
       this.buyModalType = 'add'
       this.integralBuyShowStatus = true
       this.$nextTick(() => {
+        this.$set(this.integralRulesTypeInfo, 'id', info.id)
         this.$set(this.integralRulesTypeInfo, 'state', '0')
         this.$set(this.integralRulesTypeInfo, 'employeeId', [])
         this.$set(this.integralRulesTypeInfo, 'creditsRuleJsonDetailVo', {})
@@ -865,16 +896,26 @@ export default {
     },
     // 删除商品规则
     deleteGoodsMethod (info) {
-      this.integralTableLoading = true
-      const tempInfo = { id: info.id }
-      deleteGoodsRulesApi(tempInfo).then(response => {
-        if (response.code === 200) {
-          // this.integralPagination.current
-          this.$set(this.integralPagination, 'current', 1)
-          this.getIntegralRulesData()
+      const that = this
+      this.$confirm({
+        title: '确定删除所选内容?',
+        // content: 'Some descriptions',
+        okText: '确认删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async () => {
+          that.integralTableLoading = true
+          const tempInfo = { id: info.id }
+          deleteGoodsRulesApi(tempInfo).then(response => {
+            if (response.code === 200) {
+              // this.integralPagination.current
+              that.$set(that.integralPagination, 'current', 1)
+              that.getIntegralRulesData()
+            }
+          }).catch(() => {
+            that.integralTableLoading = false
+          })
         }
-      }).catch(() => {
-        this.integralTableLoading = false
       })
     }
   }

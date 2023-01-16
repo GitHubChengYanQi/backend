@@ -9,8 +9,9 @@
           type="primary"
           style="margin: 0 10px;"
           @click="goSearchTotalData"
+          v-permission="'/creditsEmployeeLog/employeeIntegralAll@get'"
         >查询</a-button>
-        <a-button @click="goResetTotalData">重置</a-button>
+        <a-button @click="goResetTotalData" v-permission="'/creditsEmployeeLog/employeeIntegralAll@get'">重置</a-button>
       </div>
       <div class="statisticCardDiv">
         <div class="singleStatisticCard">
@@ -52,7 +53,14 @@
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">变动原因</div>
-          <a-select class="pickSelectClass" placeholder="请选择" mode="multiple" v-model="searchDetailInfo.changeCauseList">
+          <a-select
+            :allowClear="true"
+            class="pickSelectClass"
+            placeholder="请选择"
+            mode="multiple"
+            v-model="searchDetailInfo.changeCauseList"
+            :maxTagCount="2"
+            :maxTagPlaceholder="`+${searchDetailInfo.changeCauseList.length - 2}`">
             <a-select-option v-for="item in reasonList" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
           </a-select>
         </div>
@@ -76,12 +84,19 @@
         <a-button
           type="primary"
           style="margin: 0 10px;"
-          @click="searchDetailMethod">查询</a-button>
+          @click="searchDetailMethod"
+          v-permission="'/creditsEmployeeLog/employeeIntegralPage@post'"
+        >查询</a-button>
         <a-button
           style="margin-right: 10px;"
           @click="resetDetailMethod"
+          v-permission="'/creditsEmployeeLog/employeeIntegralPage@post'"
         >重置</a-button>
-        <a-button type="primary" @click="exportDetailData">导出</a-button>
+        <a-button
+          type="primary"
+          @click="exportDetailData"
+          v-permission="'/creditsEmployeeLog/employeeIntegralExcel@post'"
+        >导出</a-button>
       </div>
       <a-table
         :loading="tableLoading"
@@ -93,6 +108,23 @@
         class="tableBox"
         :scroll="{ x: 1500}"
         @change="handleTableChange">
+        <div slot="adjustCause" slot-scope="text">
+          <a-popover title="理由" v-if="text !== ''&& text.length > 10">
+            <template slot="content">
+              <div class="labelBox">
+                {{ text }}
+              </div>
+            </template>
+            <div>{{ text.slice(0, 10) + '...' }}</div>
+          </a-popover>
+          <div v-else-if="text !== ''&& text.length <= 10">{{ text }}</div>
+          <div v-else>-</div>
+        </div>
+        <div slot="createdEmployeeName" slot-scope="text, record">
+          <template>
+            {{ record.createdEmployeeName ? record.createdEmployeeName : '-' }}
+          </template>
+        </div>
       </a-table>
     </div>
     <goodsManager
@@ -189,12 +221,14 @@ export default {
           title: '理由',
           dataIndex: 'adjustCause',
           align: 'center',
+          scopedSlots: { customRender: 'adjustCause' },
           width: 200
         },
         {
           title: '操作人',
           dataIndex: 'createdEmployeeName',
           align: 'center',
+          scopedSlots: { customRender: 'createdEmployeeName' },
           width: 200
         }
       ],
@@ -238,10 +272,13 @@ export default {
     getIntegralTotalData () {
       if (this.totalDateArray.length === 0) {
         console.log('无搜索日期', this.searchTotalInfo)
+        this.$delete(this.searchTotalInfo, 'beginTime')
+        this.$delete(this.searchTotalInfo, 'endTime')
       } else {
-        this.$set(this.searchTotalInfo, 'beginTime', moment(this.totalDateArray[0]._d).format('YYYY-MM-DD'))
-        this.$set(this.searchTotalInfo, 'endTime', moment(this.totalDateArray[1]._d).format('YYYY-MM-DD'))
+        this.$set(this.searchTotalInfo, 'beginTime', moment(this.totalDateArray[0]._d).format('YYYY-MM-DD HH:mm:ss'))
+        this.$set(this.searchTotalInfo, 'endTime', moment(this.totalDateArray[1]._d).format('YYYY-MM-DD HH:mm:ss'))
       }
+      console.log(this.searchTotalInfo, '请求接口前验证')
       totalIntegralStatisticApi(this.searchTotalInfo).then(response => {
         this.totalInfo = response.data
       })
@@ -261,8 +298,8 @@ export default {
         this.$delete(this.searchDetailInfo, 'beginTime')
         this.$delete(this.searchDetailInfo, 'endTime')
       } else {
-        this.$set(this.searchDetailInfo, 'beginTime', moment(this.detailDateArray[0]._d).format('YYYY-MM-DD'))
-        this.$set(this.searchDetailInfo, 'endTime', moment(this.detailDateArray[1]._d).format('YYYY-MM-DD'))
+        this.$set(this.searchDetailInfo, 'beginTime', moment(this.detailDateArray[0]._d).format('YYYY-MM-DD HH:mm:ss'))
+        this.$set(this.searchDetailInfo, 'endTime', moment(this.detailDateArray[1]._d).format('YYYY-MM-DD HH:mm:ss'))
       }
       if (this.goodsList.length === 0) {
         this.$set(this.searchDetailInfo, 'goodsIdList', [])
@@ -313,7 +350,7 @@ export default {
       } else {
         this.sorter = ''
       }
-      // this.getTableData()
+      this.getTableData()
     },
     // 改变积分明细查询数据时间段
     changeDetailDate (e) {
@@ -381,17 +418,19 @@ export default {
     exportDetailData () {
       // this.searchDetailInfo
       // selectedKeyList
-      this.checkedIncreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '1' ||
+      const checkedIncreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '1' ||
         item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5')
-      this.checkedDecreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '6' ||
+      const checkedDecreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '6' ||
         item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9')
-      this.$set(this.searchDetailInfo, 'checkedIncreaseIdList', this.checkedIncreaseIdList)
-      this.$set(this.searchDetailInfo, 'checkedDecreaseIdList', this.checkedDecreaseIdList)
+      this.$set(this.searchDetailInfo, 'checkedIncreaseIdList', checkedIncreaseIdList)
+      this.$set(this.searchDetailInfo, 'checkedDecreaseIdList', checkedDecreaseIdList)
       const params = {
         page: this.pagination.current,
         perPage: this.pagination.pageSize,
         ...this.searchDetailInfo
       }
+      console.log(this.searchDetailInfo, '积分明细导出')
+      debugger
       exportIntegralDetailListApi(params).then(response => {
         console.log(response)
         callDownLoadByBlob(response, '积分明细')

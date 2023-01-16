@@ -13,7 +13,7 @@
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
-              <a-button type="link" @click="setCommonMethod(record)">设置</a-button>
+              <a-button type="link" @click="setCommonMethod(record)" v-permission="'/creditsSet/setCreditsSet@post'">设置</a-button>
             </div>
           </template>
         </div>
@@ -93,7 +93,7 @@
             <div class="singleRadioContent">
               <div class="singleRadioTitle">每笔积分有效期为</div>
               <a-input-number
-                :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : ''"
+                :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
                 placeholder="请输入"
                 :min="commonRulesInfo.creditsSetDeatilVo.minNumber"
                 :max="commonRulesInfo.creditsSetDeatilVo.maxNumber"
@@ -133,6 +133,7 @@
         >取消</a-button>
         <a-button
           type="primary"
+          v-permission="'/creditsSet/setCreditsSet@post'"
           @click="confirmCommonValidity"
           :disabled="commonRulesValidityLoading === true"
         >确定</a-button>
@@ -161,7 +162,7 @@
               <div class="singleRadioTitle">员工每日获取积分上限</div>
               <a-input-number
                 :value="commonRulesInfo.creditsSetDeatilVo.integralMaxNum ?
-                  Number(commonRulesInfo.creditsSetDeatilVo.integralMaxNum) : ''"
+                  Number(commonRulesInfo.creditsSetDeatilVo.integralMaxNum) : 1"
                 placeholder="请输入"
                 :min="1"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '5'"
@@ -188,6 +189,7 @@
         >取消</a-button>
         <a-button
           type="primary"
+          v-permission="'/creditsSet/setCreditsSet@post'"
           :disabled="commonRulesLimitLoading === true"
           @click="confirmCommonLimit"
         >确定</a-button>
@@ -215,7 +217,7 @@
             <div class="singleRadioContent">
               <div class="singleRadioTitle">到期前</div>
               <a-input-number
-                :value="commonRulesInfo.creditsSetDeatilVo.beforeDayNum ? Number(commonRulesInfo.creditsSetDeatilVo.beforeDayNum) : ''"
+                :value="commonRulesInfo.creditsSetDeatilVo.beforeDayNum ? Number(commonRulesInfo.creditsSetDeatilVo.beforeDayNum) : 1"
                 placeholder="请输入"
                 :min="1"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '7'"
@@ -253,7 +255,12 @@
           :disabled="commonRulesRemindLoading === true"
           @click="closeCommonRemindModal()"
         >取消</a-button>
-        <a-button :disabled="commonRulesRemindLoading === true" type="primary" @click="confirmCommonRemind">确定</a-button>
+        <a-button
+          :disabled="commonRulesRemindLoading === true"
+          type="primary"
+          @click="confirmCommonRemind"
+          v-permission="'/creditsSet/setCreditsSet@post'"
+        >确定</a-button>
       </template>
     </a-modal>
     <integralRulesData></integralRulesData>
@@ -346,8 +353,6 @@ export default {
     // // this.getCommonRulesData()
     // // 正式的积分规则数据
     // // this.getIntegralRulesData()
-    // // 临时获取通用规则
-    // this.commonTableData = getTempCommonData()
     // this.integralTableData = getTempIntegralData()
   },
   methods: {
@@ -476,7 +481,7 @@ export default {
     // 改变每一笔积分有效期
     changeSingleIntegralNumber (e) {
       console.log(e, '每一笔积分有效期')
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', String(e))
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', e ? String(e) : '1')
     },
     // 通用规则有效期点击取消
     closeCommonValidityModal () {
@@ -561,7 +566,7 @@ export default {
     // 改变积分上限数字
     changeLimitNumber (e) {
       // commonRulesInfo.creditsSetDeatilVo.integralMaxNum
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', String(e))
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', e ? String(e) : '1')
     },
     // 通用规则积分上限点击确定
     confirmCommonLimit () {
@@ -582,7 +587,7 @@ export default {
         console.log(this.commonRulesInfo, '积分上限提交对象')
       }
       // console.log(this.commonValidityTypeInfo, '有效期提交对象')
-      debugger
+      // debugger
       // this.commonLimitShowStatus = false
       this.commonRulesSendMethod()
     },
@@ -601,7 +606,7 @@ export default {
         // commonRulesInfo.creditsSetDeatilVo
         this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', '1')
         // this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayTime', '1')
-        debugger
+        // debugger
       } else {
         // 不提醒
         this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', '')
@@ -611,7 +616,9 @@ export default {
     },
     // 改变到期提醒天数
     changeBeforeDayNum (e) {
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', String(e))
+      console.log(e, '改变到期天数')
+      // debugger
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', e ? String(e) : '1')
     },
     // 通用规则积分到期提醒点击确定
     confirmCommonRemind () {
