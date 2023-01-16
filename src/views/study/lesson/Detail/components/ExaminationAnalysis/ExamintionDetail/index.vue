@@ -303,7 +303,7 @@ export default {
       } else {
         res = await courseExamBindExamBindPageList({
           ...data,
-          courseTaskId: router.history.current.query.courseTaskId,
+          courseTaskId: router.history.current.query.courseTaskId || null,
           courseId: router.history.current.query.courseId,
           examId: router.history.current.query.examId
         }, params)
