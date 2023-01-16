@@ -40,8 +40,7 @@
           :treeCheckStrictly="true"
           placeholder="请选择"
           v-model="searchObj.range2"
-          style="width: 150px"
-        />
+          style="width: 150px" />
         <selectPersonnel
           v-if="searchObj.range1 === 'empids'"
           class="input"
@@ -49,8 +48,7 @@
           :changeId="true"
           :num="1"
           :type="'selector'"
-          style="width: 150px"
-        />
+          style="width: 150px" />
       </div>
       <div class="searchItem">
         <span class="label">任务状态：</span>
@@ -81,6 +79,7 @@
         :colunmsSlots="['name']"
         :titleSlots="['customName']"
         :tableTotal="pagination.total"
+        :exportPermission="'/diagnosiscareanalysisday/exportreportlist#POST'"
         @getTableList="(params) => getTableList(false, params)"
         @exportTableList="(params) => getTableList(true, params)">
         <template #customName>
@@ -242,7 +241,7 @@ export default {
       }
       this.$router.push({
         path: `/followUp/data/tableItemDetail`,
-        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify(searchParams)) }
+        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: type === '3' ? '/diagnosiscareanalysisday/exporttasknumlist#POST' : '/diagnosiscareanalysisday/exportonamelist#POST' })) }
       })
     }
   }

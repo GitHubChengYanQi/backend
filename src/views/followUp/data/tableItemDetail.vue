@@ -4,6 +4,7 @@
       :tableColunms="['1', '3'].includes(type) ? tableColunms : type === '2' ? type2Colunms : type4Colunms"
       :tableData="tableData"
       :tableTotal="pagination.total"
+      :exportPermission="searchParams.exportPermission"
       @getTableList="(params) => getTableList(false, params)"
       @exportTableList="(params) => getTableList(true, params)">
       <template #radioTab="params" v-if="type === '3'">
@@ -148,6 +149,7 @@ export default {
   created () {
     this.type = this.$route.query.type
     this.searchParams = JSON.parse(decodeURIComponent(this.$route.query.searchParams))
+    console.log(this.searchParams)
     this.getTableList(false, { })
   },
   methods: {

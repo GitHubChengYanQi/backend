@@ -6,7 +6,11 @@
         <slot name="radioTab" :params="{ pagination: pagination }"></slot>
       </div>
       <div class="right">
-        <a-button type="primary" @click="getTableList(true)" style="width: 120px;">导出</a-button>
+        <a-button
+          type="primary"
+          @click="getTableList(true)"
+          style="width: 120px;"
+          v-permission="exportPermission">导出</a-button>
       </div>
     </div>
     <a-table
@@ -49,6 +53,10 @@ export default {
     tableTotal: {
       type: Number,
       default: 0
+    },
+    exportPermission: {
+      type: String,
+      default: ''
     }
   },
   data () {

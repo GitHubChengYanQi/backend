@@ -43,7 +43,7 @@ export default {
     }
   },
   created () {
-    this.tab_header = +this.$route.query.tab || 1
+    this.tab_header = +this.$route.query.tab || 0
   },
   watch: {
   },

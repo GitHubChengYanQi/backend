@@ -64,6 +64,7 @@
         :colunmsSlots="['planName']"
         :titleSlots="['fateEmployee']"
         :tableTotal="pagination.total"
+        :exportPermission="'/scrm_diagnosis_care_analysis_project/excel#POST'"
         @getTableList="(params) => getTableList(false, params)"
         @exportTableList="(params) => getTableList(true, params)">
         <template #fateEmployee>
@@ -215,7 +216,7 @@ export default {
       }
       this.$router.push({
         path: `/followUp/data/tableItemDetail`,
-        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify(searchParams)) }
+        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: '/scrm_diagnosis_care_analysis_project/excel#POST' })) }
       })
     },
     handleChartItemChange (value, key) {
