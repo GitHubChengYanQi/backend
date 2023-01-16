@@ -111,6 +111,16 @@ export function courseExamBindExamBindPageExcelExport (data, params) {
   })
 }
 
+export function examTaskBindExamExcelExport (data, params) {
+  return fileRequest({
+    url: '/examTaskBind/exam/excelExport',
+    responseType: 'blob',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function examTaskBindList (data, params) {
   return request({
     url: '/examTaskBind/list',
