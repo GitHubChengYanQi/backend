@@ -16,9 +16,11 @@
           <div class="option">
             <div class="quesituionTextArea">
               <a-textarea
+                :class="'text'+questionItemIndex+index"
+                @keydown="(event)=>keydown(event,'text'+questionItemIndex+(index+1),index,questionItemIndex,array)"
                 auto-size
                 :max-length="100"
-                placeholder="请输入选项123"
+                placeholder="请输入选项，回车自动创建下一个选项"
                 v-decorator="[`questions[${questionItemIndex}].options.${option.label}`, { rules: [{ required: true, message: '请输入选项!' }],initialValue:'' }]"
               />
               <div class="suffix">
@@ -32,7 +34,7 @@
                 <a-icon
                   v-if="options.length < 6"
                   type="plus-square"
-                  @click="$emit('addOption',index,questionItemIndex,itemIndex)"
+                  @click="$emit('addOption',index,questionItemIndex,'text'+questionItemIndex+(index+1),index)"
                 />
                 <a-icon
                   v-if="options.length !== 1"
@@ -70,7 +72,6 @@ export default {
   },
   watch: {
     options (value) {
-      console.log(value.map(item => item.label))
       this.array = value
     }
   },
@@ -85,6 +86,14 @@ export default {
         this.$emit('updateQuestions', this.questionItemIndex, evt.newIndex, evt.oldIndex)
       }
     })
+  },
+  methods: {
+    keydown (event, target, index, questionItemIndex, array) {
+      if (event.keyCode === 13 && array.length < 6) {
+        this.$emit('addOption', index, questionItemIndex, target)
+        event.preventDefault()
+      }
+    }
   }
 }
 </script>
