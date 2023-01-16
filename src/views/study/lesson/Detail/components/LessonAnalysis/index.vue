@@ -25,7 +25,7 @@
               }}
             </div>
           </div>
-          <div class="count">
+          <div class="count" v-if="detail.bindExam">
             <div>
               <div class="number"><span class="num">{{ detail.doneLearningStatusCount || 0 }}</span>人</div>
               已学完
@@ -229,14 +229,11 @@ export default {
         },
         {
           title: '学习进度',
-          dataIndex: 'doneStatusDetail',
+          dataIndex: 'rate',
           align: 'center',
           sorter: true,
-          customRender (value, record) {
-            const doneStatusDetail = record.doneStatusDetail || 0
-            const statusDetail = record.statusDetail || 0
-            const num = Math.round((doneStatusDetail / statusDetail) * 100) || 0
-            return num + '%'
+          customRender (value) {
+            return (value || 0) + '%'
           }
         },
         {
@@ -271,7 +268,7 @@ export default {
           dataIndex: 'score',
           align: 'center',
           customRender (value) {
-            return value ? '是' : '否'
+            return typeof value === 'number' ? '是' : '否'
           }
         },
         {
@@ -341,10 +338,25 @@ export default {
       if (this.task) {
         const res = await courseTaskDetail({ courseTaskId: router.history.current.query.courseTaskId })
         const data = res.data || {}
-        detail = { ...(data.courseResult || {}), ...data }
+        const courseResult = data.courseResult || {}
+        let bindExam = false
+        if (Array.isArray(courseResult.examResults) && courseResult.examResults.length > 0) {
+          bindExam = true
+        } else if (courseResult.courseWareBindResults && courseResult.courseWareBindResults.find(item => item.examId)) {
+          bindExam = true
+        }
+
+        detail = { ...courseResult, ...data, bindExam }
       } else {
         const res = await courseDetail({ courseId: router.history.current.query.courseId })
-        detail = res.data || {}
+        const courseResult = res.data || {}
+        let bindExam = false
+        if (Array.isArray(courseResult.examResults) && courseResult.examResults.length > 0) {
+          bindExam = true
+        } else if (courseResult.courseWareBindResults && courseResult.courseWareBindResults.find(item => item.examId)) {
+          bindExam = true
+        }
+        detail = { ...courseResult, bindExam }
       }
       let hour = 0
       let minute = 0

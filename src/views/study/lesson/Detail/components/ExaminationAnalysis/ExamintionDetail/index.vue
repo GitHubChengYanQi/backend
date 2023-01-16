@@ -134,7 +134,7 @@ import breadcrumb from '../../../../../components/Breadcrumd/index'
 import router from '@/router'
 import {
   courseExamBindExamBindPageExcelExport,
-  courseExamBindExamBindPageList
+  courseExamBindExamBindPageList, examTaskBindList
 } from '@/api/study/course'
 import moment from 'moment'
 import SelectEmployee from '../../../../../components/SelectEmployee/index'
@@ -295,18 +295,19 @@ export default {
         }
       }
       let res = {}
-      // if (this.task) {
-      //   res = await examTaskBindList({
-      //     ...data,
-      //     examTaskId: router.history.current.query.id
-      //   }, params)
-      // } else {
-      res = await courseExamBindExamBindPageList({
-        ...data,
-        courseId: router.history.current.query.courseId,
-        examId: router.history.current.query.examId
-      }, params)
-      // }
+      if (this.task) {
+        res = await examTaskBindList({
+          ...data,
+          examTaskId: router.history.current.query.id
+        }, params)
+      } else {
+        res = await courseExamBindExamBindPageList({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId,
+          courseId: router.history.current.query.courseId,
+          examId: router.history.current.query.examId
+        }, params)
+      }
       this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
       this.pagination.total = res.count
       this.loading = false
