@@ -71,7 +71,7 @@
                   :getCalendarContainer="() => $refs['integral_rules_container']"
                   dropdownClassName="dropdownClassName"
                   :disabled-date="e => disableBeforeDate(commonRulesInfo.creditsSetDeatilVo.monthDay, e)"
-                  :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2'"
+                  :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2' || !commonRulesInfo.creditsSetDeatilVo.monthDay"
                   valueFormat="MM-DD"
                   format="MM-DD"
                   v-model="commonRulesInfo.creditsSetDeatilVo.lastYearMonthDay"
@@ -79,8 +79,7 @@
                 ></a-date-picker>
                 至下一年
                 <a-date-picker
-                  inputReadOnly
-                  :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2'"
+                  :disabled="true"
                   valueFormat="MM-DD"
                   format="MM-DD"
                   v-model="commonRulesInfo.creditsSetDeatilVo.nextYearMonthDay"
@@ -95,12 +94,31 @@
               <a-input-number
                 :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
                 placeholder="请输入"
-                :min="commonRulesInfo.creditsSetDeatilVo.minNumber"
-                :max="commonRulesInfo.creditsSetDeatilVo.maxNumber"
+                :min="1"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
                 @change="changeSingleIntegralNumber"
                 class="inputSelectClass">
               </a-input-number>
+              <!-- <a-input-number
+                v-if="commonRulesInfo.creditsSetDeatilVo.ytdType === '2'"
+                :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
+                placeholder="请输入"
+                :min="1"
+                :max="18"
+                :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
+                @change="changeSingleIntegralNumber"
+                class="inputSelectClass">
+              </a-input-number> -->
+              <!-- <a-input-number
+                v-if="commonRulesInfo.creditsSetDeatilVo.ytdType === '3'"
+                :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
+                placeholder="请输入"
+                :min="1"
+                :max="365"
+                :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
+                @change="changeSingleIntegralNumber"
+                class="inputSelectClass">
+              </a-input-number> -->
               <!-- v-if="commonRulesInfo.creditsSetDeatilVo && commonRulesInfo.creditsSetDeatilVo.ytdType" -->
               <a-select
                 v-if="singleIntegralValidityTypeList[0] && singleIntegralValidityTypeList[0].code"
@@ -434,7 +452,7 @@ export default {
     // 切换去年时间
     changePreviousDate () {
       console.log('切换去年时间')
-      const tempNextMonthDay = moment(this.commonRulesInfo.creditsSetDeatilVo.monthDay).subtract(1, 'd')
+      const tempNextMonthDay = moment(this.commonRulesInfo.creditsSetDeatilVo.lastYearMonthDay).subtract(1, 'd')
       this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'nextYearMonthDay', moment(tempNextMonthDay).format('MM-DD'))
     },
     // 判断日期是否可选
@@ -481,7 +499,33 @@ export default {
     // 改变每一笔积分有效期
     changeSingleIntegralNumber (e) {
       console.log(e, '每一笔积分有效期')
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '1') {
+        // 年
+        if (Number(text) > 3) {
+          text = 3
+        }
+      } else if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '2') {
+        // 月
+        if (Number(text) > 18) {
+          text = 18
+        }
+      } else if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '3') {
+        // 日
+        if (Number(text) > 365) {
+          debugger
+          text = 365
+        }
+      }
+      // console.log(text, 'text')
+      // debugger
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', String(text))
     },
     // 通用规则有效期点击取消
     closeCommonValidityModal () {

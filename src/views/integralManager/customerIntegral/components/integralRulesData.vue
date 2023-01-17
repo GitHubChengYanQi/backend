@@ -320,7 +320,7 @@
                   <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
                   <div v-else class="tagDiv">
                     <div v-for="item in radarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
-                      {{ item.radarArticleTitle }}
+                      {{ item.radarArticleTitle.length > 6 ? item.radarArticleTitle.slice(0, 6) + '...' : item.radarArticleTitle }}
                       <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
                     </div>
                     <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
@@ -584,6 +584,18 @@ export default {
         }
         this.$set(tempInfo, 'creditsRuleJsonDetailVo', tempInfo.creditsRuleJsonDetailVo)
         this.integralRulesTypeInfo = this.deepClonev2(tempInfo)
+        if (info.ruleType === '4') {
+          this.radarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
+        } else if (info.ruleType === '3') {
+          this.buyRadarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
+          const tempInfo = {
+            id: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodId,
+            name: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodsName
+          }
+          const tempGoodsList = []
+          tempGoodsList.push(tempInfo)
+          this.goodsList = this.deepClonev2(tempGoodsList)
+        }
       })
     },
     // 切换是否生效
