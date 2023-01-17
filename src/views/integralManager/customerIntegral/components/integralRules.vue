@@ -610,7 +610,17 @@ export default {
     // 改变积分上限数字
     changeLimitNumber (e) {
       // commonRulesInfo.creditsSetDeatilVo.integralMaxNum
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', String(text))
     },
     // 通用规则积分上限点击确定
     confirmCommonLimit () {
@@ -662,7 +672,18 @@ export default {
     changeBeforeDayNum (e) {
       console.log(e, '改变到期天数')
       // debugger
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', String(text))
+      // this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', e ? String(e) : '1')
     },
     // 通用规则积分到期提醒点击确定
     confirmCommonRemind () {

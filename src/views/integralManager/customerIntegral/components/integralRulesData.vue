@@ -610,7 +610,19 @@ export default {
     },
     // 改变朋友圈积分数值
     changeFriendCircleIntegralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // beforeDayNum
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 设置朋友圈弹框点击取消
     closeIntegralFriendCircleModal () {
@@ -685,11 +697,33 @@ export default {
     // 改变新增好友弹框未流失天数
     changeFriendDayNumber (e) {
       // this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', String(text))
     },
     // 改变新增好友弹框积分
     changeAddFriendIntegral (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 设置加好友弹框点击取消
     closeIntegralAddFriendModal () {
@@ -722,24 +756,79 @@ export default {
     },
     // 改变购买弹框看素材后购买天数
     changeBuyLookAfterDayNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', String(text))
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', e ? String(e) : '1')
     },
     // 改变购买弹框未退换天数
     changeBuySalesReturnDayNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', String(text))
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', e ? String(e) : '1')
     },
     // 改变购买弹框积分数
     changeBuyIntegralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 改变查看素材弹框积分
     changeMaterialIntergralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 改变查看素材弹框生效一次天数
     changeMaterialValidDayNumber (e) {
       // integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', String(text))
     },
     // 获取规则限制类型数据字典
     async getCommonRuleLimitData () {

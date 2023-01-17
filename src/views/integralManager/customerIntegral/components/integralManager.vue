@@ -371,7 +371,18 @@ export default {
     },
     // 改变积分数字
     changeIntegralNumber (e) {
-      this.$set(this.batchInfo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      this.$set(this.batchInfo, 'integral', String(text))
+      // this.$set(this.batchInfo, 'integral', e ? String(e) : '1')
     },
     // 表格监听事件
     handleTableChange ({ current, pageSize }, filters, sorter) {
