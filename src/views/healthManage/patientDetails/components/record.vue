@@ -244,7 +244,7 @@ export default {
     async getQuestionResults (item, state) {
       console.log(',,,,,,,,,,,,,,,,,', this.currentObj)
       console.log(',,,,,,,,,,,,,,,,,', this.contactData)
-      console.log(item, state)
+      console.log(11111111111111111111111, item, state)
       this.currentObj = item
       this.currentObj.contactData = this.contactData
       console.log(',,,,,,,,,,,,,,,,,', this.currentObj)
@@ -279,6 +279,7 @@ export default {
           this.visible2 = true
         })
       } else {
+        this.mediumContent = this.currentObj.mediumContent
         this.visible1 = true
       }
     },
