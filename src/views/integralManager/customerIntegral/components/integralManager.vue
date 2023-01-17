@@ -100,7 +100,17 @@
                   <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">编辑</div>
                 </div>
                 <div class="reasonTagDiv">
-                  <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @close="deleteHistoryTag($event, item)">{{ returnReasonText(item) }}</a-tag>
+                  <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @close="deleteHistoryTag($event, item)">
+                    <a-popover title="" v-if="item.length > 10">
+                      <template slot="content">
+                        <div class="labelBox">
+                          {{ item }}
+                        </div>
+                      </template>
+                      <div>{{ returnReasonText(item) }}</div>
+                    </a-popover>
+                    <div v-else-if="item.length <= 10">{{ item }}</div>
+                  </a-tag>
                   <!-- <div class="singleReasonTag" v-for="item in historyReasonList" :key="item">{{ item }}
                     <div class="singleDelete">X</div>
                   </div> -->
@@ -265,7 +275,7 @@ export default {
     // 返回调整原因(最多显示10个字)
     returnReasonText (text) {
       if (text.length > 10) {
-        return text.slice(0, 10)
+        return text.slice(0, 10) + '...'
       } else {
         return text
       }
