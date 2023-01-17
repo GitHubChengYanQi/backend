@@ -201,7 +201,8 @@
                   <div v-if="buyRadarList.length === 0" class="noRadarDiv">+互动雷达</div>
                   <div v-else class="tagDiv">
                     <div v-for="item in buyRadarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
-                      {{ item.radarArticleTitle }}
+                      <!-- {{ item.radarArticleTitle }} -->
+                      {{ item.radarArticleTitle.length > 2 ? item.radarArticleTitle.slice(0, 2) + '...' : item.radarArticleTitle }}
                       <div class="delete" @click.stop="deleteBuySingleTag(item)">+</div>
                     </div>
                     <div v-if="buyRadarList.length > 1" class="singleTagDiv">{{ `+${buyRadarList.length - 1}` }}</div>
@@ -223,7 +224,8 @@
                   <div v-if="goodsList.length === 0" class="noGoodsDiv">+商品库</div>
                   <div v-else class="tagDiv">
                     <div v-for="item in goodsList" :key="item.id" class="singleTagDiv">
-                      {{ item.name }}
+                      <!-- {{ item.name }} -->
+                      {{ item.name.length > 2 ? item.name.slice(0, 2) + '...' : item.name }}
                       <div class="delete" @click.stop="deleteSingleGoods(item)">+</div>
                     </div>
                   </div>
@@ -320,7 +322,7 @@
                   <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
                   <div v-else class="tagDiv">
                     <div v-for="item in radarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
-                      {{ item.radarArticleTitle.length > 6 ? item.radarArticleTitle.slice(0, 6) + '...' : item.radarArticleTitle }}
+                      {{ item.radarArticleTitle.length > 2 ? item.radarArticleTitle.slice(0, 2) + '...' : item.radarArticleTitle }}
                       <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
                     </div>
                     <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>

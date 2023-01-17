@@ -71,7 +71,8 @@
             <div v-if="goodsList.length === 0" class="noGoodsDiv">请选择商品</div>
             <div v-else class="tagDiv">
               <div v-for="item in goodsList.slice(0,1)" :key="item.id" class="singleTagDiv">
-                {{ item.name }}
+                <!-- {{ item.name }} -->
+                {{ item.name.length > 2 ? item.name.slice(0, 2) + '...' : item.name }}
                 <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
               </div>
               <div v-if="goodsList.length > 1" class="singleTagDiv">{{ `+${goodsList.length - 1}` }}</div>
