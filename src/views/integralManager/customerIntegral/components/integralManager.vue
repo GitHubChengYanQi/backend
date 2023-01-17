@@ -393,6 +393,12 @@ export default {
         // 无需排序
         this.$delete(this.screenData, `${currentTypeText}`)
       }
+      for (const key in this.screenData) {
+        if (key.indexOf('Sort') !== -1 && key !== currentTypeText) {
+          // key带Sort,并且key不是当前点击的key
+          this.$delete(this.screenData, `${key}`)
+        }
+      }
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getDataList()
