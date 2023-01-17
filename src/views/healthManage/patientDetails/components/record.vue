@@ -8,7 +8,7 @@
               {{ item.planName }}
             </a-select-option>
           </a-select>
-          <a-button type="primary" :disabled="!planList.length || planList[0].isDefault === 2" @click="openMoadl" v-permission="'/healthManage/patientDetails/addTask#post'"> 添加随访任务 </a-button>
+          <a-button type="primary" :disabled="!planList.length || isDefault === 2" @click="openMoadl" v-permission="'/healthManage/patientDetails/addTask#post'"> 添加随访任务 </a-button>
         </Space>
       </a-form-item>
       <a-form-item label="分类查看：">
@@ -192,7 +192,8 @@ export default {
       visible1: false,
       visible2: false,
       loading: false,
-      mediumContent: {}
+      mediumContent: {},
+      isDefault: undefined
     }
   },
   mounted () {
@@ -200,7 +201,19 @@ export default {
     this.getTaskContactDetailTasks(this.planList[0].planId, this.contactId)
   },
   methods: {
+    /**
+     * 根据id获取类型
+     */
+    getTypeById (id) {
+      const arr = this.planList
+      for (let i = 0; i < arr.length; i++) {
+        if (id === arr[i].planId) {
+          return arr[i].isDefault
+        }
+      }
+    },
     handleChange (e) {
+      this.isDefault = this.getTypeById(e)
       this.selectVal = e
       this.getTaskContactDetailTasks(this.selectVal, this.contactId)
     },
@@ -222,6 +235,7 @@ export default {
       // // unzip
       var _data = pako.inflate(binData, { to: 'string' })
       this.taskObj = JSON.parse(_data)
+      console.log(1111111, this.taskObj)
       this.loading = false
     },
     /**

@@ -299,8 +299,10 @@ export default {
     async excel () {
       this.excelLoading = true
       const time = this.screenData.time || []
+      const order = this.sorter.order === 'ascend' ? 'asc' : 'desc'
       const data = {
         ...this.screenData,
+        sorter: (this.sorter.field && this.sorter.order) ? this.sorter.field + ' ' + order : null,
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
         haveExam: this.screenData.haveExam === 'all' ? null : this.screenData.haveExam,
@@ -308,7 +310,11 @@ export default {
       }
       courseTaskExcelExport(data, {
         limit: 6500,
-        page: 1
+        page: 1,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
       }).then((res) => {
         excelExport(res, '课程任务列表数据导出.xlsx')
         message.success('导出成功!')

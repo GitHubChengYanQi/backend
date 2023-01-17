@@ -433,7 +433,7 @@ export const routeList = {
     name: 'tableItemDetail',
     component: () => import('@/views/followUp/data/tableItemDetail'),
     hidden: true,
-    meta: { title: '方案数据' }
+    meta: { title: '数据详情' }
   },
   '/followUp/group': {
     path: '/followUp/group',
