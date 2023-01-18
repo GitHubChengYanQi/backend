@@ -17,18 +17,43 @@
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">可用积分总额</div>
+            <a-popover title="">
+              <template slot="content">
+                <div class="labelBox">
+                  截止目前所有员工的积分余额总和
+                </div>
+              </template>
+              <img src="@/assets/integral/question.png" alt="" class="questionClass">
+            </a-popover>
+            <!-- <img src="@/assets/integral/question.png" alt=""> -->
           </div>
           <div class="cardNumberClass">{{ totalInfo.integralTotal }}</div>
         </div>
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">发放积分</div>
+            <a-popover title="">
+              <template slot="content">
+                <div class="labelBox">
+                  指定时间段内所有新增积分总和
+                </div>
+              </template>
+              <img src="@/assets/integral/question.png" alt="" class="questionClass">
+            </a-popover>
           </div>
           <div class="cardNumberClass">{{ totalInfo.allIntegralTotal }}</div>
         </div>
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">消耗积分</div>
+            <a-popover title="">
+              <template slot="content">
+                <div class="labelBox">
+                  指定时间段内所有减少积分总和
+                </div>
+              </template>
+              <img src="@/assets/integral/question.png" alt="" class="questionClass">
+            </a-popover>
           </div>
           <div class="cardNumberClass">{{ totalInfo.consumptionIntegralTotal }}</div>
         </div>

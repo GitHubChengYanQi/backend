@@ -249,6 +249,7 @@ export default {
     handleTableChange ({ current, pageSize }, filters, sorter) {
       // console.log(current, pageSize, sorter, '监听的信息')
       this.selectedRowKeys = []
+      this.selectRowArray = []
       let currentTypeText = ''
       if (sorter.order) {
         // 获取点击的是那一列排序

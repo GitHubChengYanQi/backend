@@ -20,7 +20,6 @@
       </a-table>
     </div>
     <a-modal
-      title="积分有效期"
       :maskClosable="false"
       :width="700"
       :visible="commonValidityShowStatus"
@@ -28,6 +27,17 @@
       @cancel="closeCommonValidityModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
+      <div slot="title" class="titleSlot">
+        <div>积分有效期</div>
+        <a-popover title="">
+          <template slot="content">
+            <div class="labelBox">
+              积分有效期规则仅适用于规则生效后发放的积分，不影响历史已发放积分
+            </div>
+          </template>
+          <img src="@/assets/integral/question.png" alt="" class="questionClass">
+        </a-popover>
+      </div>
       <a-spin :spinning="commonRulesValidityLoading">
         <a-radio-group
           class="radioValityGroupDiv"

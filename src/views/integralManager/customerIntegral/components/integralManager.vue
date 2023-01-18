@@ -65,7 +65,9 @@
       <a-spin :spinning="batchInfoModalLoading">
         <div class="formDivContent">
           <div class="formDivText" v-if="batchInfo.employeeIdList && batchInfo.employeeIdList.length !== 0">{{ `将给${batchInfo.employeeIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}</div>
-          <div class="formDivText" v-if="batchInfo.checkedRuleIdList && batchInfo.checkedRuleIdList.length !== 0">{{ `将给${batchInfo.checkedRuleIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}</div>
+          <div class="formDivText" v-if="batchInfo.checkedRuleIdList && batchInfo.checkedRuleIdList.length !== 0">
+            {{ `将给${batchInfo.checkedRuleIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}
+          </div>
           <div class="singleFormRulesDiv">
             <div class="singleFormTitle">调整积分</div>
             <div class="singleFormContent">
@@ -97,7 +99,7 @@
               <div class="singleReasonContent">
                 <div class="reasonTopDiv">
                   <div class="reasonTitle">历史调整原因</div>
-                  <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">编辑</div>
+                  <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">{{ isCloseReason ? '保存' : '编辑' }}</div>
                 </div>
                 <div class="reasonTagDiv" v-if="historyReasonList.length !== 0">
                   <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @click="chooseHistoryTag(item)" @close="deleteHistoryTag($event, item)">

@@ -264,6 +264,8 @@ export default {
       this.pagination.pageSize = pageSize
       this.pagination.current = current
       this.getTableData()
+      this.selectItem = []
+      this.rowSelection = []
     },
     onSelectChange (keys, rows) {
       this.rowSelection = keys
