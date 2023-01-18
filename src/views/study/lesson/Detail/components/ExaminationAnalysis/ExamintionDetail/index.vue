@@ -265,10 +265,10 @@ export default {
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
-      if (this.task) {
+      if (this.task || router.history.current.query.examTaskId) {
         examTaskBindExamExcelExport({
           ...data,
-          examTaskId: router.history.current.query.id
+          examTaskId: router.history.current.query.examTaskId || router.history.current.query.id
         }, {
           limit: 6500,
           page: 1,
@@ -321,15 +321,15 @@ export default {
         }
       }
       let res = {}
-      if (this.task) {
+      if (this.task || router.history.current.query.examTaskId) {
         res = await examTaskBindList({
           ...data,
-          examTaskId: router.history.current.query.id
+          examTaskId: router.history.current.query.examTaskId || router.history.current.query.id
         }, params)
       } else {
         res = await courseExamBindExamBindPageList({
           ...data,
-          courseTaskId: router.history.current.query.courseTaskId || null,
+          // courseTaskId: router.history.current.query.courseTaskId || null,
           courseId: router.history.current.query.courseId,
           examId: router.history.current.query.examId
         }, params)

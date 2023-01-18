@@ -92,6 +92,16 @@ export function examCourseBindPageExcelExport (data, params) {
   })
 }
 
+export function examTaskCourseBindPageExcelExport (data, params) {
+  return fileRequest({
+    url: '/examTask/excelExport',
+    responseType: 'blob',
+    method: 'post',
+    data,
+    params
+  })
+}
+
 export function courseExamBindExamBindPageList (data, params) {
   return request({
     url: '/courseExamBind/examBindPageList',

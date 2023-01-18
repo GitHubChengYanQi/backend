@@ -88,7 +88,7 @@
                   style="font-size: 24px" />
               </div>
               <div class="nickname">
-                <a-tooltip overlayClassName="myTooltip">
+                <a-tooltip placement="topLeft" overlayClassName="myTooltip">
                   <template slot="title">
                     {{ text }}
                   </template>
