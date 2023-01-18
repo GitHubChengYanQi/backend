@@ -73,7 +73,11 @@ export default {
     }
   },
   computed: {},
-  watch: {},
+  watch: {
+    tableTotal (e) {
+      this.pagination.total = e
+    }
+  },
   methods: {
     onSelectTableItemChange (rows) {
       this.selectedTableRowKeys = rows
