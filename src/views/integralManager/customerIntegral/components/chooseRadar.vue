@@ -209,6 +209,11 @@ export default {
   },
   methods: {
     async handleAddRadarOk () {
+      debugger
+      if (this.selectItem.length === 0) {
+        this.$message.warning('请选择雷达素材')
+        return
+      }
       if (this.selectItem.some(it => it.selectChannel === undefined)) {
         this.$message.warning('请给选中雷达内容选择对应渠道')
         return
