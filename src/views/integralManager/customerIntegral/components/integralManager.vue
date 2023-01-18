@@ -54,7 +54,7 @@
       </div>
     </a-table>
     <a-modal
-      title="批量调整积分"
+      :title="dialogTitle"
       :maskCloseable="false"
       :width="600"
       :visible="integralBatchShowStatus"
@@ -65,7 +65,9 @@
       <a-spin :spinning="batchInfoModalLoading">
         <div class="formDivContent">
           <div class="formDivText" v-if="batchInfo.employeeIdList && batchInfo.employeeIdList.length !== 0">{{ `将给${batchInfo.employeeIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}</div>
-          <div class="formDivText" v-if="batchInfo.checkedRuleIdList && batchInfo.checkedRuleIdList.length !== 0">{{ `将给${batchInfo.checkedRuleIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}</div>
+          <div class="formDivText" v-if="batchInfo.checkedRuleIdList && batchInfo.checkedRuleIdList.length !== 0">
+            {{ `将给${batchInfo.checkedRuleIdList.length}位员工调整积分，员工可在积分统计查看相应调整记录` }}
+          </div>
           <div class="singleFormRulesDiv">
             <div class="singleFormTitle">调整积分</div>
             <div class="singleFormContent">
@@ -76,6 +78,7 @@
                 <a-input-number
                   placeholder="请输入积分"
                   :min="1"
+                  :max="99999"
                   :value="batchInfo.integral ? Number(batchInfo.integral) : 1"
                   class="singleInputClass"
                   @change="changeIntegralNumber">
@@ -97,10 +100,20 @@
               <div class="singleReasonContent">
                 <div class="reasonTopDiv">
                   <div class="reasonTitle">历史调整原因</div>
-                  <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">编辑</div>
+                  <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">{{ isCloseReason ? '保存' : '编辑' }}</div>
                 </div>
-                <div class="reasonTagDiv">
-                  <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @close="deleteHistoryTag($event, item)">{{ returnReasonText(item) }}</a-tag>
+                <div class="reasonTagDiv" v-if="historyReasonList.length !== 0">
+                  <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @click="chooseHistoryTag(item)" @close="deleteHistoryTag($event, item)">
+                    <a-popover title="" v-if="item.length > 10">
+                      <template slot="content">
+                        <div class="labelBox">
+                          {{ item }}
+                        </div>
+                      </template>
+                      <div>{{ returnReasonText(item) }}</div>
+                    </a-popover>
+                    <div v-else-if="item.length <= 10">{{ item }}</div>
+                  </a-tag>
                   <!-- <div class="singleReasonTag" v-for="item in historyReasonList" :key="item">{{ item }}
                     <div class="singleDelete">X</div>
                   </div> -->
@@ -166,6 +179,7 @@ export default {
   },
   data () {
     return {
+      dialogTitle: '',
       isCloseReason: false, // 历史调整原因是否可删除
       historyReasonList: [],
       deepClonev2,
@@ -265,10 +279,21 @@ export default {
     // 返回调整原因(最多显示10个字)
     returnReasonText (text) {
       if (text.length > 10) {
-        return text.slice(0, 10)
+        return text.slice(0, 10) + '...'
       } else {
         return text
       }
+    },
+    // 点击历史标签
+    chooseHistoryTag (item) {
+      console.log(item, '选择标签')
+      const oldText = this.batchInfo.adjustCause
+      let newText = oldText + item
+      if (newText.length > 50) {
+        // 合成的新长度大于50
+        newText = newText.slice(0, 50)
+      }
+      this.$set(this.batchInfo, 'adjustCause', newText)
     },
     // 去删除原因
     goDeleteReason () {
@@ -282,13 +307,17 @@ export default {
     },
     // 删除历史原因
     deleteHistoryTag (e, text) {
+      this.batchInfoModalLoading = true
       const params = { causeName: text }
       // debugger
       e.preventDefault()
       deleteHistoryReasonApi(params).then(response => {
         if (response.code === 200) {
+          this.batchInfoModalLoading = false
           this.getHistoryList()
         }
+      }).catch(() => {
+        this.batchInfoModalLoading = false
       })
     },
     // 获取数据
@@ -361,7 +390,22 @@ export default {
     },
     // 改变积分数字
     changeIntegralNumber (e) {
-      this.$set(this.batchInfo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      console.log(text, 'text')
+      this.$set(this.batchInfo, 'integral', text)
+      // this.$set(this.batchInfo, 'integral', e ? String(e) : '1')
     },
     // 表格监听事件
     handleTableChange ({ current, pageSize }, filters, sorter) {
@@ -382,6 +426,12 @@ export default {
       } else {
         // 无需排序
         this.$delete(this.screenData, `${currentTypeText}`)
+      }
+      for (const key in this.screenData) {
+        if (key.indexOf('Sort') !== -1 && key !== currentTypeText) {
+          // key带Sort,并且key不是当前点击的key
+          this.$delete(this.screenData, `${key}`)
+        }
       }
       this.pagination.current = current
       this.pagination.pageSize = pageSize
@@ -427,7 +477,6 @@ export default {
       }
       console.log(this.batchInfo, 'batchInfo')
       this.batchInfoModalLoading = true
-      debugger
       batchCustomerIntegralApi(this.batchInfo).then(response => {
         console.log(response)
         if (response.code === 200) {
@@ -446,6 +495,7 @@ export default {
       this.batchInfo = {}
       this.integralBatchShowStatus = true
       this.getChangeType()
+      this.dialogTitle = '调整积分'
       this.$nextTick(() => {
         const tempArray = []
         tempArray.push(record.id)
@@ -457,11 +507,14 @@ export default {
     // 点击批量调整按钮
     goBatchChangeIntegral () {
       this.batchInfo = {}
+      this.keys = []
+      this.rows = []
       if (this.selectedKeyList.length !== 0) {
         // 有选项,直接弹出调整弹框
         this.integralBatchShowStatus = true
         this.getChangeType()
         this.$nextTick(() => {
+          this.dialogTitle = '批量调整积分'
           this.$set(this.batchInfo, 'checkedRuleIdList', this.selectedKeyList)
           this.$set(this.batchInfo, 'employeeIdList', [])
           this.$set(this.batchInfo, 'integral', '10')
@@ -505,6 +558,7 @@ export default {
         this.integralBatchShowStatus = true
         this.getChangeType()
         this.$nextTick(() => {
+          this.dialogTitle = '批量调整积分'
           const tempArray = this.deepClonev2(e)
           this.$set(this.batchInfo, 'employeeIdList', tempArray)
           this.$set(this.batchInfo, 'checkedRuleIdList', [])

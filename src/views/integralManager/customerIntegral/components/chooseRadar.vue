@@ -209,6 +209,10 @@ export default {
   },
   methods: {
     async handleAddRadarOk () {
+      if (this.selectItem.length === 0) {
+        this.$message.warning('请选择雷达素材')
+        return
+      }
       if (this.selectItem.some(it => it.selectChannel === undefined)) {
         this.$message.warning('请给选中雷达内容选择对应渠道')
         return
@@ -241,6 +245,8 @@ export default {
         current,
         size: pageSize
       }
+      this.selectItem = []
+      this.rowSelection = []
       scrmRadarArticleFind(obj).then(res => {
         console.log(res)
         this.tableData = res.data.datas.map(item => {
@@ -264,6 +270,8 @@ export default {
       this.pagination.pageSize = pageSize
       this.pagination.current = current
       this.getTableData()
+      this.selectItem = []
+      this.rowSelection = []
     },
     onSelectChange (keys, rows) {
       this.rowSelection = keys

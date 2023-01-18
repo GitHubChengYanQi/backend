@@ -25,7 +25,7 @@
         </div>
         <div slot="options" slot-scope="text, record">
           <template>
-            <div style="display: flex;justify-content: space-around;">
+            <div style="display: flex;justify-content: space-between;">
               <a-button type="link" @click="setIntegralMethod(record)" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button>
               <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst" v-permission="'/creditsRule/addGoodsCreditsRule@post'">新增商品</a-button>
               <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst" v-permission="'/creditsRule/delGoodsCreditsRule@delete'">删除</a-button>
@@ -58,11 +58,13 @@
           <div class="singleFormDiv">
             <div class="singleFormTitle">积分规则</div>
             <div class="singleFormText">任务时间内完成朋友圈群发任务，可获得</div>
+            <!-- && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral -->
             <a-input-number
-              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
               placeholder="请选择"
               class="singleInputClass"
               :min="1"
+              :max="99999"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
               @change="changeFriendCircleIntegralNumber">
             </a-input-number>
@@ -122,8 +124,8 @@
             <a-input-number
               class="singleInputClass"
               :min="1"
-              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
-                && integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum"
+              :max="100"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum ?
                 Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) : 1"
               @change="changeFriendDayNumber">
@@ -132,11 +134,11 @@
             <div class="singleFormText">未流失，员工可获得</div>
             <a-input-number
               :min="1"
-              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
-                && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ?
                 Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
               class="singleInputClass"
+              :max="99999"
               @change="changeAddFriendIntegral">
             </a-input-number>
             <div class="singleFormText">积分</div>
@@ -201,7 +203,8 @@
                   <div v-if="buyRadarList.length === 0" class="noRadarDiv">+互动雷达</div>
                   <div v-else class="tagDiv">
                     <div v-for="item in buyRadarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
-                      {{ item.radarArticleTitle }}
+                      <!-- {{ item.radarArticleTitle }} -->
+                      {{ item.radarArticleTitle.length > 2 ? item.radarArticleTitle.slice(0, 2) + '...' : item.radarArticleTitle }}
                       <div class="delete" @click.stop="deleteBuySingleTag(item)">+</div>
                     </div>
                     <div v-if="buyRadarList.length > 1" class="singleTagDiv">{{ `+${buyRadarList.length - 1}` }}</div>
@@ -211,7 +214,8 @@
                 <div class="singleFormText">后</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
+                  :max="100"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -223,7 +227,8 @@
                   <div v-if="goodsList.length === 0" class="noGoodsDiv">+商品库</div>
                   <div v-else class="tagDiv">
                     <div v-for="item in goodsList" :key="item.id" class="singleTagDiv">
-                      {{ item.name }}
+                      <!-- {{ item.name }} -->
+                      {{ item.name.length > 2 ? item.name.slice(0, 2) + '...' : item.name }}
                       <div class="delete" @click.stop="deleteSingleGoods(item)">+</div>
                     </div>
                   </div>
@@ -233,7 +238,8 @@
                 <div class="singleFormText">且</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
+                  :max="100"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) : ''"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -242,7 +248,8 @@
                 <div class="singleFormText">天内，未退货，员工可获得</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                  :max="99999"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -320,7 +327,7 @@
                   <div v-if="radarList.length === 0" class="noRadarDiv">+互动雷达</div>
                   <div v-else class="tagDiv">
                     <div v-for="item in radarList.slice(0,1)" :key="item.radarArticleId" class="singleTagDiv">
-                      {{ item.radarArticleTitle.length > 6 ? item.radarArticleTitle.slice(0, 6) + '...' : item.radarArticleTitle }}
+                      {{ item.radarArticleTitle.length > 2 ? item.radarArticleTitle.slice(0, 2) + '...' : item.radarArticleTitle }}
                       <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
                     </div>
                     <div v-if="radarList.length > 1" class="singleTagDiv">{{ `+${radarList.length - 1}` }}</div>
@@ -330,7 +337,8 @@
                 <div class="singleFormText">后，员工可获得</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                  :max="99999"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -343,6 +351,7 @@
                 <!-- <a-input default-value="10" class="singleInputClass"></a-input> -->
                 <a-input-number
                   :min="1"
+                  :max="100"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum) : 1"
                   placeholder="请输入"
@@ -588,13 +597,17 @@ export default {
           this.radarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
         } else if (info.ruleType === '3') {
           this.buyRadarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
-          const tempInfo = {
-            id: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodId,
-            name: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodsName
+          if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodId && this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodsName) {
+            const tempInfo = {
+              id: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodId,
+              name: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodsName
+            }
+            const tempGoodsList = []
+            tempGoodsList.push(tempInfo)
+            this.goodsList = this.deepClonev2(tempGoodsList)
+          } else {
+            this.goodsList = []
           }
-          const tempGoodsList = []
-          tempGoodsList.push(tempInfo)
-          this.goodsList = this.deepClonev2(tempGoodsList)
         }
       })
     },
@@ -608,7 +621,22 @@ export default {
     },
     // 改变朋友圈积分数值
     changeFriendCircleIntegralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // beforeDayNum
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 设置朋友圈弹框点击取消
     closeIntegralFriendCircleModal () {
@@ -633,7 +661,6 @@ export default {
           this.$message.error('请填写全部数据')
           return false
         }
-        debugger
         this.commonIntegralRulesSend()
       }
       // this.integralFriendCircleShowStatus = false
@@ -648,7 +675,6 @@ export default {
       }
       this.integralRulesTypeInfo = Object.assign({}, tempInfo)
       console.log(this.integralRulesTypeInfo)
-      debugger
       this.integralAddFriendLoading = true
       this.integralFriendCircleLoading = true
       this.integralBuyLoading = true
@@ -683,11 +709,39 @@ export default {
     // 改变新增好友弹框未流失天数
     changeFriendDayNumber (e) {
       // this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 100) {
+        text = '100'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', String(text))
     },
     // 改变新增好友弹框积分
     changeAddFriendIntegral (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 设置加好友弹框点击取消
     closeIntegralAddFriendModal () {
@@ -710,7 +764,6 @@ export default {
               this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
             }
           }
-          debugger
           this.commonIntegralRulesSend()
         } else {
           this.$message.error('请填写全部数据')
@@ -720,24 +773,94 @@ export default {
     },
     // 改变购买弹框看素材后购买天数
     changeBuyLookAfterDayNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', String(text))
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', e ? String(e) : '1')
     },
     // 改变购买弹框未退换天数
     changeBuySalesReturnDayNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', String(text))
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', e ? String(e) : '1')
     },
     // 改变购买弹框积分数
     changeBuyIntegralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 改变查看素材弹框积分
     changeMaterialIntergralNumber (e) {
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 改变查看素材弹框生效一次天数
     changeMaterialValidDayNumber (e) {
       // integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum
-      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', e ? String(e) : '1')
+      // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', String(text))
     },
     // 获取规则限制类型数据字典
     async getCommonRuleLimitData () {
@@ -904,6 +1027,8 @@ export default {
         this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', '1')
         this.buyRadarList = []
         this.goodsList = []
+        this.$set(this.integralRulesTypeInfo, 'employeeIds', [])
+        // integralRulesTypeInfo.employeeIds
       })
     },
     // 删除商品规则

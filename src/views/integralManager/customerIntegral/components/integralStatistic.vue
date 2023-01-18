@@ -4,7 +4,7 @@
       <div class="allStatisticTitle">总体统计</div>
       <div class="searchLine">
         <div class="searchTitle">选择时间</div>
-        <a-range-picker class="pickTimeClass" v-model="totalDateArray" :format="dateFormatList"></a-range-picker>
+        <a-range-picker class="pickTimeClass" v-model="totalDateArray" :format="dateFormatList" :defaultPickerValue="defaultDateArray"></a-range-picker>
         <a-button
           type="primary"
           style="margin: 0 10px;"
@@ -17,18 +17,43 @@
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">可用积分总额</div>
+            <a-popover title="">
+              <template slot="content">
+                <div class="labelBox">
+                  截止目前所有员工的积分余额总和
+                </div>
+              </template>
+              <img src="@/assets/integral/question.png" alt="" class="questionClass">
+            </a-popover>
+            <!-- <img src="@/assets/integral/question.png" alt=""> -->
           </div>
           <div class="cardNumberClass">{{ totalInfo.integralTotal }}</div>
         </div>
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">发放积分</div>
+            <a-popover title="">
+              <template slot="content">
+                <div class="labelBox">
+                  指定时间段内所有新增积分总和
+                </div>
+              </template>
+              <img src="@/assets/integral/question.png" alt="" class="questionClass">
+            </a-popover>
           </div>
           <div class="cardNumberClass">{{ totalInfo.allIntegralTotal }}</div>
         </div>
         <div class="singleStatisticCard">
           <div class="cardTopClass">
             <div class="cardTopTitle">消耗积分</div>
+            <a-popover title="">
+              <template slot="content">
+                <div class="labelBox">
+                  指定时间段内所有减少积分总和
+                </div>
+              </template>
+              <img src="@/assets/integral/question.png" alt="" class="questionClass">
+            </a-popover>
           </div>
           <div class="cardNumberClass">{{ totalInfo.consumptionIntegralTotal }}</div>
         </div>
@@ -49,7 +74,7 @@
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">选择时间</div>
-          <a-range-picker class="pickTimeClass" v-model="detailDateArray" :format="dateFormatList" @change="changeDetailDate"></a-range-picker>
+          <a-range-picker class="pickTimeClass" v-model="detailDateArray" :format="dateFormatList" :defaultPickerValue="defaultDateArray" @change="changeDetailDate"></a-range-picker>
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">变动原因</div>
@@ -71,7 +96,8 @@
             <div v-if="goodsList.length === 0" class="noGoodsDiv">请选择商品</div>
             <div v-else class="tagDiv">
               <div v-for="item in goodsList.slice(0,1)" :key="item.id" class="singleTagDiv">
-                {{ item.name }}
+                <!-- {{ item.name }} -->
+                {{ item.name.length > 2 ? item.name.slice(0, 2) + '...' : item.name }}
                 <div class="delete" @click.stop="deleteSingleTag(item)">+</div>
               </div>
               <div v-if="goodsList.length > 1" class="singleTagDiv">{{ `+${goodsList.length - 1}` }}</div>
@@ -109,7 +135,7 @@
         :scroll="{ x: 1500}"
         @change="handleTableChange">
         <div slot="adjustCause" slot-scope="text">
-          <a-popover title="理由" v-if="text !== ''&& text.length > 10">
+          <a-popover title="理由" v-if="text && text.length > 10">
             <template slot="content">
               <div class="labelBox">
                 {{ text }}
@@ -117,7 +143,7 @@
             </template>
             <div>{{ text.slice(0, 10) + '...' }}</div>
           </a-popover>
-          <div v-else-if="text !== ''&& text.length <= 10">{{ text }}</div>
+          <div v-else-if="text && text.length <= 10">{{ text }}</div>
           <div v-else>-</div>
         </div>
         <div slot="createdEmployeeName" slot-scope="text, record">
@@ -147,6 +173,7 @@ export default {
   name: 'BackendIntegralStatistic',
   data () {
     return {
+      defaultDateArray: [], // 默认面板日期
       // 商品库选择后显示标签数组
       goodsList: [],
       selectedKeyList: [],
@@ -159,11 +186,7 @@ export default {
       reasonList: [],
       dateFormatList: ['YYYY-MM-DD', 'YYYY-MM-DD'],
       // 总体数据统计
-      totalInfo: {
-        integralTotal: '2,290',
-        allIntegralTotal: '5,700',
-        consumptionIntegralTotal: '3,410'
-      },
+      totalInfo: {},
       // 查询总体数据对象
       searchTotalInfo: {},
       // 查询积分明细数据对象
@@ -247,6 +270,10 @@ export default {
     goodsManager
   },
   created () {
+    this.defaultDateArray = []
+    const tempPreviousDate = moment().subtract(1, 'M')
+    this.defaultDateArray.push(moment(tempPreviousDate).format('YYYY-MM-DD'))
+    this.defaultDateArray.push(moment().format('YYYY-MM-DD'))
     console.log('积分统计数据')
     this.getIntegralTotalData()
     this.getChangeCauseList()
@@ -418,10 +445,16 @@ export default {
     exportDetailData () {
       // this.searchDetailInfo
       // selectedKeyList
-      const checkedIncreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '1' ||
-        item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5')
-      const checkedDecreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '6' ||
-        item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9')
+      // const checkedIncreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '1' ||
+      //   item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5')
+      // const checkedDecreaseIdList = this.selectedKeyList.filter(item => item.changeCause === '6' ||
+      //   item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9')
+      const tempArray = this.tableData.filter(item => this.selectedKeyList.indexOf(item.id) !== -1)
+      console.log(tempArray)
+      const checkedIncreaseIdList = tempArray.filter(item => item.changeCause === '1' ||
+        item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5').map(info => info.id)
+      const checkedDecreaseIdList = tempArray.filter(item => item.changeCause === '6' ||
+        item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9').map(info => info.id)
       this.$set(this.searchDetailInfo, 'checkedIncreaseIdList', checkedIncreaseIdList)
       this.$set(this.searchDetailInfo, 'checkedDecreaseIdList', checkedDecreaseIdList)
       const params = {
@@ -430,7 +463,6 @@ export default {
         ...this.searchDetailInfo
       }
       console.log(this.searchDetailInfo, '积分明细导出')
-      debugger
       exportIntegralDetailListApi(params).then(response => {
         console.log(response)
         callDownLoadByBlob(response, '积分明细')
