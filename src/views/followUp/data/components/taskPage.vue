@@ -222,6 +222,13 @@ export default {
     async getTableList (isExport, { pagination = false, ids }) {
       const newSearchObj = deepClonev2(this.searchObj)
       newSearchObj.planids = newSearchObj.planids.join(',')
+      newSearchObj[newSearchObj.range1] = newSearchObj.range2.map(it => it.value || it).join(',')
+      delete newSearchObj.range1
+      delete newSearchObj.range2
+      const [starttime = '', endtime = ''] = newSearchObj.reportTrack
+      newSearchObj.starttime = starttime
+      newSearchObj.endtime = endtime
+
       if (pagination) {
         this.pagination = pagination
       }
@@ -242,6 +249,7 @@ export default {
         const data = await getExcelTaskTableDataReq(newSearchObj)
         callDownLoadByBlob(data, '随访任务数据')
       } else {
+        console.log(newSearchObj, 'newSearchObj')
         getTaskTableDataReq(newSearchObj).then(res => {
           // console.log(res, 'res')
           this.tableData = res.data.datas
