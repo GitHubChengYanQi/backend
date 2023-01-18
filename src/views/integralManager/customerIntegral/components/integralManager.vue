@@ -78,6 +78,7 @@
                 <a-input-number
                   placeholder="请输入积分"
                   :min="1"
+                  :max="99999"
                   :value="batchInfo.integral ? Number(batchInfo.integral) : 1"
                   class="singleInputClass"
                   @change="changeIntegralNumber">
@@ -402,7 +403,8 @@ export default {
       if (!text) {
         text = '1'
       }
-      this.$set(this.batchInfo, 'integral', String(text))
+      console.log(text, 'text')
+      this.$set(this.batchInfo, 'integral', text)
       // this.$set(this.batchInfo, 'integral', e ? String(e) : '1')
     },
     // 表格监听事件

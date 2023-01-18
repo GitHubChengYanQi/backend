@@ -4,7 +4,7 @@
       <div class="allStatisticTitle">总体统计</div>
       <div class="searchLine">
         <div class="searchTitle">选择时间</div>
-        <a-range-picker class="pickTimeClass" v-model="totalDateArray" :format="dateFormatList"></a-range-picker>
+        <a-range-picker class="pickTimeClass" v-model="totalDateArray" :format="dateFormatList" :defaultPickerValue="defaultDateArray"></a-range-picker>
         <a-button
           type="primary"
           style="margin: 0 10px;"
@@ -74,7 +74,7 @@
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">选择时间</div>
-          <a-range-picker class="pickTimeClass" v-model="detailDateArray" :format="dateFormatList" @change="changeDetailDate"></a-range-picker>
+          <a-range-picker class="pickTimeClass" v-model="detailDateArray" :format="dateFormatList" :defaultPickerValue="defaultDateArray" @change="changeDetailDate"></a-range-picker>
         </div>
         <div class="singleSearch">
           <div class="singleSearchTitle">变动原因</div>
@@ -173,6 +173,7 @@ export default {
   name: 'BackendIntegralStatistic',
   data () {
     return {
+      defaultDateArray: [], // 默认面板日期
       // 商品库选择后显示标签数组
       goodsList: [],
       selectedKeyList: [],
@@ -269,6 +270,10 @@ export default {
     goodsManager
   },
   created () {
+    this.defaultDateArray = []
+    const tempPreviousDate = moment().subtract(1, 'M')
+    this.defaultDateArray.push(moment(tempPreviousDate).format('YYYY-MM-DD'))
+    this.defaultDateArray.push(moment().format('YYYY-MM-DD'))
     console.log('积分统计数据')
     this.getIntegralTotalData()
     this.getChangeCauseList()

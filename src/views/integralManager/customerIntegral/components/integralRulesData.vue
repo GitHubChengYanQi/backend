@@ -25,7 +25,7 @@
         </div>
         <div slot="options" slot-scope="text, record">
           <template>
-            <div style="display: flex;justify-content: space-around;">
+            <div style="display: flex;justify-content: space-between;">
               <a-button type="link" @click="setIntegralMethod(record)" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button>
               <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst" v-permission="'/creditsRule/addGoodsCreditsRule@post'">新增商品</a-button>
               <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst" v-permission="'/creditsRule/delGoodsCreditsRule@delete'">删除</a-button>
@@ -64,6 +64,7 @@
               placeholder="请选择"
               class="singleInputClass"
               :min="1"
+              :max="99999"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
               @change="changeFriendCircleIntegralNumber">
             </a-input-number>
@@ -123,6 +124,7 @@
             <a-input-number
               class="singleInputClass"
               :min="1"
+              :max="100"
               v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum ?
                 Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) : 1"
@@ -136,6 +138,7 @@
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ?
                 Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
               class="singleInputClass"
+              :max="99999"
               @change="changeAddFriendIntegral">
             </a-input-number>
             <div class="singleFormText">积分</div>
@@ -211,6 +214,7 @@
                 <div class="singleFormText">后</div>
                 <a-input-number
                   :min="1"
+                  :max="100"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum) : 1"
                   placeholder="请输入"
@@ -234,6 +238,7 @@
                 <div class="singleFormText">且</div>
                 <a-input-number
                   :min="1"
+                  :max="100"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) : ''"
                   placeholder="请输入"
@@ -243,6 +248,7 @@
                 <div class="singleFormText">天内，未退货，员工可获得</div>
                 <a-input-number
                   :min="1"
+                  :max="99999"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
@@ -331,6 +337,7 @@
                 <div class="singleFormText">后，员工可获得</div>
                 <a-input-number
                   :min="1"
+                  :max="99999"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
@@ -344,6 +351,7 @@
                 <!-- <a-input default-value="10" class="singleInputClass"></a-input> -->
                 <a-input-number
                   :min="1"
+                  :max="100"
                   v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum) : 1"
                   placeholder="请输入"

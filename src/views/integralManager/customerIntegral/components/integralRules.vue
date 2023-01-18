@@ -193,6 +193,7 @@
                   Number(commonRulesInfo.creditsSetDeatilVo.integralMaxNum) : 1"
                 placeholder="请输入"
                 :min="1"
+                :max="99999"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '5'"
                 class="inputSelectClass"
                 @change="changeLimitNumber">
@@ -248,6 +249,7 @@
                 :value="commonRulesInfo.creditsSetDeatilVo.beforeDayNum ? Number(commonRulesInfo.creditsSetDeatilVo.beforeDayNum) : 1"
                 placeholder="请输入"
                 :min="1"
+                :max="100"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '7'"
                 class="inputSelectClass"
                 @change="changeBeforeDayNum">
@@ -529,7 +531,6 @@ export default {
       } else if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '3') {
         // 日
         if (Number(text) > 365) {
-          debugger
           text = 365
         }
       }
