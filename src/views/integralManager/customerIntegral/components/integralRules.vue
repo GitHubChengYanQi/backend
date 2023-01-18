@@ -20,7 +20,6 @@
       </a-table>
     </div>
     <a-modal
-      title="积分有效期"
       :maskClosable="false"
       :width="700"
       :visible="commonValidityShowStatus"
@@ -28,6 +27,17 @@
       @cancel="closeCommonValidityModal()"
       :getContainer="() => $refs['integral_rules_container']"
     >
+      <div slot="title" class="titleSlot">
+        <div>积分有效期</div>
+        <a-popover title="">
+          <template slot="content">
+            <div class="labelBox">
+              积分有效期规则仅适用于规则生效后发放的积分，不影响历史已发放积分
+            </div>
+          </template>
+          <img src="@/assets/integral/question.png" alt="" class="questionClass">
+        </a-popover>
+      </div>
       <a-spin :spinning="commonRulesValidityLoading">
         <a-radio-group
           class="radioValityGroupDiv"
@@ -71,7 +81,7 @@
                   :getCalendarContainer="() => $refs['integral_rules_container']"
                   dropdownClassName="dropdownClassName"
                   :disabled-date="e => disableBeforeDate(commonRulesInfo.creditsSetDeatilVo.monthDay, e)"
-                  :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2'"
+                  :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2' || !commonRulesInfo.creditsSetDeatilVo.monthDay"
                   valueFormat="MM-DD"
                   format="MM-DD"
                   v-model="commonRulesInfo.creditsSetDeatilVo.lastYearMonthDay"
@@ -79,8 +89,7 @@
                 ></a-date-picker>
                 至下一年
                 <a-date-picker
-                  inputReadOnly
-                  :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '2'"
+                  :disabled="true"
                   valueFormat="MM-DD"
                   format="MM-DD"
                   v-model="commonRulesInfo.creditsSetDeatilVo.nextYearMonthDay"
@@ -95,12 +104,31 @@
               <a-input-number
                 :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
                 placeholder="请输入"
-                :min="commonRulesInfo.creditsSetDeatilVo.minNumber"
-                :max="commonRulesInfo.creditsSetDeatilVo.maxNumber"
+                :min="1"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
                 @change="changeSingleIntegralNumber"
                 class="inputSelectClass">
               </a-input-number>
+              <!-- <a-input-number
+                v-if="commonRulesInfo.creditsSetDeatilVo.ytdType === '2'"
+                :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
+                placeholder="请输入"
+                :min="1"
+                :max="18"
+                :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
+                @change="changeSingleIntegralNumber"
+                class="inputSelectClass">
+              </a-input-number> -->
+              <!-- <a-input-number
+                v-if="commonRulesInfo.creditsSetDeatilVo.ytdType === '3'"
+                :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
+                placeholder="请输入"
+                :min="1"
+                :max="365"
+                :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
+                @change="changeSingleIntegralNumber"
+                class="inputSelectClass">
+              </a-input-number> -->
               <!-- v-if="commonRulesInfo.creditsSetDeatilVo && commonRulesInfo.creditsSetDeatilVo.ytdType" -->
               <a-select
                 v-if="singleIntegralValidityTypeList[0] && singleIntegralValidityTypeList[0].code"
@@ -165,6 +193,7 @@
                   Number(commonRulesInfo.creditsSetDeatilVo.integralMaxNum) : 1"
                 placeholder="请输入"
                 :min="1"
+                :max="99999"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '5'"
                 class="inputSelectClass"
                 @change="changeLimitNumber">
@@ -220,6 +249,7 @@
                 :value="commonRulesInfo.creditsSetDeatilVo.beforeDayNum ? Number(commonRulesInfo.creditsSetDeatilVo.beforeDayNum) : 1"
                 placeholder="请输入"
                 :min="1"
+                :max="100"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '7'"
                 class="inputSelectClass"
                 @change="changeBeforeDayNum">
@@ -434,7 +464,7 @@ export default {
     // 切换去年时间
     changePreviousDate () {
       console.log('切换去年时间')
-      const tempNextMonthDay = moment(this.commonRulesInfo.creditsSetDeatilVo.monthDay).subtract(1, 'd')
+      const tempNextMonthDay = moment(this.commonRulesInfo.creditsSetDeatilVo.lastYearMonthDay).subtract(1, 'd')
       this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'nextYearMonthDay', moment(tempNextMonthDay).format('MM-DD'))
     },
     // 判断日期是否可选
@@ -481,7 +511,39 @@ export default {
     // 改变每一笔积分有效期
     changeSingleIntegralNumber (e) {
       console.log(e, '每一笔积分有效期')
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', e ? String(e) : '1')
+      let text = String(e)
+      let isValidStatus = false
+      debugger
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+        isValidStatus = true
+        // text = ''
+      }
+      if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '1') {
+        // 年
+        if (Number(text) > 3 || (isValidStatus && String(e).length > 3)) {
+          text = 3
+        }
+      } else if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '2') {
+        // 月
+        if (Number(text) > 18 || (isValidStatus && String(e).length > 3)) {
+          text = 18
+        }
+      } else if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '3') {
+        // 日
+        if (Number(text) > 365 || (isValidStatus && String(e).length > 3)) {
+          text = 365
+        }
+      }
+      if (!text) {
+        text = '1'
+      }
+      // console.log(text, 'text')
+      // debugger
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', String(text))
     },
     // 通用规则有效期点击取消
     closeCommonValidityModal () {
@@ -531,7 +593,6 @@ export default {
       }
       this.integralRulesTypeInfo = Object.assign({}, tempInfo)
       console.log(this.integralRulesTypeInfo)
-      debugger
       this.commonRulesRemindLoading = true
       this.commonRulesValidityLoading = true
       this.commonRulesLimitLoading = true
@@ -566,7 +627,20 @@ export default {
     // 改变积分上限数字
     changeLimitNumber (e) {
       // commonRulesInfo.creditsSetDeatilVo.integralMaxNum
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', String(text))
     },
     // 通用规则积分上限点击确定
     confirmCommonLimit () {
@@ -618,7 +692,21 @@ export default {
     changeBeforeDayNum (e) {
       console.log(e, '改变到期天数')
       // debugger
-      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', e ? String(e) : '1')
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', String(text))
+      // this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', e ? String(e) : '1')
     },
     // 通用规则积分到期提醒点击确定
     confirmCommonRemind () {
@@ -639,7 +727,6 @@ export default {
         console.log(this.commonRulesInfo, '到期提醒提交对象')
       }
       // console.log(this.commonValidityTypeInfo, '有效期提交对象')
-      debugger
       // this.commonRemindShowStatus = false
       this.commonRulesSendMethod()
     },

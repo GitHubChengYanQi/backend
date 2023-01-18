@@ -6,6 +6,7 @@
           <img
             v-if="!detailLoading"
             height="220"
+            width="300"
             :src="detail.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_220,w_300'"
           >
           <div class="info">
@@ -310,7 +311,11 @@ export default {
           courseTaskId: router.history.current.query.courseTaskId
         }, {
           limit: 6500,
-          page: 1
+          page: 1,
+          sorter: {
+            field: this.sorter.field,
+            order: this.sorter.order
+          }
         }).then((res) => {
           excelExport(res, '课程分析数据导出.xlsx')
           message.success('导出成功!')
@@ -323,7 +328,11 @@ export default {
           courseId: router.history.current.query.courseId
         }, {
           limit: 6500,
-          page: 1
+          page: 1,
+          sorter: {
+            field: this.sorter.field,
+            order: this.sorter.order
+          }
         }).then((res) => {
           excelExport(res, '课程分析数据导出.xlsx')
           message.success('导出成功!')
@@ -601,6 +610,7 @@ export default {
     width: 300px;
     height: 220px;
     position: relative;
+    text-align: center;
 
     img {
       max-width: 300px;

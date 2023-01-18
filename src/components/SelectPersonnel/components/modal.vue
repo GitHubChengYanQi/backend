@@ -118,6 +118,8 @@ export default {
       if (!Multiple && this.checkedKeys.length > 1) {
         this.$message.error('只能选择一个成员！')
       } else {
+        this.searchStr = ''
+        this.expandedKeys = []
         this.$emit('output', this.checkedKeys, 'ok')
         sessionStorage.removeItem(this.$parent.curId)
         this.modalShow = false

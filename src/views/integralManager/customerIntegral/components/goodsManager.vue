@@ -200,7 +200,8 @@ export default {
       console.log(this.showStatus, 'showStatus')
       this.goodsManagerShowStatus = this.showStatus
       if (this.goodsManagerShowStatus) {
-        this.modalLoadingStatus = true
+        this.$set(this.goodsManagerPagination, 'current', 1)
+        this.$set(this.goodsManagerPagination, 'pageSize', 10)
         this.getData()
       }
     }
@@ -219,9 +220,10 @@ export default {
     search () {
       this.goodsManagerPagination.current = 1
       this.screenData.erpOrderNos = ''
-      this.getTableData()
+      this.getData()
     },
     getData () {
+      this.modalLoadingStatus = true
       const params = {
         page: this.goodsManagerPagination.current,
         perPage: this.goodsManagerPagination.pageSize,
@@ -249,6 +251,7 @@ export default {
     handleTableChange ({ current, pageSize }, filters, sorter) {
       // console.log(current, pageSize, sorter, '监听的信息')
       this.selectedRowKeys = []
+      this.selectRowArray = []
       let currentTypeText = ''
       if (sorter.order) {
         // 获取点击的是那一列排序

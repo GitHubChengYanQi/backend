@@ -42,7 +42,11 @@
           <div slot="name" slot-scope="text, record">
             <div class="user-info flex">
               <div class="avatar mr12">
-                <img height="50" width="50" :src="record.coverImageUrl ? record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50' : require('@/assets/study/examImg.png')">
+                <img
+                  height="50"
+                  width="50"
+                  :src="record.coverImageUrl ? record.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_50,w_50' : require('@/assets/study/examImg.png')"
+                >
               </div>
               <div class="nickname">
                 <a-tooltip overlayClassName="myTooltip">
@@ -59,7 +63,7 @@
               <div>
                 <a-button
                   class="successButton"
-                  @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?examId=${record.examId}&courseTaskId=${$router.history.current.query.courseTaskId || ''}&courseId=${$router.history.current.query.courseId}&examCount=${record.examCount || 0}&passExamCount=${record.passExamCount || 0}&noPassExamCount=${record.noPassExamCount || 0}&inExamCount=${record.inExamCount || 0}`)"
+                  @click="() => $router.push(`/study/examinationAnalysis/examintionDetail?examId=${record.examId}&courseTaskId=${$router.history.current.query.courseTaskId || ''}&examTaskId=${record.examTaskId || ''}&courseId=${$router.history.current.query.courseId}&examCount=${record.examCount || 0}&passExamCount=${record.passExamCount || 0}&noPassExamCount=${record.noPassExamCount || 0}&inExamCount=${record.inExamCount || 0}`)"
                 >
                   查看详情
                 </a-button>
@@ -75,11 +79,19 @@
 <script>
 
 import router from '@/router'
-import { examCourseBindPageExcelExport, examCourseBindPageList } from '@/api/study/course'
+import {
+  examCourseBindPageExcelExport,
+  examCourseBindPageList,
+  examTaskCourseBindPageExcelExport
+} from '@/api/study/course'
 import { excelExport } from '@/utils/downloadUtil'
 import { message } from 'ant-design-vue'
+import { examTaskList } from '@/api/study/task'
 
 export default {
+  props: {
+    task: Boolean
+  },
   data () {
     return {
       loading: false,
@@ -176,39 +188,86 @@ export default {
       this.excelLoading = true
       const data = {
         ...this.screenData,
-        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType,
-        courseId: router.history.current.query.courseId
+        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType
       }
-      examCourseBindPageExcelExport(data, {
+
+      const params = {
         limit: 6500,
-        page: 1
-      }).then((res) => {
-        excelExport(res, '考试分析数据导出.xlsx')
-        message.success('导出成功!')
-      }).finally(() => {
-        this.excelLoading = false
-      })
+        page: 1,
+        sorter: {
+          field: this.sorter.field,
+          order: this.sorter.order
+        }
+      }
+
+      if (this.task) {
+        examTaskCourseBindPageExcelExport({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId
+        }, params).then((res) => {
+          excelExport(res, '考试分析数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      } else {
+        examCourseBindPageExcelExport({
+          ...data,
+          courseId: router.history.current.query.courseId
+        }, params).then((res) => {
+          excelExport(res, '考试分析数据导出.xlsx')
+          message.success('导出成功!')
+        }).finally(() => {
+          this.excelLoading = false
+        })
+      }
     },
     getTableData () {
       this.loading = true
       const data = {
         ...this.screenData,
-        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType,
-        courseId: router.history.current.query.courseId
+        bindType: this.screenData.bindType === 'all' ? null : this.screenData.bindType
       }
-      examCourseBindPageList(data, {
+
+      const params = {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
           field: this.sorter.field,
           order: this.sorter.order
         }
-      }).then(res => {
-        this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
-        this.pagination.total = res.count
-      }).finally(() => {
-        this.loading = false
-      })
+      }
+
+      if (this.task) {
+        examTaskList({
+          ...data,
+          courseTaskId: router.history.current.query.courseTaskId
+        }, params).then(res => {
+          this.tableData = res.data.map((item, index) => {
+            const examResult = item.examResult || {}
+            return {
+              ...item,
+              name: examResult.name,
+              questionnaireName: Array.isArray(examResult.questionnaireResults) && examResult.questionnaireResults.length > 0 && examResult.questionnaireResults[0].questionnaireName,
+              bindType: examResult.bindType,
+              key: index
+            }
+          })
+          this.pagination.total = res.count
+        }).finally(() => {
+          this.loading = false
+        })
+      } else {
+        examCourseBindPageList({
+          ...data,
+          courseId: router.history.current.query.courseId
+        }, params).then(res => {
+          this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
+          this.pagination.total = res.count
+        }).finally(() => {
+          this.loading = false
+        })
+      }
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
       this.sorter = sorter

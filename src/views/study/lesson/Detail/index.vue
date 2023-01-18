@@ -9,7 +9,7 @@
         <CoursewareAnalysis :task="task" />
       </a-tab-pane>
       <a-tab-pane key="3" tab="考试分析">
-        <ExaminationAnalysis />
+        <ExaminationAnalysis :task="task" />
       </a-tab-pane>
     </a-tabs>
   </div>
