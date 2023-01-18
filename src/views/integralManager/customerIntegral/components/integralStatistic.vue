@@ -160,11 +160,7 @@ export default {
       reasonList: [],
       dateFormatList: ['YYYY-MM-DD', 'YYYY-MM-DD'],
       // 总体数据统计
-      totalInfo: {
-        integralTotal: '2,290',
-        allIntegralTotal: '5,700',
-        consumptionIntegralTotal: '3,410'
-      },
+      totalInfo: {},
       // 查询总体数据对象
       searchTotalInfo: {},
       // 查询积分明细数据对象

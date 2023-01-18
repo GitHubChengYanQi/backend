@@ -625,6 +625,9 @@ export default {
       if (Number(text) > 99999) {
         text = '99999'
       }
+      if (!text) {
+        text = '1'
+      }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 设置朋友圈弹框点击取消
@@ -711,6 +714,9 @@ export default {
       if (Number(text) > 100) {
         text = '100'
       }
+      if (!text) {
+        text = '1'
+      }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', String(text))
     },
     // 改变新增好友弹框积分
@@ -725,6 +731,9 @@ export default {
       }
       if (Number(text) > 99999) {
         text = '99999'
+      }
+      if (!text) {
+        text = '1'
       }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
@@ -769,6 +778,9 @@ export default {
       if (Number(text) > 99999) {
         text = '99999'
       }
+      if (!text) {
+        text = '1'
+      }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', String(text))
       // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'lookAfterDayNum', e ? String(e) : '1')
     },
@@ -783,6 +795,9 @@ export default {
       }
       if (Number(text) > 99999) {
         text = '99999'
+      }
+      if (!text) {
+        text = '1'
       }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', String(text))
       // this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', e ? String(e) : '1')
@@ -800,6 +815,9 @@ export default {
       if (Number(text) > 99999) {
         text = '99999'
       }
+      if (!text) {
+        text = '1'
+      }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
     // 改变查看素材弹框积分
@@ -814,6 +832,9 @@ export default {
       }
       if (Number(text) > 99999) {
         text = '99999'
+      }
+      if (!text) {
+        text = '1'
       }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'integral', String(text))
     },
@@ -830,6 +851,9 @@ export default {
       }
       if (Number(text) > 99999) {
         text = '99999'
+      }
+      if (!text) {
+        text = '1'
       }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'validDayNum', String(text))
     },

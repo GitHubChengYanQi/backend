@@ -523,6 +523,9 @@ export default {
           text = 365
         }
       }
+      if (!text) {
+        text = '1'
+      }
       // console.log(text, 'text')
       // debugger
       this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'ytdNum', String(text))
@@ -620,6 +623,9 @@ export default {
       if (Number(text) > 99999) {
         text = '99999'
       }
+      if (!text) {
+        text = '1'
+      }
       this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'integralMaxNum', String(text))
     },
     // 通用规则积分上限点击确定
@@ -681,6 +687,9 @@ export default {
       }
       if (Number(text) > 99999) {
         text = '99999'
+      }
+      if (!text) {
+        text = '1'
       }
       this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', String(text))
       // this.$set(this.commonRulesInfo.creditsSetDeatilVo, 'beforeDayNum', e ? String(e) : '1')
