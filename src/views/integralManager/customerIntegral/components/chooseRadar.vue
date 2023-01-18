@@ -209,7 +209,6 @@ export default {
   },
   methods: {
     async handleAddRadarOk () {
-      debugger
       if (this.selectItem.length === 0) {
         this.$message.warning('请选择雷达素材')
         return

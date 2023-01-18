@@ -477,7 +477,6 @@ export default {
       }
       console.log(this.batchInfo, 'batchInfo')
       this.batchInfoModalLoading = true
-      debugger
       batchCustomerIntegralApi(this.batchInfo).then(response => {
         console.log(response)
         if (response.code === 200) {

@@ -105,7 +105,6 @@
                 :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
                 placeholder="请输入"
                 :min="1"
-                :max="commonRulesInfo.creditsSetDeatilVo.maxNumber"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
                 @change="changeSingleIntegralNumber"
                 class="inputSelectClass">
@@ -513,25 +512,29 @@ export default {
     changeSingleIntegralNumber (e) {
       console.log(e, '每一笔积分有效期')
       let text = String(e)
+      let isValidStatus = false
+      debugger
       if (!/^[0-9]+$/.test(text)) {
         // 将不符合的部分清除
         // console.log('有效期有问题', text.replace(/\D/g,''))
         // console.log()
         text = text.replace(/\D/g, '')
+        isValidStatus = true
+        // text = ''
       }
       if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '1') {
         // 年
-        if (Number(text) > 3) {
+        if (Number(text) > 3 || (isValidStatus && String(e).length > 3)) {
           text = 3
         }
       } else if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '2') {
         // 月
-        if (Number(text) > 18) {
+        if (Number(text) > 18 || (isValidStatus && String(e).length > 3)) {
           text = 18
         }
       } else if (this.commonRulesInfo.creditsSetDeatilVo.ytdType === '3') {
         // 日
-        if (Number(text) > 365) {
+        if (Number(text) > 365 || (isValidStatus && String(e).length > 3)) {
           text = 365
         }
       }
@@ -590,7 +593,6 @@ export default {
       }
       this.integralRulesTypeInfo = Object.assign({}, tempInfo)
       console.log(this.integralRulesTypeInfo)
-      debugger
       this.commonRulesRemindLoading = true
       this.commonRulesValidityLoading = true
       this.commonRulesLimitLoading = true
@@ -725,7 +727,6 @@ export default {
         console.log(this.commonRulesInfo, '到期提醒提交对象')
       }
       // console.log(this.commonValidityTypeInfo, '有效期提交对象')
-      debugger
       // this.commonRemindShowStatus = false
       this.commonRulesSendMethod()
     },

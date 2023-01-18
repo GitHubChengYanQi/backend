@@ -463,7 +463,6 @@ export default {
         ...this.searchDetailInfo
       }
       console.log(this.searchDetailInfo, '积分明细导出')
-      debugger
       exportIntegralDetailListApi(params).then(response => {
         console.log(response)
         callDownLoadByBlob(response, '积分明细')

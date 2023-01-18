@@ -661,7 +661,6 @@ export default {
           this.$message.error('请填写全部数据')
           return false
         }
-        debugger
         this.commonIntegralRulesSend()
       }
       // this.integralFriendCircleShowStatus = false
@@ -676,7 +675,6 @@ export default {
       }
       this.integralRulesTypeInfo = Object.assign({}, tempInfo)
       console.log(this.integralRulesTypeInfo)
-      debugger
       this.integralAddFriendLoading = true
       this.integralFriendCircleLoading = true
       this.integralBuyLoading = true
@@ -766,7 +764,6 @@ export default {
               this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
             }
           }
-          debugger
           this.commonIntegralRulesSend()
         } else {
           this.$message.error('请填写全部数据')
