@@ -112,11 +112,11 @@ export default {
       columns: [
         {
           title: '章节',
-          dataIndex: 'index',
+          dataIndex: 'sort',
           align: 'center',
           width: '100px',
-          customRender (value, record, index) {
-            return index + 1
+          customRender (value) {
+            return value + 1
           }
         },
         {
@@ -190,7 +190,10 @@ export default {
       ],
       tableData: [],
       checkIds: [],
-      sorter: {},
+      sorter: {
+        field: 'sort',
+        order: 'ascend'
+      },
       excelLoading: false,
       pagination: {
         total: 0,
