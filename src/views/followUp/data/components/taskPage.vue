@@ -83,7 +83,10 @@
         @getTableList="(params) => getTableList(false, params)"
         @exportTableList="(params) => getTableList(true, params)">
         <template #customName>
-          <div class="btns" style="color: #2589FF;cursor: pointer;" @click="goTableDetail('3')">
+          <div
+            class="btns"
+            style="color: #2589FF;cursor: pointer;"
+            @click="goTableDetail('3', { name: searchObj.range1 === 'organids' ? '机构' : searchObj.range1 === 'shopids' ? '门店' : '员工' })">
             {{ '任务数' }}
           </div>
         </template>
@@ -264,6 +267,7 @@ export default {
         searchParams[searchParams.range1] = otherData.oid
       }
       searchParams.reporttype = searchParams.reporttype === '4' ? '7' : '10'
+      console.log(otherData, 'otherData')
       this.$router.push({
         path: `/followUp/data/tableItemDetail`,
         query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: type === '3' ? '/diagnosiscareanalysisday/exporttasknumlist#POST' : '/diagnosiscareanalysisday/exportonamelist#POST', name: otherData.name })) }
