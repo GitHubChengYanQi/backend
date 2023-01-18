@@ -99,7 +99,7 @@
                   <div class="reasonTitle">历史调整原因</div>
                   <div class="reasonEditButton" @click="goDeleteReason" v-permission="'/creditsChangeCause/delete@post'">编辑</div>
                 </div>
-                <div class="reasonTagDiv">
+                <div class="reasonTagDiv" v-if="historyReasonList.length !== 0">
                   <a-tag :closable="isCloseReason" v-for="item in historyReasonList" :key="item" @close="deleteHistoryTag($event, item)">
                     <a-popover title="" v-if="item.length > 10">
                       <template slot="content">
