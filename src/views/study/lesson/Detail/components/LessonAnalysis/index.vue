@@ -6,6 +6,7 @@
           <img
             v-if="!detailLoading"
             height="220"
+            width="300"
             :src="detail.coverImageUrl+'?x-oss-process=image/resize,m_fill,h_220,w_300'"
           >
           <div class="info">
@@ -609,6 +610,7 @@ export default {
     width: 300px;
     height: 220px;
     position: relative;
+    text-align: center;
 
     img {
       max-width: 300px;
