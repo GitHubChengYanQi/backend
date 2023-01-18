@@ -269,7 +269,7 @@ export default {
           dataIndex: 'score',
           align: 'center',
           customRender (value) {
-            return typeof value === 'number' ? '是' : '否'
+            return value ? '是' : '否'
           }
         },
         {
