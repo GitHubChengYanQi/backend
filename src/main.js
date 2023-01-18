@@ -54,7 +54,6 @@ Vue.config.productionTip = false
 
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueQuillEditor)
-Vue.use(VueQuillEditor)
 Vue.use(VueViewer)
 
 Vue.use(VueAxios)

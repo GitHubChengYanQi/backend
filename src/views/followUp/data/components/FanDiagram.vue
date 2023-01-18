@@ -1,6 +1,6 @@
 <template>
   <div class="fanDiagram">
-    <v-chart class="chart" :options="options[type]" @click="getLink"></v-chart>
+    <v-chart ref="myChart" class="chart" :options="options[type]" @click="getLink"></v-chart>
   </div>
 </template>
 
@@ -373,6 +373,7 @@ export default {
       if (this.type == 4) {
         this.line(this.dataObj)
       } else {
+        console.log(this.dataObj, '11111111')
         this.columnar(this.dataObj)
       }
     },
@@ -426,6 +427,7 @@ export default {
         this.options[this.type].legend.data = newArr.map(item => { return item.name })
       }
       this.options[this.type].series[0].data = newArr
+      this.$refs.myChart && this.$refs.myChart.mergeOptions(this.options[this.type], true)
     },
     across (arr) {
       const titleArr = arr.map(item => { return item[0] })
@@ -436,10 +438,12 @@ export default {
       this.options[this.type].series[1].data = arr.map(item => {
         return this.sum(dataArr)
       })
+      this.$refs.myChart && this.$refs.myChart.mergeOptions(this.options[this.type], true)
     },
     line (data = []) {
       if (this.type == 3) {
         this.options[this.type].series[0].data = data
+        this.$refs.myChart && this.$refs.myChart.mergeOptions(this.options[this.type], true)
       } else {
         this.options[this.type].xAxis.data = data.xAxis
         const arr = []
@@ -451,10 +455,10 @@ export default {
           arr.push(obj)
         }
         this.options[this.type].series = arr
+        this.$refs.myChart && this.$refs.myChart.mergeOptions(this.options[this.type], true)
       }
     },
     columnar (data) {
-      this.options[this.type].xAxis.data = data.xAxis
       this.options[this.type].xAxis.data = data.xAxis
       const arr = []
       const titleArr = []
@@ -473,6 +477,7 @@ export default {
       }
       this.options[this.type].legend.data = titleArr
       this.options[this.type].series = arr
+      this.$refs.myChart && this.$refs.myChart.mergeOptions(this.options[this.type], true)
     },
     sum (arr) {
       var s = 0
