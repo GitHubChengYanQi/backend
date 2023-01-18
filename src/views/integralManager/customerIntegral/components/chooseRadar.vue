@@ -246,6 +246,8 @@ export default {
         current,
         size: pageSize
       }
+      this.selectItem = []
+      this.rowSelection = []
       scrmRadarArticleFind(obj).then(res => {
         console.log(res)
         this.tableData = res.data.datas.map(item => {

@@ -105,6 +105,7 @@
                 :value="commonRulesInfo.creditsSetDeatilVo.ytdNum ? Number(commonRulesInfo.creditsSetDeatilVo.ytdNum) : 1"
                 placeholder="请输入"
                 :min="1"
+                :max="commonRulesInfo.creditsSetDeatilVo.maxNumber"
                 :disabled="commonRulesInfo.creditsSetDeatilVo.restrictionType !== '3'"
                 @change="changeSingleIntegralNumber"
                 class="inputSelectClass">
