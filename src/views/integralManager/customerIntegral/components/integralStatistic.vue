@@ -110,7 +110,7 @@
         :scroll="{ x: 1500}"
         @change="handleTableChange">
         <div slot="adjustCause" slot-scope="text">
-          <a-popover title="理由" v-if="text !== ''&& text.length > 10">
+          <a-popover title="理由" v-if="text && text.length > 10">
             <template slot="content">
               <div class="labelBox">
                 {{ text }}
@@ -118,7 +118,7 @@
             </template>
             <div>{{ text.slice(0, 10) + '...' }}</div>
           </a-popover>
-          <div v-else-if="text !== ''&& text.length <= 10">{{ text }}</div>
+          <div v-else-if="text && text.length <= 10">{{ text }}</div>
           <div v-else>-</div>
         </div>
         <div slot="createdEmployeeName" slot-scope="text, record">
