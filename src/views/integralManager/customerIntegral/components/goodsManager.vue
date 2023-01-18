@@ -200,7 +200,6 @@ export default {
       console.log(this.showStatus, 'showStatus')
       this.goodsManagerShowStatus = this.showStatus
       if (this.goodsManagerShowStatus) {
-        this.modalLoadingStatus = true
         this.getData()
       }
     }
@@ -219,9 +218,10 @@ export default {
     search () {
       this.goodsManagerPagination.current = 1
       this.screenData.erpOrderNos = ''
-      this.getTableData()
+      this.getData()
     },
     getData () {
+      this.modalLoadingStatus = true
       const params = {
         page: this.goodsManagerPagination.current,
         perPage: this.goodsManagerPagination.pageSize,

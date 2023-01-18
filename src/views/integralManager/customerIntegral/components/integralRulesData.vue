@@ -58,8 +58,9 @@
           <div class="singleFormDiv">
             <div class="singleFormTitle">积分规则</div>
             <div class="singleFormText">任务时间内完成朋友圈群发任务，可获得</div>
+            <!-- && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral -->
             <a-input-number
-              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
               placeholder="请选择"
               class="singleInputClass"
               :min="1"
@@ -122,8 +123,7 @@
             <a-input-number
               class="singleInputClass"
               :min="1"
-              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
-                && integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum ?
                 Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) : 1"
               @change="changeFriendDayNumber">
@@ -132,8 +132,7 @@
             <div class="singleFormText">未流失，员工可获得</div>
             <a-input-number
               :min="1"
-              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo
-                && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
               :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ?
                 Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
               class="singleInputClass"
@@ -212,7 +211,7 @@
                 <div class="singleFormText">后</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.lookAfterDayNum) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -235,7 +234,7 @@
                 <div class="singleFormText">且</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.salesReturnDayNum) : ''"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -244,7 +243,7 @@
                 <div class="singleFormText">天内，未退货，员工可获得</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -332,7 +331,7 @@
                 <div class="singleFormText">后，员工可获得</div>
                 <a-input-number
                   :min="1"
-                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.integral"
+                  v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
                   :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ? Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
                   placeholder="请输入"
                   class="singleInputClass"
@@ -705,8 +704,8 @@ export default {
         // console.log()
         text = text.replace(/\D/g, '')
       }
-      if (Number(text) > 99999) {
-        text = '99999'
+      if (Number(text) > 100) {
+        text = '100'
       }
       this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'friendDayNum', String(text))
     },
@@ -995,6 +994,8 @@ export default {
         this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'salesReturnDayNum', '1')
         this.buyRadarList = []
         this.goodsList = []
+        this.$set(this.integralRulesTypeInfo, 'employeeIds', [])
+        // integralRulesTypeInfo.employeeIds
       })
     },
     // 删除商品规则
