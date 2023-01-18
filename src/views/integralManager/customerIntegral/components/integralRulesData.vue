@@ -589,13 +589,17 @@ export default {
           this.radarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
         } else if (info.ruleType === '3') {
           this.buyRadarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
-          const tempInfo = {
-            id: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodId,
-            name: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodsName
+          if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodId && this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodsName) {
+            const tempInfo = {
+              id: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodId,
+              name: this.integralRulesTypeInfo.creditsRuleJsonDetailVo.goodsName
+            }
+            const tempGoodsList = []
+            tempGoodsList.push(tempInfo)
+            this.goodsList = this.deepClonev2(tempGoodsList)
+          } else {
+            this.goodsList = []
           }
-          const tempGoodsList = []
-          tempGoodsList.push(tempInfo)
-          this.goodsList = this.deepClonev2(tempGoodsList)
         }
       })
     },
