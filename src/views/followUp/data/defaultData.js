@@ -101,7 +101,7 @@ export const tableColunms2 = [
     align: 'center'
   },
   {
-    title: '片区名称',
+    slots: { title: 'customName2' },
     width: 120,
     dataIndex: 'name',
     align: 'center',
@@ -244,15 +244,15 @@ export const fixTaskSearchObj = obj => {
 export const generatorChartsData = res => {
   res.tasksendChart1 = [
     ['发送数', res.tasksend_reports.sendinfo.num],
-    ['', res.tasksend_reports.totalnum]
+    ['', res.tasksend_reports.totalnum - res.tasksend_reports.sendinfo.num]
   ]
   res.tasksendChart2 = [
     ['超时发送数', res.tasksend_reports.expsendinfo.num],
-    ['', res.tasksend_reports.totalnum]
+    ['', res.tasksend_reports.totalnum - res.tasksend_reports.expsendinfo.num]
   ]
   res.tasksendChart3 = [
     ['未发送数', res.tasksend_reports.unsendinfo.num],
-    ['', res.tasksend_reports.totalnum]
+    ['', res.tasksend_reports.totalnum - res.tasksend_reports.unsendinfo.num]
   ]
   res.tasktab_reports.chartData = [
     ['问卷', res.tasktab_reports.answerper],

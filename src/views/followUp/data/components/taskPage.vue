@@ -22,7 +22,7 @@
       <div class="searchItem">
         <span class="label">方案名称：</span>
         <a-select v-model="searchObj.planids" mode="multiple" style="width: 300px" :maxTagCount="2" placeholder="请选择">
-          <a-select-option v-for="item in searchSchemeNameSelectOptions" :key="item.planids" :value="item.planids">
+          <a-select-option v-for="item in searchSchemeNameSelectOptions" :key="item.planId" :value="item.planId">
             {{ item.planName }}
           </a-select-option>
         </a-select>
@@ -68,7 +68,7 @@
       </div>
       <div class="searchBtn">
         <a-button type="primary" @click="handleSearch">查询</a-button>
-        <a-button @click="searchObj = { ...defaultSearchObj2 }">重置</a-button>
+        <a-button @click="reset">重置</a-button>
       </div>
     </div>
     <TaskChart class="chartBox" :data="chartsDataObj" :searchParams="searchObj" />
@@ -77,7 +77,7 @@
         :tableColunms="tableColunms2"
         :tableData="tableData"
         :colunmsSlots="['name']"
-        :titleSlots="['customName']"
+        :titleSlots="['customName', 'customName2']"
         :tableTotal="pagination.total"
         :exportPermission="'/diagnosiscareanalysisday/exportreportlist#POST'"
         @getTableList="(params) => getTableList(false, params)"
@@ -86,6 +86,11 @@
           <div class="btns" style="color: #2589FF;cursor: pointer;" @click="goTableDetail('3')">
             {{ '任务数' }}
           </div>
+        </template>
+        <template #customName2>
+          <span>
+            {{ searchObj.range1 === 'organids' ? '机构' : searchObj.range1 === 'shopids' ? '门店' : '员工' }}名称
+          </span>
         </template>
         <template #name="{ text }">
           <div class="btns" style="color: #2589FF;cursor: pointer;" @click="goTableDetail('4', text.record)">
@@ -144,6 +149,16 @@ export default {
   watch: {
     'searchObj.range1' () {
       this.searchObj.range2 = []
+    },
+    'searchObj.range2' (e) {
+      if (e.length > 30) {
+        this.searchObj.range2 = e.slice(0, 30)
+      }
+    },
+    'searchObj.planids' (e) {
+      if (e.length > 30) {
+        this.searchObj.planids = e.slice(0, 30)
+      }
     }
   },
   created () {
@@ -234,15 +249,20 @@ export default {
         })
       }
     },
-    goTableDetail (type, otherData) {
+    goTableDetail (type, otherData = {}) {
+      if (this.searchObj.reporttype === '10') return
       const searchParams = deepClonev2(this.searchObj)
       if (type === '4') {
         searchParams[searchParams.range1] = otherData.oid
       }
+      searchParams.reporttype = searchParams.reporttype === '4' ? '7' : '10'
       this.$router.push({
         path: `/followUp/data/tableItemDetail`,
-        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: type === '3' ? '/diagnosiscareanalysisday/exporttasknumlist#POST' : '/diagnosiscareanalysisday/exportonamelist#POST' })) }
+        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: type === '3' ? '/diagnosiscareanalysisday/exporttasknumlist#POST' : '/diagnosiscareanalysisday/exportonamelist#POST', name: otherData.name })) }
       })
+    },
+    reset () {
+      this.searchObj = { ...defaultSearchObj2 }
     }
   }
 }

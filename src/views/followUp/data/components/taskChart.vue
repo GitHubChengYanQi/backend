@@ -2,7 +2,8 @@
   <div class="TaskChart_Component_Container">
     <ChartContainer name="任务发送情况占比" :width="'60%'" style="margin-right: 1%;">
       <template #searchTab>
-        <span style="font-weight: bold;">任务总数 {{ (data.tasksend_reports && data.tasksend_reports.totalnum) || '-' }}</span>
+        <span style="font-weight: bold;">任务总数 {{ (data.tasksend_reports && data.tasksend_reports.totalnum) || '-'
+        }}</span>
       </template>
       <div style="height: 410px;display: flex;justify-content: space-around;">
         <div class="circleItem">
@@ -18,14 +19,14 @@
     </ChartContainer>
     <ChartContainer width="39%" name="任务类型占比情况">
       <template #rightTop>
-        <span style="font-weight: bold;">未发送任务总量：{{ (data.tasktab_reports && data.tasktab_reports.num) || '-' }}</span>
+        <span style="font-weight: bold;">{{ chart2Value === '1' ? '总任务' : chart2Value === '2' ? '已发送任务' : chart2Value
+          === '3' ? '超时发送任务' : chart2Value === '4' ? '未发送任务' : '' }}量：{{ (data.tasktab_reports && data.tasktab_reports.num) || '-' }}</span>
       </template>
       <template #searchTab>
         <a-radio-group
-          default-value="1"
+          v-model="chart2Value"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({tasktab: value, targetdata: 2}, 'tasktab_reports')"
-        >
+          @change="({ target: { value } }) => handleChartItemChange({ tasktab: value, targetdata: 2 }, 'tasktab_reports')">
           <a-radio-button value="1">总任务</a-radio-button>
           <a-radio-button value="2">已发送任务</a-radio-button>
           <a-radio-button value="3">超时发送任务</a-radio-button>
@@ -41,8 +42,7 @@
         <a-radio-group
           default-value="1"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({taskpertab: value, targetdata: 3}, 'taskpertab_reports')"
-        >
+          @change="({ target: { value } }) => handleChartItemChange({ taskpertab: value, targetdata: 3 }, 'taskpertab_reports')">
           <a-radio-button value="1">任务数</a-radio-button>
           <a-radio-button value="2">发送数</a-radio-button>
           <a-radio-button value="3">超时发送数</a-radio-button>
@@ -55,8 +55,7 @@
           :dataObj="{
             xAxis: data.taskpertab_reports.xaxis,
             data: data.taskpertab_reports.data
-          }"
-        />
+          }" />
       </div>
     </ChartContainer>
     <ChartContainer name="任务各类型数据情况">
@@ -64,8 +63,7 @@
         <a-radio-group
           v-model="chart4Value"
           button-style="solid"
-          @change="({ target: { value } }) => handleChartItemChange({tasktype: value, targetdata: 4}, 'tasktype_reports')"
-        >
+          @change="({ target: { value } }) => handleChartItemChange({ tasktype: value, targetdata: 4 }, 'tasktype_reports')">
           <a-radio-button value="1">问卷</a-radio-button>
           <a-radio-button value="2">患教</a-radio-button>
           <a-radio-button value="3">嘱托</a-radio-button>
@@ -76,10 +74,9 @@
           :type="5"
           :dataObj="{
             xAxis: data.tasktype_reports.xaxis,
-            data:data.tasktype_reports.data
+            data: data.tasktype_reports.data
           }"
-          @getClick="e => chart4Value === '1' && showModel(e)"
-        />
+          @getClick="e => chart4Value === '1' && showModel(e)" />
       </div>
     </ChartContainer>
     <a-modal
@@ -88,15 +85,14 @@
       :visible="isShow"
       :closable="false"
       :footer="null"
-      @cancel="()=>{
+      @cancel="() => {
         isShow = false
-      }"
-    >
+      }">
       <template slot="title">
         <div class="header">
           <div>问卷任务情况明细</div>
           <a-button
-            @click="()=>{
+            @click="() => {
               isShow = false
             }"
             key="back">返回</a-button>
@@ -110,8 +106,7 @@
             :data-source="tableData"
             :pagination="pagination"
             @change="handleTableChange"
-            class="table"
-          ></a-table>
+            class="table"></a-table>
         </div>
       </div>
     </a-modal>
@@ -143,6 +138,7 @@ export default {
   data () {
     return {
       isShow: false,
+      chart2Value: '1',
       chart4Value: '1',
       columns: [{
         align: 'center',
@@ -192,8 +188,6 @@ export default {
       chart4Name: ''
     }
   },
-  computed: {},
-  watch: {},
   created () {
   },
   methods: {
@@ -264,14 +258,17 @@ export default {
 ::v-deep(.ant-modal-body) {
   padding: 0;
 }
+
 .modal_box {
   display: flex;
   justify-content: center;
   width: 100%;
   min-height: 370px;
+
   .table_box {
     min-width: 600px;
     min-height: 370px;
+
     .table {
       min-height: 370px;
     }
