@@ -150,7 +150,6 @@ export default {
   created () {
     this.type = this.$route.query.type
     this.searchParams = JSON.parse(decodeURIComponent(this.$route.query.searchParams))
-    console.log(this.searchParams)
     this.getTableList(false, { })
   },
   methods: {
@@ -158,7 +157,6 @@ export default {
       const { pagination = false, ids } = params
       const newSearchObj = deepClonev2(this.searchParams)
       if (['1', '2'].includes(this.type)) {
-        newSearchObj.planId = newSearchObj.planId.join(',')
       } else {
         newSearchObj.planids = newSearchObj.planids.join(',')
         const [starttime = '', endtime = ''] = newSearchObj.reportTrack
@@ -176,7 +174,6 @@ export default {
       const { pageSize, current } = pagination || this.pagination
       newSearchObj.size = pageSize
       newSearchObj.current = current
-      console.log(newSearchObj, 'newSearchObj')
       if (isExport) {
         if (this.type === '1') {
           newSearchObj.excelType = 'vertical'
@@ -212,6 +209,7 @@ export default {
           if (this.type === '2') {
             getTableDetailDataReq(newSearchObj).then(res => {
               this.tableData = res.data.datas
+              this.pagination.total = res.data.total
             })
           } else {
             getTableItemDetailDataReq(newSearchObj).then(res => {
@@ -226,10 +224,12 @@ export default {
           getTaskTableTitleItemDataReq(newSearchObj).then(res => {
             this.tableColunms = res.data.head.map(it => ({ ...it, dataIndex: it.dataindex, width: 130, align: 'center' }))
             this.tableData = res.data.datas
+            this.pagination.total = res.data.total
           })
         } else if (this.type === '4') {
           getTaskTableItemDataReq(newSearchObj).then(res => {
             this.tableData = res.data.datas
+            this.pagination.total = res.data.total
           })
         }
       }

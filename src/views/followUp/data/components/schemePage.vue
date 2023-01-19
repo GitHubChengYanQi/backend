@@ -213,7 +213,9 @@ export default {
       if (this.searchObj.reportIndex === '10') return
       const searchParams = deepClonev2(this.searchObj)
       if (type === '2') {
-        searchParams.itemId = otherData.planId
+        searchParams.planId = otherData.planId
+      } else {
+        searchParams.planId = searchParams.planId.join(',')
       }
       searchParams.reportIndex = searchParams.reportIndex === '4' ? '7' : '10'
       this.$router.push({

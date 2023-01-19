@@ -265,9 +265,10 @@ export default {
       const searchParams = deepClonev2(this.searchObj)
       if (type === '4') {
         searchParams[searchParams.range1] = otherData.oid
+      } else {
+        searchParams[searchParams.range1] = searchParams.range2.map(it => it.value || it).join(',')
       }
       searchParams.reporttype = searchParams.reporttype === '4' ? '7' : '10'
-      console.log(otherData, 'otherData')
       this.$router.push({
         path: `/followUp/data/tableItemDetail`,
         query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: type === '3' ? '/diagnosiscareanalysisday/exporttasknumlist#POST' : '/diagnosiscareanalysisday/exportonamelist#POST', name: otherData.name })) }
