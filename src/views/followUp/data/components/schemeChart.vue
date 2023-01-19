@@ -50,12 +50,12 @@
         <FanDiagram :type="2" :dataArr="data.rowRank || []" />
       </div>
     </ChartContainer>
-    <ChartContainer extra="所选时间范围内，使用方案的用户总人数" name="使用方案用户总人数" :rightTop="`用户总人数 ${1867}`">
+    <ChartContainer extra="所选时间范围内，使用方案的用户总人数" name="使用方案用户总人数" :rightTop="`用户总人数 ${data.dayContactTotal}`">
       <div style="height: 150px;">
         <FanDiagram :type="3" :dataArr="data.dayContact" />
       </div>
     </ChartContainer>
-    <ChartContainer name="使用方案总次数" extra="所选时间范围内，使用方案总次数" :rightTop="`方案总数 ${1867}`">
+    <ChartContainer name="使用方案总次数" extra="所选时间范围内，使用方案总次数" :rightTop="`方案总数 ${data.dayTogetherTotal}`">
       <div style="height: 150px;">
         <FanDiagram :type="3" :dataArr="data.dayTogether" />
       </div>
@@ -65,7 +65,7 @@
         <FanDiagram :type="3" :dataArr="data.dayComplete" />
       </div>
     </ChartContainer>
-    <ChartContainer name="使用方案员工总人数" extra="所选时间范围内，使用方案的员工人数" :rightTop="`员工总人数 ${1867}`">
+    <ChartContainer name="使用方案员工总人数" extra="所选时间范围内，使用方案的员工人数" :rightTop="`员工总人数 ${data.dayEmployeeTotal}`">
       <div style="height: 150px;">
         <FanDiagram :type="3" :dataArr="data.dayEmployee" />
       </div>
