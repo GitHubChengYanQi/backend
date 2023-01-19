@@ -4,8 +4,8 @@
       <a-form layout="inline">
 
         <a-form-item
-          label="课程名称">
-          <a-input v-model="screenData.name" placeholder="请输入课程名称" :maxLength="20"></a-input>
+          label="考试名称">
+          <a-input v-model="screenData.name" placeholder="请输入考试名称" :maxLength="20"></a-input>
         </a-form-item>
 
         <a-form-item
