@@ -485,7 +485,7 @@ export default {
       batchCustomerIntegralApi(this.batchInfo).then(response => {
         console.log(response)
         if (response.code === 200) {
-          this.$message.success('批量处理成功')
+          this.$message.success('处理成功')
           this.integralBatchShowStatus = false
           this.batchInfoModalLoading = false
           this.$set(this.pagination, 'current', 1)
