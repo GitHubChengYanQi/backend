@@ -288,7 +288,12 @@ export default {
     chooseHistoryTag (item) {
       console.log(item, '选择标签')
       const oldText = this.batchInfo.adjustCause
-      let newText = oldText + item
+      let newText = ''
+      if (oldText) {
+        newText = oldText + item
+      } else {
+        newText = item
+      }
       if (newText.length > 50) {
         // 合成的新长度大于50
         newText = newText.slice(0, 50)

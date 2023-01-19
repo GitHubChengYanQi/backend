@@ -513,7 +513,7 @@ export default {
       console.log(e, '每一笔积分有效期')
       let text = String(e)
       let isValidStatus = false
-      debugger
+      // debugger
       if (!/^[0-9]+$/.test(text)) {
         // 将不符合的部分清除
         // console.log('有效期有问题', text.replace(/\D/g,''))
