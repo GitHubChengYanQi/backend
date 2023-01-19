@@ -667,7 +667,7 @@ export default {
     commonIntegralRulesSend () {
       const tempInfo = {}
       for (const key in this.integralRulesTypeInfo) {
-        if (key === 'id' || key === 'state' || key === 'creditsRuleJsonDetailVo' || key === 'employeeIds') {
+        if (key === 'id' || key === 'state' || key === 'creditsRuleJsonDetailVo' || key === 'employeeId' || key === 'employeeIds') {
           this.$set(tempInfo, `${key}`, this.integralRulesTypeInfo[key])
         }
       }
@@ -677,6 +677,7 @@ export default {
       this.integralFriendCircleLoading = true
       this.integralBuyLoading = true
       this.integralMaterialLoading = true
+      console.log(this.integralRulesTypeInfo, 'this.integralRulesTypeInfo')
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
         if (response.code === 200) {
           this.integralFriendCircleLoading = false
