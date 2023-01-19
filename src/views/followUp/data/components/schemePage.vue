@@ -53,7 +53,7 @@
       </div>
       <div class="searchBtn">
         <a-button type="primary" @click="handleSearch">查询</a-button>
-        <a-button @click="searchObj = { ...defaultSearchObj }">重置</a-button>
+        <a-button @click="reset">重置</a-button>
       </div>
     </div>
     <SchemeChart class="chartBox" :data="chartsDataObj" />
@@ -209,18 +209,23 @@ export default {
         })
       }
     },
-    goTableDetail (type, otherData) {
+    goTableDetail (type, otherData = {}) {
+      if (this.searchObj.reportIndex === '10') return
       const searchParams = deepClonev2(this.searchObj)
       if (type === '2') {
         searchParams.itemId = otherData.planId
       }
+      searchParams.reportIndex = searchParams.reportIndex === '4' ? '7' : '10'
       this.$router.push({
         path: `/followUp/data/tableItemDetail`,
-        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: '/scrm_diagnosis_care_analysis_project/excel#POST' })) }
+        query: { type, tab: 0, searchParams: encodeURIComponent(JSON.stringify({ ...searchParams, exportPermission: '/scrm_diagnosis_care_analysis_project/excel#POST', name: otherData.planName })) }
       })
     },
     handleChartItemChange (value, key) {
       this.handleSearch({ ...value, reportKagi: key })
+    },
+    reset () {
+      this.searchObj = { ...defaultSearchObj }
     }
   }
 }

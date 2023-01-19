@@ -116,9 +116,10 @@ export default {
       // this.handleChartItemChange({ [e]: '' }, 'pieRate')
     },
     chart1RangeDetailSelect (e) {
-      // if (e.length) {
+      if (e.length > 30) {
+        this.chart1RangeDetailSelect = e.slice(0, 30)
+      }
       this.handleChartItemChange({ [this.chart1RangeSelect]: e.map(it => it.value || it).join(','), pieField: this.useType }, 'pieRate')
-      // }
     }
   },
   created () {

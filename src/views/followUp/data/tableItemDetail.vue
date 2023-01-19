@@ -1,5 +1,6 @@
 <template>
   <div class="TableItemDetail_Page_Container">
+    <span>{{ type === '1' ? '各方案使用员工数数据明细表' : type === '2' ? `${searchParams.name}数据明细表` : type === '3' ? `各${searchParams.name}任务数数明细表` : `${searchParams.name}任务数据明细表` }}</span>
     <SelfTable
       :tableColunms="['1', '3'].includes(type) ? tableColunms : type === '2' ? type2Colunms : type4Colunms"
       :tableData="tableData"
