@@ -646,30 +646,28 @@ export default {
     },
     // 设置朋友圈弹框点击确定
     confirmIntegralFriendCircle () {
-      if (this.integralRulesTypeInfo.ruleType === '1') {
-        // 朋友圈
-        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
-          console.log('朋友圈可以提交', this.integralRulesTypeInfo)
-          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
-            if (key === 'integral') {
-              // 无需处理
-            } else {
-              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
-            }
+      // 朋友圈
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
+        console.log('朋友圈可以提交', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'integral') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
           }
-        } else {
-          this.$message.error('请填写全部数据')
-          return false
         }
-        this.commonIntegralRulesSend()
+      } else {
+        this.$message.error('请填写全部数据')
+        return false
       }
+      this.commonIntegralRulesSend()
       // this.integralFriendCircleShowStatus = false
     },
     // 公共的积分规则提交
     commonIntegralRulesSend () {
       const tempInfo = {}
       for (const key in this.integralRulesTypeInfo) {
-        if (key === 'id' || key === 'state' || key === 'creditsRuleJsonDetailVo' || key === 'employeeId') {
+        if (key === 'id' || key === 'state' || key === 'creditsRuleJsonDetailVo' || key === 'employeeIds') {
           this.$set(tempInfo, `${key}`, this.integralRulesTypeInfo[key])
         }
       }
@@ -752,22 +750,20 @@ export default {
     // 设置加好友弹框点击确定
     confirmIntegralAddFriend () {
       // debugger
-      if (this.integralRulesTypeInfo.ruleType === '2') {
-        // 加好友
-        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
-          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) {
-          console.log('加好友可以提交', this.integralRulesTypeInfo)
-          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
-            if (key === 'integral' || key === 'friendDayNum') {
-              // 无需处理
-            } else {
-              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
-            }
+      // 加好友
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
+        this.integralRulesTypeInfo.creditsRuleJsonDetailVo.friendDayNum) {
+        console.log('加好友可以提交', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'integral' || key === 'friendDayNum') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
           }
-          this.commonIntegralRulesSend()
-        } else {
-          this.$message.error('请填写全部数据')
         }
+        this.commonIntegralRulesSend()
+      } else {
+        this.$message.error('请填写全部数据')
       }
     //   this.integralAddFriendShowStatus = false
     },
@@ -990,25 +986,23 @@ export default {
     },
     // 设置查看素材弹框点击确定
     confirmIntegralMaterial () {
-      if (this.integralRulesTypeInfo.ruleType === '4') {
-        // 查看素材
-        if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
-          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum &&
-          this.radarList.length !== 0) {
-          this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'radarArticleJsonVoList', this.radarList)
-          console.log('查看素材可以提交', this.integralRulesTypeInfo)
-          for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
-            if (key === 'integral' || key === 'validDayNum' || key === 'radarArticleJsonVoList') {
-              // 无需处理
-            } else {
-              this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
-            }
+      // 查看素材
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral &&
+        this.integralRulesTypeInfo.creditsRuleJsonDetailVo.validDayNum &&
+        this.radarList.length !== 0) {
+        this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'radarArticleJsonVoList', this.radarList)
+        console.log('查看素材可以提交', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'integral' || key === 'validDayNum' || key === 'radarArticleJsonVoList') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
           }
-          // debugger
-          this.commonIntegralRulesSend()
-        } else {
-          this.$message.error('请填写全部数据')
         }
+        // debugger
+        this.commonIntegralRulesSend()
+      } else {
+        this.$message.error('请填写全部数据')
       }
       // this.integralMaterialShowStatus = false
     },
