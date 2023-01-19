@@ -468,6 +468,7 @@ export default {
     closeIntegralBatchModal () {
       if (!this.batchInfoModalLoading) {
         this.integralBatchShowStatus = false
+        this.isCloseReason = false
       }
     },
     // 调整积分弹框点击确定
@@ -499,6 +500,7 @@ export default {
     setIntegral (record) {
       this.batchInfo = {}
       this.integralBatchShowStatus = true
+      this.isCloseReason = false
       this.getChangeType()
       this.dialogTitle = '调整积分'
       this.$nextTick(() => {
@@ -561,6 +563,7 @@ export default {
       if (e && e.length !== 0) {
         this.$refs.SelectPersonnel.modalShow = false
         this.integralBatchShowStatus = true
+        this.isCloseReason = false
         this.getChangeType()
         this.$nextTick(() => {
           this.dialogTitle = '批量调整积分'
