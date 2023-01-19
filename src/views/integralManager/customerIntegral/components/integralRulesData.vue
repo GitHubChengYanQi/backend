@@ -27,7 +27,7 @@
           <template>
             <div style="display: flex;justify-content: space-between;">
               <a-button type="link" @click="setIntegralMethod(record)" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button>
-              <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst" v-permission="'/creditsRule/addGoodsCreditsRule@post'">新增商品</a-button>
+              <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst" v-permission="'/creditsRule/addGoodsCreditsRule@post'">新增</a-button>
               <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst" v-permission="'/creditsRule/delGoodsCreditsRule@delete'">删除</a-button>
             </div>
           </template>
@@ -452,7 +452,7 @@ export default {
         {
           title: '操作',
           align: 'center',
-          width: 250,
+          width: 150,
           fixed: 'right',
           scopedSlots: { customRender: 'options' },
           all: true
