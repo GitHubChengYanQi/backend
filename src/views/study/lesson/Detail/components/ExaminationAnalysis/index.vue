@@ -283,7 +283,11 @@ export default {
       }
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
-      this.sorter = sorter
+      let field = sorter.field
+      if (this.task && sorter.field === 'examCount') {
+        field = 'inExamCount'
+      }
+      this.sorter = { ...sorter, field }
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
