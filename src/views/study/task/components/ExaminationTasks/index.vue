@@ -174,18 +174,8 @@ export default {
         },
         {
           title: '考试类别',
-          dataIndex: 'bindType',
-          align: 'center',
-          customRender (value, record) {
-            switch (record.examResult && record.examResult.bindType) {
-              case 1:
-                return '章节考'
-              case 2:
-                return '总考'
-              default:
-                return '定向考'
-            }
-          }
+          dataIndex: 'type',
+          align: 'center'
         },
         {
           title: '考核总人数',
