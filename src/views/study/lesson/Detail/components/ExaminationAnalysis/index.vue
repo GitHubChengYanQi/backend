@@ -245,11 +245,24 @@ export default {
         }, params).then(res => {
           this.tableData = res.data.map((item, index) => {
             const examResult = item.examResult || {}
+            let bindType = 0
+            switch (item.type) {
+              case '章节考':
+                bindType = 1
+                break
+              case '总考':
+                bindType = 2
+                break
+              default:
+                break
+            }
             return {
               ...item,
               name: examResult.name,
+              questionnaireResults: examResult.questionnaireResults,
               questionnaireName: Array.isArray(examResult.questionnaireResults) && examResult.questionnaireResults.length > 0 && examResult.questionnaireResults[0].questionnaireName,
-              bindType: examResult.bindType,
+              bindType,
+              examCount: item.inExamCount,
               key: index
             }
           })

@@ -205,7 +205,7 @@ export default {
           dataIndex: 'status',
           align: 'center',
           customRender (value, record) {
-            return record.examCount > 0 ? (value === 1 ? '通过' : '未通过') : '--'
+            return record.examCount > 0 ? ((value + '') === '1' ? '通过' : '未通过') : '--'
           }
         },
         {

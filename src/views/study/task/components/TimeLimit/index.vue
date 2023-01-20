@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   props: {
     value: {
@@ -34,7 +36,14 @@ export default {
   },
   methods: {
     date (date, dateString) {
-      this.$emit('change', dateString)
+      if (Array.isArray(dateString) && dateString.length > 0) {
+        this.$emit('change', [
+          moment(dateString[0]).format('YYYY/MM/DD 00:00:00'),
+          moment(dateString[1]).format('YYYY/MM/DD 23:59:59')
+        ])
+      } else {
+        this.$emit('change', dateString)
+      }
     },
     change ({ target: { value } }) {
       this.time = []
