@@ -318,17 +318,29 @@ export default {
       if (records.length === 0) {
         message.warn('请选择想要下载的文件！')
       } else {
-        var main = document.getElementById('app')// 随便获取一个页面上的div，Id要与括号内相同
-        records.forEach((item, index) => {
-          // 使用了闭包，返回的函数能够使用外部的path
+        const pdfFiles = []
+        const files = []
+        records.forEach(item => {
+          if ((item.suffix || '').toLowerCase() === 'pdf') {
+            pdfFiles.push(item)
+          } else {
+            files.push(item)
+          }
+        })
+        pdfFiles.forEach((item, index) => {
+          const time = setTimeout(() => {
+            window.open(item.mediaUrl)
+            clearTimeout(time)
+          }, 1000 * index)
+        })
+        files.forEach((item, index) => {
           const timer1 = setTimeout(() => {
             const path = item.mediaUrl
-            // 定义一个看不见的iframe
             const iframe = document.createElement('iframe')
-            iframe.style.display = 'none' // 防止影响页面设置不可见
-            iframe.style.height = '0' // 防止影响页面高度设置为0
+            iframe.style.display = 'none'
+            iframe.style.height = '0'
             iframe.src = path
-            main.appendChild(iframe)// 这一行必须，iframe挂在到dom树上才会发请求
+            document.body.appendChild(iframe)
             var timer2 = setTimeout(function () {
               iframe.remove()
               clearTimeout(timer2)
@@ -436,8 +448,7 @@ export default {
       this.screenData = {}
       this.getTableData()
     }
-  }
-  ,
+  },
   components: {
     upload, FilePreview, SelectEmployee, Preview
   }
