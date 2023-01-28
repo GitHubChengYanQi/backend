@@ -88,9 +88,6 @@
       @close="preview = false"
       :content="content"
     >
-      <div>
-        <img class="img" :src="url" alt="avatar" width="283" />
-      </div>
     </Preview>
   </div>
 </template>
