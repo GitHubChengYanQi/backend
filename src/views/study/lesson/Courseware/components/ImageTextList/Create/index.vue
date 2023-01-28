@@ -64,9 +64,6 @@
       @close="preview = false"
       :content="content"
     >
-      <div>
-        <img v-if="url" class="img" :src="url" alt="avatar" width="283" />
-      </div>
     </Preview>
   </div>
 </template>

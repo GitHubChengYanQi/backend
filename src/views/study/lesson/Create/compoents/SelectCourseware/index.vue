@@ -121,7 +121,6 @@
       :content="content"
     >
       <div>
-        <img v-if="previewType === 'text'" class="img" :src="url" alt="avatar" width="283" />
         <video v-if="previewType === 'video'" :src="url" style="width: 100%" controls></video>
         <iframe
           v-if="previewType === 'file'"
