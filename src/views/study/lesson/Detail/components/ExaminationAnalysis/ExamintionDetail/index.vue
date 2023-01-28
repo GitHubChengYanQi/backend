@@ -1,7 +1,11 @@
 <template>
   <div>
 
-    <breadcrumb v-if="!task" :titles="['课程管理','课程详情','考试详情']" back></breadcrumb>
+    <breadcrumb
+      v-if="!task"
+      :titles="[$router.history.current.query.examTaskId ? '任务列表' : '课程管理','课程详情','考试详情']"
+      back
+    />
 
     <div class="head" :style="this.task ? {borderTopLeftRadius:0,borderTopRightRadius:0} : {}">
       <div class="box">
