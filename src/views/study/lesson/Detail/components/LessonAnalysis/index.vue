@@ -316,8 +316,12 @@ export default {
         title: '考试结果',
         dataIndex: 'courseExamStatus',
         align: 'center',
-        customRender (value) {
-          return value !== 0 ? '通过' : '未通过'
+        customRender (value, record) {
+          if (record.score) {
+            return value !== 0 ? '通过' : '未通过'
+          } else {
+            return '--'
+          }
         }
       }
     ]
