@@ -125,14 +125,14 @@
       :content="content"
     >
       <div>
+        <img v-if="previewType === 'img'" class="img" :src="url" alt="avatar" width="283" />
         <iframe
-          v-if="previewType === 'file'"
+          v-else
           style="border: none;height: 527px"
           :class="{'iframe1': true, 'iframe2' : false}"
-          :src="`https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
+          :src="previewType === 'pdf' ?`https://view.xdocin.com/view?src=${url}` : `https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
         >
         </iframe>
-        <img v-if="previewType === 'img'" class="img" :src="url" alt="avatar" width="283" />
       </div>
     </Preview>
     <a-modal
@@ -293,6 +293,8 @@ export default {
     openPreview (record) {
       if (['jpg', 'png'].includes((record.suffix || '').toLowerCase())) {
         this.previewType = 'img'
+      } else if ((record.suffix || '').toLowerCase() === 'pdf') {
+        this.previewType = 'pdf'
       } else {
         this.previewType = 'file'
       }
