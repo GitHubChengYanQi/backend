@@ -126,6 +126,17 @@
           ></a-select>
         </a-form-item>
 
+        <a-form-item
+          v-if="task"
+          label="学习结果：">
+          <a-select
+            :options="[{value:0,label:'全部'},{value:2,label:'已完成'},{value:3,label:'超时未完成'},{value:4,label:'超时已完成'}]"
+            v-model="screenData.status"
+            style="width: 200px"
+            placeholder="请选择学习结果"
+          ></a-select>
+        </a-form-item>
+
         <a-form-item>
           <div class="my-space">
             <a-button @click="reset">重置</a-button>
@@ -151,7 +162,11 @@
           :rowKey="record => record.key"
           :pagination="pagination"
           @change="handleTableChange"
-        />
+        >
+          <div slot="result" slot-scope="text, record">
+            {{ result(record.doneTime) }}
+          </div>
+        </a-table>
       </a-spin>
     </div>
   </div>
@@ -263,22 +278,6 @@ export default {
           customRender (value) {
             return value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '-'
           }
-        },
-        {
-          title: '考试状态',
-          dataIndex: 'score',
-          align: 'center',
-          customRender (value) {
-            return value ? '是' : '否'
-          }
-        },
-        {
-          title: '考试结果',
-          dataIndex: 'courseExamStatus',
-          align: 'center',
-          customRender (value) {
-            return value !== 0 ? '通过' : '未通过'
-          }
         }
       ],
       tableData: [],
@@ -294,14 +293,52 @@ export default {
     }
   },
   created () {
+    const newColumns = this.columns
+    if (this.task) {
+      newColumns.push({
+        title: '学习结果',
+        dataIndex: 'result',
+        align: 'center',
+        scopedSlots: { customRender: 'result' }
+      })
+    }
+    this.columns = [
+      ...newColumns,
+      {
+        title: '考试状态',
+        dataIndex: 'score',
+        align: 'center',
+        customRender (value) {
+          return value ? '是' : '否'
+        }
+      },
+      {
+        title: '考试结果',
+        dataIndex: 'courseExamStatus',
+        align: 'center',
+        customRender (value) {
+          return value !== 0 ? '通过' : '未通过'
+        }
+      }
+    ]
     this.getTableData()
     this.getCourseDetail()
   },
   methods: {
+    result (doneTime) {
+      if (doneTime) {
+        const second = moment(this.detail.endTime).diff(moment(doneTime), 'second')
+        return second > 0 ? '已完成' : '超时已完成'
+      } else {
+        const second = moment(this.detail.endTime).diff(moment(), 'second')
+        return second > 0 ? '-' : '超时未完成'
+      }
+    },
     async excel () {
       this.excelLoading = true
       const data = {
         ...this.screenData,
+        status: this.screenData.status === 0 ? null : this.screenData.status,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
@@ -391,6 +428,7 @@ export default {
       this.loading = true
       const data = {
         ...this.screenData,
+        status: this.screenData.status === 0 ? null : this.screenData.status,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
