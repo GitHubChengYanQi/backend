@@ -259,6 +259,7 @@ export default {
             return {
               ...item,
               name: examResult.name,
+              coverImageUrl: item.examResult && item.examResult.coverImageUrl,
               questionnaireResults: examResult.questionnaireResults,
               questionnaireName: Array.isArray(examResult.questionnaireResults) && examResult.questionnaireResults.length > 0 && examResult.questionnaireResults[0].questionnaireName,
               bindType,
