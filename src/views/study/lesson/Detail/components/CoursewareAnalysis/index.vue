@@ -109,85 +109,7 @@ export default {
     return {
       loading: false,
       screenData: {},
-      columns: [
-        {
-          title: '章节',
-          dataIndex: 'sort',
-          align: 'center',
-          width: '100px',
-          customRender (value) {
-            return value + 1
-          }
-        },
-        {
-          title: '课件',
-          width: '200px',
-          dataIndex: 'courseWareResult',
-          align: 'center',
-          scopedSlots: { customRender: 'name' }
-        },
-        {
-          title: '时长',
-          dataIndex: 'createTime',
-          align: 'center',
-          customRender (value, record) {
-            return (record.hour < 10 ? '0' + record.hour || 0 : record.hour || 0) + ':' + (record.minute < 10 ? '0' + record.minute || 0 : record.minute || 0) + ':' + (record.second < 10 ? '0' + record.second || 0 : record.second || 0)
-          }
-        },
-        {
-          title: '已学完人数',
-          dataIndex: 'doneLearningstatusCount',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '未学人数',
-          dataIndex: 'noLearningstatusCount',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '进行中人数',
-          dataIndex: 'learningstatusCount',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '累计学习时长',
-          dataIndex: 'learningTime',
-          align: 'center',
-          sorter: true,
-          customRender (value) {
-            return value ? getTimeDifference(value) : '-'
-          }
-        },
-        {
-          title: '关联考试',
-          dataIndex: 'examId',
-          align: 'center',
-          customRender (value) {
-            return value ? '是' : '否'
-          }
-        },
-        {
-          title: '考试人数',
-          dataIndex: 'examCount',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '通过人数',
-          dataIndex: 'passExamCount',
-          align: 'center',
-          sorter: true
-        },
-        {
-          title: '未通过人数',
-          dataIndex: 'noPassExamCount',
-          align: 'center',
-          sorter: true
-        }
-      ],
+      columns: [],
       tableData: [],
       checkIds: [],
       sorter: {
@@ -206,6 +128,116 @@ export default {
     }
   },
   created () {
+    let columns = [
+      {
+        title: '章节',
+        dataIndex: 'sort',
+        align: 'center',
+        width: '100px',
+        customRender (value) {
+          return value + 1
+        }
+      },
+      {
+        title: '课件',
+        width: '200px',
+        dataIndex: 'courseWareResult',
+        align: 'center',
+        scopedSlots: { customRender: 'name' }
+      },
+      {
+        title: '时长',
+        dataIndex: 'createTime',
+        align: 'center',
+        customRender (value, record) {
+          return (record.hour < 10 ? '0' + record.hour || 0 : record.hour || 0) + ':' + (record.minute < 10 ? '0' + record.minute || 0 : record.minute || 0) + ':' + (record.second < 10 ? '0' + record.second || 0 : record.second || 0)
+        }
+      },
+      {
+        title: '已学完人数',
+        dataIndex: 'doneLearningstatusCount',
+        align: 'center',
+        sorter: true
+      }
+    ]
+    if (this.task) {
+      columns.push({
+        title: '完成率',
+        dataIndex: 'doneRate',
+        align: 'center',
+        sorter: true,
+        customRender (value) {
+          return (value || 0) + '%'
+        }
+      })
+    }
+
+    columns = [
+      ...columns,
+      {
+        title: '未学人数',
+        dataIndex: 'noLearningstatusCount',
+        align: 'center',
+        sorter: true
+      },
+      {
+        title: '进行中人数',
+        dataIndex: 'learningstatusCount',
+        align: 'center',
+        sorter: true
+      }
+    ]
+
+    if (this.task) {
+      columns.push({
+        title: '参与率',
+        dataIndex: 'rate',
+        align: 'center',
+        sorter: true,
+        customRender (value) {
+          return (value || 0) + '%'
+        }
+      })
+    }
+
+    this.columns = [
+      ...columns,
+      {
+        title: '累计学习时长',
+        dataIndex: 'learningTime',
+        align: 'center',
+        sorter: true,
+        customRender (value) {
+          return value ? getTimeDifference(value) : '-'
+        }
+      },
+      {
+        title: '关联考试',
+        dataIndex: 'examId',
+        align: 'center',
+        customRender (value) {
+          return value ? '是' : '否'
+        }
+      },
+      {
+        title: '考试人数',
+        dataIndex: 'examCount',
+        align: 'center',
+        sorter: true
+      },
+      {
+        title: '通过人数',
+        dataIndex: 'passExamCount',
+        align: 'center',
+        sorter: true
+      },
+      {
+        title: '未通过人数',
+        dataIndex: 'noPassExamCount',
+        align: 'center',
+        sorter: true
+      }
+    ]
     this.getTableData()
   },
   methods: {
