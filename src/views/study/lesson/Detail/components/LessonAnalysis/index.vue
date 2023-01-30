@@ -330,6 +330,9 @@ export default {
   },
   methods: {
     result (doneTime) {
+      if (this.detail.haveTimeLimit === 1) {
+        return doneTime ? '已完成' : '-'
+      }
       if (doneTime) {
         const second = moment(this.detail.endTime).diff(moment(doneTime), 'second')
         return second > 0 ? '已完成' : '超时已完成'
