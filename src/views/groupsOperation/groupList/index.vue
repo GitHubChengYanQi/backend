@@ -16,8 +16,10 @@
           show-search
           placeholder="请输入群名称"
           style="width: 120px"
+          :dropdown-match-select-width="false"
           :default-active-first-option="false"
           :filter-option="false"
+          :dropdownStyle="dropDownStyle"
           :options="nameSearchOptions"
           @search="searchChangeDebounceFn"
           @change="handleChange" />
@@ -164,6 +166,13 @@ export default {
   },
   data () {
     return {
+      selectValue: '',
+      dropDownStyle: {
+        width: '150px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      },
       namesss: '',
       searchObj: {
         employeeIds: [],
@@ -317,13 +326,24 @@ export default {
       this.searchObj.labels = filD
       this.groupTagsSelectList = filD
     },
+    // 搜索内容
     async handleSearch (val) {
-      if (!val) {
+      let text = ''
+      // debugger
+      console.log(val, '搜索内容')
+      if (!val && !this.selectValue) {
         this.nameSearchOptions = []
+        this.$set(this.searchObj, 'name', this.selectValue)
         return
+      } else if (!val && this.selectValue) {
+        text = this.selectValue
+      } else {
+        text = val
       }
-      const { data } = await getSearchGroupNameOptionsListReq({ name: val })
+      this.$set(this.searchObj, 'name', text)
+      const { data } = await getSearchGroupNameOptionsListReq({ name: text })
       this.nameSearchOptions = data.map(it => ({ label: it.name, value: it.name }))
+      this.selectValue = text
     },
     handleChange (val) {
       console.log('handleChange', val)
