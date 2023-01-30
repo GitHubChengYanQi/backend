@@ -256,8 +256,11 @@ export default {
     getTableData () {
       this.loading = true
       const time = this.screenData.time || []
+      const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
       const data = {
         ...this.screenData,
+        employeeId: isUserId ? this.screenData.userName.split('id:')[1] : null,
+        userName: isUserId ? null : this.screenData.userName,
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
         courseWareType: 'video'
