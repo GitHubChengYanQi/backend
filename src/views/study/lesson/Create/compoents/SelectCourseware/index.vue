@@ -121,14 +121,20 @@
       :content="content"
     >
       <div>
+        <img v-if="previewType === 'img'" class="img" :src="url" alt="avatar" width="283" />
         <video v-if="previewType === 'video'" :src="url" style="width: 100%" controls></video>
+        <iframe
+          v-if="previewType === 'pdf'"
+          style="border: none;height: 527px"
+          :class="{'iframe1': true, 'iframe2' : false}"
+          :src="url"
+        />
         <iframe
           v-if="previewType === 'file'"
           style="border: none;height: 527px"
           :class="{'iframe1': true, 'iframe2' : false}"
           :src="`https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
-        >
-        </iframe>
+        />
       </div>
     </Preview>
 
@@ -252,8 +258,14 @@ export default {
   },
   methods: {
     openPreview (record) {
-      if (record.courseWareType === 'file' && ['jpg', 'png'].includes((record.suffix || '').toLowerCase())) {
-        this.previewType = 'text'
+      if (record.courseWareType === 'file') {
+        if (['jpg', 'png'].includes((record.suffix || '').toLowerCase())) {
+          this.previewType = 'img'
+        } else if ((record.suffix || '').toLowerCase() === 'pdf') {
+          this.previewType = 'pdf'
+        } else {
+          this.previewType = 'file'
+        }
       } else {
         this.previewType = record.courseWareType
       }
