@@ -343,8 +343,11 @@ export default {
     },
     async excel () {
       this.excelLoading = true
+      const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
       const data = {
         ...this.screenData,
+        employeeId: isUserId ? this.screenData.userName.split('id:')[1] : null,
+        userName: isUserId ? null : this.screenData.userName,
         status: this.screenData.status === 0 ? null : this.screenData.status,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
@@ -433,8 +436,11 @@ export default {
     },
     async getTableData () {
       this.loading = true
+      const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
       const data = {
         ...this.screenData,
+        employeeId: isUserId ? this.screenData.userName.split('id:')[1] : null,
+        userName: isUserId ? null : this.screenData.userName,
         status: this.screenData.status === 0 ? null : this.screenData.status,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null

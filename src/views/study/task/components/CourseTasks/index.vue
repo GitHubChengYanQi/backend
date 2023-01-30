@@ -300,8 +300,11 @@ export default {
       this.excelLoading = true
       const time = this.screenData.time || []
       const order = this.sorter.order === 'ascend' ? 'asc' : 'desc'
+      const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
       const data = {
         ...this.screenData,
+        employeeId: isUserId ? this.screenData.userName.split('id:')[1] : null,
+        userName: isUserId ? null : this.screenData.userName,
         sorter: (this.sorter.field && this.sorter.order) ? this.sorter.field + ' ' + order : null,
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,
@@ -358,8 +361,11 @@ export default {
       this.loading = true
       const time = this.screenData.time || []
       const order = this.sorter.order === 'ascend' ? 'asc' : 'desc'
+      const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
       const data = {
         ...this.screenData,
+        employeeId: isUserId ? this.screenData.userName.split('id:')[1] : null,
+        userName: isUserId ? null : this.screenData.userName,
         sorter: (this.sorter.field && this.sorter.order) ? this.sorter.field + ' ' + order : null,
         startTime: time[0] ? moment(time[0]).format('YYYY/MM/DD 00:00:00') : null,
         endTime: time[1] ? moment(time[1]).format('YYYY/MM/DD 23:59:59') : null,

@@ -2,25 +2,19 @@
   <div>
     <AutoComplete
       v-model="name"
-      :data-source="options"
       style="width: 200px"
       :placeholder="placeholder"
       @search="search"
       @change="handleChange"
-    />
-    <!--    <a-select-->
-    <!--      :options="options"-->
-    <!--      show-search-->
-    <!--      :filterOption="false"-->
-    <!--      :placeholder="placeholder"-->
-    <!--      style="width: 200px"-->
-    <!--      v-model="id"-->
-    <!--      allowClear-->
-    <!--      @change="handleChange"-->
-    <!--      @search="search"-->
-    <!--    >-->
-    <!--      <a-spin v-if="loading" slot="notFoundContent" size="small" />-->
-    <!--    </a-select>-->
+    >
+      <template slot="dataSource">
+        <a-select-option
+          v-for="item in options"
+          :key="'id:'+item.id"
+          class="show-all"
+        >{{ item.name }}</a-select-option>
+      </template>
+    </AutoComplete>
   </div>
 </template>
 
@@ -67,7 +61,7 @@ export default {
       this.options = []
       this.loading = true
       enterMembersList({ name }).then((res) => {
-        this.options = res.data.list.map(item => (item.name))
+        this.options = res.data.list
       }).finally(() => {
         this.loading = false
       })
