@@ -262,8 +262,11 @@ export default {
   methods: {
     async excel () {
       this.excelLoading = true
+      const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
       const data = {
         ...this.screenData,
+        employeeId: isUserId ? this.screenData.userName.split('id:')[1] : null,
+        userName: isUserId ? null : this.screenData.userName,
         examStatus: this.screenData.examStatus === 'all' ? null : this.screenData.examStatus,
         examIsPass: this.screenData.examIsPass === 'all' ? null : this.screenData.examIsPass,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
@@ -309,8 +312,11 @@ export default {
     },
     async getTableData () {
       this.loading = true
+      const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
       const data = {
         ...this.screenData,
+        employeeId: isUserId ? this.screenData.userName.split('id:')[1] : null,
+        userName: isUserId ? null : this.screenData.userName,
         examStatus: this.screenData.examStatus === 'all' ? null : this.screenData.examStatus,
         examIsPass: this.screenData.examIsPass === 'all' ? null : this.screenData.examIsPass,
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
