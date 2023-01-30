@@ -130,7 +130,7 @@
           v-else
           style="border: none;height: 527px"
           :class="{'iframe1': true, 'iframe2' : false}"
-          :src="previewType === 'pdf' ?`https://view.xdocin.com/view?src=${url}` : `https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
+          :src="previewType === 'pdf' ? url : `https://view.officeapps.live.com/op/embed.aspx?src=${url}`"
         >
         </iframe>
       </div>
