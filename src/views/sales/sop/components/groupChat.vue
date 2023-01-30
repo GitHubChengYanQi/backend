@@ -27,7 +27,7 @@
           </div>
           <div class="item">
             <div class="title">群名称：</div>
-            <a-input placeholder="请输入要搜索的客户" v-model="groupChatSearchInfo.workRoomName"/>
+            <a-input placeholder="请输入要搜索的群聊" v-model="groupChatSearchInfo.workRoomName"/>
           </div>
           <div class="item">
             <div class="title">标签：</div>
