@@ -15,8 +15,7 @@
           v-model="searchObj.name"
           show-search
           placeholder="请输入群名称"
-          style="width: 120px"
-          :dropdown-match-select-width="false"
+          style="width: 150px"
           :default-active-first-option="false"
           :filter-option="false"
           :dropdownStyle="dropDownStyle"
