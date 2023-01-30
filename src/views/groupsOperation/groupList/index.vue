@@ -15,7 +15,7 @@
           v-model="searchObj.name"
           show-search
           placeholder="请输入群名称"
-          style="width: 150px"
+          style="width: 200px"
           :default-active-first-option="false"
           :filter-option="false"
           :dropdownStyle="dropDownStyle"
@@ -167,7 +167,7 @@ export default {
     return {
       selectValue: '',
       dropDownStyle: {
-        width: '150px',
+        width: '200px',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap'
