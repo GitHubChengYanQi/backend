@@ -320,7 +320,7 @@ export default {
           if (record.score) {
             return value !== 0 ? '通过' : '未通过'
           } else {
-            return '--'
+            return '未考试'
           }
         }
       }
