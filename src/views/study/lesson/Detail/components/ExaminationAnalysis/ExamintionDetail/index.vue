@@ -272,18 +272,19 @@ export default {
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
+      const params = {
+        limit: 6500,
+        page: 1,
+        sorter: {
+          field: this.sorter.field || 'doneAt',
+          order: this.sorter.order || 'descend'
+        }
+      }
       if (this.task || router.history.current.query.examTaskId) {
         examTaskBindExamExcelExport({
           ...data,
           examTaskId: router.history.current.query.examTaskId || router.history.current.query.id
-        }, {
-          limit: 6500,
-          page: 1,
-          sorter: {
-            field: this.sorter.field,
-            order: this.sorter.order
-          }
-        }).then((res) => {
+        }, params).then((res) => {
           excelExport(res, '考试详情数据导出.xlsx')
           message.success('导出成功!')
         }).finally(() => {
@@ -295,14 +296,7 @@ export default {
           courseTaskId: router.history.current.query.courseTaskId || null,
           courseId: router.history.current.query.courseId,
           examId: router.history.current.query.examId
-        }, {
-          limit: 6500,
-          page: 1,
-          sorter: {
-            field: this.sorter.field,
-            order: this.sorter.order
-          }
-        }).then((res) => {
+        }, params).then((res) => {
           excelExport(res, '考试详情数据导出.xlsx')
           message.success('导出成功!')
         }).finally(() => {
@@ -326,8 +320,8 @@ export default {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
-          field: this.sorter.field,
-          order: this.sorter.order
+          field: this.sorter.field || 'doneAt',
+          order: this.sorter.order || 'descend'
         }
       }
       let res = {}
