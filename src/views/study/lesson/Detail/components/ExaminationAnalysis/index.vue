@@ -195,8 +195,8 @@ export default {
         limit: 6500,
         page: 1,
         sorter: {
-          field: this.sorter.field,
-          order: this.sorter.order
+          field: this.sorter.field || 'sort',
+          order: this.sorter.order || 'ascend'
         }
       }
 
@@ -233,7 +233,7 @@ export default {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
-          field: this.sorter.field,
+          field: this.sorter.field || 'sort',
           order: this.sorter.order
         }
       }
