@@ -206,7 +206,7 @@ export default {
               examId: item.exam ? item.examId : null
             })) : [],
             courseClassId: values.courseClassId ? values.courseClassId[values.courseClassId.length - 1] : null,
-            questionnaireIds: [values.questionnaireId],
+            questionnaireIds: values.questionnaireId ? [values.questionnaireId] : [],
             examIds: values.exam ? [values.exam.examId] : [],
             applicableObject: values.applicableObject[0] === 'all' ? 1 : 2,
             empIds: values.applicableObject[0] === 'all' ? [] : values.applicableObject

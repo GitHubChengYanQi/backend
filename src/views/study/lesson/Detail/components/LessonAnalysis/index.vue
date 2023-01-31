@@ -360,8 +360,8 @@ export default {
           limit: 6500,
           page: 1,
           sorter: {
-            field: this.sorter.field,
-            order: this.sorter.order
+            field: this.sorter.field || 'lastLearningTime',
+            order: this.sorter.order || 'descend'
           }
         }).then((res) => {
           excelExport(res, '课程分析数据导出.xlsx')
@@ -449,8 +449,8 @@ export default {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
-          field: this.sorter.field,
-          order: this.sorter.order
+          field: this.sorter.field || 'lastLearningTime',
+          order: this.sorter.order || 'descend'
         }
       }
       let res = {}
