@@ -63,6 +63,11 @@ export default {
   background-image: url("../../../../assets/mobile.png");
   background-repeat: no-repeat;
   padding: 65px 45px;
+  .ql-editor{
+    img{
+      width:100%;
+    }
+  }
 
   .title {
     display: flex;
