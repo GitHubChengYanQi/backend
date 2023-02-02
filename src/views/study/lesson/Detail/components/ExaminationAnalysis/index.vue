@@ -195,7 +195,7 @@ export default {
         limit: 6500,
         page: 1,
         sorter: {
-          field: this.sorter.field || 'sort',
+          field: this.sorter.order ? this.sorter.field : 'sort',
           order: this.sorter.order || 'ascend'
         }
       }
@@ -233,8 +233,8 @@ export default {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
-          field: this.sorter.field || 'sort',
-          order: this.sorter.order
+          field: this.sorter.order ? this.sorter.field : 'sort',
+          order: this.sorter.order || 'ascend'
         }
       }
 
@@ -263,7 +263,6 @@ export default {
               questionnaireResults: examResult.questionnaireResults,
               questionnaireName: Array.isArray(examResult.questionnaireResults) && examResult.questionnaireResults.length > 0 && examResult.questionnaireResults[0].questionnaireName,
               bindType,
-              examCount: item.inExamCount,
               key: index
             }
           })
@@ -284,11 +283,12 @@ export default {
       }
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
-      let field = sorter.field
-      if (this.task && sorter.field === 'examCount') {
-        field = 'inExamCount'
-      }
-      this.sorter = { ...sorter, field }
+      // let field = sorter.field
+      // if (this.task && sorter.field === 'examCount') {
+      //   field = 'inExamCount'
+      // }
+      // this.sorter = { ...sorter, field }
+      this.sorter = sorter
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
