@@ -11,7 +11,7 @@
       class="select"
       :value="val"
       show-search
-      placeholder="请选择"
+      placeholder="请输入商品名称"
       :default-active-first-option="false"
       :filter-option="false"
       :not-found-content="null"
