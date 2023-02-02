@@ -276,7 +276,7 @@ export default {
         limit: 6500,
         page: 1,
         sorter: {
-          field: this.sorter.field || 'doneAt',
+          field: this.sorter.order ? this.sorter.field : 'doneAt',
           order: this.sorter.order || 'descend'
         }
       }
@@ -320,7 +320,7 @@ export default {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
-          field: this.sorter.field || 'doneAt',
+          field: this.sorter.order ? this.sorter.field : 'doneAt',
           order: this.sorter.order || 'descend'
         }
       }
