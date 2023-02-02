@@ -360,7 +360,7 @@ export default {
           limit: 6500,
           page: 1,
           sorter: {
-            field: this.sorter.field || 'lastLearningTime',
+            field: this.sorter.order ? this.sorter.field : 'lastLearningTime',
             order: this.sorter.order || 'descend'
           }
         }).then((res) => {
@@ -449,7 +449,7 @@ export default {
         limit: this.pagination.pageSize,
         page: this.pagination.current,
         sorter: {
-          field: this.sorter.field || 'lastLearningTime',
+          field: this.sorter.order ? this.sorter.field : 'lastLearningTime',
           order: this.sorter.order || 'descend'
         }
       }
