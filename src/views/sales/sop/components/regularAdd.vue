@@ -30,7 +30,7 @@
         </div>
         <div class="line multiple">
           <span class="label">
-            <span style="color: red">*</span>筛选客户
+            <span style="color: red">*</span>选择标签
           </span>
           <div class="selectBox">
             <!-- <div class="filterListBox">
@@ -117,7 +117,9 @@
                 @click="$message.warn('执行后不可修改！')"
               ></div> -->
               <div class="chooseDateBox1">
-                <p class="tip">当客户条件为所选内容时</p>
+                <p class="tip" v-if="addInfo.selectTagList.length === 0 && addInfo.excludeTagList.length === 0">当客户条件为所选内容时</p>
+                <p class="tip" v-if="addInfo.selectTagList.length !== 0">{{ `当客户标签变更为"${returnTextTag(addInfo.selectTagList)}"` }}</p>
+                <p class="tip" v-if="addInfo.excludeTagList.length !== 0">{{ `且客户标签不包含"${returnTextTag(addInfo.excludeTagList)}"` }}</p>
                 <div class="chooseDateBoxRadio">
                   <div class="line-wrapper">
                     <a-radio
@@ -281,6 +283,16 @@ export default {
     }
   },
   methods: {
+    // 返回标签文字
+    returnTextTag (array) {
+      const textArray = array.map(item => item.name)
+      const tempText = textArray.join('，')
+      if (tempText.length > 50) {
+        return tempText.slice(0, 50) + '...'
+      } else {
+        return tempText
+      }
+    },
     changeSopName () {
       this.isSopEdit = true
     },
