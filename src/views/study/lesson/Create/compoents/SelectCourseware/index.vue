@@ -153,19 +153,19 @@
       </a-tabs>
 
       <FileList
-        :selectRows="checkCourseWares['fileList']"
+        :selectRows="courseWares['fileList']"
         select
         v-if="key === '1'"
         @selectRows="(rows)=>selectRows('fileList',rows)"
       />
       <VideoList
-        :selectRows="checkCourseWares['videoList']"
+        :selectRows="courseWares['videoList']"
         select
         v-if="key === '2'"
         @selectRows="(rows)=>selectRows('videoList',rows)"
       />
       <ImageTextList
-        :selectRows="checkCourseWares['imageTextList']"
+        :selectRows="courseWares['imageTextList']"
         select
         v-if="key === '3'"
         @selectRows="(rows)=>selectRows('imageTextList',rows)"
