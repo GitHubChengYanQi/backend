@@ -88,7 +88,7 @@
               </div>
             </div>
             <div v-else>
-              {{ question.answerResults.find(item => item.isTrue === 1).answerContent === 'true' ? '正确' : '错误' }}
+              {{ question.answerResults.find(item => item.isTrue === 1) && question.answerResults.find(item => item.isTrue === 1).answerContent === 'true' ? '正确' : '错误' }}
             </div>
           </div>
         </div>
