@@ -255,7 +255,7 @@ export default {
         },
         {
           title: '参与人数',
-          dataIndex: 'participantsNumber',
+          dataIndex: 'participantsCount',
           align: 'center',
           sorter: true
         },
