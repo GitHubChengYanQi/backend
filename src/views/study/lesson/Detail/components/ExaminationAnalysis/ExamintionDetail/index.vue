@@ -192,6 +192,9 @@ export default {
           dataIndex: '4',
           align: 'center',
           customRender (value, record) {
+            if (record.status === 0 && record.task) {
+              return '否'
+            }
             return record.examCount > 0 ? '是' : '否'
           }
         },
@@ -201,6 +204,9 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
+            if (record.status === 0 && record.task) {
+              return '--'
+            }
             return record.examCount > 0 ? value : '--'
           }
         },
@@ -209,6 +215,9 @@ export default {
           dataIndex: 'status',
           align: 'center',
           customRender (value, record) {
+            if (record.status === 0 && record.task) {
+              return '--'
+            }
             return record.examCount > 0 ? ((value + '') === '1' ? '通过' : '未通过') : '--'
           }
         },
@@ -217,6 +226,9 @@ export default {
           dataIndex: 'examCount',
           align: 'center',
           customRender (value, record) {
+            if (record.status === 0 && record.task) {
+              return '--'
+            }
             return record.examCount > 0 ? value : '--'
           }
         },
@@ -226,6 +238,9 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
+            if (record.status === 0 && record.task) {
+              return '--'
+            }
             return record.examCount > 0 ? value : '--'
           }
         },
@@ -235,6 +250,9 @@ export default {
           align: 'center',
           sorter: true,
           customRender (value, record) {
+            if (record.status === 0 && record.task) {
+              return '--'
+            }
             return (record.examCount > 0 && value) ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '--'
           }
         }
@@ -338,7 +356,7 @@ export default {
           examId: router.history.current.query.examId
         }, params)
       }
-      this.tableData = res.data.map((item, index) => ({ ...item, key: index }))
+      this.tableData = res.data.map((item, index) => ({ ...item, key: index,task:this.task || router.history.current.query.examTaskId }))
       this.pagination.total = res.count
       this.loading = false
     },
