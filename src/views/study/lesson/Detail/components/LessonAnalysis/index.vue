@@ -352,18 +352,19 @@ export default {
         deptIds: (Array.isArray(this.screenData.deptIds) && this.screenData.deptIds.length > 0) ? this.screenData.deptIds.map(item => item.value) : null,
         storeIds: (Array.isArray(this.screenData.storeIds) && this.screenData.storeIds.length > 0) ? this.screenData.storeIds.map(item => item.value) : null
       }
+      const params = {
+        limit: 6500,
+        page: 1,
+        sorter: {
+          field: this.sorter.order ? this.sorter.field : 'lastLearningTime',
+          order: this.sorter.order || 'descend'
+        }
+      }
       if (this.task) {
         courseTaskBindExcelExport({
           ...data,
           courseTaskId: router.history.current.query.courseTaskId
-        }, {
-          limit: 6500,
-          page: 1,
-          sorter: {
-            field: this.sorter.order ? this.sorter.field : 'lastLearningTime',
-            order: this.sorter.order || 'descend'
-          }
-        }).then((res) => {
+        },params).then((res) => {
           excelExport(res, '课程分析数据导出.xlsx')
           message.success('导出成功!')
         }).finally(() => {
@@ -373,14 +374,7 @@ export default {
         courseEmployeeBindExcelExport({
           ...data,
           courseId: router.history.current.query.courseId
-        }, {
-          limit: 6500,
-          page: 1,
-          sorter: {
-            field: this.sorter.field,
-            order: this.sorter.order
-          }
-        }).then((res) => {
+        }, params).then((res) => {
           excelExport(res, '课程分析数据导出.xlsx')
           message.success('导出成功!')
         }).finally(() => {
