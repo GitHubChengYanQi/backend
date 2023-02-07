@@ -364,7 +364,7 @@ export default {
         courseTaskBindExcelExport({
           ...data,
           courseTaskId: router.history.current.query.courseTaskId
-        },params).then((res) => {
+        }, params).then((res) => {
           excelExport(res, '课程分析数据导出.xlsx')
           message.success('导出成功!')
         }).finally(() => {

@@ -34,7 +34,7 @@
       :footer="null"
       destroyOnClose
       :width="800"
-      title="选择课程"
+      title="创建考试"
       :visible="createVisible"
       @cancel="cancel"
     >
