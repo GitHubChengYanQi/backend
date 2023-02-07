@@ -70,6 +70,12 @@
             </a-input-number>
             <div class="singleFormText">积分</div>
           </div>
+          <div class="singleFormDiv" v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo && integralRulesTypeInfo.creditsRuleJsonDetailVo.circleofFriendsType">
+            <div class="singleFormTitle">朋友圈类型</div>
+            <a-radio-group v-model="integralRulesTypeInfo.creditsRuleJsonDetailVo.circleofFriendsType">
+              <a-radio v-for="item in friendTypeList" :key="item.code" :value="item.code">{{ item.name }}</a-radio>
+            </a-radio-group>
+          </div>
           <div class="singleFormDiv">
             <div class="singleFormCustomerTitle">适用员工</div>
             <selectPersonnel
@@ -411,6 +417,9 @@ export default {
   name: 'BackendIntegralRulesData',
   data () {
     return {
+      // 积分规则列表加载动画
+      integralTableLoading: false,
+      friendTypeList: [], // 朋友圈类型数组
       buyModalType: '',
       deepClonev2,
       // 积分规则列表数据
@@ -500,9 +509,17 @@ export default {
     chooseRadar
   },
   created () {
-    this.getIntegralRulesData()
+    this.getFriendTypeData()
   },
   methods: {
+    // 获取朋友圈类型字典
+    async getFriendTypeData () {
+      const params = { dictType: 'circleof_friends_type' }
+      await getDict(params).then(response => {
+        this.friendTypeList = response.data
+      })
+      this.getIntegralRulesData()
+    },
     // 获取积分规则列表
     async getIntegralRulesData () {
       this.integralTableLoading = true
@@ -593,7 +610,11 @@ export default {
         }
         this.$set(tempInfo, 'creditsRuleJsonDetailVo', tempInfo.creditsRuleJsonDetailVo)
         this.integralRulesTypeInfo = this.deepClonev2(tempInfo)
-        if (info.ruleType === '4') {
+        if (info.ruleType === '1') {
+          if (!info.creditsRuleJsonDetailVo.circleofFriendsType) {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'circleofFriendsType', this.friendTypeList[0].code)
+          }
+        } else if (info.ruleType === '4') {
           this.radarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
         } else if (info.ruleType === '3') {
           this.buyRadarList = this.deepClonev2(this.integralRulesTypeInfo.creditsRuleJsonDetailVo.radarArticleJsonVoList)
@@ -650,7 +671,7 @@ export default {
       if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
         console.log('朋友圈可以提交', this.integralRulesTypeInfo)
         for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
-          if (key === 'integral') {
+          if (key === 'integral' || key === 'circleofFriendsType') {
             // 无需处理
           } else {
             this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
@@ -678,6 +699,7 @@ export default {
       this.integralBuyLoading = true
       this.integralMaterialLoading = true
       console.log(this.integralRulesTypeInfo, 'this.integralRulesTypeInfo')
+      // debugger
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
         if (response.code === 200) {
           this.integralFriendCircleLoading = false

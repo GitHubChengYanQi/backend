@@ -22,9 +22,9 @@
           <span class="label">
             <span style="color: red">*</span>选择执行员工
           </span>
+          <!-- v-if="treeData"
+            :record="treeData" -->
           <selectPersonnel
-            v-if="treeData"
-            :record="treeData"
             class="selectPersonnelCom"
             type="button"
             name="选择成员"
