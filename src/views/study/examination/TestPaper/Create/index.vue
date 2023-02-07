@@ -268,7 +268,7 @@ export default {
                   } else if (item.questionType === 'single') {
                     answer = String.fromCharCode(65 + index)
                   } else {
-                    answer = optionItem.answerContent
+                    answer = optionItem.answerContent === '正确' ? 'true' : 'false'
                   }
                 }
                 if (item.questionType === 'judge') {
