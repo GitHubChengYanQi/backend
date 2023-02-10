@@ -396,6 +396,132 @@
         >确定</a-button>
       </template>
     </a-modal>
+    <a-modal
+      title="新建电子会员卡"
+      :maskCloseable="false"
+      :width="1000"
+      :visible="newMemberShowStatus"
+      class="newMemberModalClass"
+      @cancel="closeNewMemberModal()"
+      :getContainer="() => $refs['integral_data_container']"
+    >
+      <a-spin :spinning="newMemberLoading">
+        <div class="formDivContent">
+          <div class="singleFormDiv">
+            <div class="singleFormTitle">规则状态</div>
+            <a-switch
+              :checked="integralRulesTypeInfo.state === '1' ? true : false"
+              @click="setRules(integralRulesTypeInfo)"
+              checked-children="开"
+              un-checked-children="关"
+            />
+            <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
+          </div>
+          <div class="singleFormDiv">
+            <div class="singleFormTitle">积分规则</div>
+            <div class="singleFormText">好友新建一个电子会员卡，员工可获得</div>
+            <a-input-number
+              :min="1"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
+              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ?
+                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
+              class="singleInputClass"
+              :max="99999"
+              @change="changeAddFriendIntegral">
+            </a-input-number>
+            <div class="singleFormText">积分</div>
+          </div>
+          <div class="singleFormDiv">
+            <div class="singleFormCustomerTitle">适用员工</div>
+            <selectPersonnel
+              v-if="treeData"
+              :record="treeData"
+              class="selectPersonnelCom"
+              type="button"
+              name="添加员工"
+              v-model="integralRulesTypeInfo.employeeIds"
+              @getVal="employeeIdsChange"
+            />
+          </div>
+          <div class="formRulesDesc">积分奖励将在好友新建电子会员卡后立即发放</div>
+        </div>
+      </a-spin>
+      <template slot="footer">
+        <a-button
+          :disabled="newMemberLoading === true"
+          @click="closeNewMemberModal()"
+        >取消</a-button>
+        <a-button
+          type="primary"
+          :disabled="newMemberLoading === true"
+          @click="confirmNewMember"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+        >确定</a-button>
+      </template>
+    </a-modal>
+    <a-modal
+      title="绑定电子会员卡"
+      :maskCloseable="false"
+      :width="1000"
+      :visible="bindMemberShowStatus"
+      class="bindMemberModalClass"
+      @cancel="closeBindMemberModal()"
+      :getContainer="() => $refs['integral_data_container']"
+    >
+      <a-spin :spinning="bindMemberLoading">
+        <div class="formDivContent">
+          <div class="singleFormDiv">
+            <div class="singleFormTitle">规则状态</div>
+            <a-switch
+              :checked="integralRulesTypeInfo.state === '1' ? true : false"
+              @click="setRules(integralRulesTypeInfo)"
+              checked-children="开"
+              un-checked-children="关"
+            />
+            <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
+          </div>
+          <div class="singleFormDiv">
+            <div class="singleFormTitle">积分规则</div>
+            <div class="singleFormText">好友绑定一个电子会员卡，员工可获得</div>
+            <a-input-number
+              :min="1"
+              v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
+              :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.integral ?
+                Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) : 1"
+              class="singleInputClass"
+              :max="99999"
+              @change="changeAddFriendIntegral">
+            </a-input-number>
+            <div class="singleFormText">积分</div>
+          </div>
+          <div class="singleFormDiv">
+            <div class="singleFormCustomerTitle">适用员工</div>
+            <selectPersonnel
+              v-if="treeData"
+              :record="treeData"
+              class="selectPersonnelCom"
+              type="button"
+              name="添加员工"
+              v-model="integralRulesTypeInfo.employeeIds"
+              @getVal="employeeIdsChange"
+            />
+          </div>
+          <div class="formRulesDesc">积分奖励将在好友绑定电子会员卡后立即发放</div>
+        </div>
+      </a-spin>
+      <template slot="footer">
+        <a-button
+          :disabled="bindMemberLoading === true"
+          @click="closeBindMemberModal()"
+        >取消</a-button>
+        <a-button
+          type="primary"
+          :disabled="bindMemberLoading === true"
+          @click="confirmNewMember"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+        >确定</a-button>
+      </template>
+    </a-modal>
     <goodsManager
       :isRadioStatus="true"
       :zIndex="1200"
@@ -467,6 +593,14 @@ export default {
           all: true
         }
       ],
+      // 积分规则新建会员卡弹框
+      newMemberShowStatus: false,
+      // 积分规则弹框加载动画
+      newMemberLoading: false,
+      // 积分规则新建会员卡弹框
+      bindMemberShowStatus: false,
+      // 积分规则弹框加载动画
+      bindMemberLoading: false,
       // 积分规则朋友圈任务弹框
       integralFriendCircleLoading: false,
       // 积分规则设置群发朋友圈任务弹框
@@ -588,6 +722,12 @@ export default {
       } else if (info.ruleType === '4') {
         // 查看素材
         this.integralMaterialShowStatus = true
+      } else if (info.ruleType === '5') {
+        // 新建会员
+        this.newMemberShowStatus = true
+      } else if (info.ruleType === '6') {
+        // 新建会员
+        this.bindMemberShowStatus = true
       }
       this.$nextTick(() => {
         const tempInfo = this.deepClonev2(info)
@@ -698,6 +838,8 @@ export default {
       this.integralFriendCircleLoading = true
       this.integralBuyLoading = true
       this.integralMaterialLoading = true
+      this.newMemberLoading = true
+      this.bindMemberLoading = true
       console.log(this.integralRulesTypeInfo, 'this.integralRulesTypeInfo')
       // debugger
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
@@ -710,6 +852,10 @@ export default {
           this.integralBuyShowStatus = false
           this.integralMaterialLoading = false
           this.integralMaterialShowStatus = false
+          this.newMemberShowStatus = false
+          this.newMemberLoading = false
+          this.bindMemberLoading = false
+          this.bindMemberShowStatus = false
           // this.integralPagination.current
           this.$set(this.integralPagination, 'current', 1)
           this.$set(this.integralPagination, 'pageSize', 10)
@@ -720,6 +866,8 @@ export default {
         this.integralAddFriendLoading = false
         this.integralBuyLoading = false
         this.integralMaterialLoading = false
+        this.newMemberLoading = false
+        this.bindMemberLoading = false
       })
     },
     // 选择组织机构
@@ -1071,6 +1219,51 @@ export default {
           })
         }
       })
+    },
+    // 关闭新增会员弹框
+    closeNewMemberModal () {
+      this.newMemberShowStatus = false
+    },
+    // 设置新增会员弹框点击确定
+    confirmNewMember () {
+      // 查看素材
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
+        console.log('新增会员可以提交', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'integral') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+          }
+        }
+        // debugger
+        this.commonIntegralRulesSend()
+      } else {
+        this.$message.error('请填写全部数据')
+      }
+      // this.integralMaterialShowStatus = false
+    },
+    // 关闭绑定会员弹框
+    closeBindMemberModal () {
+      this.bindMemberShowStatus = false
+    },
+    // 设置新增会员弹框点击确定
+    confirmBindMember () {
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.integral) {
+        console.log('绑定会员可以提交', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'integral') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+          }
+        }
+        // debugger
+        this.commonIntegralRulesSend()
+      } else {
+        this.$message.error('请填写全部数据')
+      }
+      // this.integralMaterialShowStatus = false
     }
   }
 }

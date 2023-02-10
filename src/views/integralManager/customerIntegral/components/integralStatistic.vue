@@ -452,7 +452,7 @@ export default {
       const tempArray = this.tableData.filter(item => this.selectedKeyList.indexOf(item.id) !== -1)
       console.log(tempArray)
       const checkedIncreaseIdList = tempArray.filter(item => item.changeCause === '1' ||
-        item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5').map(info => info.id)
+        item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5' || item.changeCause === '10' || item.changeCause === '11').map(info => info.id)
       const checkedDecreaseIdList = tempArray.filter(item => item.changeCause === '6' ||
         item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9').map(info => info.id)
       this.$set(this.searchDetailInfo, 'checkedIncreaseIdList', checkedIncreaseIdList)
