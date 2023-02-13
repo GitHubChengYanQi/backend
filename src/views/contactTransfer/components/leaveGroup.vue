@@ -276,6 +276,10 @@ export default {
      */
     acceptData (e = []) {
       if (!e.length) return
+      if (this.selectedRowKeys === '' || this.selectedRowKeys.length == 0) {
+        this.$message.warning('请选择群聊')
+        return false
+      }
       const params = {
         type: 1,
         list: JSON.stringify(this.selectedRowKeys),

@@ -236,6 +236,10 @@ export default {
     // 接收子组件传值
     acceptData (e = []) {
       if (!e.length) return
+      if (this.tableSelectClient === '' || this.tableSelectClient.length == 0) {
+        this.$message.warning('请选择客户')
+        return false
+      }
       const params = {
         type: 2,
         list: JSON.stringify(this.tableSelectClient),
