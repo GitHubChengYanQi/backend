@@ -536,6 +536,9 @@
                 margin-top: -6px;
             }
         }
+        .formRulesDesc {
+            margin-top: 20px;
+        }
     }
 }
 .newMemberModalClass {
@@ -631,6 +634,92 @@
                     color: rgba(0, 0, 0, 0.6);
                     text-shadow: none;
                 }
+            }
+        }
+        .formRulesDesc {
+            margin-top: 20px;
+        }
+    }
+}
+.memberBuyIntegralModalClass {
+    .formDivContent {
+        /deep/.singleFormDiv {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            .singleFormTitle {
+                font-size: 16px;
+                flex-shrink: 0;
+                margin-right: 20px;
+            }
+            .singleFormCustomerTitle {
+                font-size: 16px;
+                flex-shrink: 0;
+                margin-bottom: 10px;
+                margin-right: 20px;
+            }
+            .singleFormText {
+                font-size: 12px;
+                flex-shrink: 0;
+                margin-right: 20px;
+            }
+            .singleInputClass {
+                width: 200px;
+            }
+            .switchText {
+                margin-left: 10px;
+            }
+            .selectPersonnelCom {
+                width: 90%;
+                .ant-btn {
+                    width: 180px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 3px;
+                    border: 1px dashed #8a8a8a;
+                    background: none;
+                    color: rgba(0, 0, 0, 0.6);
+                    text-shadow: none;
+                }
+            }
+        }
+        /deep/.singleFormRulesDiv {
+            display: flex;
+            margin-top: 20px;
+            .singleFormTitle {
+                font-size: 16px;
+                flex-shrink: 0;
+                margin-right: 20px;
+            }
+            .singleFormContent {
+                .singleContent {
+                    margin-top: 20px;
+                    .singleFormLi {
+                        margin-top: 10px;
+                        display: flex;
+                        align-items: center;
+                        .singleFormText {
+                            font-size: 12px;
+                            flex-shrink: 0;
+                            margin-right: 20px;
+                        }
+                        .singleInputClass {
+                            width: 200px;
+                            margin-right: 10px;
+                        } 
+                    }
+                    .singleFormLi:nth-child(1) {
+                        margin-top: 0px;
+                    }
+                }
+                .singleContent:nth-child(1) {
+                    margin-top: -5px;
+                }
+            }
+            .singleFormContentDiv {
+                margin-top: -6px;
             }
         }
         .formRulesDesc {

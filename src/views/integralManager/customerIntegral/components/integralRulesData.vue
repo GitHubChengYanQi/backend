@@ -27,6 +27,7 @@
           <template>
             <div style="display: flex;justify-content: space-between;">
               <a-button type="link" @click="setIntegralMethod(record)" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button>
+              <!-- <a-button type="link" @click="setIntegralMember" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button> -->
               <a-button type="link" @click="addGoodsMethod(record)" v-if="record.ruleType === '3' && record.isFirst" v-permission="'/creditsRule/addGoodsCreditsRule@post'">新增</a-button>
               <a-button type="link" style="color: #b1b1b1" @click="deleteGoodsMethod(record)" v-if="record.ruleType === '3' && !record.isFirst" v-permission="'/creditsRule/delGoodsCreditsRule@delete'">删除</a-button>
             </div>
@@ -431,7 +432,7 @@
             </a-input-number>
             <div class="singleFormText">积分</div>
           </div>
-          <div class="singleFormDiv">
+          <!-- <div class="singleFormDiv">
             <div class="singleFormCustomerTitle">适用员工</div>
             <selectPersonnel
               v-if="treeData"
@@ -442,7 +443,7 @@
               v-model="integralRulesTypeInfo.employeeIds"
               @getVal="employeeIdsChange"
             />
-          </div>
+          </div> -->
           <div class="formRulesDesc">积分奖励将在好友新建电子会员卡后立即发放</div>
         </div>
       </a-spin>
@@ -494,7 +495,7 @@
             </a-input-number>
             <div class="singleFormText">积分</div>
           </div>
-          <div class="singleFormDiv">
+          <!-- <div class="singleFormDiv">
             <div class="singleFormCustomerTitle">适用员工</div>
             <selectPersonnel
               v-if="treeData"
@@ -505,7 +506,7 @@
               v-model="integralRulesTypeInfo.employeeIds"
               @getVal="employeeIdsChange"
             />
-          </div>
+          </div> -->
           <div class="formRulesDesc">积分奖励将在好友绑定电子会员卡后立即发放</div>
         </div>
       </a-spin>
@@ -518,6 +519,116 @@
           type="primary"
           :disabled="bindMemberLoading === true"
           @click="confirmNewMember"
+          v-permission="'/creditsRule/setCreditsRule@post'"
+        >确定</a-button>
+      </template>
+    </a-modal>
+    <a-modal
+      title="会员消费送积分"
+      :maskCloseable="false"
+      :width="1000"
+      :visible="memberBuyIntegralShowStatus"
+      class="memberBuyIntegralModalClass"
+      @cancel="closeMemberBuyIntegralModal()"
+      :getContainer="() => $refs['integral_data_container']"
+    >
+      <a-spin :spinning="memberBuyIntegralLoading">
+        <div class="formDivContent">
+          <div class="singleFormDiv">
+            <div class="singleFormTitle">规则状态</div>
+            <a-switch
+              :checked="integralRulesTypeInfo.state === '1' ? true : false"
+              @click="setRules(integralRulesTypeInfo)"
+              checked-children="开"
+              un-checked-children="关"
+            />
+            <div class="switchText">{{ integralRulesTypeInfo.state === '1' ? '已启用' : '未启用' }}</div>
+          </div>
+          <div class="singleFormRulesDiv">
+            <div class="singleFormTitle">积分规则</div>
+            <!-- <div class="singleFormText">好友绑定一个电子会员卡，员工可获得</div> -->
+            <div class="singleFormContent">
+              <div class="singleContent">
+                <div class="singleFormLi">
+                  <div class="singleFormText">办理会员卡</div>
+                  <a-input-number
+                    :min="1"
+                    v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
+                    :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardBeforeDayNum ?
+                      Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardBeforeDayNum) : 1"
+                    class="singleInputClass"
+                    :max="99999"
+                    @change="changeMemberBeforeDay">
+                  </a-input-number>
+                  <div class="singleFormText">天内，用户每消费1元，员工可获得</div>
+                  <a-input-number
+                    :min="1"
+                    v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
+                    :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardBeforeIntegral ?
+                      Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardBeforeIntegral) : 1"
+                    class="singleInputClass"
+                    :max="99999"
+                    @change="changeMemberBuyNum($event, 'markCardBeforeIntegral')">
+                  </a-input-number>
+                  <div class="singleFormText">积分</div>
+                </div>
+                <!-- <div class="singleFormLi">
+                  <div class="singleFormText">内未退货，员工可获得</div>
+
+                </div> -->
+              </div>
+              <div class="singleContent">
+                <div class="singleFormLi">
+                  <div class="singleFormText">办理会员卡</div>
+                  <a-input-number
+                    disabled
+                    :min="1"
+                    v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
+                    :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardAfterDayNum ?
+                      Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardAfterDayNum) : 1"
+                    class="singleInputClass"
+                    :max="99999"
+                    @change="changeAddFriendIntegral">
+                  </a-input-number>
+                  <div class="singleFormText">天后，用户每消费1元，员工可获得</div>
+                  <a-input-number
+                    :min="1"
+                    v-if="integralRulesTypeInfo.creditsRuleJsonDetailVo"
+                    :value="integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardAfterIntegral ?
+                      Number(integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardAfterIntegral) : 1"
+                    class="singleInputClass"
+                    :max="99999"
+                    @change="changeMemberBuyNum($event, 'markCardAfterIntegral')">
+                  </a-input-number>
+                  <div class="singleFormText">积分</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="singleFormDiv">
+            <div class="singleFormCustomerTitle">适用员工</div>
+            <selectPersonnel
+              v-if="treeData"
+              :record="treeData"
+              class="selectPersonnelCom"
+              type="button"
+              name="添加员工"
+              v-model="integralRulesTypeInfo.employeeIds"
+              @getVal="employeeIdsChange"
+            />
+          </div> -->
+          <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以购买时的规则为准</div>
+        </div>
+      </a-spin>
+      <template slot="footer">
+        <a-button
+          :disabled="memberBuyIntegralLoading === true"
+          @click="closeMemberBuyIntegralModal()"
+        >取消</a-button>
+        <a-button
+          type="primary"
+          :disabled="memberBuyIntegralLoading === true"
+          @click="confirmMemberBuyIntegral()"
           v-permission="'/creditsRule/setCreditsRule@post'"
         >确定</a-button>
       </template>
@@ -593,6 +704,10 @@ export default {
           all: true
         }
       ],
+      // 会员消费送积分弹框
+      memberBuyIntegralShowStatus: false,
+      // 会员消费送积分动画
+      memberBuyIntegralLoading: false,
       // 积分规则新建会员卡弹框
       newMemberShowStatus: false,
       // 积分规则弹框加载动画
@@ -646,6 +761,70 @@ export default {
     this.getFriendTypeData()
   },
   methods: {
+    // 改变办理会员日期
+    changeMemberBeforeDay (e) {
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'markCardBeforeDayNum', String(text))
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, 'markCardAfterDayNum', String(text))
+    },
+    // 设置会员消费送积分
+    setIntegralMember () {
+      this.memberBuyIntegralShowStatus = true
+    },
+    // 改变会员消费送积分功能的积分值
+    changeMemberBuyNum (e, status) {
+      let text = String(e)
+      if (!/^[0-9]+$/.test(text)) {
+        // 将不符合的部分清除
+        // console.log('有效期有问题', text.replace(/\D/g,''))
+        // console.log()
+        text = text.replace(/\D/g, '')
+      }
+      if (Number(text) > 99999) {
+        text = '99999'
+      }
+      if (!text) {
+        text = '1'
+      }
+      const tempStatus = status
+      this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${tempStatus}`, String(text))
+    },
+    // 关闭会员购买送积分弹框
+    closeMemberBuyIntegralModal () {
+      this.memberBuyIntegralShowStatus = false
+    },
+    // 会员购买送积分弹框点击确定
+    confirmMemberBuyIntegral () {
+      if (this.integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardAfterDayNum &&
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardAfterIntegral &&
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardBeforeDayNum &&
+          this.integralRulesTypeInfo.creditsRuleJsonDetailVo.markCardBeforeIntegral) {
+        console.log('会员购买送积分', this.integralRulesTypeInfo)
+        for (const key in this.integralRulesTypeInfo.creditsRuleJsonDetailVo) {
+          if (key === 'markCardAfterDayNum' || key === 'markCardAfterIntegral' || key === 'markCardBeforeDayNum' || key === 'markCardBeforeIntegral') {
+            // 无需处理
+          } else {
+            this.$set(this.integralRulesTypeInfo.creditsRuleJsonDetailVo, `${key}`, '')
+          }
+        }
+      } else {
+        this.$message.error('请填写全部数据')
+        return false
+      }
+      this.commonIntegralRulesSend()
+    },
     // 获取朋友圈类型字典
     async getFriendTypeData () {
       const params = { dictType: 'circleof_friends_type' }
@@ -726,8 +905,11 @@ export default {
         // 新建会员
         this.newMemberShowStatus = true
       } else if (info.ruleType === '6') {
-        // 新建会员
+        // 绑定会员
         this.bindMemberShowStatus = true
+      } else if (info.ruleType === '7') {
+        // 会员消费送积分
+        this.memberBuyIntegralShowStatus = true
       }
       this.$nextTick(() => {
         const tempInfo = this.deepClonev2(info)
@@ -840,8 +1022,9 @@ export default {
       this.integralMaterialLoading = true
       this.newMemberLoading = true
       this.bindMemberLoading = true
+      this.memberBuyIntegralLoading = true
       console.log(this.integralRulesTypeInfo, 'this.integralRulesTypeInfo')
-      // debugger
+      debugger
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
         if (response.code === 200) {
           this.integralFriendCircleLoading = false
@@ -856,6 +1039,8 @@ export default {
           this.newMemberLoading = false
           this.bindMemberLoading = false
           this.bindMemberShowStatus = false
+          this.memberBuyIntegralLoading = false
+          this.memberBuyIntegralShowStatus = false
           // this.integralPagination.current
           this.$set(this.integralPagination, 'current', 1)
           this.$set(this.integralPagination, 'pageSize', 10)
@@ -868,6 +1053,7 @@ export default {
         this.integralMaterialLoading = false
         this.newMemberLoading = false
         this.bindMemberLoading = false
+        this.memberBuyIntegralLoading = false
       })
     },
     // 选择组织机构
