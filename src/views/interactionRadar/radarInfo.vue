@@ -211,6 +211,15 @@
             @change="handleTableChange"
             ref="table"
           >
+            <template slot="contactNick" slot-scope="text">
+              <a-tooltip placement="topLeft">
+                <template slot="title">
+                  <span>{{ text }}</span>
+                </template>
+                <span v-if="text.length && text.length > 20">{{ text.slice(0, 20) }}</span>
+                <span v-else>{{ text }}</span>
+              </a-tooltip>
+            </template>
           </a-table>
         </div>
       </div>
@@ -445,7 +454,8 @@ export default {
               title: '客户昵称',
               fixed: 'left',
               dataIndex: 'contactNick',
-              width: 150
+              width: 200,
+              scopedSlots: { customRender: 'contactNick' }
             },
             {
               align: 'center',

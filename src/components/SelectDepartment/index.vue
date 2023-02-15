@@ -9,7 +9,7 @@
   <div class="select-employee-input">
     <a-tree-select
       v-model="data"
-      style="width: 100%"
+      style="width: 100%;"
       :tree-data="treeData"
       tree-checkable
       :placeholder="placeholder"
@@ -17,6 +17,7 @@
       :show-checked-strategy="SHOW_PARENT"
       :replaceFields="replaceFields"
       :treeCheckStrictly="treeCheckStrictly"
+      dropdown-class-name="downMenus"
       allowClear
       @change="onChange"
     />
@@ -91,5 +92,8 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+.downMenus{
+  height:200px;
+}
 </style>
