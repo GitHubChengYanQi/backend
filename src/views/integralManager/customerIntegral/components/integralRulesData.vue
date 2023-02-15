@@ -81,6 +81,7 @@
             <div class="singleFormCustomerTitle">适用员工</div>
             <selectPersonnel
               v-if="treeData"
+              :num="20"
               :record="treeData"
               class="selectPersonnelCom"
               type="button"
@@ -153,6 +154,7 @@
           <div class="singleFormDiv">
             <div class="singleFormCustomerTitle">适用员工</div>
             <selectPersonnel
+              :num="20"
               v-if="treeData"
               :record="treeData"
               class="selectPersonnelCom"
@@ -269,6 +271,7 @@
           <div class="singleFormDiv">
             <div class="singleFormCustomerTitle">适用员工</div>
             <selectPersonnel
+              :num="20"
               v-if="treeData"
               :record="treeData"
               class="selectPersonnelCom"
@@ -374,6 +377,7 @@
             <selectPersonnel
               v-if="treeData"
               :record="treeData"
+              :num="20"
               class="selectPersonnelCom"
               type="button"
               name="添加员工"
