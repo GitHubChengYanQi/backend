@@ -381,7 +381,7 @@
               @getVal="employeeIdsChange"
             />
           </div>
-          <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
+          <div class="formRulesDesc">一个素材1天内可生效1次，指用户1天内多次点击素材时，只给员工发放1次积分。积分奖励将在用户查看雷达素材后立即发放</div>
         </div>
       </a-spin>
       <template slot="footer">
