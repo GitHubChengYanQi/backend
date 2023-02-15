@@ -390,6 +390,10 @@ export default {
       if (this.selectListMode === '2') {
         this.currentItem.secondType = 'R'
       }
+      if (!this.currentItem.radarDitchId) {
+        this.$message.error('请选择渠道')
+        return false
+      }
       this.$emit('close', keys.length ? this.currentItem : '', 2)
     }
   }
