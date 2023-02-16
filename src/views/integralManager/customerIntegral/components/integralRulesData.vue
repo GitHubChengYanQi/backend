@@ -924,6 +924,7 @@ export default {
         if (!tempInfo.employeeId || (tempInfo.employeeId && (tempInfo.employeeId.length === 0))) {
           // 没有选择员工
           this.$set(tempInfo, 'employeeIds', [])
+          this.$set(tempInfo, 'employeeId', [])
         } else if (tempInfo.employeeId.length === 1) {
           // 有一个员工
           const employeeIdList = []
@@ -1028,7 +1029,7 @@ export default {
       this.bindMemberLoading = true
       this.memberBuyIntegralLoading = true
       console.log(this.integralRulesTypeInfo, 'this.integralRulesTypeInfo')
-      debugger
+      // debugger
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
         if (response.code === 200) {
           this.integralFriendCircleLoading = false
