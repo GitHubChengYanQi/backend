@@ -32,7 +32,14 @@
             </a-col>
             <a-col :lg="5">
               <a-form-item label="所属员工：" :labelCol="{ lg: { span: 7 } }" :wrapperCol="{ lg: { span: 14 } }">
-                <SelectEmployeeInput v-model="employeeIds" :changeId="true"/>
+                <!-- <SelectEmployeeInput v-model="employeeIds" :changeId="true"/> -->
+                <selectPersonnel
+                  class="input"
+                  v-model="employeeIds"
+                  :changeId="true"
+                  :num="1"
+                  :type="'selector'"
+                />
               </a-form-item>
             </a-col>
             <a-col :lg="4">
