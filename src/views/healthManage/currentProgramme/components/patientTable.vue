@@ -138,7 +138,13 @@
         </a-row>
       </div>
     </a-table>
-    <a-modal v-model="visible" title="选择患者" @ok="handleOk" :width="400" :destroyOnClose="true">
+    <a-modal
+      v-model="visible"
+      title="选择患者"
+      @ok="handleOk"
+      :confirmLoading="loading"
+      :width="400"
+      :destroyOnClose="true">
       <a-input-search placeholder="输入患者名称" v-model="searchVal" @search="searchUser" @change="searchUser" />
       <div
         class="demo-infinite-container"
@@ -498,10 +504,12 @@ export default {
      * 添加患者确定按钮
      */
     async handleOk () {
+      this.loading = true
       const { code } = await planBindAddBatch({
         planId: this.planId,
         workContactIds: this.userIdList
       })
+      this.loading = false
       this.visible = false
       if (code === 200) {
         this.$message.success('添加成功')

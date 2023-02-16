@@ -21,7 +21,13 @@
     <div class="searchBar">
       <div class="searchItem">
         <span class="label">方案名称：</span>
-        <a-select v-model="searchObj.planId" mode="multiple" style="width: 300px" :maxTagCount="2" placeholder="请选择">
+        <a-select
+          v-model="searchObj.planId"
+          @change="handleChange"
+          mode="multiple"
+          style="width: 300px"
+          :maxTagCount="2"
+          placeholder="请选择">
           <a-select-option v-for="item in searchSchemeNameSelectOptions" :key="item.planId" :value="item.planId">
             {{ item.planName }}
           </a-select-option>
@@ -135,7 +141,12 @@ export default {
   },
   mounted () { },
   methods: {
-
+    handleChange (e) {
+      if (e.length > 30) {
+        (this.searchObj.planId).pop()
+        this.$message.warning('方案不能超过30个')
+      }
+    },
     init () {
       getDataDetailItemsReq({}).then(res => {
         this.infoData = {

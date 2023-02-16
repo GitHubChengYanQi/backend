@@ -450,7 +450,7 @@ export default {
         //height: 500px;
         height: 434px;
         padding: 0px !important;
-
+        padding-bottom:200px !important;
         .item {
           width: 100%;
           max-width: 100%;
