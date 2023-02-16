@@ -57,7 +57,7 @@
                       <a-menu slot="overlay" v-if="item.status != 2">
                         <a-menu-item key="1" v-if="item.status == 0" v-permission="'/healthManage/addProgramme#update1'" @click="suspendOrContinue(item)">启用</a-menu-item>
                         <a-menu-item key="1" v-if="item.status == 1" v-permission="'/healthManage/addProgramme#update2'" @click="suspendOrContinue(item)">暂停</a-menu-item>
-                        <a-menu-item key="2" v-if="item.isDefault !== 2" @click="delItem(item)" v-permission="'/healthManage/addProgramme#update3'">删除</a-menu-item>
+                        <a-menu-item key="2" @click="delItem(item)" v-permission="'/healthManage/addProgramme#update3'">删除</a-menu-item>
                         <a-menu-item key="3" v-if="item.isDefault != 1 && item.status != 1" @click="goEditProgramme(item.planId)" v-permission="'/healthManage/addProgramme#edit'">编辑</a-menu-item>
                       </a-menu>
                       <a-button type="primary" ghost style="margin-left: 8px">
