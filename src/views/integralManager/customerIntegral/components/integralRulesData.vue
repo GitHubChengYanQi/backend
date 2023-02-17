@@ -621,7 +621,7 @@
               @getVal="employeeIdsChange"
             />
           </div> -->
-          <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以购买时的规则为准</div>
+          <div class="formRulesDesc">积分奖励将在用户消费后立即发放，发放的积分数量，以购买时的规则为准</div>
         </div>
       </a-spin>
       <template slot="footer">
