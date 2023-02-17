@@ -621,7 +621,7 @@
               @getVal="employeeIdsChange"
             />
           </div> -->
-          <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以购买时的规则为准</div>
+          <div class="formRulesDesc">积分奖励将在用户消费后立即发放，发放的积分数量，以购买时的规则为准</div>
         </div>
       </a-spin>
       <template slot="footer">
@@ -924,6 +924,7 @@ export default {
         if (!tempInfo.employeeId || (tempInfo.employeeId && (tempInfo.employeeId.length === 0))) {
           // 没有选择员工
           this.$set(tempInfo, 'employeeIds', [])
+          this.$set(tempInfo, 'employeeId', [])
         } else if (tempInfo.employeeId.length === 1) {
           // 有一个员工
           const employeeIdList = []
@@ -1028,7 +1029,7 @@ export default {
       this.bindMemberLoading = true
       this.memberBuyIntegralLoading = true
       console.log(this.integralRulesTypeInfo, 'this.integralRulesTypeInfo')
-      debugger
+      // debugger
       setIntegralRulesApi(this.integralRulesTypeInfo).then(response => {
         if (response.code === 200) {
           this.integralFriendCircleLoading = false

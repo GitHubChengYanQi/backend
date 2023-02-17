@@ -287,8 +287,8 @@ export default {
   },
   methods: {
     // 单击某一行的回调
-    onSelectionChange (selectedRowKeys) {
-      console.log(selectedRowKeys, '单击某一行的回调')
+    onSelectionChange (selectedRowKeys, selectedRows) {
+      console.log(selectedRowKeys, '单击某一行的回调', selectedRows)
       // this.sendArray = record.listTaskInfo
       // const tempIdArray = []
       // tempIdArray.push(record.id)
@@ -365,6 +365,10 @@ export default {
     },
     // 数据统计切换页码
     handleTableChange ({ current, pageSize }, filters, sorter) {
+      if (this.pagination.current !== current) {
+        // 翻页成功,清除选中
+        this.selectedKeyList = []
+      }
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       console.log(sorter, 'sorter')
@@ -452,9 +456,9 @@ export default {
       const tempArray = this.tableData.filter(item => this.selectedKeyList.indexOf(item.id) !== -1)
       console.log(tempArray)
       const checkedIncreaseIdList = tempArray.filter(item => item.changeCause === '1' ||
-        item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5' || item.changeCause === '10' || item.changeCause === '11').map(info => info.id)
+        item.changeCause === '2' || item.changeCause === '3' || item.changeCause === '4' || item.changeCause === '5' || item.changeCause === '10' || item.changeCause === '11' || item.changeCause === '12').map(info => info.id)
       const checkedDecreaseIdList = tempArray.filter(item => item.changeCause === '6' ||
-        item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9').map(info => info.id)
+        item.changeCause === '7' || item.changeCause === '8' || item.changeCause === '9' || item.changeCause === '13').map(info => info.id)
       this.$set(this.searchDetailInfo, 'checkedIncreaseIdList', checkedIncreaseIdList)
       this.$set(this.searchDetailInfo, 'checkedDecreaseIdList', checkedDecreaseIdList)
       const params = {

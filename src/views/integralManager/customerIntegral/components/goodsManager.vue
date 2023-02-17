@@ -200,6 +200,8 @@ export default {
       console.log(this.showStatus, 'showStatus')
       this.goodsManagerShowStatus = this.showStatus
       if (this.goodsManagerShowStatus) {
+        this.selectedRowKeys = []
+        this.$delete(this.screenData, 'name')
         this.$set(this.goodsManagerPagination, 'current', 1)
         this.$set(this.goodsManagerPagination, 'pageSize', 10)
         this.getData()

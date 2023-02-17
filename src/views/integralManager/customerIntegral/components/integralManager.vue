@@ -438,6 +438,10 @@ export default {
           this.$delete(this.screenData, `${key}`)
         }
       }
+      if (this.pagination.current !== current) {
+        // 翻页成功,清除选中
+        this.selectedKeyList = []
+      }
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getDataList()
