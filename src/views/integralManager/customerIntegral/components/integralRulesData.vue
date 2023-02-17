@@ -230,7 +230,7 @@
                   class="singleInputClass"
                   @change="changeBuyLookAfterDayNumber">
                 </a-input-number>
-                <div class="singleFormText">天内,购买了</div>
+                <div class="singleFormText">天内,每购买了</div>
                 <!-- <a-button @click="chooseGoods()">+添加商品</a-button> -->
                 <div class="goodsContentDiv" @click="chooseGoodsMethod">
                   <div v-if="goodsList.length === 0" class="noGoodsDiv">+商品库</div>
@@ -281,7 +281,10 @@
               @getVal="employeeIdsChange"
             />
           </div>
-          <div class="formRulesDesc">积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
+          <div class="formRulesDesc">
+            <div>获得积分按购买药品数量计算，用户一单购买了多次商品，员工可多次获得积分</div>
+            <div>积分奖励将在满足条件的后一天0点，集中发放，发放的积分数量，以最新的规则为准</div>
+          </div>
         </div>
       </a-spin>
       <template slot="footer">

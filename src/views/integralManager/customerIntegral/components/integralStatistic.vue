@@ -84,8 +84,8 @@
             placeholder="请选择"
             mode="multiple"
             v-model="searchDetailInfo.changeCauseList"
-            :maxTagCount="2"
-            :maxTagPlaceholder="`+${searchDetailInfo.changeCauseList.length - 2}`">
+            :maxTagCount="1"
+            :maxTagPlaceholder="`+${searchDetailInfo.changeCauseList.length - 1}`">
             <a-select-option v-for="item in reasonList" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
           </a-select>
         </div>
