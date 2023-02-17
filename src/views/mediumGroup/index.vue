@@ -266,7 +266,7 @@
                   <a-button @click="clearSeach">清空</a-button>
                 </div>
                 <div class="btn">
-                  <a-button v-permission="'/mediumGroup/index@add'" type="primary" style="marginRight: 10px" @click="() => { this.addPhotoModal = true; this.modalType = 2 }"><a-icon type="upload" />上传图片</a-button>
+                  <a-button v-permission="'/mediumGroup/index@add'" type="primary" style="marginRight: 10px" @click="() => { this.addPhotoModal = true; this.modalType = 2; this.materialDetail.id = ''; this.materialGroupId = ''; this.editTypeNum = ''}"><a-icon type="upload" />上传图片</a-button>
                 </div>
               </div>
               <div class="picture">
@@ -1426,7 +1426,9 @@ export default {
       selectedRowKeys: [],
       editImageModal: false,
       title: '',
-      photoData: {},
+      photoData: {
+        imageName: ''
+      },
       addPhotoModal: false,
       searchValue2: '',
       FormData: {}
@@ -1826,13 +1828,18 @@ export default {
     // 上传
     uploadSuccess (data) {
       this.imgUrl = data.fullPath
-      if (this.modalType === 2 || this.modalType === 6 || this.modalType === 3) {
-        const imagePath = data.path
-        this.upLoadRes.imagePath = imagePath
+      if (this.modalType === 6 || this.modalType === 3) {
+        this.upLoadRes.imagePath = data.path
         this.upLoadRes.imageName = data.name
       }
       if (this.modalType === 2) {
-        this.photoData.imageName = this.upLoadRes.imageName
+        this.upLoadRes.imagePath = data.path
+        if (!this.photoData.imageName || this.photoData.imageName === '') {
+          this.upLoadRes.imageName = data.name
+          this.photoData.imageName = data.name
+        } else {
+          this.upLoadRes.imageName = this.photoData.imageName
+        }
       }
     },
     // 添加图文素材
