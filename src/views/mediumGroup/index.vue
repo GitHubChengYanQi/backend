@@ -1426,7 +1426,9 @@ export default {
       selectedRowKeys: [],
       editImageModal: false,
       title: '',
-      photoData: {},
+      photoData: {
+        imageName: ''
+      },
       addPhotoModal: false,
       searchValue2: '',
       FormData: {}
@@ -1832,7 +1834,7 @@ export default {
       }
       if (this.modalType === 2) {
         this.upLoadRes.imagePath = data.path
-        if (this.photoData.imageName === '') {
+        if (!this.photoData.imageName || this.photoData.imageName === '') {
           this.upLoadRes.imageName = data.name
           this.photoData.imageName = data.name
         } else {
