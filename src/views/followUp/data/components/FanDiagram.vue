@@ -194,6 +194,12 @@ export default {
           ]
         },
         3: {
+          dataZoom: {
+            type: 'inside',
+            show: true,
+            start: 0,
+            end: 100
+          },
           color: ['#55CB9C'],
           tooltip: {
             trigger: 'axis'
@@ -231,7 +237,6 @@ export default {
           series: [
             {
               type: 'line',
-              symbol: 'none',
               areaStyle: {
                 color: '#C9E7DB'
               },
@@ -240,6 +245,12 @@ export default {
           ]
         },
         4: {
+          dataZoom: {
+            type: 'inside',
+            show: true,
+            start: 0,
+            end: 100
+          },
           color: ['#55CB9C', '#1890ff'],
           tooltip: {
             trigger: 'axis'
@@ -281,6 +292,12 @@ export default {
           ]
         },
         5: {
+          dataZoom: {
+            type: 'inside',
+            show: true,
+            start: 0,
+            end: 100
+          },
           color: ['#1890ff', '#55CB9C', '#586589', '#E8B215'],
           tooltip: {
             trigger: 'axis',

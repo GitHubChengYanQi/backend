@@ -356,7 +356,7 @@ export default {
           examId: router.history.current.query.examId
         }, params)
       }
-      this.tableData = res.data.map((item, index) => ({ ...item, key: index,task:this.task || router.history.current.query.examTaskId }))
+      this.tableData = res.data.map((item, index) => ({ ...item, key: index, task: this.task || router.history.current.query.examTaskId }))
       this.pagination.total = res.count
       this.loading = false
     },
