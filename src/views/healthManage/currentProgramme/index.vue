@@ -169,7 +169,7 @@ export default {
       let data
       const _self = this
       this.$confirm({
-        content: status == 0 ? '随访方案启用后，患者开始执行随访方案。医生则不能编辑方案' : '停止后，患者将停止随访方案执行，医生可在停止后编辑随访方案内容',
+        content: status == 0 ? '随访方案启用后，患者开始执行随访方案。专员则不能编辑方案' : '停止后，患者将停止随访方案执行，专员可在停止后编辑随访方案内容',
         okText: '确定',
         okType: 'danger',
         cancelText: '取消',
