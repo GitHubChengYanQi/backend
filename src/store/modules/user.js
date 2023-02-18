@@ -49,6 +49,7 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const data = response.data
+          sessionStorage.setItem('info', JSON.stringify(data))
           commit('SET_USER_INFO', data)
           resolve(response)
         }).catch(error => {

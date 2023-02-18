@@ -27,7 +27,7 @@ const fileRequest = axios.create({
 
 const ossRequest = axios.create({
   // API 请求的默认前缀
-  baseURL: process.env.VUE_APP_API_UPLOAD_URL,
+  baseURL: JSON.parse(sessionStorage.getItem('info')).ossUploadUrl, // process.env.VUE_APP_API_UPLOAD_URL,
   timeout: 300000 // 请求超时时间
 })
 
