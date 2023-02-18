@@ -1292,7 +1292,11 @@ export default {
         this.source = source
         this.isUpload = true
       }
-      ossUpload(tempFormData, source.token).then(res => {
+
+      ossUpload({
+        url: JSON.parse(sessionStorage.getItem('info')).ossUploadUrl,
+        data: tempFormData,
+        cancelToken: source.token }).then(res => {
         if (shape == 5) {
           this.setData.inputData.uploadVideo[index].video = `${info.host}/${info.key}` + '?1=1'
           this.setData.inputData.uploadVideo[index].isUpload = false

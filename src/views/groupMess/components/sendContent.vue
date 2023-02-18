@@ -882,7 +882,10 @@ export default {
         tempFormData.append(i, info[i])
       }
       tempFormData.append('file', fileInfo)
-      ossUpload(tempFormData).then(res => {
+      ossUpload({
+        url: JSON.parse(sessionStorage.getItem('info')).ossUploadUrl,
+        data: tempFormData,
+        cancelToken: '' }).then(res => {
         // this.uploadUrl = `${info.host}/${info.key}`
         const videoInfo = {
           type: 3,

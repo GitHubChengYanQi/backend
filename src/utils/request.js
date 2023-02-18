@@ -25,16 +25,11 @@ const fileRequest = axios.create({
   timeout: 30000 // 请求超时时间
 })
 
-let path = ''
-let ossRequest = null
-setTimeout(() => {
-  path = JSON.parse(sessionStorage.getItem('info')).ossUploadUrl
-  ossRequest = axios.create({
-    // API 请求的默认前缀
-    baseURL: path, // process.env.VUE_APP_API_UPLOAD_URL,
-    timeout: 300000 // 请求超时时间
-  })
-}, 2000)
+const ossRequest = axios.create({
+  // API 请求的默认前缀
+  baseURL: '', // process.env.VUE_APP_API_UPLOAD_URL,
+  timeout: 300000 // 请求超时时间
+})
 
 // 异常拦截处理器
 const errorHandler = (error) => {

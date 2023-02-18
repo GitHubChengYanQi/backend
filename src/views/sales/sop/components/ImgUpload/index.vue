@@ -72,7 +72,10 @@ export default {
         tempFormData.append(i, info[i])
       }
       tempFormData.append('file', fileInfo.file)
-      ossUpload(tempFormData).then(res => {
+      ossUpload({
+        url: JSON.parse(sessionStorage.getItem('info')).ossUploadUrl,
+        data: tempFormData,
+        cancelToken: '' }).then(res => {
         this.$emit('successUpload', this.oss)
         this.$emit('loadingMethod', false)
       })
