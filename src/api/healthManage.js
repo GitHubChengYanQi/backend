@@ -430,3 +430,11 @@ export function validatePlanTemplateBind (params) {
     params
   })
 }
+
+export function radarDetail (data) {
+  return request({
+    url: '/scrm_radar_shift/load',
+    method: 'POST',
+    data: data
+  })
+}

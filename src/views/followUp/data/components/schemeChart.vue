@@ -104,7 +104,7 @@ export default {
   data () {
     return {
       useType: 'fate_together',
-      chart1RangeSelect: '',
+      chart1RangeSelect: 'pieAgency',
       chart1RangeDetailSelect: [],
       schemeRange1SelectOptions
     }

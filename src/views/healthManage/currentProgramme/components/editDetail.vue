@@ -96,7 +96,8 @@
         </div>
         <template v-for="item in pageData.processs">
           <a-row :key="`${item.article.formId}-`" v-if="item.article">
-            <a-col class="contentItem flex-row-center" :span="12" @click="openDetailModal(item.article,'患教')">
+            <a-col class="contentItem flex-row-center" :span="12" >
+              <!-- <a-col class="contentItem flex-row-center" :span="12" @click="openDetailModal(item.article,'患教')"> -->
               <div class="contentItem-tip"></div>
               {{ item.article.name }}
             </a-col>
@@ -280,16 +281,20 @@ export default {
       this.$router.push(`/healthManage/addProgramme?planId=${planId}&type=edit&pageType=personal`)
     },
     openDetailModal (item, keyName) {
-      this.detailObj = {
-        ...item,
-        keyName
-      }
-      if (keyName == '患教') {
-        this.visible2 = true
-      } else {
-        this.visible1 = true
-      }
-      console.log(this.detailObj)
+      // console.log(11111, item)
+      // radarDetail().then(res => {
+      //   console.log(111, res)
+      // })
+      // this.detailObj = {
+      //   ...item,
+      //   keyName
+      // }
+      // if (keyName == '患教') {
+      //   this.visible2 = true
+      // } else {
+      //   this.visible1 = true
+      // }
+      // console.log(this.detailObj)
     }
   }
 }
