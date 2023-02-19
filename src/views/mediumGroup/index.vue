@@ -266,7 +266,7 @@
                   <a-button @click="clearSeach">清空</a-button>
                 </div>
                 <div class="btn">
-                  <a-button v-permission="'/mediumGroup/index@add'" type="primary" style="marginRight: 10px" @click="() => { this.addPhotoModal = true; this.modalType = 2; this.materialDetail.id = ''; this.materialGroupId = ''; this.editTypeNum = ''}"><a-icon type="upload" />上传图片</a-button>
+                  <a-button v-permission="'/mediumGroup/index@add'" type="primary" style="marginRight: 10px" @click="() => { this.addPhotoModal = true; this.modalType = 2; this.materialDetail.id = ''; this.materialGroupId = ''; this.editTypeNum = ''; this.photoData = {}; this.upLoadRes = {}}"><a-icon type="upload" />上传图片</a-button>
                 </div>
               </div>
               <div class="picture">
@@ -899,7 +899,7 @@
                 <a-input v-model="photoData.title" :maxLength="15" />
               </a-form-model-item>
               <a-form-model-item label="图片名称：">
-                <a-input v-model="photoData.imageName" />
+                <a-input v-model="photoData.imageName" @change="handleNameChange" />
               </a-form-model-item>
               <a-form-item label="图片：">
                 <upload
@@ -1359,7 +1359,9 @@ export default {
       currentId: null,
       moveId: null,
       moveData: {},
-      upLoadRes: {},
+      upLoadRes: {
+        imageName: ''
+      },
       materialGroupId: 0,
       picTextModalData: [],
       imgSearchStr: '',
@@ -1834,13 +1836,17 @@ export default {
       }
       if (this.modalType === 2) {
         this.upLoadRes.imagePath = data.path
-        if (!this.photoData.imageName || this.photoData.imageName === '') {
-          this.upLoadRes.imageName = data.name
-          this.photoData.imageName = data.name
-        } else {
+        if (this.photoData.imageName && this.photoData.imageName.length > 0) {
           this.upLoadRes.imageName = this.photoData.imageName
+        } else {
+          this.photoData.imageName = data.name
+          this.upLoadRes.imageName = data.name
         }
       }
+    },
+    // 改写图片名称
+    handleNameChange (e) {
+      this.upLoadRes.imageName = e.target.value
     },
     // 添加图文素材
     addImageTextDefine () {
@@ -2064,6 +2070,7 @@ export default {
                 title: this.photoData.title,
                 ...this.upLoadRes
               }
+              console.log(11111, content)
               addMaterialLibrary({
                 type: Number(this.tabsNumber),
                 content: content,
