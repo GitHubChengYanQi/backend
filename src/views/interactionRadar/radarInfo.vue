@@ -216,8 +216,7 @@
                 <template slot="title">
                   <span>{{ text }}</span>
                 </template>
-                <span v-if="text.length && text.length > 20">{{ text.slice(0, 20) }}</span>
-                <span v-else>{{ text }}</span>
+                <span>{{ text }}</span>
               </a-tooltip>
             </template>
           </a-table>
@@ -452,9 +451,10 @@ export default {
             {
               align: 'center',
               title: '客户昵称',
-              fixed: 'left',
               dataIndex: 'contactNick',
+              fixed: 'left',
               width: 200,
+              ellipsis: true,
               scopedSlots: { customRender: 'contactNick' }
             },
             {
