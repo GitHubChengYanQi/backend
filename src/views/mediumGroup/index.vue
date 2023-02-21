@@ -1810,6 +1810,7 @@ export default {
       })
     },
     uploadSuccessV (data) {
+      this.upLoadRes = {}
       if (this.modalType === 4) {
         const voicePath = data.path
         this.upLoadRes.voicePath = voicePath
@@ -2011,6 +2012,7 @@ export default {
       }
       form.validate(valid => {
         if (valid) {
+          console.log(22222,this.upLoadRes)
           if (Object.keys(this.upLoadRes).length === 2) {
             const content = {
               ...this.upLoadRes,
