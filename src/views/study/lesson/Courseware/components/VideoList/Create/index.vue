@@ -141,6 +141,10 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
+          if (!values.title.replaceAll(' ', '')) {
+            message.warn('请输入课件名称！')
+            return
+          }
           this.loading = true
           const data = {
             courseWareType: 'video',
