@@ -38,7 +38,7 @@ export default {
   },
   watch: {
     value () {
-      // this.name = this.value
+      this.name = this.value
     }
   },
   data () {
@@ -53,12 +53,8 @@ export default {
   },
   methods: {
     handleChange (value) {
-      console.log(value.length)
-      if (value.length > 10) {
-        return
-      }
-      // this.name = value
-      // this.$emit('input', value)
+      this.name = value
+      this.$emit('input', value)
     },
     search (value) {
       this.getUserList(value)
