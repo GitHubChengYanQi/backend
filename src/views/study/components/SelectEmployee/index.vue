@@ -7,12 +7,14 @@
       @search="search"
       @change="handleChange"
     >
+      <a-input :maxLength="10" />
       <template slot="dataSource">
         <a-select-option
           v-for="item in options"
           :key="'id:'+item.id"
           class="show-all"
-        >{{ item.name }}</a-select-option>
+        >{{ item.name }}
+        </a-select-option>
       </template>
     </AutoComplete>
   </div>
@@ -36,7 +38,7 @@ export default {
   },
   watch: {
     value () {
-      this.name = this.value
+      // this.name = this.value
     }
   },
   data () {
@@ -51,8 +53,12 @@ export default {
   },
   methods: {
     handleChange (value) {
-      this.name = value
-      this.$emit('input', value)
+      console.log(value.length)
+      if (value.length > 10) {
+        return
+      }
+      // this.name = value
+      // this.$emit('input', value)
     },
     search (value) {
       this.getUserList(value)
