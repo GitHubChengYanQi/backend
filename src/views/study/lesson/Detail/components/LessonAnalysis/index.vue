@@ -17,7 +17,7 @@
         <div class="column">
           <div class="title">{{ detail.name }}</div>
           <div class="space">
-            <div>分类：{{ detail.courseClassResult && detail.courseClassResult.name }}</div>
+            <div>分类：{{ detail.courseClassResult && (detail.courseClassResult.name + (detail.courseClassResult.parent ? `/${detail.courseClassResult.parent.name}` : '')) }}</div>
             <div>创建时间：{{ moment(detail.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
             <div v-if="task">
               限定时长：

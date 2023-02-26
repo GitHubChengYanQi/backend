@@ -233,7 +233,10 @@ export default {
           dataIndex: 'courseClassResult',
           align: 'center',
           customRender (value) {
-            return (value && value.name) || '-'
+            if (!value) {
+              return ''
+            }
+            return value.name + (value.parent ? `/${value.parent.name}` : '')
           }
         },
         {
