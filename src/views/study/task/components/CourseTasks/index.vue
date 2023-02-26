@@ -180,7 +180,8 @@ export default {
           width: '150px',
           align: 'center',
           customRender (value, record) {
-            return record.courseResult && record.courseResult.courseClassResult && record.courseResult.courseClassResult.name
+            const courseClassResult = record.courseResult && record.courseResult.courseClassResult
+            return courseClassResult.name + (courseClassResult.parent ? `/${courseClassResult.parent.name}` : '')
           }
         },
         {
