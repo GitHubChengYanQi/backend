@@ -236,7 +236,7 @@ export default {
             if (!value) {
               return ''
             }
-            return value.name + (value.parent ? `/${value.parent.name}` : '')
+            return (value.parent ? `${value.parent.name}/` : '') + value.name
           }
         },
         {
@@ -338,7 +338,10 @@ export default {
           dataIndex: 'courseClassResult',
           align: 'center',
           customRender (value) {
-            return value && (value.name || '-')
+            if (!value) {
+              return ''
+            }
+            return (value.parent ? `${value.parent.name}/` : '') + value.name
           }
         },
         {
@@ -397,7 +400,15 @@ export default {
     getTreeData () {
       this.classTreeLoading = true
       courseClassTreeView().then((res) => {
-        this.classTree = res.data
+        this.classTree = res.data.map(item => {
+          return {
+            ...item,
+            children: (Array.isArray(item.children) && item.children.length > 0) ? item.children.map(item => ({
+              ...item,
+              children: null
+            })) : null
+          }
+        })
       }).finally(() => {
         this.classTreeLoading = false
       })

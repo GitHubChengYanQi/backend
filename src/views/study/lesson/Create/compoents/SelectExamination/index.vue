@@ -269,7 +269,6 @@ export default {
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 16px;
 }
 
 .successButton {

@@ -39,7 +39,7 @@
       <div class="box">
         <img :src="require('@/assets/study/examDetail05.png')">
         <div>
-          <div class="num">{{ passingRate }} %</div>
+          <div class="num">{{ passingRate }}%</div>
           通过率
         </div>
       </div>
@@ -515,7 +515,7 @@ export default {
   background-color: #fff;
   display: flex;
   margin-bottom: 24px;
-  gap: 24px;
+  gap: 16px;
   border-radius: 8px;
 
   .box {
@@ -529,8 +529,8 @@ export default {
     justify-items: center;
 
     img {
-      width: 80px;
-      height: 80px;
+      width: 60px;
+      height: 60px;
     }
 
     > div {

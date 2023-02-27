@@ -188,7 +188,15 @@ export default {
     getTreeData () {
       this.classTreeLoading = true
       courseClassTreeView().then((res) => {
-        this.classTree = res.data
+        this.classTree = res.data.map(item => {
+          return {
+            ...item,
+            children: (Array.isArray(item.children) && item.children.length > 0) ? item.children.map(item => ({
+              ...item,
+              children: null
+            })) : null
+          }
+        })
       }).finally(() => {
         this.classTreeLoading = false
       })
