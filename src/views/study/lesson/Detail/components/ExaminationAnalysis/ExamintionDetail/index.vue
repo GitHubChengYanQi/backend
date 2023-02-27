@@ -273,7 +273,7 @@ export default {
     this.examCount = router.history.current.query.examCount || 0
     this.passExamCount = router.history.current.query.passExamCount || 0
     this.noPassExamCount = router.history.current.query.noPassExamCount || 0
-    this.passingRate = Math.round((this.passExamCount / this.examCount) * 100) || 0
+    this.passingRate = Math.ceil((this.passExamCount / this.examCount) * 100) || 0
     this.inExamCount = router.history.current.query.inExamCount || 0
     this.getTableData()
   },
