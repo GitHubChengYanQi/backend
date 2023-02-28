@@ -7,43 +7,45 @@
       back
     />
 
-    <div class="head" :style="this.task ? {borderTopLeftRadius:0,borderTopRightRadius:0} : {}">
-      <div class="box">
-        <img :src="require('@/assets/study/examDetail01.png')">
-        <div>
-          <div class="num">{{ examCount }}</div>
-          考试人数
+    <a-spin :spinning="examDataLoading">
+      <div class="head" :style="this.task ? {borderTopLeftRadius:0,borderTopRightRadius:0} : {}">
+        <div class="box">
+          <img :src="require('@/assets/study/examDetail01.png')">
+          <div>
+            <div class="num">{{ examCount }}</div>
+            考试人数
+          </div>
+        </div>
+        <div class="box">
+          <img :src="require('@/assets/study/examDetail02.png')">
+          <div>
+            <div class="num">{{ passExamCount }}</div>
+            通过人数
+          </div>
+        </div>
+        <div class="box">
+          <img :src="require('@/assets/study/examDetail03.png')">
+          <div>
+            <div class="num">{{ noPassExamCount }}</div>
+            未通过人数
+          </div>
+        </div>
+        <div class="box">
+          <img :src="require('@/assets/study/examDetail04.png')">
+          <div>
+            <div class="num">{{ inExamCount }}</div>
+            考试中人数
+          </div>
+        </div>
+        <div class="box">
+          <img :src="require('@/assets/study/examDetail05.png')">
+          <div>
+            <div class="num">{{ passingRate }}%</div>
+            通过率
+          </div>
         </div>
       </div>
-      <div class="box">
-        <img :src="require('@/assets/study/examDetail02.png')">
-        <div>
-          <div class="num">{{ passExamCount }}</div>
-          通过人数
-        </div>
-      </div>
-      <div class="box">
-        <img :src="require('@/assets/study/examDetail03.png')">
-        <div>
-          <div class="num">{{ noPassExamCount }}</div>
-          未通过人数
-        </div>
-      </div>
-      <div class="box">
-        <img :src="require('@/assets/study/examDetail04.png')">
-        <div>
-          <div class="num">{{ inExamCount }}</div>
-          考试中人数
-        </div>
-      </div>
-      <div class="box">
-        <img :src="require('@/assets/study/examDetail05.png')">
-        <div>
-          <div class="num">{{ passingRate }}%</div>
-          通过率
-        </div>
-      </div>
-    </div>
+    </a-spin>
 
     <a-card :bordered="false" class="my-table-search">
       <a-form layout="inline">
@@ -138,12 +140,13 @@ import breadcrumb from '../../../../../components/Breadcrumd/index'
 import router from '@/router'
 import {
   courseExamBindExamBindPageExcelExport,
-  courseExamBindExamBindPageList, examTaskBindExamExcelExport, examTaskBindList
+  courseExamBindExamBindPageList, examCourseBindPageList, examTaskBindExamExcelExport, examTaskBindList
 } from '@/api/study/course'
 import moment from 'moment'
 import SelectEmployee from '../../../../../components/SelectEmployee/index'
 import { excelExport } from '@/utils/downloadUtil'
 import { message } from 'ant-design-vue'
+import { examTaskList } from '@/api/study/task'
 
 export default {
   props: {
@@ -160,6 +163,7 @@ export default {
       loading: false,
       screenData: {},
       excelLoading: false,
+      examDataLoading: false,
       columns: [
         {
           title: '姓名',
@@ -270,14 +274,43 @@ export default {
     }
   },
   created () {
-    this.examCount = router.history.current.query.examCount || 0
-    this.passExamCount = router.history.current.query.passExamCount || 0
-    this.noPassExamCount = router.history.current.query.noPassExamCount || 0
-    this.passingRate = Math.ceil((this.passExamCount / this.examCount) * 100) || 0
-    this.inExamCount = router.history.current.query.inExamCount || 0
     this.getTableData()
+    this.getExamData()
   },
   methods: {
+    getExamData () {
+      this.examDataLoading = true
+      if (this.task || router.history.current.query.examTaskId) {
+        examTaskList({
+          examTaskId: router.history.current.query.examTaskId || router.history.current.query.id,
+          courseTaskId: router.history.current.query.courseTaskId
+        }).then((res) => {
+          const data = (res.data || [])[0] || {}
+          this.examCount = data.examCount || 0
+          this.passExamCount = data.passExamCount || 0
+          this.noPassExamCount = data.noPassExamCount || 0
+          this.passingRate = Math.ceil((data.passExamCount / data.examCount) * 100) || 0
+          this.inExamCount = data.inExamCount || 0
+        }).finally(() => {
+          this.examDataLoading = false
+        })
+      } else {
+        examCourseBindPageList({
+          examId: router.history.current.query.examId,
+          courseId: router.history.current.query.courseId
+        }).then((res) => {
+          const data = (res.data || [])[0] || {}
+          this.examCount = data.examCount || 0
+          this.passExamCount = data.passExamCount || 0
+          this.noPassExamCount = data.noPassExamCount || 0
+          this.passingRate = Math.ceil((data.passExamCount / data.examCount) * 100) || 0
+          this.inExamCount = data.inExamCount || 0
+        }).finally(() => {
+          this.examDataLoading = false
+        })
+      }
+      // exam/courseBindPageList
+    },
     async excel () {
       this.excelLoading = true
       const isUserId = this.screenData.userName && this.screenData.userName.indexOf('id:') !== -1
@@ -356,7 +389,11 @@ export default {
           examId: router.history.current.query.examId
         }, params)
       }
-      this.tableData = res.data.map((item, index) => ({ ...item, key: index, task: this.task || router.history.current.query.examTaskId }))
+      this.tableData = res.data.map((item, index) => ({
+        ...item,
+        key: index,
+        task: this.task || router.history.current.query.examTaskId
+      }))
       this.pagination.total = res.count
       this.loading = false
     },
