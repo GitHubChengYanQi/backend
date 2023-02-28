@@ -2,7 +2,7 @@
   <div>
     <!-- 会员列表 -->
     <a-form :label-col="{ span: 7 }" :wrapper-col="{ span: 14 }">
-      <a-row :gutter="16">
+      <a-row :gutter="12">
         <a-col :lg="6">
           <a-form-item label="搜索会员:">
             <a-input v-model="screenData.name" placeholder="请输入要搜索的会员姓名"></a-input>
@@ -41,7 +41,7 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-row :gutter="16">
+      <a-row :gutter="12">
         <a-col :lg="6">
           <a-form-item label="开卡方式:">
             <!-- :maxTagPlaceholder="`+${searchInfo.changeCauseList.length - 2}`" -->
@@ -140,13 +140,25 @@
           </div>
         </template>
         </div> -->
-        <div slot="sysRuleType" slot-scope="text, record">
+        <!-- <div slot="sysRuleType" slot-scope="text, record">
           <template>
             {{ record.sysRuleType === '1' ? '系统类型' : '' }}
           </template>
-        </div>
-        <div slot="showExecuteVal" slot-scope="text">
+        </div> -->
+        <!-- <div slot="showExecuteVal" slot-scope="text">
           <a-popover title="执行字段">
+            <template slot="content">
+              <div class="labelBox">
+                {{ text }}
+              </div>
+            </template>
+            <a-tag type="button">
+              查看
+            </a-tag>
+          </a-popover>
+        </div> -->
+        <div slot="showExecuteVal" slot-scope="text">
+          <a-popover title="客户标签">
             <template slot="content">
               <div class="labelBox">
                 {{ text }}
@@ -167,7 +179,8 @@
         <div slot="options">
           <template>
             <div style="display: flex;justify-content: space-between;">
-              <a-button type="link" v-permission="'/creditsRule/setCreditsRule@post'">设置</a-button>
+              <a-button type="link">详情</a-button>
+              <a-button type="link">消费记录</a-button>
             </div>
           </template>
         </div>
@@ -190,24 +203,61 @@ export default {
       // 表格表头
       tableColumns: [
         {
-          title: '规则名称',
+          title: '会员姓名',
           dataIndex: 'ruleName',
           align: 'center',
           width: 200
         },
         {
-          title: '积分余额',
+          title: '开卡员工',
           dataIndex: 'integral',
+          align: 'center',
+          width: 200
+        },
+        {
+          title: '所属门店',
+          dataIndex: 'state',
+          align: 'center',
+          scopedSlots: { customRender: 'state' },
+          width: 200
+        },
+        {
+          title: '所属机构',
+          dataIndex: 'position',
+          align: 'center',
+          width: 150
+        },
+        {
+          title: '开卡时间',
+          dataIndex: 'openDate',
           align: 'center',
           sortDirections: ['descend', 'ascend'],
           sorter: true,
           width: 200
         },
         {
-          title: '状态',
-          dataIndex: 'state',
+          title: '是否为企微好友',
+          dataIndex: 'isQwFriend',
           align: 'center',
-          scopedSlots: { customRender: 'state' },
+          width: 200
+        },
+        {
+          title: '客户标签',
+          dataIndex: 'customerLabel',
+          align: 'center',
+          scopedSlots: { customRender: 'customerLabel' },
+          width: 200
+        },
+        {
+          title: '手机号',
+          dataIndex: 'phone',
+          align: 'center',
+          width: 200
+        },
+        {
+          title: '开卡方式',
+          dataIndex: 'openType',
+          align: 'center',
           width: 200
         },
         {
@@ -351,18 +401,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.searchButtonWrapper {
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 30px;
-}
-.topTableDiv {
-    margin-top: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    .topDivText {
-        font-size: 14px;
-    }
-}
+@import url('./css/index.less');
 </style>
