@@ -173,7 +173,7 @@ import { departmentEmp } from '@/api/common.js'
 // getActivityPersonNum,
 import { getTagList, getActivityPersonNum, getActivityDetail, getDictData, addActivitySop, editActivitySop } from '@/api/salers'
 import Department from '@/components/department'
-import LabelSelect from '../../..//clientFollow/components/LabelSelect.vue'
+import LabelSelect from '../../../clientFollow/components/LabelSelect.vue'
 import { disabledBeforeDate } from '../sopUtils'
 export default {
   name: 'ActivityAdd',
