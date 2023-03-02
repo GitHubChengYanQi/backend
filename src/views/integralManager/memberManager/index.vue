@@ -5,12 +5,12 @@
       <a-row :gutter="10">
         <a-col :lg="6">
           <a-form-item label="搜索会员:">
-            <a-input v-model="screenData.name" placeholder="请输入要搜索的会员姓名"></a-input>
+            <a-input v-model="screenData.name" placeholder="请输入要搜索的会员姓名" :allowClear="true"></a-input>
           </a-form-item>
         </a-col>
         <a-col :lg="6">
           <a-form-item label="手机号:">
-            <a-input v-model="screenData.phone" placeholder="请输入要搜索的手机号"></a-input>
+            <a-input v-model="screenData.phone" placeholder="请输入要搜索的手机号" :allowClear="true"></a-input>
           </a-form-item>
         </a-col>
         <a-col :lg="6">
@@ -54,6 +54,11 @@
       </a-row>
       <div class="searchButtonWrapper">
         <a-button
+          style="margin: 0 10px;"
+          @click="exportData"
+          v-permission="`/memberCenterUser/pc/excel@get`"
+        >导出Excel</a-button>
+        <a-button
           type="primary"
           style="margin: 0 10px;"
           @click="goSearchData"
@@ -69,10 +74,10 @@
     <div class="tableWrapper">
       <div class="topTableDiv">
         <div class="topDivText">
-          {{ `共${tableDataList.length}个客户,已选择${selectedKeyList.length}个客户` }}
+          {{ `共${tablePagination.total}个客户,已选择${selectedKeyList.length}个客户` }}
         </div>
         <div class="topRightDiv">
-          <a-button style="margin: 0 10px;" @click="exportData" v-permission="`/memberCenterUser/pc/excel@get`">导出Excel</a-button>
+          <!-- <a-button style="margin: 0 10px;" @click="exportData" v-permission="`/memberCenterUser/pc/excel@get`">导出Excel</a-button> -->
           <!-- <a-button style="margin: 0 10px;" @click="batchMakeTag" :disabled="selectedKeyList.length === 0">批量打标签</a-button>
           <a-button style="margin: 0 10px;" @click="batchRemoveTag" :disabled="selectedKeyList.length === 0">批量移除标签</a-button> -->
         </div>
@@ -142,7 +147,7 @@
         </div>
       </a-table>
     </div>
-    <memberBuyRecord :showStatus.sync="memberBuyRecordShowStatus" :id="chooseRecordInfo.memberUserId"></memberBuyRecord>
+    <memberBuyRecord :showStatus.sync="memberBuyRecordShowStatus" :id="String(chooseRecordInfo.memberUserId)"></memberBuyRecord>
   </div>
 </template>
 
@@ -257,10 +262,8 @@ export default {
     // 获取消费记录
     goRecord (info) {
       // console.log(id, '获取消费记录')
+      this.chooseRecordInfo = Object.assign({}, info)
       this.memberBuyRecordShowStatus = true
-      this.$nextTick(() => {
-        this.chooseRecordInfo = Object.assign({}, info)
-      })
     },
     // 获取开卡方式字典
     async getOpenCardType () {
@@ -358,6 +361,7 @@ export default {
     },
     // 导出会员列表
     exportData () {
+      this.$set(this.screenData, 'memberUserIdListStr', this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : '')
       const params = {
         ...this.screenData,
         page: this.tablePagination.current,

@@ -153,15 +153,16 @@ export default {
         this.modalLoadingStatus = false
       })
     },
-    // 群聊列表分页信息
+    // 消费记录列表分页信息
     buyRecordHandleTableChange ({ current, pageSize }) {
       this.buyRecordPagination.current = current
       this.buyRecordPagination.pageSize = pageSize
       this.getDataList()
     },
-    // 关闭添加群聊弹框
+    // 关闭消费记录弹框
     closeBuyRecord () {
       this.buyRecordShowStatus = false
+      this.buyRecordDataList = []
       this.$emit('update:showStatus', this.buyRecordShowStatus)
     }
   }
