@@ -90,7 +90,7 @@
       </div>
       <a-table
         :loading="tableLoading"
-        :row-key="record => record.id"
+        :row-key="record => record.memberUserId"
         :data-source="tableDataList"
         :columns="tableColumns"
         :pagination="tablePagination"
@@ -102,6 +102,9 @@
             <div>{{ record.name }}</div>
             <div>{{ record.nickName }}</div>
           </div> -->
+        <div slot="contentName" slot-scope="text">
+          {{ returnTableText(text) }}
+        </div>
         <div slot="makeCardEmployeeName" slot-scope="text">
           {{ returnTableText(text) }}
         </div>
@@ -127,7 +130,13 @@
             </a-popover>
           </div> -->
         <div slot="makeCardTypeStr" slot-scope="text">
-          {{ returnDictText(text, openCardTypeList) }}
+          {{ returnTableText(text) }}
+        </div>
+        <div slot="phone" slot-scope="text">
+          {{ returnTableText(text) }}
+        </div>
+        <div slot="makeCardTypeStr" slot-scope="text">
+          {{ returnTableText(text) }}
         </div>
         <!-- <div slot="state" slot-scope="text, record">
             <template>
@@ -174,9 +183,10 @@ export default {
       tableColumns: [
         {
           title: '会员姓名',
-          dataIndex: 'name',
+          dataIndex: 'contentName',
           align: 'center',
-          width: 200
+          width: 200,
+          scopedSlots: { customRender: 'contentName' }
         },
         {
           title: '开卡员工',
@@ -204,6 +214,7 @@ export default {
           dataIndex: 'makeCardTimeStr',
           align: 'center',
           sortDirections: ['descend', 'ascend'],
+          scopedSlots: { customRender: 'makeCardTimeStr' },
           sorter: true,
           width: 200
         },
@@ -211,6 +222,7 @@ export default {
           title: '手机号',
           dataIndex: 'phone',
           align: 'center',
+          scopedSlots: { customRender: 'phone' },
           width: 200
         },
         {
@@ -269,13 +281,22 @@ export default {
       })
       this.getData()
     },
-    // 根据字典返回字段
-    returnDictText (text, array) {
-      const tempArray = array.filter(item => item.code === text)
-      return tempArray[0].name
-    },
+    // // 根据字典返回字段
+    // returnDictText (text, array) {
+    //   if (text) {
+    //     const tempArray = array.filter(item => item.code === text)
+    //     if (tempArray && tempArray.length !== 0) {
+    //       return tempArray[0].name
+    //     } else {
+    //       return '/'
+    //     }
+    //   } else {
+    //     return '/'
+    //   }
+    // },
     // 返回表格中的数据
     returnTableText (text) {
+      // console.log(text, 'text', info)
       const tempText = text || '/'
       return tempText
     },
@@ -306,7 +327,7 @@ export default {
       await getMemberListData(params).then(response => {
         this.tableLoading = false
         console.log(response, '获取员工积分列表')
-        this.tableData = response.data.list
+        this.tableDataList = response.data.list
         this.$set(this.tablePagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
           // 列表中没有数据
