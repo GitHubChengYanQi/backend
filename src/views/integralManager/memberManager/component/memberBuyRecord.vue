@@ -6,6 +6,7 @@
       :width="1400"
       centered
       :visible="buyRecordShowStatus"
+      :footer="null"
       class="buyRecordClass"
       @cancel="closeBuyRecord"
       :dialogStyle="dialogStyle"
@@ -23,13 +24,13 @@
         >
         </a-table>
       </a-spin>
-      <template slot="footer">
+      <!-- <template slot="footer">
         <a-button
           :disabled="modalLoadingStatus"
           @click="closeBuyRecord"
         >取消</a-button>
         <a-button type="primary" :disabled="modalLoadingStatus" @click="closeBuyRecord">确定</a-button>
-      </template>
+      </template> -->
     </a-modal>
   </div>
 </template>

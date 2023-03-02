@@ -140,7 +140,7 @@
           </div> -->
         <div slot="options" slot-scope="text, record">
           <template>
-            <div style="display: flex;justify-content: space-between;">
+            <div style="display: flex;justify-content: center;">
               <a-button type="link" @click="goRecord(record)" v-permission="`/memberCenterUser/pc/getConsumptionLogByPhone@get`">消费记录</a-button>
             </div>
           </template>
@@ -289,7 +289,7 @@ export default {
     // 返回表格中的数据
     returnTableText (text) {
       // console.log(text, 'text', info)
-      const tempText = text || '/'
+      const tempText = text || '-'
       return tempText
     },
     // 获取数据列表
