@@ -37,24 +37,13 @@
           </a-form-item>
         </a-col>
         <a-col :lg="6">
-          <a-form-item label="开卡方式:">
-            <a-select
-              :allowClear="true"
-              class="pickSelectClass"
-              placeholder="请选择"
-              v-model="screenData.makeCardType"
-            >
-              <a-select-option v-for="item in openCardTypeList" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6">
           <a-form-item label="开卡时间:">
-            <a-range-picker
+            <!-- <a-range-picker
               class="pickTimeClass"
               v-model="detailDateArray"
               :defaultPickerValue="defaultDateArray">
-            </a-range-picker>
+            </a-range-picker> -->
+            <a-range-picker class="pickTimeClass" v-model="detailDateArray" :format="defaultDateArray"></a-range-picker>
           </a-form-item>
         </a-col>
         <!-- <a-col :lg="6">
@@ -362,7 +351,7 @@ export default {
     goResetData () {
       this.$set(this.tablePagination, 'current', 1)
       this.screenData = {}
-      this.defaultDateArray = []
+      this.detailDateArray = []
       // this.screenData.employeeIdList
       this.$set(this.screenData, 'employeeIdList', [])
       this.getData()
