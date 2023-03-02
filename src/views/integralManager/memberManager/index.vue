@@ -102,7 +102,7 @@
             <div>{{ record.name }}</div>
             <div>{{ record.nickName }}</div>
           </div> -->
-        <div slot="contentName" slot-scope="text">
+        <div slot="name" slot-scope="text">
           {{ returnTableText(text) }}
         </div>
         <div slot="makeCardEmployeeName" slot-scope="text">
@@ -183,10 +183,10 @@ export default {
       tableColumns: [
         {
           title: '会员姓名',
-          dataIndex: 'contentName',
+          dataIndex: 'name',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'contentName' }
+          scopedSlots: { customRender: 'name' }
         },
         {
           title: '开卡员工',
