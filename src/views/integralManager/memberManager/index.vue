@@ -68,10 +68,12 @@
           type="primary"
           style="margin: 0 10px;"
           @click="goSearchData"
+          v-permission="`/memberCenterUser/pc/index@get`"
         >查询</a-button>
         <a-button
           style="margin-right: 10px;"
           @click="goResetData"
+          v-permission="`/memberCenterUser/pc/index@get`"
         >重置</a-button>
       </div>
     </a-form>
@@ -81,7 +83,7 @@
           {{ `共${tableDataList.length}个客户,已选择${selectedKeyList.length}个客户` }}
         </div>
         <div class="topRightDiv">
-          <a-button style="margin: 0 10px;" @click="exportData">导出Excel</a-button>
+          <a-button style="margin: 0 10px;" @click="exportData" v-permission="`/memberCenterUser/pc/excel@get`">导出Excel</a-button>
           <!-- <a-button style="margin: 0 10px;" @click="batchMakeTag" :disabled="selectedKeyList.length === 0">批量打标签</a-button>
           <a-button style="margin: 0 10px;" @click="batchRemoveTag" :disabled="selectedKeyList.length === 0">批量移除标签</a-button> -->
         </div>
@@ -136,7 +138,7 @@
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-between;">
-              <a-button type="link" @click="goRecord(record)">消费记录</a-button>
+              <a-button type="link" @click="goRecord(record)" v-permission="`/memberCenterUser/pc/getConsumptionLogByPhone@get`">消费记录</a-button>
             </div>
           </template>
         </div>
@@ -265,6 +267,7 @@ export default {
       await getDict(params).then(response => {
         this.openCardTypeList = response.data
       })
+      this.getData()
     },
     // 根据字典返回字段
     returnDictText (text, array) {
@@ -279,7 +282,7 @@ export default {
     // 获取数据列表
     async getData () {
       this.tableLoading = true
-      if (this.screenData.employeeIdList.length !== 0) {
+      if (this.screenData.employeeIdList && this.screenData.employeeIdList.length !== 0) {
         this.$set(this.screenData, 'makeCardEmployeeIdStr', this.screenData.employeeIdList.join(','))
       } else {
         this.$set(this.screenData, 'makeCardEmployeeIdStr', '')
