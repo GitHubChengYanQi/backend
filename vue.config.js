@@ -137,7 +137,7 @@ const vueConfig = {
         // target: 'https://testscrmapi.yifeijiankang.com/',
         // target: 'http://192.168.31.253:6007/',
         // target: 'http://172.16.0.207:6007/',
-        // target: 'http://192.168.31.18:6007/',
+        // target: 'http://192.168.31.43:6007/',
         // target: 'http://192.168.50.109:6007/', // 娄
         // target: 'http://192.168.31.18:6007/',
         // target: 'http://192.168.31.43:6007/',

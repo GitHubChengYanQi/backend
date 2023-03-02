@@ -2012,7 +2012,7 @@ export default {
       }
       form.validate(valid => {
         if (valid) {
-          console.log(22222,this.upLoadRes)
+          console.log(22222, this.upLoadRes)
           if (Object.keys(this.upLoadRes).length === 2) {
             const content = {
               ...this.upLoadRes,
