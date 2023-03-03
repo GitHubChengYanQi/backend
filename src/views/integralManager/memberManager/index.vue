@@ -20,7 +20,7 @@
               name="请选择员工"
               :changeId="true"
               :num="1"
-              v-model="screenData.employeeIdList"
+              v-model="employeeIdList"
             />
           </a-form-item>
         </a-col>
@@ -161,6 +161,8 @@ export default {
   name: 'BackendIndex',
   data () {
     return {
+      // 开卡员工选择数组
+      employeeIdList: [],
       // 当前选择的消费记录对象
       chooseRecordInfo: {},
       // 消费记录弹框显示状态
@@ -295,8 +297,8 @@ export default {
     // 获取数据列表
     async getData () {
       this.tableLoading = true
-      if (this.screenData.employeeIdList && this.screenData.employeeIdList.length !== 0) {
-        this.$set(this.screenData, 'makeCardEmployeeIdStr', this.screenData.employeeIdList.join(','))
+      if (this.employeeIdList && this.employeeIdList.length !== 0) {
+        this.$set(this.screenData, 'makeCardEmployeeIdStr', this.employeeIdList.join(','))
       } else {
         this.$set(this.screenData, 'makeCardEmployeeIdStr', '')
       }
@@ -356,7 +358,8 @@ export default {
       this.screenData = {}
       this.detailDateArray = []
       // this.screenData.employeeIdList
-      this.$set(this.screenData, 'employeeIdList', [])
+      // this.$set(this.screenData, 'employeeIdList', [])
+      this.employeeIdList = []
       this.getData()
     },
     // 导出会员列表
