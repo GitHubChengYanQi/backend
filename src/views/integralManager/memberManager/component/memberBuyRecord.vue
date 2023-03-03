@@ -3,7 +3,7 @@
     <a-modal
       title="消费记录"
       :maskClosable="false"
-      :width="1400"
+      :width="1700"
       centered
       :visible="buyRecordShowStatus"
       :footer="null"
@@ -22,6 +22,12 @@
           :scroll="{ x: 1500 }"
           @change="buyRecordHandleTableChange"
         >
+          <div slot="num" slot-scope="text">
+            {{ returnNumText(text) }}
+          </div>
+          <div slot="orderDateStr" slot-scope="text">
+            {{ returnDateText(text) }}
+          </div>
         </a-table>
       </a-spin>
       <!-- <template slot="footer">
@@ -37,12 +43,13 @@
 
 <script>
 import { getMemberBuyRecordData } from '@/api/member'
+import moment from 'moment'
 export default {
   name: 'MemberBuyRecord',
   data () {
     return {
       dialogStyle: {
-        left: '130px'
+        left: '10px'
       },
       modalLoadingStatus: false, // 弹框加载中显示状态
       // 消费记录弹框显示状态
@@ -77,7 +84,8 @@ export default {
           title: '数量',
           dataIndex: 'num',
           align: 'center',
-          width: 150
+          width: 150,
+          scopedSlots: { customRender: 'num' }
         },
         {
           title: '单位',
@@ -95,7 +103,8 @@ export default {
           title: '消费时间',
           dataIndex: 'orderDateStr',
           align: 'center',
-          width: 150
+          width: 150,
+          scopedSlots: { customRender: 'orderDateStr' }
         }
       ],
       // 消费记录弹框分页信息
@@ -138,6 +147,20 @@ export default {
     console.log('组件创建')
   },
   methods: {
+    // 返回表格中的数量
+    returnNumText (text) {
+      const tempText = text
+      const tempNum = parseInt(tempText)
+      if (tempText.indexOf('.') !== 0) {
+        return tempNum + '.' + tempText.split('.')[1]
+      } else {
+        return tempNum + '.0'
+      }
+    },
+    // 返回表格中的时间
+    returnDateText (text) {
+      return moment(text).format('YYYY-MM-DD HH:mm:ss')
+    },
     getDataList () {
       const params = {
         id: this.id,
