@@ -15,7 +15,7 @@
       <a-spin :spinning="modalLoadingStatus">
         <span>只显示最近3个月的消费记录</span>
         <a-table
-          :row-key="record => record.goodCode"
+          :row-key="record => record.id"
           :columns="buyRecordColumns"
           :data-source="buyRecordDataList"
           :pagination="buyRecordPagination"
@@ -188,6 +188,7 @@ export default {
     closeBuyRecord () {
       this.buyRecordShowStatus = false
       this.buyRecordDataList = []
+      this.buyRecordPagination.current = 1
       this.$emit('update:showStatus', this.buyRecordShowStatus)
     }
   }
