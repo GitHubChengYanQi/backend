@@ -153,7 +153,7 @@ export default {
       const tempText = text
       const tempNum = parseInt(tempText)
       if (tempText.indexOf('.') !== 0) {
-        return tempNum + '.' + tempText.split('.')[1]
+        return tempNum + '.' + tempText.split('.')[1].slice(0, 1)
       } else {
         return tempNum + '.0'
       }
