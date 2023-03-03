@@ -15,7 +15,7 @@
       <a-spin :spinning="modalLoadingStatus">
         <span>只显示最近3个月的消费记录</span>
         <a-table
-          :row-key="record => record.id"
+          :row-key="record => record.goodCode"
           :columns="buyRecordColumns"
           :data-source="buyRecordDataList"
           :pagination="buyRecordPagination"
@@ -114,7 +114,8 @@ export default {
         pageSize: 10,
         showSizeChanger: true,
         showQuickJumper: true,
-        pageSizeOptions: ['10', '20', '30', '50']
+        pageSizeOptions: ['10', '20', '30', '50'],
+        showTotal: (total, range) => `共${total}条数据 `
       }
     }
   },
