@@ -3,7 +3,7 @@
     <a-modal
       title="消费记录"
       :maskClosable="false"
-      :width="1400"
+      :width="1700"
       centered
       :visible="buyRecordShowStatus"
       :footer="null"
@@ -42,7 +42,7 @@ export default {
   data () {
     return {
       dialogStyle: {
-        left: '130px'
+        left: '10px'
       },
       modalLoadingStatus: false, // 弹框加载中显示状态
       // 消费记录弹框显示状态
