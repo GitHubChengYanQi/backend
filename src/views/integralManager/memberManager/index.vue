@@ -402,6 +402,9 @@ export default {
       //     this.$delete(this.screenData, `${key}`)
       //   }
       // }
+      if (current) {
+        this.selectedKeyList = []
+      }
       this.tablePagination.current = current
       this.tablePagination.pageSize = pageSize
       this.getData()
