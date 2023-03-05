@@ -1034,5 +1034,11 @@ export const routeList = {
     name: '员工积分',
     component: () => import('@/views/integralManager/customerIntegral/index'),
     meta: { title: '员工积分' }
+  },
+  '/memberManager/index': {
+    path: '/memberManager/index',
+    name: '会员列表',
+    component: () => import('@/views/integralManager/memberManager/index'),
+    meta: { title: '会员列表' }
   }
 }

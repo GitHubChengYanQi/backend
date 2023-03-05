@@ -43,7 +43,7 @@
             </div>
             <div class="item">
               <span class="label">年龄</span>
-              <span class="content">{{ basicData.ageNum || '-' }}</span>
+              <span class="content">{{ basicData.ageNum || returnAgeText() }}</span>
             </div>
             <div class="item" v-for="(item,index) in info" :key="index">
               <div
@@ -94,6 +94,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import stepNews from '@/components/StepNews/StepNews'
 import { track, editUserPortrait, saveUserInfoReq } from '@/api/workContact'
 import { deepClonev2 } from '@/utils/util'
@@ -133,6 +134,29 @@ export default {
     }
   },
   methods: {
+    returnAgeText () {
+      // 已认证, this.memberInfo.idCard
+      // this.memberInfo.idCard = '210103199403224514'
+      if (this.basicData.idCard) {
+        // 存在身份证号
+        const tempIdCardText = this.basicData.idCard
+        const tempBirthday = tempIdCardText.slice(6, 14)
+        const tempYear = tempBirthday.slice(0, 4)
+        const tempMonth = tempBirthday.slice(4, 6)
+        const tempDate = tempBirthday.slice(6, tempBirthday.length)
+        console.log(tempYear, tempMonth, tempDate)
+        const tempDateString = moment(tempYear + '/' + tempMonth + '/' + tempDate)
+        const currentDate = moment()
+        const duration = moment.duration(moment(currentDate).diff(tempDateString)).as('Y')
+        console.log(duration, '时长')
+        return parseInt(duration)
+      } else {
+        // 不存在身份证号,直接返回相应字段
+        // return this.infoDetail[text]
+        console.log('不存在身份证号')
+        return '-'
+      }
+    },
     getContactId () {
       if (this.$route.query.contactId !== undefined) {
         this.contactId = this.$route.query.contactId
