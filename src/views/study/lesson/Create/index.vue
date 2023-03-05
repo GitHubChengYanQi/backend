@@ -135,7 +135,7 @@ export default {
         if (`${data[i].value}` === `${value}`) {
           return [`${value}`]
         }
-        if (data[i].children.length > 0) {
+        if (data[i].children && data[i].children.length > 0) {
           const values = this.getParentValue(value, data[i].children)
           if (values.length > 0) {
             return [`${data[i].value}`, ...values]
