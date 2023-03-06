@@ -33,7 +33,7 @@
             </div>
             <div>
               <div class="number"><span class="num">{{ detail.nolearningStatusCount || 0 }}</span>人</div>
-              未学完
+              未学
             </div>
             <div>
               <div class="number"><span class="num">{{ detail.learningStatusCount || 0 }}</span>人</div>
