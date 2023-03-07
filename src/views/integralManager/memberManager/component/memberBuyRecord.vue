@@ -2,8 +2,7 @@
   <div id="buy_record_container" ref="buy_record_container" v-if="buyRecordShowStatus">
     <a-modal
       title="消费记录"
-      :maskClosable="false"
-      :width="1700"
+      :maskClosable="true"
       centered
       :visible="buyRecordShowStatus"
       :footer="null"
@@ -15,7 +14,7 @@
       <a-spin :spinning="modalLoadingStatus">
         <span>只显示最近3个月的消费记录</span>
         <a-table
-          :row-key="record => record.id"
+          :row-key="record => record.tempId"
           :columns="buyRecordColumns"
           :data-source="buyRecordDataList"
           :pagination="buyRecordPagination"
@@ -91,7 +90,7 @@ export default {
           title: '单位',
           dataIndex: 'unit',
           align: 'center',
-          width: 150
+          width: 100
         },
         {
           title: '消费门店',
@@ -171,12 +170,20 @@ export default {
       this.modalLoadingStatus = true
       getMemberBuyRecordData(params).then(response => {
         console.log(response, '获取群聊列表')
-        this.buyRecordDataList = response.data.list
+        this.buyRecordDataList = this.returnTempIdList(response.data.list)
         this.$set(this.buyRecordPagination, 'total', Number(response.data.page.total))
         this.modalLoadingStatus = false
       }).catch(() => {
         this.modalLoadingStatus = false
       })
+    },
+    returnTempIdList (array) {
+      let tempIndex = 1
+      const tempArray = array.map(item => {
+        item.tempId = tempIndex++
+        return item
+      })
+      return tempArray
     },
     // 消费记录列表分页信息
     buyRecordHandleTableChange ({ current, pageSize }) {
@@ -196,6 +203,14 @@ export default {
 </script>
 
   <style lang="less" scoped>
+  /deep/.buyRecordClass {
+    .ant-modal-wrap {
+      .ant-modal {
+        width: 90% !important;
+      }
+    }
+
+  }
   .filter-input-row {
     display: flex;
     flex-wrap: wrap;
