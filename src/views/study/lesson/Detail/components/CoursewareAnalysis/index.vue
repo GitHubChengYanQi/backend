@@ -308,7 +308,10 @@ export default {
       this.loading = false
     },
     handleTableChange ({ current, pageSize }, filters, sorter) {
-      this.sorter = sorter
+      this.sorter = sorter.order ? sorter : {
+        field: 'sort',
+        order: 'ascend'
+      }
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getTableData()
