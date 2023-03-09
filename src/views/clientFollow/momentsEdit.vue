@@ -542,12 +542,13 @@ export default {
         if (type === 'photo') {
           dom.onload = function () {
             // 图片原始尺寸
-            const originWidth = this.width
-            const originHeight = this.height
+            const originWidth = parseInt(this.width)
+            const originHeight = parseInt(this.height)
             // 最大尺寸限制
-            const maxWidth = 1440; const maxHeight = 1080
-            if (originWidth > maxWidth || originHeight > maxHeight) {
-              that.$message.warn(`${name} 图片过大，请选择1440*1080以下的图片`)
+            const maxWidth = 1440
+            const maxHeight = 1080
+            if (originWidth * originHeight > (maxWidth * maxHeight)) {
+              that.$message.warn(`${name} 图片过大，图片长*款总像素不能超过1555200`)
               resolve(false)
             } else {
               resolve(true)
