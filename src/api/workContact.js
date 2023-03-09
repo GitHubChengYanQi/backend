@@ -1,4 +1,12 @@
 import request from '@/utils/request'
+// 获取企微会员中心信息
+export function getQwMemberInfo (params) {
+  return request({
+    url: '/memberCenterUser/memberErpAuth',
+    method: 'get',
+    params
+  })
+}
 
 // 客户-客户详情-用户画像
 export function getUserPortrait (params) {

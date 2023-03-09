@@ -453,8 +453,17 @@ export default {
     goPage (e, item = {}) {
       console.log(e, item)
       if (e != 3) {
-        this.$router.push(`/interactionRadar/setRadar${e == 0 ? '' : '?id=' + item.id}`)
+        // 新建/修改
+        // this.$router.push(`/interactionRadar/setRadar${e == 0 ? '' : '?id=' + item.id}${this.catalogIndex === -1 ? '' : ('&catalogIndex=' + this.catalogIndex)}`)
+        this.$router.push({
+          path: '/interactionRadar/setRadar',
+          query: {
+            id: e === 0 ? '-1' : item.id,
+            catalogIndex: this.catalogIndex
+          }
+        })
       } else {
+        // 查看数据
         this.$router.push(`/interactionRadar/radarInfo?id=${item.id}`)
       }
     },
