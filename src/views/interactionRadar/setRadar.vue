@@ -555,7 +555,7 @@ export default {
             title: '雷达标题：',
             type: 'input',
             key: 'title',
-            fontNumber: 15
+            fontNumber: 25
           },
           {
             title: '选择分组：',
@@ -985,21 +985,29 @@ export default {
       })
     },
     getUrl () {
-      const object = {}
-      // 1.获取？后面的所有内容包括问号
-      const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
+      // const object = {}
+      // // 1.获取？后面的所有内容包括问号
+      // const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
 
-      // 2.截取？后面的字符
-      const urlData = url.substr(1)
-      // name=嘻嘻&hobby=追剧
-      if (urlData.length === 0) return
-      const strs = urlData.split('&')
-      for (let i = 0; i < strs.length; i++) {
-        object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      // // 2.截取？后面的字符
+      // const urlData = url.substr(1)
+      // // name=嘻嘻&hobby=追剧
+      // if (urlData.length === 0) return
+      // const strs = urlData.split('&')
+      // for (let i = 0; i < strs.length; i++) {
+      //   object[strs[i].split('=')[0]] = strs[i].split('=')[1]
+      // }
+      // if (!object.hasOwnProperty('id')) return
+      const currentId = this.$route.query.id
+      if (currentId === '-1') {
+
+      } else {
+        this.tableId = currentId
+        this.getInfo()
       }
-      if (!object.hasOwnProperty('id')) return
-      this.tableId = object.id
-      this.getInfo()
+      // debugger
+      // this.tableId = currentId === '-1' ? '' : currentId
+      // this.getInfo()
     },
     getInfo () {
       console.log(this.tableId)
@@ -1082,6 +1090,13 @@ export default {
         this.selectArr.channel = data.ditch
         if (data.ditch.length == 1) {
           this.setData.inputData.ditch = [data.ditch[0].id]
+        }
+        const catalogIndex = this.$route.query.catalogIndex
+        console.log(catalogIndex === '-1', '上页传入的catalogIndex')
+        if (catalogIndex === '-1') {
+
+        } else {
+          this.setData.inputData['unitId'] = Number(catalogIndex)
         }
       })
     },
