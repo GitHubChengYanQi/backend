@@ -1000,7 +1000,7 @@ export default {
       // if (!object.hasOwnProperty('id')) return
       const currentId = this.$route.query.id
       if (currentId === '-1') {
-        this.tableId = ''
+        this.tableId = '-1'
       } else {
         this.tableId = currentId
         this.getInfo()
