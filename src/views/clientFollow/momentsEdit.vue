@@ -542,8 +542,8 @@ export default {
         if (type === 'photo') {
           dom.onload = function () {
             // 图片原始尺寸
-            const originWidth = Number(this.width)
-            const originHeight = Number(this.height)
+            const originWidth = parseInt(this.width)
+            const originHeight = parseInt(this.height)
             // 最大尺寸限制
             const maxWidth = 1440
             const maxHeight = 1080

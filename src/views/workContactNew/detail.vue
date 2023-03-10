@@ -31,6 +31,9 @@
                 </div>
                 <div class="source mt4">@微信</div>
               </div>
+              <div class="infoContent" v-if="memberInfo.isAuth === '1'">
+                <div class="mt4">{{ `会员卡号:${memberInfo.memberNo}` }}</div>
+              </div>
             </div>
             <!--            <div class="right">-->
             <!--              <a-button type="primary" ghost @click="$refs.addEvent.show()">添加事件</a-button>-->
@@ -159,6 +162,7 @@ import selectTags from '@/components/addlabel/index'
 import personalTag from '@/views/workContactNew/components/personalTag'
 
 import {
+  getQwMemberInfo,
   getWorkContactInfo,
   // getStageManageList,
   updateStageManageList,
@@ -170,6 +174,8 @@ import {
 export default {
   data () {
     return {
+      // 会员中心对象
+      memberInfo: {},
       currentTab: '1',
       data: {
         contactCorpTag: [],
@@ -248,12 +254,20 @@ export default {
       this.$refs.info.setData(this.data.employees, userInfo)
       this.$refs.group.setData(this.data.roomName)
 
-      this.getStageManageData()
-
-      this.loading = false
+      // this.getStageManageData()
+      this.getMemberInfoData()
       // })
     },
-
+    // 获取企微会员信息
+    getMemberInfoData () {
+      const params = {
+        contactId: this.contactId
+      }
+      getQwMemberInfo(params).then(response => {
+        this.memberInfo = response.data
+        this.loading = false
+      })
+    },
     tagsEdit () {
       const ad = []
       this.data.contactCorpTag.forEach(i => {
@@ -378,10 +392,19 @@ export default {
 
   .left {
     align-items: start;
-
     .source {
       color: #5fc75d;
       font-size: 13px;
+    }
+    .infoContent {
+      margin-left: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .mt4 {
+        color: #5fc75d;
+        font-size: 13px;
+      }
     }
   }
 }

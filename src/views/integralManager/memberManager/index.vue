@@ -84,7 +84,7 @@
       </div>
       <a-table
         :loading="tableLoading"
-        :row-key="record => record.memberUserId"
+        :row-key="record => record.memberCardId"
         :data-source="tableDataList"
         :columns="tableColumns"
         :pagination="tablePagination"
@@ -364,7 +364,7 @@ export default {
     },
     // 导出会员列表
     exportData () {
-      this.$set(this.screenData, 'memberUserIdListStr', this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : '')
+      this.$set(this.screenData, 'memberCardIdListStr', this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : '')
       const params = {
         ...this.screenData,
         page: this.tablePagination.current,
