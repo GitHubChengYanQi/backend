@@ -927,9 +927,8 @@ export default {
     }
   },
   created () {
+    // this.getUrl()
     this.setType()
-    this.getUrl()
-    this.getFind()
   },
   computed: {
     dataListSelectionKeys () {
@@ -952,6 +951,50 @@ export default {
     }
   },
   methods: {
+    setType (isState = true) {
+      const { shape, contentSource } = this.setData.inputData
+      const { inputType, articleArr, inputData } = this.setData
+      const newInputType = inputType.concat(this.change[shape])
+      if (shape == 3) {
+        const articleType = newInputType.concat(articleArr[contentSource])
+        console.log(articleType)
+        this.$set(this.setData, 'changeType', articleType)
+      } else {
+        this.setData.inputData.contentSource = '0'
+        this.$set(this.setData, 'changeType', newInputType)
+      }
+      const resetArr = ['linkImg', 'radarLink', 'linkTitle', 'linkDigest', 'content', 'articleLink']
+      if (isState && inputData.shape != 5) {
+        if (this.source) {
+          this.source.cancel()
+          this.source = null
+        }
+        resetArr.map(item => {
+          this.setData.inputData[item] = ''
+        })
+      }
+      this.getFind()
+    },
+    async getFind () {
+      const obj = {}
+      await scrmRadarLabelFind(obj).then((res) => {
+        console.log(res)
+        const { data } = res
+        this.selectArr.grouping = data.group
+        this.selectArr.channel = data.ditch
+        if (data.ditch.length == 1) {
+          this.setData.inputData.ditch = [data.ditch[0].id]
+        }
+        const catalogIndex = this.$route.query.catalogIndex
+        console.log(catalogIndex === '-1', '上页传入的catalogIndex')
+        if (catalogIndex === '-1') {
+
+        } else {
+          this.setData.inputData['unitId'] = Number(catalogIndex)
+        }
+      })
+      this.getUrl()
+    },
     closeVideo (e) {
       this.$confirm({
         title: '提示',
@@ -984,7 +1027,7 @@ export default {
         }
       })
     },
-    getUrl () {
+    async getUrl () {
       // const object = {}
       // // 1.获取？后面的所有内容包括问号
       // const url = decodeURI(location.search) // ?name=嘻嘻&hobby=追剧
@@ -1003,7 +1046,7 @@ export default {
         this.tableId = '-1'
       } else {
         this.tableId = currentId
-        this.getInfo()
+        await this.getInfo()
       }
       // debugger
       // this.tableId = currentId === '-1' ? '' : currentId
@@ -1080,25 +1123,6 @@ export default {
       console.log(e)
       this.isShow = e == 1
       this.isShowKey = key
-    },
-    getFind () {
-      const obj = {}
-      scrmRadarLabelFind(obj).then((res) => {
-        console.log(res)
-        const { data } = res
-        this.selectArr.grouping = data.group
-        this.selectArr.channel = data.ditch
-        if (data.ditch.length == 1) {
-          this.setData.inputData.ditch = [data.ditch[0].id]
-        }
-        const catalogIndex = this.$route.query.catalogIndex
-        console.log(catalogIndex === '-1', '上页传入的catalogIndex')
-        if (catalogIndex === '-1') {
-
-        } else {
-          this.setData.inputData['unitId'] = Number(catalogIndex)
-        }
-      })
     },
     close (key) {
       this.setData.inputData[key] = ''
@@ -1440,29 +1464,6 @@ export default {
     editorChange (html) {
       // console.log(html)
       this.setData.inputData.content = html
-    },
-    setType (isState = true) {
-      const { shape, contentSource } = this.setData.inputData
-      const { inputType, articleArr, inputData } = this.setData
-      const newInputType = inputType.concat(this.change[shape])
-      if (shape == 3) {
-        const articleType = newInputType.concat(articleArr[contentSource])
-        console.log(articleType)
-        this.$set(this.setData, 'changeType', articleType)
-      } else {
-        this.setData.inputData.contentSource = '0'
-        this.$set(this.setData, 'changeType', newInputType)
-      }
-      const resetArr = ['linkImg', 'radarLink', 'linkTitle', 'linkDigest', 'content', 'articleLink']
-      if (isState && inputData.shape != 5) {
-        if (this.source) {
-          this.source.cancel()
-          this.source = null
-        }
-        resetArr.map(item => {
-          this.setData.inputData[item] = ''
-        })
-      }
     },
     searchMedium () {
       this.medium.pagination.current = 1
