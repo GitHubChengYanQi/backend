@@ -459,7 +459,7 @@ export default {
           path: '/interactionRadar/setRadar',
           query: {
             id: e === 0 ? '-1' : item.id,
-            catalogIndex: this.catalogIndex
+            catalogIndex: String(this.catalogIndex)
           }
         })
       } else {
