@@ -352,6 +352,22 @@
             <div class="search_box">
               <div class="hint">共有{{ medium.pagination.total }}个素材</div>
               <div class="seach">
+                <a-tree-select
+                  @change="changeSelectGroup"
+                  v-model="materialGroupId"
+                  class="treeSelectClass"
+                  :dropdown-style="{ maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }"
+                  placeholder="请选择分组"
+                  allow-clear
+                  tree-default-expand-all
+                  :replaceFields="{
+                    children:'children',
+                    title:'name',
+                    key:'id',
+                    value: 'id'
+                  }"
+                  :treeData="treeData">
+                </a-tree-select>
                 <a-input class="input" v-model="modelSearch" placeholder="输入要搜素的内容"></a-input>
                 <a-button type="primary" class="button" @click="searchMedium">搜索</a-button>
                 <a-button class="button" @click="resetMedium">清空</a-button>
@@ -536,7 +552,7 @@
 <script>
 import QuillEditor from './components/QuillEditor'
 import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
-import { materialLibraryList } from '@/api/mediumGroup'
+import { materialLibraryList, mediumGroup } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
 import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad, scrmRadarArticleGrab } from '@/api/setRadar.js'
@@ -546,6 +562,10 @@ export default {
   components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
   data () {
     return {
+      // 素材分组id
+      materialGroupId: null,
+      // 素材分组数据
+      treeData: [],
       oss: {},
       preview: false,
       isShow: false,
@@ -952,6 +972,18 @@ export default {
     }
   },
   methods: {
+    // 改变素材分组
+    changeSelectGroup (e) {
+      console.log(e, '切换素材分组')
+      this.getMedium()
+    },
+    // 获取素材分组列表
+    async getGroupList () {
+      await mediumGroup().then(res => {
+        this.treeData = res.data
+      })
+      this.getMedium()
+    },
     closeVideo (e) {
       this.$confirm({
         title: '提示',
@@ -1205,6 +1237,7 @@ export default {
         this.$router.push('/interactionRadar/index')
       })
     },
+    // 翻页
     handleTableChange ({ current, pageSize }) {
       this.medium.pagination.current = current
       this.medium.pagination.pageSize = pageSize
@@ -1464,10 +1497,12 @@ export default {
         })
       }
     },
+    // 搜索
     searchMedium () {
       this.medium.pagination.current = 1
       this.getMedium()
     },
+    // 重置
     resetMedium () {
       this.medium.pagination.current = 1
       this.medium.pagination.pageSize = 10
@@ -1480,7 +1515,8 @@ export default {
         page: current,
         perPage: pageSize,
         type: this.medium.type,
-        searchStr: this.modelSearch
+        searchStr: this.modelSearch,
+        mediumGroupId: this.materialGroupId === null ? '' : this.materialGroupId
       }
       materialLibraryList(obj).then((res) => {
         const { page, list } = res.data
@@ -1492,6 +1528,7 @@ export default {
         })
       })
     },
+    // 设置
     setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0) {
       this.isEditor = isEditor
       this.isUpload = false
@@ -1529,7 +1566,8 @@ export default {
       } else if (e == 3) {
         this.modelTab = 1
         this.isImageText = true
-        this.getMedium()
+        // 点击选择图文,先获取素材库分组
+        this.getGroupList()
       }
     }
   }
@@ -2198,13 +2236,17 @@ export default {
         .seach {
           display: flex;
           align-items: center;
+          .treeSelectClass {
+            width: 200px;
+            margin-right: 10px;
+          }
           .input {
             width: 165px;
-            height: 25px;
+            margin-right: 10px;
           }
           .button {
             width: auto;
-            height: 25px;
+            margin-right: 10px;
           }
         }
       }

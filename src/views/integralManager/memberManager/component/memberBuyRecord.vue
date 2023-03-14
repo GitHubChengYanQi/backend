@@ -169,7 +169,7 @@ export default {
       }
       this.modalLoadingStatus = true
       getMemberBuyRecordData(params).then(response => {
-        console.log(response, '获取群聊列表')
+        console.log(response, '获取消费列表')
         this.buyRecordDataList = this.returnTempIdList(response.data.list)
         this.$set(this.buyRecordPagination, 'total', Number(response.data.page.total))
         this.modalLoadingStatus = false
