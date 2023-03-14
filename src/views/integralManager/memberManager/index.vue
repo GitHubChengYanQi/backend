@@ -350,6 +350,7 @@ export default {
     // 查询数据
     goSearchData () {
       this.$set(this.tablePagination, 'current', 1)
+      this.selectedKeyList = []
       this.getData()
     },
     // 重置数据
@@ -360,6 +361,7 @@ export default {
       // this.screenData.employeeIdList
       // this.$set(this.screenData, 'employeeIdList', [])
       this.employeeIdList = []
+      this.selectedKeyList = []
       this.getData()
     },
     // 导出会员列表
