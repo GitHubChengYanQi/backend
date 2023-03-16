@@ -608,6 +608,8 @@ export default {
 
 .myLabelBox {
   width: 400px;
+  max-height: 20vh;
+  overflow: auto;
 
   span {
     margin-bottom: 10px;
