@@ -222,7 +222,7 @@ export default {
             if (record.status === 0 && record.task) {
               return '--'
             }
-            return record.examCount > 0 ? ((value + '') === '1' ? '通过' : '未通过') : '--'
+            return record.examCount > 0 ? ((value + '') === '1' || (value + '') === '3' ? '通过' : '未通过') : '--'
           }
         },
         {
