@@ -132,19 +132,28 @@
             <template>
               <div class="my-space">
                 <a-button
-                  class="warnButton"
+                  :disabled="record.edit === 0"
+                  :class="{warnButton:true,disabledButton:record.edit === 0}"
                   @click="() => $router.push(`/study/lesson/detail?courseId=${record.courseId}`)"
                 >
                   详情
                 </a-button>
                 <a-button
-                  class="successButton"
+                  :disabled="record.edit === 0"
+                  :class="{successButton:true,disabledButton:record.edit === 0}"
+                  class=""
                   @click="() => $router.push(`/study/lesson/create?id=${record.courseId}`)"
                 >
                   编辑
                 </a-button>
 
-                <a-button class="delButton" @click="deleteAttribute(record.courseId)">删除</a-button>
+                <a-button
+                  :disabled="record.edit === 0"
+                  :class="{delButton:true,disabledButton:record.edit === 0}"
+                  @click="deleteAttribute(record.courseId)"
+                >
+                  删除
+                </a-button>
               </div>
             </template>
           </div>
@@ -529,6 +538,15 @@ export default {
   border-radius: 8px;
 }
 
+.disabledButton {
+  color: rgba(0, 0, 0, 0.25);
+  background-color: #f5f5f5;
+  border: none;
+  height: auto;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
 .my-table-search {
   border-radius: 8px;
 
@@ -590,6 +608,8 @@ export default {
 
 .myLabelBox {
   width: 400px;
+  max-height: 20vh;
+  overflow: auto;
 
   span {
     margin-bottom: 10px;

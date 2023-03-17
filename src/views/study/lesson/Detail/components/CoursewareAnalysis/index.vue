@@ -258,6 +258,7 @@ export default {
       if (this.task) {
         courseTaskBindDetailExcelExport({
           ...data,
+          courseId: router.history.current.query.courseId,
           courseTaskId: router.history.current.query.courseTaskId
         }, params).then((res) => {
           excelExport(res, '课件分析数据导出.xlsx')
@@ -295,6 +296,7 @@ export default {
       if (this.task) {
         res = await courseTaskBindDetailList({
           ...data,
+          courseId: router.history.current.query.courseId,
           courseTaskId: router.history.current.query.courseTaskId
         }, params)
       } else {
