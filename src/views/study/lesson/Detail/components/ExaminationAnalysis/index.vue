@@ -258,6 +258,7 @@ export default {
             }
             return {
               ...item,
+              timeLimit: examResult.timeLimit,
               name: examResult.name,
               coverImageUrl: item.examResult && item.examResult.coverImageUrl,
               questionnaireResults: examResult.questionnaireResults,
