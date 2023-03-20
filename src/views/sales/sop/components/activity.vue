@@ -25,7 +25,8 @@
         </template>
       </div>
     </a-table>
-    <a-modal
+    <sopDataModal :showModal.sync="dataModalShow" :searchTypeInfo="sopDataSearchInfo"></sopDataModal>
+    <!-- <a-modal
       class="dataModalContainer"
       :getContainer="() => $refs['userSop_Page_Container']"
       :title="`SOP名称:${selectDataObj.sopName}`"
@@ -52,46 +53,51 @@
         >
         </a-table>
       </div>
-    </a-modal>
+    </a-modal> -->
   </div>
 </template>
 <script>
+import { deepClonev2 } from '@/utils/util'
+import sopDataModal from './sopDataModal.vue'
 import topHeader from './topHeader'
-import { getActivityList, delActivitySop, exportDataList, exportDataMethod } from '@/api/salers'
-import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import { getActivityList, delActivitySop } from '@/api/salers'
+// exportDataList, exportDataMethod
+// import { callDownLoadByBlob } from '@/utils/downloadUtil'
 export default {
   data () {
     return {
+      // 数据弹框传入对象
+      sopDataSearchInfo: {},
       tableLoading: false,
       dataModalShow: false, // 导出数据弹框是否显示
-      selectDataObj: {}, // 点击的导出数据对象
-      exportDataObj: {}, // 导出数据接口需要的对象
-      dataModalSearchVal: '', // 导出数据弹框模糊搜索
-      modalTableData: [], // 导出数据弹框中列表数据
-      // 导出数据列表表头
-      modalTableColumns: [
-        {
-          title: '员工姓名',
-          dataIndex: 'empName',
-          align: 'center',
-          width: 150,
-          all: true
-        },
-        {
-          title: '应发客户数',
-          dataIndex: 'suedNum',
-          align: 'center',
-          width: 150,
-          all: true
-        },
-        {
-          title: '未完成客户数',
-          dataIndex: 'outUnsentNum',
-          align: 'center',
-          width: 200,
-          all: true
-        }
-      ],
+      // selectDataObj: {}, // 点击的导出数据对象
+      // exportDataObj: {}, // 导出数据接口需要的对象
+      // dataModalSearchVal: '', // 导出数据弹框模糊搜索
+      // modalTableData: [], // 导出数据弹框中列表数据
+      // // 导出数据列表表头
+      // modalTableColumns: [
+      //   {
+      //     title: '员工姓名',
+      //     dataIndex: 'empName',
+      //     align: 'center',
+      //     width: 150,
+      //     all: true
+      //   },
+      //   {
+      //     title: '应发客户数',
+      //     dataIndex: 'suedNum',
+      //     align: 'center',
+      //     width: 150,
+      //     all: true
+      //   },
+      //   {
+      //     title: '未完成客户数',
+      //     dataIndex: 'outUnsentNum',
+      //     align: 'center',
+      //     width: 200,
+      //     all: true
+      //   }
+      // ],
       tablePagination: {},
       // 列表数据
       tableData: [],
@@ -173,7 +179,8 @@ export default {
     }
   },
   components: {
-    topHeader
+    topHeader,
+    sopDataModal
   },
   created () {
     const tempPageIndex = sessionStorage.getItem('activityPage')
@@ -189,46 +196,19 @@ export default {
   methods: {
     // 去获取导出的数据列表
     goExportData (record) {
-      this.dataModalShow = true
+      // this.sopDataSearchInfo = {}
       console.log(record, '导出数据传递的参数')
-      this.$set(this.exportDataObj, 'sopId', record.id)
-      this.$set(this.exportDataObj, 'sopType', 'Activity')
-      this.$set(this.selectDataObj, 'sopName', record.sopName)
-      this.$set(this.exportDataObj, 'sendEmpName', '')
-      this.commonMethod()
-      // this.$set(this.exportDataObj, 'sendEmpName', record.id)
-      // const params = {
-      //   sopId: record.id,
-      //   sopType: 'Regular',
-      //   sendEmpName: ''
-      // }
-    },
-    // 公共的请求
-    commonMethod () {
-      exportDataList(this.exportDataObj).then(response => {
-        console.log(response, '获取导出数据')
-        this.modalTableData = response.data
-      })
-    },
-    // 导出当前数据
-    exportData () {
-      if (this.modalTableData.length != 0) {
-        exportDataMethod(this.exportDataObj).then(response => {
-          // console.log(response, '点击导出')
-          callDownLoadByBlob(response, '导出数据记录')
-        })
-      } else {
-        this.$message.warning('当前没有数据可导出')
-      }
+      const tempInfo = {}
+      this.$set(tempInfo, 'sopId', record.id)
+      this.$set(tempInfo, 'sopType', 'Activity')
+      this.$set(tempInfo, 'sopName', record.sopName)
+      this.$set(tempInfo, 'sendEmpName', '')
+      this.sopDataSearchInfo = deepClonev2(tempInfo)
+      this.dataModalShow = true
     },
     // 关闭导出数据弹框
     closeDataModal () {
-      this.dataModalShow = false
-    },
-    // 数据模糊搜索
-    dataModalSearch () {
-      console.log(this.exportDataObj, '添加模糊搜索后的对象')
-      this.commonMethod()
+      // this.dataModalShow = false
     },
     // 切换数据
     getChangeList ({ current, pageSize }) {
