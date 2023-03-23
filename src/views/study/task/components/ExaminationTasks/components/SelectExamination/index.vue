@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-button type="primary" style="border-radius: 8px" class="add" @click="visible = true">
+    <a-button type="primary" style="border-radius: 8px" class="add" @click="visible = true;examination=[]">
       创建任务
     </a-button>
     <a-modal
