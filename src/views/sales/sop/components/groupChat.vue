@@ -210,7 +210,7 @@ export default {
         pageSize: 10,
         showSizeChanger: true,
         showQuickJumper: true,
-        pageSizeOptions: ['10', '20', '30', '50']
+        pageSizeOptions: ['10', '20', '30', '50', '100', '200']
       }
     }
   },
