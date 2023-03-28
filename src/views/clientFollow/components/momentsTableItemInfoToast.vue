@@ -170,8 +170,9 @@ export default {
       }
       if (expstatus) {
         obj.expstatus = expstatus
+        console.log(this.detailObj, '导出前')
         obj.totalPeopleNum = `全部人数${this.detailObj.total ? this.detailObj.total : 0}`
-        obj.finishedPeopleNum = `已完成人数${this.detailObj.doneNu ? this.detailObj.doneNu : 0}`
+        obj.finishedPeopleNum = `已完成人数${this.detailObj.doneNum ? this.detailObj.doneNum : 0}`
         obj.unFinishedPeopleNum = `未完成人数${this.detailObj.unfinishNum ? this.detailObj.unfinishNum : 0}`
         obj.percentageComplete = `完成率${this.detailObj.completion_rates}`
         obj.finishedInformation = `员工完成情况${this.detailObj.emp_comple}`
