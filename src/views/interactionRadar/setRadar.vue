@@ -1527,7 +1527,6 @@ export default {
           return item
         })
         this.medium.data = tempArray.filter(item => {
-          debugger
           const fileFixArray = item.content.fileName.split('.')
           const fileFix = fileFixArray[fileFixArray.length - 1]
           if (fileFix === 'pdf') {
