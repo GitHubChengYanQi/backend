@@ -1522,9 +1522,17 @@ export default {
         const { page, list } = res.data
         console.log(res)
         this.medium.pagination.total = page.total
-        this.medium.data = list.map((item) => {
+        const tempArray = list.map((item) => {
           item.title = item.content.title
           return item
+        })
+        this.medium.data = tempArray.filter(item => {
+          debugger
+          const fileFixArray = item.content.fileName.split('.')
+          const fileFix = fileFixArray[fileFixArray.length - 1]
+          if (fileFix === 'pdf') {
+            return item
+          }
         })
       })
     },
