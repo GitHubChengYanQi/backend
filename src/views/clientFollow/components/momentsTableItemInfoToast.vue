@@ -170,6 +170,14 @@ export default {
       }
       if (expstatus) {
         obj.expstatus = expstatus
+        obj.totalPeopleNum = this.detailObj.total
+        obj.finishedPeopleNum = this.detailObj.doneNu
+        obj.unFinishedPeopleNum = this.detailObj.unfinishNum
+        obj.percentageComplete = this.detailObj.completion_rates
+        obj.finishedInformation = this.detailObj.emp_comple
+        obj.sendCustomerInformation = this.detailObj.contact_comple
+        obj.customerThumbsUpNum = this.detailObj.like_num
+        obj.customerReviewNum = this.detailObj.comment_num
         const data = await momentsListItemExportReq(obj)
         callDownLoadByBlob(data, '朋友圈任务详细列表')
       } else {

@@ -668,7 +668,7 @@ export default {
               title: '链接标题：',
               type: 'input',
               key: 'linkTitle',
-              fontNumber: 15
+              fontNumber: 25
             },
             {
               title: '链接摘要：',
@@ -744,7 +744,7 @@ export default {
             title: '链接标题：',
             type: 'input',
             key: 'linkTitle',
-            fontNumber: 15
+            fontNumber: 25
           },
           {
             title: '链接摘要：',
@@ -782,7 +782,7 @@ export default {
             title: '链接标题：',
             type: 'input',
             key: 'linkTitle',
-            fontNumber: 15
+            fontNumber: 25
           },
           {
             title: '链接摘要：',
@@ -808,7 +808,7 @@ export default {
           title: '链接标题：',
           type: 'input',
           key: 'linkTitle',
-          fontNumber: 15
+          fontNumber: 25
         },
         {
           title: '链接摘要：',

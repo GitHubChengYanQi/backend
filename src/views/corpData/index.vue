@@ -61,7 +61,7 @@
         </div>
         <div class="chart-box">
           <p>
-            实施概况
+            实时概况
             <span>更新时间：{{ updateTime }}</span>
           </p>
           <div class="chart-data">
