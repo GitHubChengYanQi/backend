@@ -152,7 +152,7 @@
       <div class="my-space">
         <a-icon type="exclamation-circle" theme="filled" style="color: red;font-size: 24px;" />
         <div>
-          删除该分类后，分类下的子分类及创建的课程列表都会被删除确定删除“{{ delClass.title }}”分类吗?
+          删除该分类后，分类下的子分类会被删除。确定删除“{{ delClass.title }}”分类吗?
         </div>
       </div>
     </a-modal>
