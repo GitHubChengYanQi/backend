@@ -719,8 +719,8 @@ export default {
         grouping: [],
         channel: [],
         sourceType: [
-          { code: '0', name: '素材库' },
-          { code: '1', name: '公众号' },
+          { code: '0', name: '图文素材' },
+          { code: '1', name: '公众号文章' },
           { code: '2', name: '新建' }
         ],
         videoType: [
