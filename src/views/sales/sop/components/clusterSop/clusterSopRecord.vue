@@ -126,6 +126,18 @@
         :customRow="rowClick"
         :rowClassName="setRowClassName"
         @change="handleTableChange">
+        <div slot="clusterName" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
+        <div slot="clusterOwnerName" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
+        <div slot="sopName" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
+        <div slot="createdAt" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
         <div slot="options" slot-scope="text, record">
           <template>
             <div style="display: flex;justify-content: space-around;">
@@ -216,19 +228,22 @@ export default {
           title: '群名称',
           dataIndex: 'clusterName',
           align: 'center',
-          width: 100
+          width: 100,
+          scopedSlots: { customRender: 'clusterName' }
         },
         {
           title: '群主',
           dataIndex: 'clusterOwnerName',
           align: 'center',
-          width: 100
+          width: 100,
+          scopedSlots: { customRender: 'clusterOwnerName' }
         },
         {
           title: 'SOP名称',
           dataIndex: 'sopName',
           align: 'center',
-          width: 100
+          width: 100,
+          scopedSlots: { customRender: 'sopName' }
         },
         {
           title: '创建时间',
@@ -236,7 +251,8 @@ export default {
           align: 'center',
           sorter: true,
           sortDirections: ['descend', 'ascend'],
-          width: 100
+          width: 100,
+          scopedSlots: { customRender: 'createdAt' }
         },
         {
           title: '任务状态',
