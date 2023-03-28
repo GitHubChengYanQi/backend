@@ -170,14 +170,14 @@ export default {
       }
       if (expstatus) {
         obj.expstatus = expstatus
-        obj.totalPeopleNum = this.detailObj.total
-        obj.finishedPeopleNum = this.detailObj.doneNu
-        obj.unFinishedPeopleNum = this.detailObj.unfinishNum
-        obj.percentageComplete = this.detailObj.completion_rates
-        obj.finishedInformation = this.detailObj.emp_comple
-        obj.sendCustomerInformation = this.detailObj.contact_comple
-        obj.customerThumbsUpNum = this.detailObj.like_num
-        obj.customerReviewNum = this.detailObj.comment_num
+        obj.totalPeopleNum = `全部人数${this.detailObj.total ? this.detailObj.total : 0}`
+        obj.finishedPeopleNum = `已完成人数${this.detailObj.doneNu ? this.detailObj.doneNu : 0}`
+        obj.unFinishedPeopleNum = `未完成人数${this.detailObj.unfinishNum ? this.detailObj.unfinishNum : 0}`
+        obj.percentageComplete = `完成率${this.detailObj.completion_rates}`
+        obj.finishedInformation = `员工完成情况${this.detailObj.emp_comple}`
+        obj.sendCustomerInformation = `发送客户情况${this.detailObj.contact_comple}`
+        obj.customerThumbsUpNum = `客户点赞数${this.detailObj.like_num ? this.detailObj.like_num : 0}`
+        obj.customerReviewNum = `客户评论数${this.detailObj.comment_num ? this.detailObj.comment_num : 0}`
         const data = await momentsListItemExportReq(obj)
         callDownLoadByBlob(data, '朋友圈任务详细列表')
       } else {
