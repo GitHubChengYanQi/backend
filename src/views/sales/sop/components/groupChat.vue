@@ -75,6 +75,12 @@
           :scroll="{ x: 1500 }"
           @change="groupChatHandleTableChange"
         >
+          <div slot="roomName" slot-scope="text">
+            {{ text ? text : '-' }}
+          </div>
+          <div slot="ownerName" slot-scope="text">
+            {{ text ? text : '-' }}
+          </div>
           <div slot="tagListStr" slot-scope="text">
             <a-popover title="群标签" v-if="text !== ''">
               <template slot="content">
@@ -167,13 +173,15 @@ export default {
           title: '群名称',
           dataIndex: 'roomName',
           align: 'center',
-          width: 150
+          width: 150,
+          scopedSlots: { customRender: 'roomName' }
         },
         {
           title: '群主',
           dataIndex: 'ownerName',
           align: 'center',
-          width: 150
+          width: 150,
+          scopedSlots: { customRender: 'ownerName' }
         },
         {
           title: '创建时间',
