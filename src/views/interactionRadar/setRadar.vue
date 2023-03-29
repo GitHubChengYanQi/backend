@@ -1507,6 +1507,7 @@ export default {
       this.medium.pagination.current = 1
       this.medium.pagination.pageSize = 10
       this.modelSearch = ''
+      this.materialGroupId = ''
       this.getMedium()
     },
     getMedium () {
@@ -1522,16 +1523,9 @@ export default {
         const { page, list } = res.data
         console.log(res)
         this.medium.pagination.total = page.total
-        const tempArray = list.map((item) => {
+        this.medium.data = list.map((item) => {
           item.title = item.content.title
           return item
-        })
-        this.medium.data = tempArray.filter(item => {
-          const fileFixArray = item.content.fileName.split('.')
-          const fileFix = fileFixArray[fileFixArray.length - 1]
-          if (fileFix === 'pdf') {
-            return item
-          }
         })
       })
     },
@@ -1574,8 +1568,9 @@ export default {
         this.modelTab = 1
         this.isImageText = true
         // 点击选择图文,先获取素材库分组
-        this.getGroupList()
+        // this.getGroupList()
       }
+      this.getGroupList()
     }
   }
 }
