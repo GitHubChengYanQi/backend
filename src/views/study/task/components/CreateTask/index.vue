@@ -16,6 +16,7 @@
       <a-form-item label="限定时长">
         <TimeLimit
           v-decorator="['timeLimit', { initialValue: [] }]"
+          @dateType="dateType"
         >
         </TimeLimit>
       </a-form-item>
@@ -45,13 +46,21 @@ export default {
   components: { Employee, TimeLimit },
   data () {
     return {
+      type: 0,
       form: this.$form.createForm(this, { name: 'coordinated' })
     }
   },
   methods: {
+    dateType (type) {
+      this.type = type
+    },
     submit () {
       this.form.validateFields((err, values) => {
         if (!err) {
+          if (this.type === 1 && values.timeLimit.length <= 0) {
+            message.warn('请选择限定时长！')
+            return
+          }
           this.$emit('onSubmit', values)
         } else {
           message.warn('请检查必填项！')

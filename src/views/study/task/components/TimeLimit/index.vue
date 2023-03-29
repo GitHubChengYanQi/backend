@@ -46,6 +46,7 @@ export default {
       }
     },
     change ({ target: { value } }) {
+      this.$emit('dateType', value)
       this.time = []
       this.$emit('change', [])
     }

@@ -293,17 +293,17 @@ export default {
       })
     },
     switchChange (checked) {
+      if (!checked) {
+        return
+      }
       setTimeout(() => {
         const questions = this.form.getFieldValue('questions')
         this.form.setFieldsValue({
           questions: questions.map((item, index) => {
-            if (index === questions.length - 1) {
-              return {
-                ...item,
-                fen: checked ? this.number : 0
-              }
+            return {
+              ...item,
+              fen: this.number
             }
-            return item
           })
         })
         this.count()
