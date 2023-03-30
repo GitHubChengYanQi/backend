@@ -256,7 +256,7 @@ export default {
         keyName
       }
       if (keyName == '患教') {
-        this.visible2 = true
+        // this.visible2 = true
       } else {
         this.visible1 = true
       }
