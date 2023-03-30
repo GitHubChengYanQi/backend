@@ -45,6 +45,9 @@
       class="tableBox"
       :scroll="{ x: 1500}"
       @change="handleTableChange">
+      <div slot="employeeName" slot-scope="text">
+        {{ text ? text : '-' }}
+      </div>
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: space-around;">
@@ -206,7 +209,8 @@ export default {
           title: '员工名称',
           dataIndex: 'employeeName',
           align: 'center',
-          width: 200
+          width: 200,
+          scopedSlots: { customRender: 'employeeName' }
         },
         {
           title: '积分余额',
