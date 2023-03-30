@@ -234,10 +234,14 @@ export default {
     this.getDicData('sop_contact_type')
   },
   watch: {
-    employeeIds () {
+    employeeIds (newValue, oldValue) {
       console.log(this.employeeIds, '监听选择执行员工')
       this.$set(this.addInfo, 'empIds', this.employeeIds.join(','))
-      this.getActivityPersonData()
+      if (newValue.length === 0) {
+        this.addInfo.predictNum = 0
+      } else {
+        this.getActivityPersonData()
+      }
     },
     'addInfo.sopName' (e) {
       if (e && e.length > 18) {
@@ -293,6 +297,7 @@ export default {
         // 选择筛选类型
         this.setDefaultCustomerMethod()
       }
+      this.addInfo.predictNum = 0
       // 自动获取群发活动预计人数
       this.getActivityPersonData()
     },
@@ -510,6 +515,7 @@ export default {
         return item
       })
       this.$set(this.addInfo, 'listSearchInfo', tempArray)
+      this.addInfo.predictNum = 0
       // 自动获取群发活动预计人数
       this.getActivityPersonData()
     },
@@ -525,6 +531,7 @@ export default {
       // tempInfo.listSearchInfo[bigIndex].vals = ''
       // tempInfo.listSearchInfo[bigIndex].tagsList = []
       this.addInfo = Object.assign({}, tempInfo)
+      this.addInfo.predictNum = 0
       // 自动获取群发活动预计人数
       this.getActivityPersonData()
     },
@@ -539,6 +546,7 @@ export default {
         // this.$set(this.addInfo.listSearchInfo, `${index}`, this.addInfo.listSearchInfo[index])
       }
       this.$set(this.addInfo, 'listSearchInfo', this.addInfo.listSearchInfo)
+      this.addInfo.predictNum = 0
       // 自动获取群发活动预计人数
       this.getActivityPersonData()
     },
@@ -546,6 +554,7 @@ export default {
     changeCustomer (val) {
       this.isSopEdit = true
       console.log(val, '切换客户类型')
+      this.addInfo.predictNum = 0
       // 自动获取群发活动预计人数
       this.getActivityPersonData()
     },
@@ -570,6 +579,7 @@ export default {
         this.$set(this.addInfo, 'listSearchInfo', tempArray)
         // console.log(this.addInfo.andOrType, '当前的逻辑类型', this.logicalList, '当前逻辑数组中的内容')
       }
+      this.addInfo.predictNum = 0
       // 自动获取群发活动预计人数
       this.getActivityPersonData()
     },

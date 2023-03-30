@@ -168,10 +168,20 @@ export default {
     this.getDicData('sop_contact_type')
   },
   watch: {
-    employeeIds () {
-      console.log(this.employeeIds, '监听选择执行员工')
+    employeeIds (newValue, oldValue) {
+      console.log(this.employeeIds, '监听选择执行员工', newValue, oldValue)
+      // debugger
       this.$set(this.addInfo, 'empIds', this.employeeIds.join(','))
-      this.getGeneralPersonData()
+      if (oldValue.length === 0) {
+        // 之前无数据
+        // this.getGeneralPersonData()
+      } else if (newValue.length !== 0) {
+        // 之前有数据
+        this.getGeneralPersonData()
+      }
+      if (newValue.length === 0) {
+        this.addInfo.predictNum = 0
+      }
     },
     'addInfo.sopName' (e) {
       if (e && e.length > 18) {
@@ -232,6 +242,7 @@ export default {
       this.isSopEdit = true
       this.$set(this.addInfo, 'searchLableId', '')
       this.selectTagList = []
+      this.addInfo.predictNum = 0
       this.getGeneralPersonData()
     },
     // 获取标签列表
