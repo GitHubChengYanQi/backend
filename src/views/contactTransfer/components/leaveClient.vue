@@ -64,7 +64,7 @@
           </div>
         </div>
         <a-table
-          rowKey="contactWxId"
+          rowKey="id"
           :loading="loading"
           :columns="columns"
           :data-source="tableData"
@@ -208,6 +208,7 @@ export default {
         this.loading = false
         this.tableData = res.data.list
         this.pagination.total = res.data.page.total
+        console.log(11111)
       })
     },
     /**
