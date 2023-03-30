@@ -161,6 +161,7 @@ export default {
     //   }
     // },
     async getTableList (expstatus) {
+      const that = this
       const { current, pageSize } = this.pagination
       const obj = {
         moment_id: this.momentId,
@@ -179,8 +180,24 @@ export default {
         obj.sendCustomerInformation = `发送客户情况${this.detailObj.contact_comple}`
         obj.customerThumbsUpNum = `客户点赞数${this.detailObj.like_num ? this.detailObj.like_num : 0}`
         obj.customerReviewNum = `客户评论数${this.detailObj.comment_num ? this.detailObj.comment_num : 0}`
-        const data = await momentsListItemExportReq(obj)
-        callDownLoadByBlob(data, '朋友圈任务详细列表')
+        momentsListItemExportReq(obj).then(response => {
+          console.log(response, 'response')
+          callDownLoadByBlob(response, '朋友圈任务详细列表')
+        }).catch(error => {
+          const errorFileReader = new FileReader()
+          errorFileReader.readAsText(error.response.data)
+          errorFileReader.onload = function () {
+            try {
+              const resErrorData = JSON.parse(errorFileReader.result)
+              console.log(resErrorData, '请求失败得到处理后的参数')
+              that.$message.error(resErrorData.msg)
+            } catch (error) {
+              console.log(error, 'error')
+            }
+          }
+        })
+        // console.log(data, 'data')
+        // debugger
       } else {
         const { data } = await getMomentsItemListReq(obj)
         this.tableData = data.datas
