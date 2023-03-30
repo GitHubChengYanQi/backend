@@ -55,23 +55,25 @@
           format="YYYY-MM-DD HH:mm"
           @change="searchDateChange" />
       </div>
-      <a-button
-        type="primary"
-        @click="() => {
-          this.pagination.current = 1
-          getTableList()
-        }">查询</a-button>
-      <a-button
-        style="margin-left: 10px;"
-        @click="() => {
-          this.searchObj = {
-            employeeIds: [],
-            name: '',
-            date: [],
-            labels: [],
-            tagMatchType: '1'
-          }; this.getTableList()
-        }">重置</a-button>
+      <div class="searchItem">
+        <a-button
+          type="primary"
+          @click="() => {
+            this.pagination.current = 1
+            getTableList()
+          }">查询</a-button>
+        <a-button
+          style="margin-left: 10px;"
+          @click="() => {
+            this.searchObj = {
+              employeeIds: [],
+              name: '',
+              date: [],
+              labels: [],
+              tagMatchType: '1'
+            }; this.getTableList()
+          }">重置</a-button>
+      </div>
     </div>
     <div class="tableBox">
       <div class="previewBar">
