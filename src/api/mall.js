@@ -165,11 +165,11 @@ export function combinList (params) {
 /**
  * 删除联合用药
  */
-export function deleteCombin (params) {
+export function deleteCombin (data) {
   return request({
     url: '/drugCombination/delete',
     method: 'delete',
-    params
+    data
   })
 }
 /**

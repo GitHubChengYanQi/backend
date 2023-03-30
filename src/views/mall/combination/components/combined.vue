@@ -342,7 +342,10 @@ export default {
           content: '是否确认删除？',
           icon: () => null,
           onOk: () => {
-            deleteCombin(record.id).then(() => {
+            const tempInfo = {
+              id: record.id
+            }
+            deleteCombin(tempInfo).then(() => {
               this.getTableData()
             })
           }
