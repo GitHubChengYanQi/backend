@@ -80,7 +80,8 @@
         <div class="lef">
           <span class="total">共{{ pagination.total }}个群聊</span>
           <span class="select">已选择{{ selectedTableRowKeys.length }}个群聊</span>
-          <span class="refresh" @click="getTableList()">更新数据</span>
+          <!-- <span class="refresh" @click="getTableList()">更新数据</span> -->
+          <span class="refresh" @click="updateData">更新数据</span>
         </div>
         <div class="rig">
           <!-- class='btn' -->
@@ -317,6 +318,10 @@ export default {
     this.getTableList()
   },
   methods: {
+    updateData () {
+      this.$message.info('更新数据')
+      this.getTableList()
+    },
     searchDateChange (_, values) {
       this.searchObj.date = values
     },
