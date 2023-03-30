@@ -81,7 +81,7 @@
           <span class="total">共{{ pagination.total }}个群聊</span>
           <span class="select">已选择{{ selectedTableRowKeys.length }}个群聊</span>
           <!-- <span class="refresh" @click="getTableList()">更新数据</span> -->
-          <span class="refresh" @click="updateData">更新数据</span>
+          <span class="refresh" @click="updateRoomData" v-permission="'/workRoom/syn@put'">更新数据</span>
         </div>
         <div class="rig">
           <!-- class='btn' -->
@@ -98,6 +98,18 @@
         :pagination="pagination"
         :row-selection="{ selectedRowKeys: selectedTableRowKeys, onChange: onSelectTableItemChange }"
         @change="handleTableChange">
+        <div slot="roomName" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
+        <div slot="ownerName" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
+        <div slot="departName" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
+        <div slot="parentDepart" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
         <div slot="groupLabels" slot-scope="text" class="groupLabels">
           <div class="labelItem" v-for="(item, index) in text" :key="index">
             {{ item }}
@@ -158,7 +170,7 @@
 import GroupTags from '../components/tags.vue'
 import { getSearchGroupNameOptionsListReq, batchSetTagsReq, batchRemoveTagsReq, groupListExportReq, getListItemSettingInfoReq, saveListItemSettingInfoReq } from '@/api/groupsOperation'
 import { debounce, trasnfromOptions } from '../groupUtils'
-import { workRoomList } from '@/api/workRoom'
+import { workRoomList, synList } from '@/api/workRoom'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
 
 export default {
@@ -195,25 +207,29 @@ export default {
           title: '群名称',
           width: 120,
           dataIndex: 'roomName',
-          align: 'center'
+          align: 'center',
+          scopedSlots: { customRender: 'roomName' }
         },
         {
           title: '群主',
           width: 120,
           align: 'center',
-          dataIndex: 'ownerName'
+          dataIndex: 'ownerName',
+          scopedSlots: { customRender: 'ownerName' }
         },
         {
           title: '所属门店',
           width: 120,
           align: 'center',
-          dataIndex: 'departName'
+          dataIndex: 'departName',
+          scopedSlots: { customRender: 'departName' }
         },
         {
           title: '所属机构',
           width: 120,
           align: 'center',
-          dataIndex: 'parentDepart'
+          dataIndex: 'parentDepart',
+          scopedSlots: { customRender: 'parentDepart' }
         },
         {
           title: '创建时间',
@@ -318,9 +334,12 @@ export default {
     this.getTableList()
   },
   methods: {
-    updateData () {
-      this.$message.info('更新数据')
-      this.getTableList()
+    // 同步群数据
+    updateRoomData () {
+      synList().then(response => {
+        console.log(response)
+        this.$message.info('更新数据')
+      })
     },
     searchDateChange (_, values) {
       this.searchObj.date = values
