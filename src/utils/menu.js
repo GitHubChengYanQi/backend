@@ -138,7 +138,7 @@ export function setBreadcrumb (path, data) {
       returnPath: '/groupsOperation/joinGroupSaying/index'
     },
     21: {
-      path: ['/interactionRadar/setRadar', '/interactionRadar/radarInfo'],
+      path: ['/interactionRadar/setRadar', '/interactionRadar/radarInfo', '/interactionRadar/editRadar'],
       returnPath: '/interactionRadar/index'
     },
     22: {
@@ -165,12 +165,12 @@ export function setBreadcrumb (path, data) {
     path: '/riskEarlyWarning/creatingScoringTemplate', // 需要改变面包屑的地址
     title: '编辑评分模型', // 改变的名称
     key: 'id'// 根据参数
-  }, {
-    path: '/interactionRadar/setRadar', // 需要改变面包屑的地址
-    title: '修改互动雷达', // 改变的名称
-    key: 'id'// 根据参数
   }]
-
+  // {
+  //   path: '/interactionRadar/setRadar', // 需要改变面包屑的地址
+  //   title: '修改互动雷达', // 改变的名称
+  //   key: 'id'// 根据参数
+  // }
   // 无需匹配地址  直接获取上一个全路径自动back
   const backList = ['/healthManage/patientDetails', '/healthManage/patientDetails1', '/workContact/contactFieldPivot', '/contactTransfer/resignAllotRecord', '/contactTransfer/workAllotRecord']
   sideMenus.find((item) => {
