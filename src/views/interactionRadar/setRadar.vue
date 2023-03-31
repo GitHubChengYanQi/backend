@@ -668,7 +668,7 @@ export default {
               title: '链接标题：',
               type: 'input',
               key: 'linkTitle',
-              fontNumber: 15
+              fontNumber: 25
             },
             {
               title: '链接摘要：',
@@ -719,8 +719,8 @@ export default {
         grouping: [],
         channel: [],
         sourceType: [
-          { code: '0', name: '素材库' },
-          { code: '1', name: '公众号' },
+          { code: '0', name: '图文素材' },
+          { code: '1', name: '公众号文章' },
           { code: '2', name: '新建' }
         ],
         videoType: [
@@ -744,7 +744,7 @@ export default {
             title: '链接标题：',
             type: 'input',
             key: 'linkTitle',
-            fontNumber: 15
+            fontNumber: 25
           },
           {
             title: '链接摘要：',
@@ -782,7 +782,7 @@ export default {
             title: '链接标题：',
             type: 'input',
             key: 'linkTitle',
-            fontNumber: 15
+            fontNumber: 25
           },
           {
             title: '链接摘要：',
@@ -808,7 +808,7 @@ export default {
           title: '链接标题：',
           type: 'input',
           key: 'linkTitle',
-          fontNumber: 15
+          fontNumber: 25
         },
         {
           title: '链接摘要：',
@@ -1507,6 +1507,7 @@ export default {
       this.medium.pagination.current = 1
       this.medium.pagination.pageSize = 10
       this.modelSearch = ''
+      this.materialGroupId = ''
       this.getMedium()
     },
     getMedium () {
@@ -1567,8 +1568,9 @@ export default {
         this.modelTab = 1
         this.isImageText = true
         // 点击选择图文,先获取素材库分组
-        this.getGroupList()
+        // this.getGroupList()
       }
+      this.getGroupList()
     }
   }
 }

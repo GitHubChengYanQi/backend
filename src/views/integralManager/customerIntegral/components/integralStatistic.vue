@@ -134,6 +134,9 @@
         class="tableBox"
         :scroll="{ x: 1500}"
         @change="handleTableChange">
+        <div slot="employeeIdName" slot-scope="text">
+          {{ text ? text : '-' }}
+        </div>
         <div slot="adjustCause" slot-scope="text">
           <a-popover title="理由" v-if="text && text.length > 10">
             <template slot="content">
@@ -202,7 +205,8 @@ export default {
           title: '员工名称',
           dataIndex: 'employeeIdName',
           align: 'center',
-          width: 200
+          width: 200,
+          scopedSlots: { customRender: 'employeeIdName' }
         },
         {
           title: '交易时间',

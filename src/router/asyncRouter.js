@@ -908,6 +908,13 @@ export const routeList = {
     component: () => import('@/views/interactionRadar/setRadar'),
     meta: { title: '新建互动雷达' }
   },
+  '/interactionRadar/editRadar': {
+    path: '/interactionRadar/editRadar',
+    name: '修改互动雷达',
+    hidden: true,
+    component: () => import('@/views/interactionRadar/setRadar'),
+    meta: { title: '修改互动雷达' }
+  },
   '/interactionRadar/radarInfo': {
     path: '/interactionRadar/radarInfo',
     name: '互动雷达详情',

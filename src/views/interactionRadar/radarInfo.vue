@@ -766,7 +766,7 @@ export default {
       console.log(obj)
       const title = ['客户数据', '渠道数据', '员工数据']
       scrmRadarVisitorExcel(obj).then((res) => {
-        callDownLoadByBlob(res, title[tab])
+        callDownLoadByBlob(res, `${this.radarInfo.data.title}-${title[tab]}`)
       })
     },
     reset () {

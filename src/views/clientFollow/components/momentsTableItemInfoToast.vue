@@ -161,6 +161,7 @@ export default {
     //   }
     // },
     async getTableList (expstatus) {
+      const that = this
       const { current, pageSize } = this.pagination
       const obj = {
         moment_id: this.momentId,
@@ -170,8 +171,33 @@ export default {
       }
       if (expstatus) {
         obj.expstatus = expstatus
-        const data = await momentsListItemExportReq(obj)
-        callDownLoadByBlob(data, '朋友圈任务详细列表')
+        console.log(this.detailObj, '导出前')
+        obj.totalPeopleNum = `全部人数${this.detailObj.total ? this.detailObj.total : 0}`
+        obj.finishedPeopleNum = `已完成人数${this.detailObj.doneNum ? this.detailObj.doneNum : 0}`
+        obj.unFinishedPeopleNum = `未完成人数${this.detailObj.unfinishNum ? this.detailObj.unfinishNum : 0}`
+        obj.percentageComplete = `完成率${this.detailObj.completion_rates}`
+        obj.finishedInformation = `员工完成情况${this.detailObj.emp_comple}`
+        obj.sendCustomerInformation = `发送客户情况${this.detailObj.contact_comple}`
+        obj.customerThumbsUpNum = `客户点赞数${this.detailObj.like_num ? this.detailObj.like_num : 0}`
+        obj.customerReviewNum = `客户评论数${this.detailObj.comment_num ? this.detailObj.comment_num : 0}`
+        momentsListItemExportReq(obj).then(response => {
+          console.log(response, 'response')
+          callDownLoadByBlob(response, '朋友圈任务详细列表')
+        }).catch(error => {
+          const errorFileReader = new FileReader()
+          errorFileReader.readAsText(error.response.data)
+          errorFileReader.onload = function () {
+            try {
+              const resErrorData = JSON.parse(errorFileReader.result)
+              console.log(resErrorData, '请求失败得到处理后的参数')
+              that.$message.error(resErrorData.msg)
+            } catch (error) {
+              console.log(error, 'error')
+            }
+          }
+        })
+        // console.log(data, 'data')
+        // debugger
       } else {
         const { data } = await getMomentsItemListReq(obj)
         this.tableData = data.datas
