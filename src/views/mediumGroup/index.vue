@@ -899,7 +899,7 @@
                 <a-input v-model="photoData.title" :maxLength="15" />
               </a-form-model-item>
               <a-form-model-item label="图片名称：">
-                <a-input v-model="photoData.imageName" @change="handleNameChange" />
+                <a-input v-model="photoData.imageName" @change="handleNameChange" :maxLength="40"/>
               </a-form-model-item>
               <a-form-item label="图片：">
                 <upload

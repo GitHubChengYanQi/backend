@@ -14,6 +14,7 @@
         <a-select
           v-model="searchObj.name"
           show-search
+          allow-clear
           placeholder="请输入群名称"
           style="width: 200px"
           :default-active-first-option="false"
@@ -372,6 +373,11 @@ export default {
     },
     handleChange (val) {
       console.log('handleChange', val)
+      if (!val) {
+        this.selectValue = undefined
+        this.$delete(this.searchObj, 'name')
+        // delete this.groupChatSearchInfo.workRoomName
+      }
     },
     async getTableList (isExport) {
       const { date, employeeIds, labels, name, tagMatchType } = this.searchObj
