@@ -1830,6 +1830,7 @@ export default {
     },
     // 上传
     uploadSuccess (data) {
+      // console.log(data, '上传图片', this.modalType, 'modalType')
       this.imgUrl = data.fullPath
       if (this.modalType === 6 || this.modalType === 3) {
         this.upLoadRes.imagePath = data.path
@@ -1838,10 +1839,11 @@ export default {
       if (this.modalType === 2) {
         this.upLoadRes.imagePath = data.path
         if (this.photoData.imageName && this.photoData.imageName.length > 0) {
+          // this.upLoadRes.imageName = data.name.length > 40 ? this.photoData.imageName
           this.upLoadRes.imageName = this.photoData.imageName
         } else {
-          this.photoData.imageName = data.name
-          this.upLoadRes.imageName = data.name
+          this.photoData.imageName = data.name.length > 40 ? data.name.slice(0, 40) : data.name
+          this.upLoadRes.imageName = data.name.length > 40 ? data.name.slice(0, 40) : data.name
         }
       }
     },
