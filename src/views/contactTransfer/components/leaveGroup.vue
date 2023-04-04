@@ -52,7 +52,7 @@
           </div>
         </div>
         <a-table
-          rowKey="chatId"
+          rowKey="roomId"
           :loading="loading"
           :columns="columns"
           :data-source="tableData"
