@@ -36,7 +36,8 @@
         <div v-permission="'uploadFile'">
           <a-tooltip>
             <template slot="title">
-              上传文件支持格式: jpg、png、ppt、pptx、pdf、doc、docx文件大小不超过100M
+              <div>上传文件支持格式: jpg、png、ppt、pptx、pdf、doc、docx文件大小不超过100M。</div>
+              <div>上传文件后，请先进行预览。若遇到PPT无法打开或打开错误，请将PPT文件转化为PDF重新上传。</div>
             </template>
             <a-icon type="question-circle" />
           </a-tooltip>
