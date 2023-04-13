@@ -37,7 +37,8 @@ export function scrmRadarVisitorVisit (data) {
   return request({
     url: 'scrm_radar_visitor/visit',
     method: 'post',
-    data
+    data,
+    timeout: '180000'
   })
 }
 // 文章获取
@@ -54,7 +55,8 @@ export function scrmRadarVisitorExcel (data) {
     url: 'scrm_radar_visitor/excel',
     method: 'post',
     data,
-    responseType: 'blob'
+    responseType: 'blob',
+    timeout: '180000'
   })
 }
 // 渠道数据
@@ -62,7 +64,8 @@ export function scrmRadarVisitorDitch (data) {
   return request({
     url: 'scrm_radar_visitor/ditch',
     method: 'post',
-    data
+    data,
+    timeout: '180000'
   })
 }
 // 员工数据
@@ -70,7 +73,8 @@ export function scrmRadarVisitorShift (data) {
   return request({
     url: 'scrm_radar_visitor/shift',
     method: 'post',
-    data
+    data,
+    timeout: '180000'
   })
 }
 

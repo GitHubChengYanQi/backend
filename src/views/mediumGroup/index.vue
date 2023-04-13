@@ -899,7 +899,7 @@
                 <a-input v-model="photoData.title" :maxLength="15" />
               </a-form-model-item>
               <a-form-model-item label="图片名称：">
-                <a-input v-model="photoData.imageName" @change="handleNameChange" />
+                <a-input v-model="photoData.imageName" @change="handleNameChange" :maxLength="40"/>
               </a-form-model-item>
               <a-form-item label="图片：">
                 <upload
@@ -1840,8 +1840,8 @@ export default {
         if (this.photoData.imageName && this.photoData.imageName.length > 0) {
           this.upLoadRes.imageName = this.photoData.imageName
         } else {
-          this.photoData.imageName = data.name
-          this.upLoadRes.imageName = data.name
+          this.photoData.imageName = data.name.length > 40 ? data.name.slice(0, 40) : data.name
+          this.upLoadRes.imageName = data.name.length > 40 ? data.name.slice(0, 40) : data.name
         }
       }
     },

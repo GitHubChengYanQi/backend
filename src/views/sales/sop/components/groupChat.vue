@@ -27,7 +27,19 @@
           </div>
           <div class="item">
             <div class="title">群名称：</div>
-            <a-input placeholder="请输入要搜索的群聊" v-model="groupChatSearchInfo.workRoomName"/>
+            <a-select
+              v-model="groupChatSearchInfo.workRoomName"
+              show-search
+              allow-clear
+              placeholder="请输入群名称"
+              style="width: 200px"
+              :default-active-first-option="false"
+              :filter-option="false"
+              :dropdownStyle="dropDownStyle"
+              :options="nameSearchOptions"
+              @search="searchChangeDebounceFn"
+              @change="handleChange"/>
+            <!-- <a-input placeholder="请输入要搜索的群聊" v-model="groupChatSearchInfo.workRoomName"/> -->
           </div>
           <div class="item">
             <div class="title">标签：</div>
@@ -76,6 +88,9 @@
           @change="groupChatHandleTableChange"
         >
           <div slot="roomName" slot-scope="text">
+            {{ text ? text : '-' }}
+          </div>
+          <div slot="roomPersonNum" slot-scope="text">
             {{ text ? text : '-' }}
           </div>
           <div slot="ownerName" slot-scope="text">
@@ -138,15 +153,27 @@
 
 <script>
 import GroupTags from './groupTags.vue'
+import { debounce } from '../groupUtils'
+import { getSearchGroupNameOptionsListReq } from '@/api/groupsOperation'
 import { getGroupChatListMethod } from '@/api/cluster'
 import moment from 'moment'
 export default {
   name: 'GroupChat',
   data () {
     return {
+      selectValue: '',
       dialogStyle: {
         left: '130px'
       },
+      dropDownStyle: {
+        width: '200px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      },
+      // 联想选择组
+      nameSearchOptions: [],
+      searchChangeDebounceFn: debounce(this.handleSearch, 300),
       lablesModalType: '',
       groupTagsSelectList: [],
       groupTagsModalShow: false, // 群标签弹框显示状态
@@ -182,6 +209,13 @@ export default {
           align: 'center',
           width: 150,
           scopedSlots: { customRender: 'ownerName' }
+        },
+        {
+          title: '成员数',
+          dataIndex: 'roomPersonNum',
+          align: 'center',
+          width: 150,
+          scopedSlots: { customRender: 'roomPersonNum' }
         },
         {
           title: '创建时间',
@@ -295,6 +329,36 @@ export default {
       // filterIdArr = this.groupChatSearchInfo.tagsList.map((item) => item.id)
       // filterInputArr = this.groupChatSearchInfo.tagsList
       this.groupChatSearchInfo.tagsList = this.groupChatSearchInfo.tagsList.filter((_, i) => i != index)
+    },
+    // 搜索内容
+    async handleSearch (val) {
+      let text = ''
+      // debugger
+      console.log(val, '搜索内容')
+      if (!val && !this.selectValue) {
+        this.nameSearchOptions = []
+        // groupChatSearchInfo.workRoomName
+        // this.$set(this.searchObj, 'name', this.selectValue)
+        this.$set(this.groupChatSearchInfo, 'workRoomName', this.selectValue)
+        return
+      } else if (!val && this.selectValue) {
+        text = this.selectValue
+      } else {
+        text = val
+      }
+      // this.$set(this.searchObj, 'name', text)
+      this.$set(this.groupChatSearchInfo, 'workRoomName', text)
+      const { data } = await getSearchGroupNameOptionsListReq({ name: text })
+      this.nameSearchOptions = data.map(it => ({ label: it.name, value: it.name }))
+      this.selectValue = text
+    },
+    handleChange (val) {
+      console.log('handleChange', val)
+      if (!val) {
+        this.selectValue = undefined
+        this.$delete(this.groupChatSearchInfo, 'workRoomName')
+        // delete this.groupChatSearchInfo.workRoomName
+      }
     },
     // 标签弹窗确认
     async handleAddGroupTagsOk () {

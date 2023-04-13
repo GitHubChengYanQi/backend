@@ -702,6 +702,7 @@ export default {
       }
     },
     async sendMomments () {
+      const that = this
       if (!this.employeeIds.length) {
         this.$message.warning('请选择执行员工！')
         return
@@ -739,28 +740,67 @@ export default {
       try {
         if (this.$route.query.id) {
           obj.id = this.$route.query.id
-          await setMomentsItemInfoReq(obj)
-          console.log(obj, 'obj')
-          this.$message.success('编辑成功！')
+          await setMomentsItemInfoReq(obj).then(response => {
+            console.log(response, 'response')
+            if (response.code === 200) {
+              this.$message.success('编辑成功！')
+              this.$nextTick(() => {
+                this.$router.go(-1)
+                this.sendBol = true
+              })
+            }
+          }).catch(error => {
+            const errorFileReader = new FileReader()
+            errorFileReader.readAsText(error.response.data)
+            errorFileReader.onload = function () {
+              try {
+                const resErrorData = JSON.parse(errorFileReader.result)
+                console.log(resErrorData, '请求失败得到处理后的参数')
+                that.$message.error(resErrorData.msg)
+              } catch (error) {
+                console.log(error, 'error')
+              }
+            }
+          })
+          // console.log(obj, 'obj')
         } else {
-          await addMomentsItemReq(obj)
-          this.$message.success('添加成功！')
+          await addMomentsItemReq(obj).then(response => {
+            console.log(response, 'response')
+            if (response.code === 200) {
+              this.$message.success('添加成功！')
+              this.$nextTick(() => {
+                this.$router.go(-1)
+                this.sendBol = true
+              })
+            }
+          }).catch(error => {
+            const errorFileReader = new FileReader()
+            errorFileReader.readAsText(error.response.data)
+            errorFileReader.onload = function () {
+              try {
+                const resErrorData = JSON.parse(errorFileReader.result)
+                console.log(resErrorData, '请求失败得到处理后的参数')
+                that.$message.error(resErrorData.msg)
+              } catch (error) {
+                console.log(error, 'error')
+              }
+            }
+          })
         }
       } catch (_) {
         this.sendBol = true
       }
       this.isDone = true
-      this.$nextTick(() => {
-        this.$router.go(-1)
-        this.sendBol = true
-      })
+      // this.$nextTick(() => {
+      //   this.$router.go(-1)
+      //   this.sendBol = true
+      // })
     },
     // 获取最新的预计人数
     async getMomentsItemExpectedNum () {
       if (!this.employeeIds.length && this.expectedNum === 0) {
         return
       }
-
       const res = await getMomentsItemExpectedNumReq({
         empids: this.employeeIds.join(','),
         tagids: this.selectTagList.map(it => it.id).join(',')
