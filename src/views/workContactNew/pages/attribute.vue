@@ -485,6 +485,7 @@ export default {
           const data = await planBindAddBatch({ workContactIds: [ id ] })
           if (data.code == 200) {
             _self.$message.success('操作成功')
+            _self.getData()
           } else {
             _self.$message.error('操作失败')
           }
