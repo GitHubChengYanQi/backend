@@ -379,7 +379,9 @@ export default {
         })
       }
       filter.employeeId = filter.employeeId.join(',')
-      if (this.table.selectRows[this.table.page.page]) {
+      console.log(this.table.selectRows, this.table.page.page)
+      // debugger
+      if (this.table.selectRows[this.table.page.page].length !== 0) {
         this.exportList = JSON.parse(JSON.stringify(this.table.selectRows[this.table.page.page]))
         this.excel()
       } else {
