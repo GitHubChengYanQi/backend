@@ -791,13 +791,16 @@ export default {
         this.sendBol = true
       }
       this.isDone = true
+      // this.$nextTick(() => {
+      //   this.$router.go(-1)
+      //   this.sendBol = true
+      // })
     },
     // 获取最新的预计人数
     async getMomentsItemExpectedNum () {
       if (!this.employeeIds.length && this.expectedNum === 0) {
         return
       }
-
       const res = await getMomentsItemExpectedNumReq({
         empids: this.employeeIds.join(','),
         tagids: this.selectTagList.map(it => it.id).join(',')

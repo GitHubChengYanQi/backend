@@ -734,7 +734,7 @@
               <a-form-model-item label="标题名称：" prop="maintitle">
                 <a-input v-model="imageTextData.maintitle" :maxLength="15" />
               </a-form-model-item>
-              <a-form-model-item label="图片封面：">
+              <a-form-model-item label="图片封面：" required>
                 <upload
                   v-if="imgUrl === ''"
                   :imageUrl="imgUrl"

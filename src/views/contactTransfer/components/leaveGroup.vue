@@ -280,14 +280,17 @@ export default {
         this.$message.warning('请选择群聊')
         return false
       }
+      console.log(this.selectedRows, 'this.selectedRows')
+      const tempList = this.selectedRows.map(item => item.chatId)
       const params = {
         type: 1,
-        list: JSON.stringify(this.selectedRowKeys),
+        list: JSON.stringify(tempList),
         takeoverUserId: e[0]
       }
       allotRoomApi(params).then((res) => {
         this.$message.info('分配成功')
         this.search()
+        this.selectedRowKeys = []
         this.getRoomStatistics()
       })
     }

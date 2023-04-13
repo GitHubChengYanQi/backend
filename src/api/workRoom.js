@@ -46,8 +46,8 @@ export function synList (params) {
   return request({
     url: '/workRoom/syn',
     method: 'put',
-    timeout: '180000',
-    data: params
+    data: params,
+    timeout: '180000'
   })
 }
 // 批量修改群

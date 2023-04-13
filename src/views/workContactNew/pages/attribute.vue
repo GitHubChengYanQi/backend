@@ -379,7 +379,9 @@ export default {
         })
       }
       filter.employeeId = filter.employeeId.join(',')
-      if (this.table.selectRows[this.table.page.page]) {
+      console.log(this.table.selectRows, this.table.page.page)
+      // debugger
+      if (this.table.selectRows[this.table.page.page].length !== 0) {
         this.exportList = JSON.parse(JSON.stringify(this.table.selectRows[this.table.page.page]))
         this.excel()
       } else {
@@ -485,6 +487,7 @@ export default {
           const data = await planBindAddBatch({ workContactIds: [ id ] })
           if (data.code == 200) {
             _self.$message.success('操作成功')
+            _self.getData()
           } else {
             _self.$message.error('操作失败')
           }

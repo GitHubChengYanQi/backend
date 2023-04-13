@@ -77,7 +77,8 @@ export function deleteExecutingSopMethod (params) {
   return request({
     url: '/sopCluster/delete',
     method: 'delete',
-    params
+    params,
+    timeout: '180000'
   })
 }
 // 获取执行记录群SOP列表
@@ -94,7 +95,8 @@ export function deleteExecuteRecordSopMethod (params) {
   return request({
     url: '/sopCluster/deleteExecutionLog',
     method: 'delete',
-    params
+    params,
+    timeout: '180000'
   })
 }
 // 群SOP导出数据
@@ -177,7 +179,8 @@ export function deleteExecutingCalendarMethod (params) {
   return request({
     url: '/sopClusterCalendar/delete',
     method: 'delete',
-    params
+    params,
+    timeout: '180000'
   })
 }
 // 获取执行记录群日历列表
