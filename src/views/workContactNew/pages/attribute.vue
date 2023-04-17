@@ -103,14 +103,14 @@
         <div class="right" style="display: flex">
           <addTag v-model="table.selects" :selectRows="table.selectRows" @change="getData" v-permission="'/workContact/index@addTag'"/>
           <removeTag v-model="table.selects" :selectRows="table.selectRows" @change="getData" v-permission="'/workContact/index@removeTag'"/>
-          <a-button
+          <!-- <a-button
             v-if="table.data.length > 0"
             :loading="loadingDownLoad"
             type="primary"
             ghost
             class="mr16"
             @click="exportData"
-            v-permission="'/workContact/index@exportData'">导出Excel</a-button>
+            v-permission="'/workContact/index@exportData'">导出Excel</a-button> -->
         </div>
       </div>
       <!--      <div class="flex-between table-header">-->
