@@ -24,10 +24,11 @@
           </span>
           <!-- v-if="treeData"
             :record="treeData" -->
-          <selectPersonnel
+          <SelectReadonlyPersonOnlyPerson
             class="selectPersonnelCom"
             type="button"
             name="选择成员"
+            :multiple="false"
             v-model="employeeIds"
             @getVal="employeeIdsChange"
           />
