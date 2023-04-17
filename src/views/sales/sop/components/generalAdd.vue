@@ -24,7 +24,7 @@
           </span>
           <!-- v-if="treeData"
             :record="treeData" -->
-          <SelectReadonlyPersonOnlyPerson
+          <SelectReadonlyPersonOnlyDepart
             class="selectPersonnelCom"
             type="button"
             name="选择成员"

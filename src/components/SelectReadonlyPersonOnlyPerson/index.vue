@@ -293,17 +293,6 @@ export default {
           this.getNodeInfo(tempInfo.children, keyList)
         }
       }
-      // for (let singleItem of keyList) {
-      //   let tempIndex = tempArray.findIndex(info => info.id === singleItem)
-      //   if (tempIndex !== -1) {
-      //     // 已选数组中存在
-      //     this.rows.push(tempArray[tempIndex])
-      //   }
-      //   let tempChildrenList = tempArray[tempIndex]
-      //   if (tempChildrenList && tempChildrenList.children && tempChildrenList.children.length !== 0) {
-      //     this.getNodeInfo(tempChildrenList.children, keyList)
-      //   }
-      // }
     },
     getNodes (tree, keys) {
       let nodes = []
@@ -350,20 +339,6 @@ export default {
       this.rows = deepClonev2(tempArray)
       const tempIdList = this.rows.map(item => item.id)
       this.$emit('getVal', tempIdList)
-      // debugger
-      // const arr = this.rows
-      // const keys = []
-      // const rows = []
-      // for (let i = 0; i < arr.length; i++) {
-      //   if (item.id !== arr[i].id) {
-      //     keys.push(arr[i].id)
-      //     rows.push(arr[i])
-      //   }
-      // }
-      // this.$set(this, 'keys', keys)
-      // this.$set(this, 'rows', rows)
-      // this.$emit('getVal', this.keys)
-      // console.log(this.keys, this.rows, '关闭tag')
     }
   }
 }

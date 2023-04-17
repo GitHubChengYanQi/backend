@@ -2,13 +2,14 @@
   <div ref="addSop_Page_Container">
     <a-modal
       :maskClosable="false"
-      :width="1000"
+      :width="500"
       title="需选择组织机构"
       :bodyStyle="dialogStyle"
       :visible="chooseTreeVisible"
       class="modalClass"
       :dialogStyle="dialogStyle"
       :getContainer="() => $refs['addSop_Page_Container']"
+      :footer="null"
       @cancel="cancelModal">
       <div class="modalBody">
         <div class="left">
@@ -17,23 +18,22 @@
             v-show="choosePersonStatus === 'tree'"
             :searchable="false"
             :noChildrenText="''"
-            :valueFormat="`object`"
             :value-consists-of="'LEAF_PRIORITY'"
             :allowSelectingDisabledDescendants="false"
-            :maxHeight="1000"
+            :maxHeight="800"
             :alwaysOpen="true"
-            :multiple="true"
+            :multiple="false"
             :options="options"
             :load-options="loadOptions"
             :matchKeys="['title']"
             :clearable="false"
-            :flat="true"
+            :flat="false"
             :limit="0"
             :limitText="() => ''"
             :sort-value-by="sortValueBy"
             :default-expand-level="1"
             placeholder="Try selecting some options."
-            v-model="valueArray"
+            v-model="valueObjectId"
             @select="selectMethod"
             @deselect="unSelectMethod"
           >
@@ -66,32 +66,7 @@
             </div>
           </div>
         </div>
-        <div class="right">
-          <div class="rightTitleDiv">
-            <div class="rightTitle">已选择的部门或成员</div>
-            <div class="rightButton" @click="clearSelect">清除</div>
-          </div>
-          <div class="tagDivWrapper">
-            <div class="singleTagDiv" v-for="item in valueArray" :key="item.id">
-              <div class="singleTagContent">
-                <img src="@/assets/person.png" v-if="item.isLeaf === '1'">
-                <img src="@/assets/bolder.png" v-else>
-                <div class="singleTagText">{{ item.title }}</div>
-              </div>
-              <div class="deleteIconDiv" @click="deletePerson(item)">x</div>
-            </div>
-          </div>
-        </div>
       </div>
-      <template slot="footer">
-        <a-button
-          @click="cancelModal"
-        >取消</a-button>
-        <a-button
-          @click="sureModal"
-          type="primary"
-        >确定</a-button>
-      </template>
     </a-modal>
   </div>
 </template>
@@ -106,6 +81,7 @@ export default {
   components: { Treeselect },
   data () {
     return {
+      valueObjectId: '',
       personList: [
         // {
         //     id: 0,
@@ -212,6 +188,9 @@ export default {
     selectRows () {
       // console.log(this.selectRows, 'this.selectRows')
       this.valueArray = deepClonev2(this.selectRows)
+      if (this.selectRows.length !== 0) {
+        this.valueObjectId = deepClonev2(this.selectRows)[0].id
+      }
     },
     // 监听输入框输入
     inputName () {
@@ -296,15 +275,24 @@ export default {
     },
     // 选择人员/部门
     choosePerson (info) {
-      const tempTagList = deepClonev2(this.valueArray)
-      const tempIndex = tempTagList.findIndex(item => item.id === info.id)
-      if (tempIndex !== -1) {
-        // 点击的对象在已选择数组中,需要移除
-        this.valueArray.splice(tempIndex, 1)
-      } else {
-        // 点击的对象不在已选择数组中,需要添加
-        this.valueArray.push(info)
+      if (info.isLeaf === '0') {
+        const tempArray = []
+        tempArray.push(info.id)
+        this.options = []
+        this.chooseTreeVisible = false
+        this.choosePersonStatus = 'tree'
+        this.$emit('update:showStatus', false)
+        this.$emit('output', tempArray)
       }
+      // const tempTagList = deepClonev2(this.valueArray)
+      // const tempIndex = tempTagList.findIndex(item => item.id === info.id)
+      // if (tempIndex !== -1) {
+      //   // 点击的对象在已选择数组中,需要移除
+      //   this.valueArray.splice(tempIndex, 1)
+      // } else {
+      //   // 点击的对象不在已选择数组中,需要添加
+      //   this.valueArray.push(info)
+      // }
     },
     // 清除已选中
     clearSelect () {
@@ -397,7 +385,7 @@ export default {
         display: flex;
         height: 100%;
         .left {
-            width: 50%;
+            width: 100%;
             flex-shrink: 0;
             height: 100%;
             .inputClass {
@@ -405,7 +393,7 @@ export default {
             }
            .vue-treeselect {
                 position: static;
-                height: 100%;
+                height: calc(100% - 46px);
            }
            .vue-treeselect__control {
                 display: none;
