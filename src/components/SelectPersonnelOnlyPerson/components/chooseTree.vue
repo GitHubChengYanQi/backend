@@ -280,15 +280,51 @@ export default {
       this.$emit('update:showStatus', false)
     },
     // 选择人员/部门
-    choosePerson (info) {
-      const tempTagList = deepClonev2(this.valueArray)
-      const tempIndex = tempTagList.findIndex(item => item.id === info.id)
-      if (tempIndex !== -1) {
-        // 点击的对象在已选择数组中,需要移除
-        this.valueArray.splice(tempIndex, 1)
-      } else {
-        // 点击的对象不在已选择数组中,需要添加
-        this.valueArray.push(info)
+    choosePerson (info, text) {
+      if (text === 'person') {
+        const tempTagList = deepClonev2(this.valueArray)
+        const tempIndex = tempTagList.findIndex(item => item.id === info.id)
+        if (tempIndex !== -1) {
+          // 点击的对象在已选择数组中,需要移除
+          this.valueArray.splice(tempIndex, 1)
+        } else {
+          // 点击的对象不在已选择数组中,需要添加
+          this.valueArray.push(info)
+        }
+      } else if (text === 'position') {
+        // 需要循环
+        this.initChoosePerson(info.children)
+      }
+    },
+    // 递归处理已选中
+    initChoosePerson (array) {
+      for (const item of array) {
+        if (item.children && item.children.length !== 0) {
+          if (item.isLeaf === '0') {
+            // 非叶子节点
+            this.initChoosePerson(item.children)
+          } else if (item.isLeaf === '1') {
+            // 叶子节点
+            const tempTagList = deepClonev2(this.valueArray)
+            const tempIndex = tempTagList.findIndex(info => item.id === info.id)
+            if (tempIndex !== -1) {
+              // 点击的对象在已选择数组中,需要移除
+              this.valueArray.splice(tempIndex, 1)
+            } else {
+              // 点击的对象不在已选择数组中,需要添加
+              this.valueArray.push(item)
+            }
+          }
+          // const tempTagList = deepClonev2(this.valueArray)
+          // const tempIndex = tempTagList.findIndex(item => item.id === info.id)
+          // if (tempIndex !== -1) {
+          //   // 点击的对象在已选择数组中,需要移除
+          //   this.valueArray.splice(tempIndex, 1)
+          // } else {
+          //   // 点击的对象不在已选择数组中,需要添加
+          //   this.valueArray.push(info)
+          // }
+        }
       }
     },
     // 清除已选中
