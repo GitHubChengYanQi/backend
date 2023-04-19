@@ -212,7 +212,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { corpData, lineChat, tenantIndex } from '@/api/corpData'
 export default {
   data () {
@@ -243,7 +242,6 @@ export default {
       options: {
         dataZoom: {
           type: 'inside',
-          filterMode: 'none',
           show: true,
           start: 0,
           end: 100
@@ -262,30 +260,18 @@ export default {
           width: '80%'
         },
         xAxis: {
-          type: 'time',
+          type: 'category',
           boundaryGap: false,
           data: [],
           axisLabel: {
-            hideOverlap: true,
-            formatter: function (v) {
-              return moment(v).format('YYYY-MM-DD')
-            }
-          },
-          axisLine: {
-            show: true
-          },
-          axisTick: {
-            show: true
-          },
-          splitLine: {
-            show: false
+            interval: 'auto',
+            rotate: 0,
+            color: 'blue',
+            margin: 20
           }
         },
         yAxis: {
-          type: 'value',
-          axisLine: {
-            show: true
-          }
+          type: 'value'
         },
         series: [
           {
@@ -293,8 +279,6 @@ export default {
             type: 'line',
             // stack: '总量',
             data: [],
-            smooth: true,
-            stack: 'Total',
             itemStyle: {
               normal: {
                 color: '#094FFF',
@@ -307,7 +291,6 @@ export default {
           {
             name: '新增入群数',
             type: 'line',
-            smooth: true,
             // stack: '总量',
             data: [],
             itemStyle: {
@@ -322,7 +305,6 @@ export default {
           {
             name: '流失客户',
             type: 'line',
-            smooth: true,
             // stack: '总量',
             data: [],
             itemStyle: {
@@ -337,7 +319,6 @@ export default {
           {
             name: '退群人数',
             type: 'line',
-            smooth: true,
             // stack: '总量',
             data: [],
             itemStyle: {
@@ -415,34 +396,21 @@ export default {
           lossContactNum.push(item.lossContactNum)
           quitRoomNum.push(item.quitRoomNum)
         })
-        console.log(time, 'timeArray')
-        // this.options.xAxis.data = time
-        this.options.xAxis.min = moment(time[0]).format('YYYY-MM-DD')
-        this.options.xAxis.max = moment(time[time.length - 1]).format('YYYY-MM-DD')
+        this.options.xAxis.data = time
         this.options.series = this.options.series.map(item => {
           if (item.name == '新增客户数') {
-            item.data = this.commonDataMethod(addContactNum, time)
+            item.data = addContactNum
           } else if (item.name == '新增入群数') {
-            item.data = this.commonDataMethod(addIntoRoomNum, time)
+            item.data = addIntoRoomNum
           } else if (item.name == '流失客户') {
-            item.data = this.commonDataMethod(lossContactNum, time)
+            item.data = lossContactNum
           } else if (item.name == '退群人数') {
-            item.data = this.commonDataMethod(quitRoomNum, time)
+            item.data = quitRoomNum
           }
           return item
         })
-        console.log(this.options, 'this.options')
+        return true
       })
-    },
-    // 处理数组的方法
-    commonDataMethod (array, timeArray) {
-      const tempArray = array.map((yItem, yIndex) => {
-        const tempInfo = []
-        tempInfo[0] = moment(timeArray[yIndex]).format('YYYY-MM-DD')
-        tempInfo[1] = yItem
-        return tempInfo
-      })
-      return tempArray
     },
     getRightData () {
       tenantIndex({ domain: 'mo.chat' }).then(res => {
