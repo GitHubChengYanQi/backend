@@ -45,6 +45,15 @@ export default {
       sessionStorage.setItem('clusterCalendarActiveType', this.active)
     }
   },
+  // 路由守卫离开路由之前
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/sop/editClusterCalendar') {
+    } else {
+      sessionStorage.removeItem('calendarTemplatePage')
+    }
+    next()
+  },
   // 页面销毁前
   beforeDestroy () {
     console.log('index页面销毁前')

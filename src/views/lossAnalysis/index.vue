@@ -1342,7 +1342,11 @@ export default {
             return item.format('YYYY-MM-DD')
           })
         } else if (idKey.includes(key) && searchData[key].length > 0) {
-          newSearch[key] = searchData[key].join(',')
+          if (typeof (searchData[key][0]) !== 'object') {
+            newSearch[key] = searchData[key].join(',')
+          } else {
+            newSearch[key] = searchData[key].map(item => item.value).join(',')
+          }
         }
       }
       return newSearch
