@@ -352,6 +352,7 @@
 import moment from 'moment'
 import { wastageContactLine, wastageContactCake, wastageContactCalc, wastageContactCome } from '@/api/lossAnalysis.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import { deepClonev2 } from '@/utils/util'
 
 export default {
   data () {
@@ -482,6 +483,30 @@ export default {
                 color: '#444444' // 设置文字颜色
               }
             },
+            toolbox: {
+              zlevel: 10,
+              show: true,
+              showTitle: false,
+              feature: {
+                dataView: {
+                  show: true,
+                  title: '第一个数据视图',
+                  readonly: true
+                },
+                saveAsImage: {
+                  show: true,
+                  title: '保存图片',
+                  excludeComponents: ['toolbox'],
+                  pixelRatio: 1,
+                  type: 'png',
+                  name: '下载'
+                }
+              },
+              iconStyle: {
+                color: 'black'
+              },
+              left: 'left'
+            },
             legend: {
               right: 0,
               icon: 'circle',
@@ -499,7 +524,7 @@ export default {
               boundaryGap: false,
               data: [],
               axisLabel: {
-                hideOverlap: true,
+                hideOverlap: true
                 // formatter: {
                 //   year: '{MM}-{dd}',
                 //   month: '{MM}-{dd}',
@@ -509,9 +534,9 @@ export default {
                 //   second: '{HH}:{mm}',
                 //   millisecond: '{HH}:{mm}'
                 // }
-                formatter: function (v) {
-                  return moment(v).format('YYYY-MM-DD')
-                }
+                // formatter: function (v) {
+                //   return moment(v).format('YYYY-MM-DD')
+                // }
               },
               // axisLabel: {
               //   interval: 'auto',
@@ -562,7 +587,7 @@ export default {
                 name: '员工删除客户',
                 type: 'line',
                 data: [],
-                smooth: true,
+                // smooth: true,
                 stack: 'Total',
                 showSymbol: false,
                 symbol: 'circle',
@@ -578,7 +603,7 @@ export default {
               {
                 name: '客户删除员工',
                 type: 'line',
-                smooth: true,
+                // smooth: true,
                 data: [],
                 showSymbol: false,
                 symbol: 'circle',
@@ -594,7 +619,7 @@ export default {
               {
                 name: '离职继承失败',
                 type: 'line',
-                smooth: true,
+                // smooth: true,
                 data: [],
                 showSymbol: false,
                 symbol: 'circle',
@@ -610,7 +635,7 @@ export default {
               {
                 name: '累计流失人数',
                 type: 'line',
-                smooth: true,
+                // smooth: true,
                 data: [],
                 showSymbol: false,
                 symbol: 'circle',
@@ -1300,27 +1325,46 @@ export default {
       console.log(obj, obj.loseOccur)
       wastageContactLine(obj).then((res) => {
         // console.log(res)
-        this.state.lineChartState = res.data.xData.length > 0
-        // this.lineChart.options[this.lineChart.tab].xAxis.data = res.data.xData
-        this.lineChart.options[this.lineChart.tab].xAxis.min = res.data.xData[0]
-        this.lineChart.options[this.lineChart.tab].xAxis.max = res.data.xData[res.data.xData.length - 1]
+        this.state.lineChartState = res.data.accumulated.length !== 0 || res.data.contactDelEmp.length !== 0 || res.data.empDelContact.length !== 0 || res.data.extends.length !== 0
+        // this.lineChart.options[this.lineChart.tab].xAxis.min = res.data.xData[0]
+        // this.lineChart.options[this.lineChart.tab].xAxis.max = res.data.xData[res.data.xData.length - 1]
+        // const currentInfo = deepClonev2(res.data)
+        // for (let singleKey in currentInfo) {
+        //   currentInfo[singleKey].map(item => item.lossTime)
+        // }
         this.lineChart.options[this.lineChart.tab].series = this.lineChart.options[this.lineChart.tab].series.map(
           (item, index) => {
-            const tempArray = res.data.yData[index].map((yItem, yIndex) => {
-              const tempInfo = []
-              tempInfo[0] = res.data.xData[yIndex]
-              tempInfo[1] = yItem
-              return tempInfo
-            })
-            // tempArray[0] = res.data.xData[]
-            // item.data = res.data.yData[index]
-            item.data = tempArray
+            if (item.name === '员工删除客户') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.empDelContact))
+            } else if (item.name === '客户删除员工') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.contactDelEmp))
+            } else if (item.name === '离职继承失败') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.extends))
+            } else if (item.name === '累计流失会员人数') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.accumulated))
+            }
+            // const tempArray = res.data[index].map((yItem, yIndex) => {
+            //   const tempInfo = []
+            //   tempInfo[0] = res.data.xData[yIndex]
+            //   tempInfo[1] = yItem
+            //   return tempInfo
+            // })
+            // item.data = tempArray
             return item
           }
         )
         console.log(this.lineChart.options[this.lineChart.tab], '处理后的echarts数据')
-        this.lineChart.options[this.lineChart.tab].yAxis.name = '累计：' + res.data.total + '人'
+        this.lineChart.options[this.lineChart.tab].yAxis.name = '累计：' + res.data.totalNum + '人'
       })
+    },
+    commonDataMethod (array) {
+      const tempArray = array.map(item => {
+        const singleArray = []
+        singleArray[0] = item.lossTime
+        singleArray[1] = item.num
+        return singleArray
+      })
+      return tempArray
     },
     setSearchData (e) {
       const data = this.search[e]
