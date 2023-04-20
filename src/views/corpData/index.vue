@@ -212,6 +212,7 @@
 </template>
 
 <script>
+import 'echarts/lib/component/toolbox'
 import moment from 'moment'
 import { corpData, lineChat, tenantIndex } from '@/api/corpData'
 export default {
@@ -269,7 +270,8 @@ export default {
               show: true
             },
             saveAsImage: {// 保存图片
-              show: true
+              show: true,
+              name: '客户统计图'
             },
             magicType: {// 动态类型切换
               type: ['bar', 'line']

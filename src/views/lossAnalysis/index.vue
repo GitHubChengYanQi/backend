@@ -349,6 +349,7 @@
 </template>
 
 <script>
+import 'echarts/lib/component/toolbox'
 import moment from 'moment'
 import { wastageContactLine, wastageContactCake, wastageContactCalc, wastageContactCome } from '@/api/lossAnalysis.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
@@ -484,28 +485,30 @@ export default {
               }
             },
             toolbox: {
-              zlevel: 10,
-              show: true,
-              showTitle: false,
+              show: true, // 是否显示工具栏组件
+              orient: 'vertical', // 工具栏icon的布局朝向
+              itemSize: 18, // 工具栏icon的大小
+              itemGap: 20, // item之间的间距
+              top: 60,
+              right: 20, // toolbox的定位位置
               feature: {
-                dataView: {
-                  show: true,
-                  title: '第一个数据视图',
-                  readonly: true
+                dataView: { // 数据视图
+                  show: true
                 },
-                saveAsImage: {
+                restore: { // 重置
+                  show: true
+                },
+                dataZoom: { // 数据缩放视图
+                  show: true
+                },
+                saveAsImage: {// 保存图片
                   show: true,
-                  title: '保存图片',
-                  excludeComponents: ['toolbox'],
-                  pixelRatio: 1,
-                  type: 'png',
-                  name: '下载'
+                  name: '流失统计图'
+                },
+                magicType: {// 动态类型切换
+                  type: ['bar', 'line']
                 }
-              },
-              iconStyle: {
-                color: 'black'
-              },
-              left: 'left'
+              }
             },
             legend: {
               right: 0,
