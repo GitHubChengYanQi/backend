@@ -590,7 +590,7 @@ export default {
                 name: '员工删除客户',
                 type: 'line',
                 data: [],
-                // smooth: true,
+                smooth: true,
                 stack: 'Total',
                 showSymbol: false,
                 symbol: 'circle',
@@ -606,7 +606,7 @@ export default {
               {
                 name: '客户删除员工',
                 type: 'line',
-                // smooth: true,
+                smooth: true,
                 data: [],
                 showSymbol: false,
                 symbol: 'circle',
@@ -622,7 +622,7 @@ export default {
               {
                 name: '离职继承失败',
                 type: 'line',
-                // smooth: true,
+                smooth: true,
                 data: [],
                 showSymbol: false,
                 symbol: 'circle',
@@ -638,7 +638,7 @@ export default {
               {
                 name: '累计流失人数',
                 type: 'line',
-                // smooth: true,
+                smooth: true,
                 data: [],
                 showSymbol: false,
                 symbol: 'circle',

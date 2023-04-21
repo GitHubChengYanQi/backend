@@ -350,7 +350,7 @@ export default {
   },
   created () {
     this.getSelect('radar_type', 'type')
-    if (sessionStorage.getItem('radarUnit') >= 0) {
+    if (sessionStorage.getItem('radarUnit') !== null && sessionStorage.getItem('radarUnit') >= 0) {
       this.catalogIndex = sessionStorage.getItem('radarUnit')
     }
     this.getGroup()
@@ -362,7 +362,7 @@ export default {
   // 路由守卫离开路由之前
   beforeRouteLeave (to, from, next) {
     console.log(from, '从哪里来', to, '跳到哪里')
-    if (to.path === '/interactionRadar/setRadar' || to.path === '/interactionRadar/editRadar' || to.path === '/interactionRadar/radarInfo') {
+    if (to.path === '/interactionRadar/editRadar' || to.path === '/interactionRadar/radarInfo') {
       sessionStorage.setItem('radarPage', this.table.pagination.current)
       console.log(this.catalogIndex, 'this.catalogIndex')
       if (this.catalogIndex >= 0) {
