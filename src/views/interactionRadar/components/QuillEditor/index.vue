@@ -14,6 +14,7 @@
       v-model="content"
       ref="myQuillEditor"
       :options="editorOption"
+      @focus="onEditorFocus($event)"
       @change="onEditorChange($event)"
     ></quill-editor>
   </div>
@@ -64,8 +65,14 @@ export default {
         modules: {
           imageDrop: true, // 图片拖拽
           imageResize: {
+            displayStyles: {
+              backgroundColor: 'black',
+              border: 'none',
+              color: 'white'
+            },
+            modules: [ 'Resize', 'DisplaySize', 'Toolbar' ]
             // 放大缩小
-            displaySize: true
+            // displaySize: true
           },
           clipboard: {
             // 粘贴版，处理粘贴时候的自带样式
@@ -99,6 +106,9 @@ export default {
     }
   },
   methods: {
+    onEditorFocus ({ editor, html, text }) {
+      console.log(editor, 'editor', html, 'html', text, 'text')
+    },
     // 富文本内容改变事件
     onEditorChange ({ editor, html, text }) {
       this.$emit('editorChange', html)

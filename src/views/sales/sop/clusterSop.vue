@@ -47,6 +47,15 @@ export default {
       sessionStorage.setItem('clusterSopActiveType', this.active)
     }
   },
+  // 路由守卫离开路由之前
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/sop/editClusterSop') {
+    } else {
+      sessionStorage.removeItem('sopTemplatePage')
+    }
+    next()
+  },
   // 页面销毁前
   beforeDestroy () {
     console.log('index页面销毁前')
@@ -57,7 +66,6 @@ export default {
       // 跳转的路由非sales的路由
       sessionStorage.removeItem('clusterSopActiveType')
     }
-    // sessionStorage.removeItem('activeType')
   },
   created () {
     console.log('created页面')

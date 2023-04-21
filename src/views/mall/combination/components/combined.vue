@@ -211,6 +211,11 @@ export default {
     }
   },
   created () {
+    if (sessionStorage.getItem('combinPage')) {
+      this.pagination.current = Number(sessionStorage.getItem('combinPage'))
+    } else {
+      this.pagination.current = 1
+    }
     this.initFn()
   },
   methods: {
@@ -324,6 +329,7 @@ export default {
     detailFn (type, record) {
       // 点击编辑后需要携带联合用药id跳转到编辑页面进行回显
       if (type === 'EDIT') {
+        sessionStorage.setItem('combinPage', this.pagination.current)
         this.$router.push({
           path: '/mall/combination/edit',
           query: {

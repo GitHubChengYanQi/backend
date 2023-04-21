@@ -205,6 +205,11 @@ export default {
   computed: {},
   watch: {},
   created () {
+    if (sessionStorage.getItem('momentPage')) {
+      this.pagination.current = Number(sessionStorage.getItem('momentPage'))
+    } else {
+      this.pagination.current = 1
+    }
     this.getTableList()
   },
   methods: {
@@ -248,6 +253,7 @@ export default {
     },
     editItem (id) {
       this.$router.push(`/clientFollow/momentsOperation/edit?id=${id}`)
+      sessionStorage.setItem('momentPage', this.pagination.current)
     },
     handleTableChange ({ current, pageSize }, _, { columnKey, order }) {
       let str = ''

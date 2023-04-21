@@ -1,12 +1,13 @@
 <template>
   <div class="auto_lable">
     <div class="table_header">
+      <!-- @click="setTable(index)" -->
       <div
         class="table_title"
         v-for="(item,index) in tabHeader"
         v-permission="item.permission"
         :style="{color: table == index ? '#1890ff':'',textShadow: '0 0 0.25px currentColor',border:table == index ? '':'none',display:item.hidden ? 'none':'' }"
-        @click="setTable(index)"
+        @click="changeTab(index)"
         :key="index"
       >
         {{ item.title }}
@@ -563,11 +564,53 @@ export default {
       addRulePermission: []
     }
   },
+  // watch: {
+  //   table () {
+  //     console.log('tab切换')
+  //     this.pagination.current = 1
+  //     sessionStorage.removeItem('autoLabelPage')
+  //     sessionStorage.removeItem('autoLabelTab')
+  //     this.setTable(this.table)
+  //   }
+  // },
   created () {
+    this.table = Number(sessionStorage.getItem('autoLabelTab'))
+    if (sessionStorage.getItem('autoLabelPage')) {
+      this.pagination.current = Number(sessionStorage.getItem('autoLabelPage'))
+    } else {
+      this.pagination.current = 1
+    }
     this.setTable(this.$route.query.id || 1)
     // this.getUrl()
   },
+  // 路由守卫离开路由之前
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/clientFollow/labelExpendInfo' || to.path === '/clientFollow/labelInfo' || to.path === '/clientFollow/addRule' || to.path === '/clientFollow/addExpendRule') {
+      sessionStorage.setItem('autoLabelPage', this.pagination.current)
+      // console.log(this.catalogIndex, 'this.catalogIndex')
+      sessionStorage.setItem('autoLabelTab', this.table)
+    } else {
+      sessionStorage.removeItem('autoLabelPage')
+      sessionStorage.removeItem('autoLabelTab')
+    }
+    next()
+  },
   methods: {
+    // 切换tab
+    changeTab (e) {
+      console.log(e, 'eeeee')
+      if (Number(e) === this.table) {
+        // 相同tab无需切换
+      } else {
+        // 不同tab需要切换
+        this.table = Number(e)
+        this.pagination.current = 1
+        sessionStorage.removeItem('autoLabelPage')
+        sessionStorage.removeItem('autoLabelTab')
+        this.setTable(this.table)
+      }
+    },
     setSpread (e, key) {
       if (!this.spread[key].includes(e.id)) {
         this.spread[key] = [...this.spread[key], e.id]
@@ -611,7 +654,6 @@ export default {
       this.searchValue = ''
       this.inputArr = []
       this.tableData = []
-      this.pagination.current = 1
       this.pagination.pageSize = 10
       this.getTableData()
       history.replaceState(null, '', `/clientFollow/autoLabel?id=${e}`)

@@ -47,6 +47,15 @@ export default {
   },
   computed: {},
   watch: {},
+  // 路由守卫离开路由之前
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/clientFollow/momentsOperation/edit') {
+    } else {
+      sessionStorage.removeItem('momentPage')
+    }
+    next()
+  },
   beforeCreate () { },
   created () { },
   beforeMount () { },

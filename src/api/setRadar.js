@@ -1,5 +1,12 @@
 import request from '@/utils/request'
-
+// 获取只有pdf的素材库
+export function getPdfMediaMethod (params) {
+  return request({
+    url: '/medium/mediumList',
+    method: 'get',
+    params: params
+  })
+}
 // 增改雷达文章
 export function scrmRadarArticleSave (data) {
   return request({

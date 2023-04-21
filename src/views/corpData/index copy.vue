@@ -212,8 +212,6 @@
 </template>
 
 <script>
-import 'echarts/lib/component/toolbox'
-import moment from 'moment'
 import { corpData, lineChat, tenantIndex } from '@/api/corpData'
 export default {
   data () {
@@ -244,8 +242,6 @@ export default {
       options: {
         dataZoom: {
           type: 'inside',
-          filterMode: 'none',
-          xAxisIndex: [0],
           show: true,
           start: 0,
           end: 100
@@ -253,48 +249,6 @@ export default {
         tooltip: {
           trigger: 'axis'
         },
-        toolbox: {
-          show: true, // 是否显示工具栏组件
-          orient: 'vertical', // 工具栏icon的布局朝向
-          itemSize: 18, // 工具栏icon的大小
-          itemGap: 20, // item之间的间距
-          right: 20, // toolbox的定位位置
-          feature: {
-            dataView: { // 数据视图
-              show: true
-            },
-            restore: { // 重置
-              show: true
-            },
-            dataZoom: { // 数据缩放视图
-              show: true
-            },
-            saveAsImage: {// 保存图片
-              show: true,
-              name: '客户统计图'
-            },
-            magicType: {// 动态类型切换
-              type: ['bar', 'line']
-            }
-          }
-        },
-        // toolbox: {
-        //   show: true,
-        //   showTitle: false,
-        //   feature: {
-        //     saveAsImage: {
-        //       show: true,
-        //       title: '保存图片',
-        //       excludeComponents: ['toolbox'],
-        //       pixelRatio: 1,
-        //       type: 'jpeg'
-        //     }
-        //   },
-        //   iconStyle: {
-        //     color: 'black'
-        //   },
-        //   left: 'left'
-        // },
         legend: {
           top: 15,
           data: ['新增客户数', '新增入群数', '流失客户', '退群人数']
@@ -306,41 +260,18 @@ export default {
           width: '80%'
         },
         xAxis: {
-          type: 'time',
-          // boundaryGap: false,
+          type: 'category',
+          boundaryGap: false,
           data: [],
           axisLabel: {
-            hideOverlap: true,
-            // formatter: function (value, index) {
-            //   console.log(value, index)
-            //   return value
-            // }
-            formatter: {
-              year: '{yyyy}',
-              month: '{yyyy}',
-              day: '{yyyy}',
-              hour: '{yyyy}',
-              minute: '{yyyy}',
-              second: '{HH}:{mm}:{ss}',
-              millisecond: '{yyyy}',
-              none: '{yyyy}'
-            }
-          },
-          axisLine: {
-            show: true
-          },
-          axisTick: {
-            show: true
-          },
-          splitLine: {
-            show: false
+            interval: 'auto',
+            rotate: 0,
+            color: 'blue',
+            margin: 20
           }
         },
         yAxis: {
-          type: 'value',
-          axisLine: {
-            show: true
-          }
+          type: 'value'
         },
         series: [
           {
@@ -348,8 +279,6 @@ export default {
             type: 'line',
             // stack: '总量',
             data: [],
-            smooth: true,
-            stack: 'Total',
             itemStyle: {
               normal: {
                 color: '#094FFF',
@@ -362,7 +291,6 @@ export default {
           {
             name: '新增入群数',
             type: 'line',
-            smooth: true,
             // stack: '总量',
             data: [],
             itemStyle: {
@@ -377,7 +305,6 @@ export default {
           {
             name: '流失客户',
             type: 'line',
-            smooth: true,
             // stack: '总量',
             data: [],
             itemStyle: {
@@ -392,7 +319,6 @@ export default {
           {
             name: '退群人数',
             type: 'line',
-            smooth: true,
             // stack: '总量',
             data: [],
             itemStyle: {
@@ -418,14 +344,6 @@ export default {
     // this.getRightData()
   },
   methods: {
-    getFormatTime (stamp) {
-      const year = new Date(stamp).getFullYear()
-      let month = new Date(stamp).getMonth() + 1
-      month = month < 10 ? '0' + month : month
-      let date = new Date(stamp).getDate()
-      date = date < 10 ? '0' + date : date
-      return year + '-' + month + '-' + date + ' ' + new Date(stamp).toLocaleTimeString('chinese', { hour12: false })
-    },
     getData () {
       corpData().then(res => {
         const { addContactNum, addFriendsNum, addIntoRoomNum, corpMemberNum, lastAddContactNum, lastAddFriendsNum,
@@ -478,36 +396,21 @@ export default {
           lossContactNum.push(item.lossContactNum)
           quitRoomNum.push(item.quitRoomNum)
         })
-        console.log(time, 'timeArray')
-        this.options.xAxis.min = time[0]
-        this.options.xAxis.max = time[time.length - 1]
-        // this.options.xAxis.min = moment(time[0]).format('YYYY-MM-DD HH:mm:ss')
-        // this.options.xAxis.max = moment(time[time.length - 1]).format('YYYY-MM-DD HH:mm:ss')
+        this.options.xAxis.data = time
         this.options.series = this.options.series.map(item => {
           if (item.name == '新增客户数') {
-            item.data = this.commonDataMethod(addContactNum, time)
+            item.data = addContactNum
           } else if (item.name == '新增入群数') {
-            item.data = this.commonDataMethod(addIntoRoomNum, time)
+            item.data = addIntoRoomNum
           } else if (item.name == '流失客户') {
-            item.data = this.commonDataMethod(lossContactNum, time)
+            item.data = lossContactNum
           } else if (item.name == '退群人数') {
-            item.data = this.commonDataMethod(quitRoomNum, time)
+            item.data = quitRoomNum
           }
           return item
         })
-        console.log(this.options, 'this.options')
+        return true
       })
-    },
-    // 处理数组的方法
-    commonDataMethod (array, timeArray) {
-      const tempArray = array.map((yItem, yIndex) => {
-        const tempInfo = []
-        // tempInfo[0] = timeArray[yIndex]
-        tempInfo[0] = moment(timeArray[yIndex]).format('YYYY-MM-DD HH:mm:ss')
-        tempInfo[1] = yItem
-        return tempInfo
-      })
-      return tempArray
     },
     getRightData () {
       tenantIndex({ domain: 'mo.chat' }).then(res => {

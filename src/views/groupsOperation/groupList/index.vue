@@ -331,7 +331,22 @@ export default {
   computed: {},
   watch: {
   },
+  // 路由守卫离开路由之前
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/groupsOperation/groupList/groupItemDetail') {
+      sessionStorage.setItem('groupPage', this.pagination.current)
+    } else {
+      sessionStorage.removeItem('groupPage')
+    }
+    next()
+  },
   created () {
+    if (sessionStorage.getItem('groupPage')) {
+      this.pagination.current = Number(sessionStorage.getItem('groupPage'))
+    } else {
+      this.pagination.current = 1
+    }
     this.getTableList()
   },
   methods: {

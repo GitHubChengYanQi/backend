@@ -555,7 +555,7 @@ import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
 import { materialLibraryList, mediumGroup } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
-import { getPdfMediaMethod, scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad, scrmRadarArticleGrab } from '@/api/setRadar.js'
+import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad, scrmRadarArticleGrab } from '@/api/setRadar.js'
 import axios from 'axios'
 
 export default {
@@ -965,7 +965,7 @@ export default {
         getCheckboxProps: (record) => ({
           props: {
             // 全部默认禁止选中
-            disabled: record.type == '文件' ? record.content.fileName.split('.')[record.content.fileName.split('.').length - 1] != 'pdf' : false
+            disabled: record.type == '文件' ? record.content.fileName.split('.')[1] != 'pdf' : false
           }
         })
       }
@@ -1385,7 +1385,6 @@ export default {
     setModelTab (e) {
       this.modelTab = e
       if (e == 1) {
-        // 选择素材库
         this.getMedium()
       } else {
         this.radio = {
@@ -1520,30 +1519,15 @@ export default {
         searchStr: this.modelSearch,
         mediumGroupId: this.materialGroupId === null ? '' : this.materialGroupId
       }
-      if (this.modalTitle === '上传PDF') {
-        console.log('选择pdf')
-        this.medium.pagination.total = 0
-        this.medium.data = []
-        getPdfMediaMethod(obj).then((res) => {
-          const { page, list } = res.data
-          console.log(res)
-          this.medium.pagination.total = page.total
-          this.medium.data = list.map((item) => {
-            item.title = item.content.title
-            return item
-          })
+      materialLibraryList(obj).then((res) => {
+        const { page, list } = res.data
+        console.log(res)
+        this.medium.pagination.total = page.total
+        this.medium.data = list.map((item) => {
+          item.title = item.content.title
+          return item
         })
-      } else {
-        materialLibraryList(obj).then((res) => {
-          const { page, list } = res.data
-          console.log(res)
-          this.medium.pagination.total = page.total
-          this.medium.data = list.map((item) => {
-            item.title = item.content.title
-            return item
-          })
-        })
-      }
+      })
     },
     // 设置
     setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0) {

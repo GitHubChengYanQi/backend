@@ -350,8 +350,31 @@ export default {
   },
   created () {
     this.getSelect('radar_type', 'type')
+    if (sessionStorage.getItem('radarUnit') !== null && sessionStorage.getItem('radarUnit') >= 0) {
+      this.catalogIndex = sessionStorage.getItem('radarUnit')
+    }
     this.getGroup()
+    if (sessionStorage.getItem('radarPage')) {
+      this.table.pagination.current = Number(sessionStorage.getItem('radarPage'))
+    }
     this.getTableData()
+  },
+  // 路由守卫离开路由之前
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/interactionRadar/editRadar' || to.path === '/interactionRadar/radarInfo') {
+      sessionStorage.setItem('radarPage', this.table.pagination.current)
+      console.log(this.catalogIndex, 'this.catalogIndex')
+      if (this.catalogIndex >= 0) {
+        sessionStorage.setItem('radarUnit', this.catalogIndex)
+      } else {
+        sessionStorage.removeItem('radarUnit')
+      }
+    } else {
+      sessionStorage.removeItem('radarPage')
+      sessionStorage.removeItem('radarUnit')
+    }
+    next()
   },
   methods: {
     handleClickChange () {
