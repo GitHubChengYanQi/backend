@@ -60,6 +60,7 @@
                 <div class="title">{{ item.title }}</div>
                 <div class="input_box">
                   <a-range-picker
+                    valueFormat="YYYY-MM-DD"
                     class="date"
                     v-model="searchData.data[item.key]"
                     v-if="item.type == 'date'"
@@ -353,10 +354,24 @@ export default {
     if (sessionStorage.getItem('radarUnit') !== null && sessionStorage.getItem('radarUnit') >= 0) {
       this.catalogIndex = sessionStorage.getItem('radarUnit')
     }
+    const storageSearchData = sessionStorage.getItem('searchData')
+    if (storageSearchData) {
+      this.searchData = JSON.parse(storageSearchData)
+      console.log(this.searchData, '从缓存中取出')
+      // if (this.searchData.data.createdAt && this.searchData.data.createdAt.length !== 0) {
+      //   this.searchData.data.createdAt = this.searchData.data.createdAt.map(item => {
+      //     return moment(item).format('YYYY-MM-DD')
+      //   })
+      // }
+    }
+
     this.getGroup()
     if (sessionStorage.getItem('radarPage')) {
       this.table.pagination.current = Number(sessionStorage.getItem('radarPage'))
     }
+    sessionStorage.removeItem('radarUnit')
+    sessionStorage.removeItem('searchData')
+    sessionStorage.removeItem('radarPage')
     this.getTableData()
   },
   // 路由守卫离开路由之前
@@ -364,6 +379,8 @@ export default {
     console.log(from, '从哪里来', to, '跳到哪里')
     if (to.path === '/interactionRadar/editRadar' || to.path === '/interactionRadar/radarInfo') {
       sessionStorage.setItem('radarPage', this.table.pagination.current)
+      console.log(this.searchData, '搜索结果')
+      sessionStorage.setItem('searchData', JSON.stringify(this.searchData))
       console.log(this.catalogIndex, 'this.catalogIndex')
       if (this.catalogIndex >= 0) {
         sessionStorage.setItem('radarUnit', this.catalogIndex)
@@ -502,6 +519,7 @@ export default {
       }
     },
     getSearch () {
+      this.table.pagination.current = 1
       this.getTableData()
     },
     reset () {

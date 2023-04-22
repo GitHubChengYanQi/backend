@@ -336,6 +336,7 @@ export default {
     console.log(from, '从哪里来', to, '跳到哪里')
     if (to.path === '/groupsOperation/groupList/groupItemDetail') {
       sessionStorage.setItem('groupPage', this.pagination.current)
+      sessionStorage.setItem('groupSearchData', JSON.stringify(this.searchObj))
     } else {
       sessionStorage.removeItem('groupPage')
     }
@@ -347,6 +348,12 @@ export default {
     } else {
       this.pagination.current = 1
     }
+    const tempSearchInfo = sessionStorage.getItem('groupSearchData')
+    if (tempSearchInfo) {
+      this.searchObj = JSON.parse(tempSearchInfo)
+    }
+    sessionStorage.removeItem('groupPage')
+    sessionStorage.removeItem('groupSearchData')
     this.getTableList()
   },
   methods: {

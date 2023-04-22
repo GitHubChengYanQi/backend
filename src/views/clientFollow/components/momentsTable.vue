@@ -210,6 +210,12 @@ export default {
     } else {
       this.pagination.current = 1
     }
+    const tempSearchInfo = sessionStorage.getItem('momentSearchData')
+    if (tempSearchInfo) {
+      this.searchObj = JSON.parse(tempSearchInfo)
+    }
+    sessionStorage.removeItem('momentPage')
+    sessionStorage.removeItem('momentSearchData')
     this.getTableList()
   },
   methods: {
@@ -252,6 +258,7 @@ export default {
       this.searchObj.date = values
     },
     editItem (id) {
+      sessionStorage.setItem('momentSearchData', JSON.stringify(this.searchObj))
       this.$router.push(`/clientFollow/momentsOperation/edit?id=${id}`)
       sessionStorage.setItem('momentPage', this.pagination.current)
     },
