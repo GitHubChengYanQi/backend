@@ -150,6 +150,12 @@ export default {
     } else {
       this.$set(this.pagination, 'current', 1)
     }
+    const tempSearchInfo = sessionStorage.getItem('calendarSearchData')
+    if (tempSearchInfo) {
+      this.searchInfo = JSON.parse(tempSearchInfo)
+    }
+    sessionStorage.removeItem('calendarTemplatePage')
+    sessionStorage.removeItem('calendarSearchData')
     this.getTableData()
   },
   methods: {
@@ -287,6 +293,7 @@ export default {
     editItem (info) {
       // 将当前的页码存入缓存中
       sessionStorage.setItem('calendarTemplatePage', this.pagination.current)
+      sessionStorage.setItem('calendarSearchData', JSON.stringify(this.searchInfo))
       this.$router.push({
         path: '/sop/editClusterCalendar',
         query: {

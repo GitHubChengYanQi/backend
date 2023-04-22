@@ -564,15 +564,6 @@ export default {
       addRulePermission: []
     }
   },
-  // watch: {
-  //   table () {
-  //     console.log('tab切换')
-  //     this.pagination.current = 1
-  //     sessionStorage.removeItem('autoLabelPage')
-  //     sessionStorage.removeItem('autoLabelTab')
-  //     this.setTable(this.table)
-  //   }
-  // },
   created () {
     this.table = Number(sessionStorage.getItem('autoLabelTab'))
     if (sessionStorage.getItem('autoLabelPage')) {
@@ -580,6 +571,8 @@ export default {
     } else {
       this.pagination.current = 1
     }
+    sessionStorage.removeItem('autoLabelPage')
+    sessionStorage.removeItem('autoLabelTab')
     this.setTable(this.$route.query.id || 1)
     // this.getUrl()
   },
@@ -587,6 +580,11 @@ export default {
   beforeRouteLeave (to, from, next) {
     console.log(from, '从哪里来', to, '跳到哪里')
     if (to.path === '/clientFollow/labelExpendInfo' || to.path === '/clientFollow/labelInfo' || to.path === '/clientFollow/addRule' || to.path === '/clientFollow/addExpendRule') {
+      console.log(this.inputArr, 'inputArr', this.searchValue, '搜索规则')
+      const autoLabelSearchData = {}
+      this.$set(autoLabelSearchData, 'inputArr', this.inputArr)
+      this.$set(autoLabelSearchData, 'searchValue', this.searchValue)
+      sessionStorage.setItem('autoLabelSearchData', JSON.stringify(autoLabelSearchData))
       sessionStorage.setItem('autoLabelPage', this.pagination.current)
       // console.log(this.catalogIndex, 'this.catalogIndex')
       sessionStorage.setItem('autoLabelTab', this.table)
@@ -651,15 +649,24 @@ export default {
         this.$refs.labelSelect.inputArr = []
       }
       this.table = Number(e)
-      this.searchValue = ''
-      this.inputArr = []
+      const storageSearchData = sessionStorage.getItem('autoLabelSearchData')
+      if (storageSearchData) {
+        const tempSearchInfo = JSON.parse(storageSearchData)
+        this.inputArr = tempSearchInfo.inputArr
+        this.searchValue = tempSearchInfo.searchValue
+      } else {
+        this.searchValue = ''
+        this.inputArr = []
+      }
       this.tableData = []
       this.pagination.pageSize = 10
+      sessionStorage.removeItem('autoLabelSearchData')
       this.getTableData()
       history.replaceState(null, '', `/clientFollow/autoLabel?id=${e}`)
     },
     getTableData () {
       let labelIdGroup = ''
+      console.log(this.inputArr, 'this.inputArr')
       if (this.inputArr.length > 0) {
         this.inputArr.map((item, index) => {
           labelIdGroup = index == 0 ? item.id : labelIdGroup + ',' + item.id

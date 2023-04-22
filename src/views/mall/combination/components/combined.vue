@@ -216,6 +216,12 @@ export default {
     } else {
       this.pagination.current = 1
     }
+    const tempSearchInfo = sessionStorage.getItem('combinSearchData')
+    if (tempSearchInfo) {
+      this.screenData = JSON.parse(tempSearchInfo)
+    }
+    sessionStorage.removeItem('combinPage')
+    sessionStorage.removeItem('combinSearchData')
     this.initFn()
   },
   methods: {
@@ -330,6 +336,7 @@ export default {
       // 点击编辑后需要携带联合用药id跳转到编辑页面进行回显
       if (type === 'EDIT') {
         sessionStorage.setItem('combinPage', this.pagination.current)
+        sessionStorage.setItem('combinSearchData', JSON.stringify(this.screenData))
         this.$router.push({
           path: '/mall/combination/edit',
           query: {
