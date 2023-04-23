@@ -38,6 +38,8 @@ export default {
     if (to.path === '/mall/combination/edit') {
     } else {
       sessionStorage.removeItem('combinPage')
+      sessionStorage.removeItem('combinSearchData')
+      sessionStorage.removeItem('combinPageSize')
     }
     next()
   },

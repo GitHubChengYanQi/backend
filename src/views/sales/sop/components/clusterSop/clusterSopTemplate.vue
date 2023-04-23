@@ -141,11 +141,18 @@ export default {
     } else {
       this.$set(this.pagination, 'current', 1)
     }
+    const tempPageSize = sessionStorage.getItem('sopTemplatePageSize')
+    if (tempPageSize) {
+      this.$set(this.pagination, 'pageSize', Number(tempPageSize))
+    } else {
+      this.$set(this.pagination, 'pageSize', 10)
+    }
     const tempSearchInfo = sessionStorage.getItem('clusterSopSearchData')
     if (tempSearchInfo) {
       this.searchInfo = JSON.parse(tempSearchInfo)
     }
     sessionStorage.removeItem('sopTemplatePage')
+    sessionStorage.removeItem('sopTemplatePageSize')
     sessionStorage.removeItem('clusterSopSearchData')
     this.getTableData()
   },
@@ -292,6 +299,7 @@ export default {
     editItem (info) {
       // 将当前的页码存入缓存中
       sessionStorage.setItem('sopTemplatePage', this.pagination.current)
+      sessionStorage.setItem('sopTemplatePageSize', this.pagination.pageSize)
       sessionStorage.setItem('clusterSopSearchData', JSON.stringify(this.searchInfo))
       this.$router.push({
         path: '/sop/editClusterSop',

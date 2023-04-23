@@ -571,8 +571,14 @@ export default {
     } else {
       this.pagination.current = 1
     }
+    if (sessionStorage.getItem('autoLabelPageSize')) {
+      this.pagination.pageSize = Number(sessionStorage.getItem('autoLabelPageSize'))
+    } else {
+      this.pagination.pageSize = 10
+    }
     sessionStorage.removeItem('autoLabelPage')
     sessionStorage.removeItem('autoLabelTab')
+    sessionStorage.removeItem('autoLabelPageSize')
     this.setTable(this.$route.query.id || 1)
     // this.getUrl()
   },
@@ -586,6 +592,7 @@ export default {
       this.$set(autoLabelSearchData, 'searchValue', this.searchValue)
       sessionStorage.setItem('autoLabelSearchData', JSON.stringify(autoLabelSearchData))
       sessionStorage.setItem('autoLabelPage', this.pagination.current)
+      sessionStorage.setItem('autoLabelPageSize', this.pagination.pageSize)
       // console.log(this.catalogIndex, 'this.catalogIndex')
       sessionStorage.setItem('autoLabelTab', this.table)
     } else {
@@ -606,6 +613,7 @@ export default {
         this.pagination.current = 1
         sessionStorage.removeItem('autoLabelPage')
         sessionStorage.removeItem('autoLabelTab')
+        sessionStorage.removeItem('autoLabelPageSize')
         this.setTable(this.table)
       }
     },
@@ -659,7 +667,7 @@ export default {
         this.inputArr = []
       }
       this.tableData = []
-      this.pagination.pageSize = 10
+      // this.pagination.pageSize = 10
       sessionStorage.removeItem('autoLabelSearchData')
       this.getTableData()
       history.replaceState(null, '', `/clientFollow/autoLabel?id=${e}`)

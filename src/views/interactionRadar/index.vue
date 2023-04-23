@@ -369,9 +369,13 @@ export default {
     if (sessionStorage.getItem('radarPage')) {
       this.table.pagination.current = Number(sessionStorage.getItem('radarPage'))
     }
+    if (sessionStorage.getItem('radarPageSize')) {
+      this.table.pagination.pageSize = Number(sessionStorage.getItem('radarPageSize'))
+    }
     sessionStorage.removeItem('radarUnit')
     sessionStorage.removeItem('searchData')
     sessionStorage.removeItem('radarPage')
+    sessionStorage.removeItem('radarPageSize')
     this.getTableData()
   },
   // 路由守卫离开路由之前
@@ -379,6 +383,7 @@ export default {
     console.log(from, '从哪里来', to, '跳到哪里')
     if (to.path === '/interactionRadar/editRadar' || to.path === '/interactionRadar/radarInfo') {
       sessionStorage.setItem('radarPage', this.table.pagination.current)
+      sessionStorage.setItem('radarPageSize', this.table.pagination.pageSize)
       console.log(this.searchData, '搜索结果')
       sessionStorage.setItem('searchData', JSON.stringify(this.searchData))
       console.log(this.catalogIndex, 'this.catalogIndex')
@@ -389,6 +394,7 @@ export default {
       }
     } else {
       sessionStorage.removeItem('radarPage')
+      sessionStorage.removeItem('radarPageSize')
       sessionStorage.removeItem('radarUnit')
     }
     next()
