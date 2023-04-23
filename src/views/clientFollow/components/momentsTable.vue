@@ -210,11 +210,17 @@ export default {
     } else {
       this.pagination.current = 1
     }
+    if (sessionStorage.getItem('momentPageSize')) {
+      this.pagination.pageSize = Number(sessionStorage.getItem('momentPageSize'))
+    } else {
+      this.pagination.pageSize = 10
+    }
     const tempSearchInfo = sessionStorage.getItem('momentSearchData')
     if (tempSearchInfo) {
       this.searchObj = JSON.parse(tempSearchInfo)
     }
     sessionStorage.removeItem('momentPage')
+    sessionStorage.removeItem('momentPageSize')
     sessionStorage.removeItem('momentSearchData')
     this.getTableList()
   },
@@ -261,6 +267,7 @@ export default {
       sessionStorage.setItem('momentSearchData', JSON.stringify(this.searchObj))
       this.$router.push(`/clientFollow/momentsOperation/edit?id=${id}`)
       sessionStorage.setItem('momentPage', this.pagination.current)
+      sessionStorage.setItem('momentPageSize', this.pagination.pageSize)
     },
     handleTableChange ({ current, pageSize }, _, { columnKey, order }) {
       let str = ''

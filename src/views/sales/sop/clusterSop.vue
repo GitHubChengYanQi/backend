@@ -53,6 +53,8 @@ export default {
     if (to.path === '/sop/editClusterSop') {
     } else {
       sessionStorage.removeItem('sopTemplatePage')
+      sessionStorage.removeItem('sopTemplatePageSize')
+      sessionStorage.removeItem('clusterSopSearchData')
     }
     next()
   },

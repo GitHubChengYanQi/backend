@@ -150,11 +150,18 @@ export default {
     } else {
       this.$set(this.pagination, 'current', 1)
     }
+    const tempPageSize = sessionStorage.getItem('calendarTemplatePageSize')
+    if (tempPageSize) {
+      this.$set(this.pagination, 'pageSize', Number(tempPageSize))
+    } else {
+      this.$set(this.pagination, 'pageSize', 10)
+    }
     const tempSearchInfo = sessionStorage.getItem('calendarSearchData')
     if (tempSearchInfo) {
       this.searchInfo = JSON.parse(tempSearchInfo)
     }
     sessionStorage.removeItem('calendarTemplatePage')
+    sessionStorage.removeItem('calendarTemplatePageSize')
     sessionStorage.removeItem('calendarSearchData')
     this.getTableData()
   },
@@ -293,6 +300,7 @@ export default {
     editItem (info) {
       // 将当前的页码存入缓存中
       sessionStorage.setItem('calendarTemplatePage', this.pagination.current)
+      sessionStorage.setItem('calendarTemplatePageSize', this.pagination.pageSize)
       sessionStorage.setItem('calendarSearchData', JSON.stringify(this.searchInfo))
       this.$router.push({
         path: '/sop/editClusterCalendar',

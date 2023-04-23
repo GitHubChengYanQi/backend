@@ -51,6 +51,8 @@ export default {
     if (to.path === '/sop/editClusterCalendar') {
     } else {
       sessionStorage.removeItem('calendarTemplatePage')
+      sessionStorage.removeItem('calendarTemplatePageSize')
+      sessionStorage.removeItem('calendarSearchData')
     }
     next()
   },

@@ -53,6 +53,7 @@ export default {
     if (to.path === '/clientFollow/momentsOperation/edit') {
     } else {
       sessionStorage.removeItem('momentPage')
+      sessionStorage.removeItem('momentPageSize')
       sessionStorage.removeItem('momentSearchData')
     }
     next()
