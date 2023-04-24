@@ -261,7 +261,7 @@ export default {
           right: 20, // toolbox的定位位置
           feature: {
             dataView: { // 数据视图
-              show: true
+              show: false
             },
             restore: { // 重置
               show: true
@@ -274,7 +274,7 @@ export default {
               name: '客户统计图'
             },
             magicType: {// 动态类型切换
-              type: ['bar', 'line']
+              show: false
             }
           }
         },
