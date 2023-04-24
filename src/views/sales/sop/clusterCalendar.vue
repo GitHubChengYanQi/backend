@@ -53,6 +53,7 @@ export default {
       sessionStorage.removeItem('calendarTemplatePage')
       sessionStorage.removeItem('calendarTemplatePageSize')
       sessionStorage.removeItem('calendarSearchData')
+      sessionStorage.removeItem('calendarSort')
     }
     next()
   },

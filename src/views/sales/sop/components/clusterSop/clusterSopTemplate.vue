@@ -151,7 +151,11 @@ export default {
     if (tempSearchInfo) {
       this.searchInfo = JSON.parse(tempSearchInfo)
     }
+    if (sessionStorage.getItem('clusterSopSort')) {
+      this.sorter = sessionStorage.getItem('clusterSopSort')
+    }
     sessionStorage.removeItem('sopTemplatePage')
+    sessionStorage.removeItem('clusterSopSort')
     sessionStorage.removeItem('sopTemplatePageSize')
     sessionStorage.removeItem('clusterSopSearchData')
     this.getTableData()
@@ -301,6 +305,7 @@ export default {
       sessionStorage.setItem('sopTemplatePage', this.pagination.current)
       sessionStorage.setItem('sopTemplatePageSize', this.pagination.pageSize)
       sessionStorage.setItem('clusterSopSearchData', JSON.stringify(this.searchInfo))
+      sessionStorage.setItem('clusterSopSort', this.sorter)
       this.$router.push({
         path: '/sop/editClusterSop',
         query: {
