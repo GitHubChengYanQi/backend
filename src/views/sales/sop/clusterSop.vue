@@ -55,6 +55,7 @@ export default {
       sessionStorage.removeItem('sopTemplatePage')
       sessionStorage.removeItem('sopTemplatePageSize')
       sessionStorage.removeItem('clusterSopSearchData')
+      sessionStorage.removeItem('clusterSopSort')
     }
     next()
   },

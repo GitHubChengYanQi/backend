@@ -338,10 +338,12 @@ export default {
       sessionStorage.setItem('groupPage', this.pagination.current)
       sessionStorage.setItem('groupPageSize', this.pagination.pageSize)
       sessionStorage.setItem('groupSearchData', JSON.stringify(this.searchObj))
+      sessionStorage.setItem('groupSort', this.tableSortStr)
     } else {
       sessionStorage.removeItem('groupPage')
       sessionStorage.removeItem('groupPageSize')
       sessionStorage.removeItem('groupSearchData')
+      sessionStorage.removeItem('groupSort')
     }
     next()
   },
@@ -360,9 +362,13 @@ export default {
     if (tempSearchInfo) {
       this.searchObj = JSON.parse(tempSearchInfo)
     }
+    if (sessionStorage.getItem('groupSort')) {
+      this.tableSortStr = sessionStorage.getItem('groupSort')
+    }
     sessionStorage.removeItem('groupPage')
     sessionStorage.removeItem('groupSearchData')
     sessionStorage.removeItem('groupPageSize')
+    sessionStorage.removeItem('groupSort')
     this.getTableList()
   },
   methods: {

@@ -219,7 +219,13 @@ export default {
     if (tempSearchInfo) {
       this.searchObj = JSON.parse(tempSearchInfo)
     }
+    if (sessionStorage.getItem('momentSort')) {
+      this.tableSortStr = sessionStorage.getItem('momentSort')
+    } else {
+      this.tableSortStr = ''
+    }
     sessionStorage.removeItem('momentPage')
+    sessionStorage.removeItem('momentSort')
     sessionStorage.removeItem('momentPageSize')
     sessionStorage.removeItem('momentSearchData')
     this.getTableList()
@@ -268,6 +274,7 @@ export default {
       this.$router.push(`/clientFollow/momentsOperation/edit?id=${id}`)
       sessionStorage.setItem('momentPage', this.pagination.current)
       sessionStorage.setItem('momentPageSize', this.pagination.pageSize)
+      sessionStorage.setItem('momentSort', this.tableSortStr)
     },
     handleTableChange ({ current, pageSize }, _, { columnKey, order }) {
       let str = ''

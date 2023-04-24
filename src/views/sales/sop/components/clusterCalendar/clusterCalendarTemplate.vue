@@ -160,7 +160,13 @@ export default {
     if (tempSearchInfo) {
       this.searchInfo = JSON.parse(tempSearchInfo)
     }
+    if (sessionStorage.getItem('calendarSort')) {
+      this.sorter = sessionStorage.getItem('calendarSort')
+    } else {
+      this.sorter = ''
+    }
     sessionStorage.removeItem('calendarTemplatePage')
+    sessionStorage.removeItem('calendarSort')
     sessionStorage.removeItem('calendarTemplatePageSize')
     sessionStorage.removeItem('calendarSearchData')
     this.getTableData()
@@ -302,6 +308,7 @@ export default {
       sessionStorage.setItem('calendarTemplatePage', this.pagination.current)
       sessionStorage.setItem('calendarTemplatePageSize', this.pagination.pageSize)
       sessionStorage.setItem('calendarSearchData', JSON.stringify(this.searchInfo))
+      sessionStorage.setItem('calendarSort', this.sorter)
       this.$router.push({
         path: '/sop/editClusterCalendar',
         query: {
