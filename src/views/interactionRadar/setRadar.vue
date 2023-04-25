@@ -1418,7 +1418,8 @@ export default {
           if (!this.isEditor) {
             this.setData.inputData[this.selectKey] = this.uploadUrl
           } else {
-            this.$refs.editor[0].getEditorData('image', this.uploadUrl)
+            // this.$refs.editor[0].getEditorData('image', this.uploadUrl)
+            this.$refs.editor[0].chooseImage(this.insertFn, this.uploadUrl)
           }
           this.uploadUrl = ''
         } else if (this.medium.type == 5) {
@@ -1429,7 +1430,10 @@ export default {
               this.source.cancel()
               this.source = null
             }
-            if (this.uploadUrl.length > 0) { this.$refs.editor[0].getEditorData('video', this.uploadUrl) }
+            if (this.uploadUrl.length > 0) {
+              // this.$refs.editor[0].getEditorData('video', this.uploadUrl)
+              this.$refs.editor[0].chooseVideo(this.insertFn, this.uploadUrl)
+            }
           }
         } else {
           this.setData.inputData.radarPDF = this.uploadUrl
@@ -1447,7 +1451,8 @@ export default {
             }
             this.modelTab = 0
           } else {
-            this.$refs.editor[0].getEditorData('image', content.imageFullPath)
+            // this.$refs.editor[0].getEditorData('image', content.imageFullPath)
+            this.$refs.editor[0].chooseImage(this.insertFn, content.imageFullPath)
           }
         } else if (this.medium.type == 3) {
           this.setData.inputData.linkImg = content.imageFullPath
@@ -1460,7 +1465,8 @@ export default {
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = content.videoFullPath
           } else {
-            this.$refs.editor[0].getEditorData('video', content.videoFullPath)
+            // this.$refs.editor[0].getEditorData('video', content.videoFullPath)
+            this.$refs.editor[0].chooseVideo(this.insertFn, content.videoFullPath)
           }
         } else {
           this.setData.inputData.radarPDF = content.fileFullPath
@@ -1573,7 +1579,9 @@ export default {
           title: '上传PDF'
         }
       }
-      this.insertFn = insertInfo.insertFn
+      if (insertInfo) {
+        this.insertFn = insertInfo.insertFn
+      }
       console.log(this.setData)
       this.selectKey = selectKey
       this.selectIndex = selectIndex
