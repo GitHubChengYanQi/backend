@@ -30,7 +30,10 @@ export default {
         modalAppendToBody: false,
         excludeKeys: [
           'insertVideo',
-          'insertImage'
+          'insertImage',
+          'blockquote',
+          'fullScreen',
+          'codeBlock'
         ]
       },
       editorConfig: {
