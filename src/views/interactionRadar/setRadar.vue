@@ -199,13 +199,19 @@
                 <div class="hint" v-if="item.hint">{{ item.hint }}</div>
               </span>
               <span class="quillEditor_box" v-else-if="item.type == 'quillEditor'">
-                <quill-editor
+                <WangEditor
+                  ref="editor"
+                  @editorChange="editorChange"
+                  v-model="setData.inputData[item.key]"
+                  @editorInfo="setMedium">
+                </WangEditor>
+                <!-- <quill-editor
                   class="quillEditor"
                   @editorChange="editorChange"
                   @setMedium="setMedium"
                   :value="setData.inputData[item.key]"
                   ref="editor"
-                />
+                /> -->
                 <a-button
                   type="primary"
                   class="button"
@@ -550,7 +556,8 @@
 </template>
 
 <script>
-import QuillEditor from './components/QuillEditor'
+import WangEditor from '@/components/WangEditor/index.vue'
+// import QuillEditor from './components/QuillEditor'
 import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
 import { materialLibraryList, mediumGroup } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
@@ -559,9 +566,10 @@ import { getPdfMediaMethod, scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarA
 import axios from 'axios'
 
 export default {
-  components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
+  components: { 'label-select': LabelSelect, 'svg-icon': SvgIcon, WangEditor },
   data () {
     return {
+      insertFn: {},
       // 素材分组id
       materialGroupId: null,
       // 素材分组数据
@@ -1402,6 +1410,7 @@ export default {
       const reg = type == 0 ? new RegExp(str) : new RegExp(wxStr)
       return reg.test(val)
     },
+    // 点击弹框确定按钮
     setCatalog () {
       const { id, content } = this.radio
       if (this.modelTab == 0) {
@@ -1471,6 +1480,7 @@ export default {
       this.selectKey = 'linkImg'
       this.modalState = false
     },
+    // 监听富文本改变
     editorChange (html) {
       // console.log(html)
       this.setData.inputData.content = html
@@ -1545,8 +1555,8 @@ export default {
         })
       }
     },
-    // 设置
-    setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0) {
+    // 点击出现弹框
+    setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0, insertInfo) {
       this.isEditor = isEditor
       this.isUpload = false
       const title = {
@@ -1563,6 +1573,7 @@ export default {
           title: '上传PDF'
         }
       }
+      this.insertFn = insertInfo.insertFn
       console.log(this.setData)
       this.selectKey = selectKey
       this.selectIndex = selectIndex
