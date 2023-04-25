@@ -2302,6 +2302,14 @@ export default {
     height: 700px;
     overflow: auto;
   }
+  /deep/.ql-editor {
+    img {
+      max-width: 100%;
+    }
+    video {
+      max-width: 100%;
+    }
+  }
   .over_box {
     position: absolute;
     top: 60px;
