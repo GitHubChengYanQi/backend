@@ -17,11 +17,12 @@
               @blur="closeInput"
               @pressEnter="inputLable(item.id, index)"
             ></a-input>
+            <!-- :class="[choiceTagsArr.indexOf(JSON.stringify(obj)) != -1 ? 'labelSelect' : '']" -->
             <div
               class="labelSub"
               v-for="(obj, idx) in item.tags"
               :key="idx"
-              :class="[choiceTagsArr.indexOf(JSON.stringify(obj)) != -1 ? 'labelSelect' : '']"
+              :class="[choiceTagsArr.map(info => info.id).indexOf(obj.id) != -1 ? 'labelSelect' : '']"
               @click="selectTags(obj)"
             >
               {{ obj.name }}
@@ -92,7 +93,8 @@ export default {
             name: item.name,
             contactTagGroupId: item.contactTagGroupId
           }
-          return JSON.stringify(tagData)
+          return tagData
+          // return JSON.stringify(tagData)
         })
       }
       this.modalShow = true
@@ -126,9 +128,9 @@ export default {
     },
     // 选中标签
     selectTags (obj) {
-      const labelIndex = this.choiceTagsArr.indexOf(JSON.stringify(obj))
+      const labelIndex = this.choiceTagsArr.map(item => item.id).indexOf(obj.id)
       if (labelIndex == -1) {
-        this.choiceTagsArr.push(JSON.stringify(obj))
+        this.choiceTagsArr.push(obj)
       } else {
         this.choiceTagsArr.splice(labelIndex, 1)
       }
@@ -141,7 +143,7 @@ export default {
     handleOk (e) {
       this.modalShow = false
       const selectTags = this.choiceTagsArr.map((item, index) => {
-        return JSON.parse(item)
+        return item
       })
       this.$emit('choiceTagsArr', selectTags)
     },
