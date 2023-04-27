@@ -49,12 +49,17 @@
     <div class="list" v-if="type==='button' || type==='default'">
       <template v-if="num">
         <a-tag :closable="!disabled" @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows.slice(0,num)" :key="index">
+          <img src="@/assets/person.png" v-if="item.isLeaf === '1'">
+          <img src="@/assets/bolder.png" v-if="item.isLeaf === '0'">
           {{ item.title }}
         </a-tag>
         <a-tag v-if="rows.length>num">+ {{ rows.length - num }} ...</a-tag>
       </template>
       <template v-else>
-        <a-tag :closable="!disabled" @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows" :key="index">{{ item.title }}
+        <a-tag :closable="!disabled" @close="(e)=>{closeTagFn(e,item)}" v-for="(item,index) in rows" :key="index">
+          <img src="@/assets/person.png" v-if="item.isLeaf === '1'">
+          <img src="@/assets/bolder.png" v-if="item.isLeaf === '0'">
+          {{ item.title }}
         </a-tag>
       </template>
     </div>
@@ -421,9 +426,12 @@ export default {
 
   .list {
     margin-top: 10px;
-
     span {
       margin-bottom: 10px;
+      img {
+        width: 20px;
+        margin-right: 4px;
+      }
     }
   }
 }

@@ -89,6 +89,7 @@
           @click="cancelModal"
         >取消</a-button>
         <a-button
+          :disabled="valueArray.length === 0"
           @click="sureModal"
           type="primary"
         >确定</a-button>
