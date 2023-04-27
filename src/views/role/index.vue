@@ -686,7 +686,12 @@ export default {
         console.log(res)
         if (i != 0) {
           this.roleName = res.data.roleName
-          this.dataPermission = res.data.dataPermission ? res.data.dataPermission.toString() : '1'
+          if (res.data.dataPermission !== undefined) {
+            this.dataPermission = res.data.dataPermission.toString()
+          } else {
+            this.dataPermission = '1'
+          }
+          // this.dataPermission = res.data.dataPermission ? res.data.dataPermission.toString() : '1'
           let newData = this.treeData
           newData = newData.map((item) => {
             item.children = res.data.roleMenu.slice(0, 2).map((items) => {

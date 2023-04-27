@@ -242,14 +242,24 @@ export default {
       statisticsShow: true,
       // 折线图
       options: {
-        dataZoom: {
-          type: 'inside',
-          filterMode: 'none',
-          xAxisIndex: [0],
-          show: true,
-          start: 0,
-          end: 100
-        },
+        dataZoom: [
+          {
+            type: 'inside',
+            filterMode: 'none',
+            xAxisIndex: [0],
+            show: true,
+            start: 0,
+            end: 100,
+            minValueSpan: 3600 * 1000 * 24 * 4,
+            maxValueSpan: 3600 * 1000 * 24 * 30
+          },
+          {
+            type: 'inside',
+            filterMode: 'none',
+            yAxisIndex: [0],
+            show: true
+          }
+        ],
         tooltip: {
           trigger: 'axis'
         },
@@ -317,13 +327,13 @@ export default {
             // }
             formatter: {
               year: '{yyyy}',
-              month: '{yyyy}',
-              day: '{yyyy}',
-              hour: '{yyyy}',
-              minute: '{yyyy}',
-              second: '{HH}:{mm}:{ss}',
-              millisecond: '{yyyy}',
-              none: '{yyyy}'
+              month: '{MM}',
+              day: '{dd}',
+              hour: '{dd}',
+              minute: '{dd}',
+              second: '{dd}',
+              millisecond: '{dd}',
+              none: '{dd}'
             }
           },
           axisLine: {

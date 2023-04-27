@@ -463,13 +463,24 @@ export default {
         tab: 0,
         options: [
           {
-            dataZoom: {
-              type: 'inside',
-              filterMode: 'none',
-              show: true,
-              start: 0,
-              end: 100
-            },
+            dataZoom: [
+              {
+                type: 'inside',
+                filterMode: 'none',
+                xAxisIndex: [0],
+                show: true,
+                start: 0,
+                end: 100,
+                minValueSpan: 3600 * 1000 * 24 * 4,
+                maxValueSpan: 3600 * 1000 * 24 * 30
+              },
+              {
+                type: 'inside',
+                filterMode: 'none',
+                yAxisIndex: [0],
+                show: true
+              }
+            ],
             tooltip: {
               trigger: 'axis',
               axisPointer: {
