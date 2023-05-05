@@ -1047,5 +1047,23 @@ export const routeList = {
     name: '会员列表',
     component: () => import('@/views/integralManager/memberManager/index'),
     meta: { title: '会员列表' }
+  },
+  '/healthStation/equipManager': {
+    path: '/healthStation/equipManager',
+    name: '设备管理',
+    component: () => import('@/views/healthStation/equipManager'),
+    meta: { title: '设备管理' }
+  },
+  '/healthStation/customerTestManager': {
+    path: '/healthStation/customerTestManager',
+    name: '客户检测数据',
+    component: () => import('@/views/healthStation/customerTestManager'),
+    meta: { title: '客户检测数据' }
+  },
+  '/healthStation/personTestManager': {
+    path: '/healthStation/personTestManager',
+    name: '员工检测数据',
+    component: () => import('@/views/healthStation/personTestManager'),
+    meta: { title: '员工检测数据' }
   }
 }
