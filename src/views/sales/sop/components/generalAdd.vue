@@ -25,7 +25,7 @@
           <!-- v-if="treeData"
             :record="treeData" -->
           <!-- SelectPersonOnlyPerson -->
-          <selectPersonOnlyPerson
+          <selectPersonnel
             class="selectPersonnelCom"
             type="button"
             name="选择成员"
