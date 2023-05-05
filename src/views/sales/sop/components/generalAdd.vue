@@ -24,6 +24,7 @@
           </span>
           <!-- v-if="treeData"
             :record="treeData" -->
+          <!-- SelectPersonOnlyPerson -->
           <selectPersonnel
             class="selectPersonnelCom"
             type="button"
@@ -565,7 +566,7 @@ export default {
   }
 }
 </script>
-<style lang='less'>
+<style lang='less' scoped>
 #addSop_Page_Container {
   .selectPersonnelCom {
     width: 90%;

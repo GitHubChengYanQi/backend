@@ -21,7 +21,16 @@ import selectEmployeeInput from '@/components/SelectEmployeeNew/Input'
 
 import selectPersonnel from './components/SelectPersonnel/index'
 import selectDepartment from './components/SelectDepartment/index'
-
+// 引入新的组织架构组件多选(全选)
+import selectPersonAll from '@/components/SelectPersonnelAll/index'
+// 引入新的组织架构组件多选(只选人)
+import selectPersonOnlyPerson from '@/components/SelectPersonnelOnlyPerson/index'
+// 引入新的组织架构组件多选(只选机构)
+import selectPersonOnlyDepart from '@/components/SelectPersonnelOnlyDepart/index'
+// 引入新的组织架构组件单选(只选人)
+import selectReadonlyPersonOnlyPerson from '@/components/SelectReadonlyPersonOnlyPerson'
+// 引入新的组织架构组件单选(只选机构)
+import selectReadonlyPersonOnlyDepart from '@/components/SelectReadonlyPersonOnlyDepart'
 import selectTag from '@/components/Select/tag'
 import selectGroupTag from '@/components/Select/groupTags'
 import selectTagInput from '@/components/SelectTag/Input'
@@ -70,7 +79,16 @@ Vue.component('StepNews', stepNews)
 Vue.component('ExportExcel', ExportExcel)
 Vue.component('m-preview', preview)
 Vue.component('More', More)
-
+// 使用新的组织架构组件多选(全选)
+Vue.component('SelectPersonAll', selectPersonAll)
+// 使用新的组织架构组件多选(只选人)
+Vue.component('SelectPersonOnlyPerson', selectPersonOnlyPerson)
+// 使用新的组织架构组件多选(只选部门)
+Vue.component('SelectPersonOnlyDepart', selectPersonOnlyDepart)
+// 使用新的组织架构组件单选(只选人)
+Vue.component('SelectReadonlyPersonOnlyPerson', selectReadonlyPersonOnlyPerson)
+// 使用新的组织架构组件单选(只选部门)
+Vue.component('SelectReadonlyPersonOnlyDepart', selectReadonlyPersonOnlyDepart)
 Vue.component('vue-drag-resize', VueDragResize)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
