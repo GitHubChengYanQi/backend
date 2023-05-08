@@ -24,7 +24,7 @@
       :loading="loading"
       label-in-value
       v-model="rows"
-      mode="multiple"
+      mode="tags"
       :open="false"
       :showArrow="true"
       :allowClear="true"
@@ -271,26 +271,19 @@ export default {
       // this.$set(this, 'keys', e)
       this.rows = []
       this.getNodeInfo(this.treeData, e)
-      console.log(this.rows, 'this.rows')
-      // const arr = this.getNodes(this.treeData, this.keys)
-      // sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
-      // console.log(arr[0], 'arr[0]')
-      // this.rows = arr[0]
+      // console.log(this.rows, 'this.rows')
       this.$emit('getVal', e)
-      // if (type === 'ok') {
-      //   this.$emit('getVal', this.keys)
-      //   this.$emit('getRows', this.rows)
-      //   this.$emit('input', this.keys)
-      // }
+      this.$emit('getVal', this.rows)
     },
     // 新的获取组织机构节点信息
     getNodeInfo (list, keyList) {
-      console.log(list, '循环数据', keyList, '已存在的id数组', this.rows, '已存在的数组')
+      // console.log(list, '循环数据', keyList, '已存在的id数组', this.rows, '已存在的数组')
       const tempArray = deepClonev2(list)
       for (let i = 0; i < tempArray.length; i++) {
         // let tempIndex = keyList.findIndex(info => info === singleItem.id)
         const tempIndex = keyList.findIndex(info => info === tempArray[i].id)
         if (tempIndex !== -1) {
+          this.$set(tempArray[i], 'label', tempArray[i].title)
           this.rows.push(tempArray[i])
         }
         const tempInfo = tempArray[i]
@@ -346,7 +339,7 @@ export default {
     },
     closeTagFn (e, item) {
       e.preventDefault()
-      console.log(e, item, this.rows, '删除前打印的信息')
+      // console.log(e, item, this.rows, '删除前打印的信息')
       const tempArray = deepClonev2(this.rows)
       const tempIndex = tempArray.findIndex(info => info.id === item.id)
       if (tempIndex !== -1) {

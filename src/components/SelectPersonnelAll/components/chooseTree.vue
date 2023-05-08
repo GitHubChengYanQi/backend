@@ -220,7 +220,7 @@ export default {
       console.log(this.inputName, '监听输入框输入')
       if (this.inputName) {
         // 输入框中有内容
-        console.log(this.personList, this.positionList)
+        // console.log(this.personList, this.positionList)
         this.choosePersonStatus = 'list'
         this.personList = []
         this.positionList = []
@@ -238,7 +238,7 @@ export default {
       }
     },
     showStatus () {
-      console.log('监听showStatus', this.showStatus)
+      // console.log('监听showStatus', this.showStatus)
       if (this.showStatus) {
         this.inputName = ''
         this.personList = []
@@ -302,7 +302,7 @@ export default {
     judgeSelectStatus (info) {
       const tempTagList = deepClonev2(this.valueArray)
       const tempIndex = tempTagList.findIndex(item => item.id === info.id)
-      console.log(tempIndex, 'tempIndex')
+      // console.log(tempIndex, 'tempIndex')
       return tempIndex
     },
     initPositionList (array) {
@@ -377,14 +377,14 @@ export default {
     },
     // 选中树节点
     selectMethod (info, id) {
-      console.log(info, '选中的点', id)
+      // console.log(info, '选中的点', id)
       this.choosePerson(info)
       // this.tagList.push(info)
       // console.log(this.valueArray, 'value')
     },
     // 取消树节点
     unSelectMethod (info, id) {
-      console.log(info, '取消选中的点', id)
+      // console.log(info, '取消选中的点', id)
       this.choosePerson(info)
     },
     // 展开树节点

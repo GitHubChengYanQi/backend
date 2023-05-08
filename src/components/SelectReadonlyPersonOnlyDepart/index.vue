@@ -24,7 +24,7 @@
       :loading="loading"
       label-in-value
       v-model="rows"
-      mode="multiple"
+      mode="tags"
       :open="false"
       :showArrow="true"
       :allowClear="true"
@@ -312,16 +312,8 @@ export default {
       this.rows = []
       this.getNodeInfo(this.treeData, e)
       console.log(this.rows, 'this.rows')
-      // const arr = this.getNodes(this.treeData, this.keys)
-      // sessionStorage.setItem(this.curId, JSON.stringify(this.keys))
-      // console.log(arr[0], 'arr[0]')
-      // this.rows = arr[0]
-      this.$emit('getVal', e)
-      // if (type === 'ok') {
-      //   this.$emit('getVal', this.keys)
-      //   this.$emit('getRows', this.rows)
-      //   this.$emit('input', this.keys)
-      // }
+      // this.$emit('getVal', e)
+      this.$emit('getVal', this.rows)
     },
     // 新的获取组织机构节点信息
     getNodeInfo (list, keyList) {
@@ -331,6 +323,8 @@ export default {
         // let tempIndex = keyList.findIndex(info => info === singleItem.id)
         const tempIndex = keyList.findIndex(info => info === tempArray[i].id)
         if (tempIndex !== -1) {
+          // tempArray[i].value = tempArray[i].title
+          this.$set(tempArray[i], 'label', tempArray[i].title)
           this.rows.push(tempArray[i])
         }
         const tempInfo = tempArray[i]

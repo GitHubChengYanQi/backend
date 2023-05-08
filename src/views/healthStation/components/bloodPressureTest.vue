@@ -15,24 +15,39 @@
           <!-- <a-input class="singleInputDiv" v-model="screenData.name" placeholder="请输入机构/员工" :allowClear="true"></a-input> -->
         </div>
         <div class="singleSearchDiv">
+          <div class="singleLabelDiv">客户名称:</div>
+          <a-input class="singleInputDiv" v-model="screenData.customerName" placeholder="请输入客户名称" :allowClear="true"></a-input>
+        </div>
+        <div class="singleSearchDiv">
+          <div class="singleLabelDiv">是否会员:</div>
+          <a-select
+            :allowClear="true"
+            class="pickSelectClass"
+            placeholder="请选择"
+            v-model="screenData.isMemberCenterUser"
+          >
+            <a-select-option v-for="item in memberRelativeList" :key="item.code" :value="item.code">{{ item.name }}</a-select-option>
+          </a-select>
+        </div>
+        <div class="singleSearchDiv">
           <div class="singleLabelDiv">检测时间:</div>
           <a-range-picker class="pickTimeClass" v-model="totalDateArray" :format="dateFormatList" @change="changeRange"></a-range-picker>
         </div>
-        <div class="singleSearchDiv">
-          <a-button
-            type="primary"
-            style="margin: 0 10px;"
-            @click="searchMethod"
-          >查询</a-button>
-          <a-button
-            style="margin-right: 10px;"
-            @click="resetMethod"
-          >重置</a-button>
-          <a-button
-            type="primary"
-            @click="exportData"
-          >导出</a-button>
-        </div>
+      </div>
+      <div class="searchButtonLine">
+        <a-button
+          type="primary"
+          style="margin: 0 10px;"
+          @click="searchMethod"
+        >查询</a-button>
+        <a-button
+          style="margin-right: 10px;"
+          @click="resetMethod"
+        >重置</a-button>
+        <a-button
+          type="primary"
+          @click="exportData"
+        >导出</a-button>
       </div>
     </div>
     <a-table
@@ -45,31 +60,37 @@
       @change="handleTableChange"
       class="tableBox"
       :scroll="{ x: 1500}">
-      <div slot="empName" slot-scope="text">
-        {{ returnTableText(text) }}
-      </div>
       <div slot="orgName" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="detectionPeopleNumAll" slot-scope="text">
+      <div slot="empName" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="detectionMemberUserNumAll" slot-scope="text">
+      <div slot="devicesCustomerName" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="detectionAllNumAll" slot-scope="text">
+      <div slot="phone" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="detectionBloodPressureNumAll" slot-scope="text">
+      <div slot="isMemberCenterUserStr" slot-scope="text">
+        {{ returnIsMemberTableText(text) }}
+      </div>
+      <div slot="detectionTimeStr" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="detectionBloodGlucoseNumAll" slot-scope="text">
+      <div slot="systolicPressure" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="devicesBloodFatNumAll" slot-scope="text">
+      <div slot="diastoliBloodPressure" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="detectionUricAcidNumAll" slot-scope="text">
+      <div slot="heartRate" slot-scope="text">
+        {{ returnTableText(text) }}
+      </div>
+      <div slot="dataSources" slot-scope="text">
+        {{ returnTableText(text) }}
+      </div>
+      <div slot="bloodPressureDiagnosticResults" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
     </a-table>
@@ -77,9 +98,10 @@
 </template>
 <script>
 import moment from 'moment'
-import { deepClonev2 } from '@/utils/util'
-import { managerTestApi, exportManagerTestApi } from '@/api/healthTest'
+import { getDict } from '@/api/common'
+import { bloodPressureTestApi, exportBloodPressureTestApi } from '@/api/healthTest'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import { deepClonev2 } from '@/utils/util'
 export default {
   name: 'BackendBloodPressureTest',
   data () {
@@ -96,70 +118,84 @@ export default {
       tableLoading: true,
       // 列表数据
       tableDataList: [],
-      // 列表表头
+      // 列表表头数据
       tableColumns: [
         {
-          title: '员工姓名',
-          dataIndex: 'empName',
-          align: 'center',
-          width: 200,
-          scopedSlots: { customRender: 'empName' }
-        },
-        {
-          title: '所属机构',
+          title: '机构名称',
           dataIndex: 'orgName',
           align: 'center',
           width: 200,
           scopedSlots: { customRender: 'orgName' }
         },
         {
-          title: '检测人数',
-          dataIndex: 'detectionPeopleNumAll',
+          title: '检测员工',
+          dataIndex: 'empName',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'detectionPeopleNumAll' }
+          scopedSlots: { customRender: 'empName' }
         },
         {
-          title: '检测会员数',
-          dataIndex: 'detectionMemberUserNumAll',
+          title: '客户',
+          dataIndex: 'devicesCustomerName',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'detectionMemberUserNumAll' }
+          scopedSlots: { customRender: 'devicesCustomerName' }
         },
         {
-          title: '检测总次数',
-          dataIndex: 'detectionAllNumAll',
+          title: '手机号',
+          dataIndex: 'phone',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'detectionAllNumAll' }
+          scopedSlots: { customRender: 'phone' }
         },
         {
-          title: '检测血压次数',
-          dataIndex: 'detectionBloodPressureNumAll',
+          title: '是否会员',
+          dataIndex: 'isMemberCenterUserStr',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'detectionBloodPressureNumAll' }
+          scopedSlots: { customRender: 'isMemberCenterUserStr' }
         },
         {
-          title: '检测血糖次数',
-          dataIndex: 'detectionBloodGlucoseNumAll',
+          title: '检测时间',
+          dataIndex: 'detectionTimeStr',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'detectionBloodGlucoseNumAll' }
+          scopedSlots: { customRender: 'detectionTimeStr' }
         },
         {
-          title: '检测血脂次数',
-          dataIndex: 'devicesBloodFatNumAll',
+          title: '收缩压',
+          dataIndex: 'systolicPressure',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'devicesBloodFatNumAll' }
+          scopedSlots: { customRender: 'systolicPressure' }
         },
         {
-          title: '检测尿酸次数',
-          dataIndex: 'detectionUricAcidNumAll',
+          title: '舒张压',
+          dataIndex: 'diastoliBloodPressure',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'detectionUricAcidNumAll' }
+          scopedSlots: { customRender: 'diastoliBloodPressure' }
+        },
+        {
+          title: '心率',
+          dataIndex: 'heartRate',
+          align: 'center',
+          width: 200,
+          scopedSlots: { customRender: 'heartRate' }
+        },
+        {
+          title: '数据来源',
+          dataIndex: 'dataSources',
+          align: 'center',
+          width: 200,
+          scopedSlots: { customRender: 'dataSources' }
+        },
+        {
+          title: '诊断结果',
+          dataIndex: 'bloodPressureDiagnosticResults',
+          align: 'center',
+          width: 200,
+          scopedSlots: { customRender: 'bloodPressureDiagnosticResults' }
         }
       ],
       // 已选中列表
@@ -177,11 +213,16 @@ export default {
   },
 
   created () {
+    console.log('created')
     this.screenData = {}
-    this.getData()
+    this.getMemberRelativeMethod()
   },
 
   methods: {
+    returnIsMemberTableText (text) {
+      const tempArray = this.memberRelativeList.filter(item => item.code === text)
+      return tempArray[0].name
+    },
     // 单击某一行的回调
     onSelectionChange (selectedRowKeys, selectedRows) {
       console.log(selectedRowKeys, '单击某一行的回调', selectedRows)
@@ -191,10 +232,13 @@ export default {
       // this.selectedList = Object.assign([], tempIdArray)
       this.selectedKeyList = selectedRowKeys
     },
-    // 日期选择回调
-    changeRange (e) {
-      this.$set(this.screenData, 'beginTime', moment(e[0]).format('YYYY-MM-DD'))
-      this.$set(this.screenData, 'endTime', moment(e[1]).format('YYYY-MM-DD'))
+    // 获取是否关联机构
+    async getMemberRelativeMethod () {
+      const params = { dictType: 'yes_no' }
+      await getDict(params).then(response => {
+        this.memberRelativeList = response.data
+      })
+      this.getData()
     },
     // 获取数据
     getData () {
@@ -205,10 +249,10 @@ export default {
       }
       console.log(params, '查询列表提交对象')
       // 这里请求接口
-      managerTestApi(params).then(response => {
+      bloodPressureTestApi(params).then(response => {
         // this.tableDataList = response.data.list
         this.tableLoading = false
-        console.log(response, '获取员工检测数据')
+        console.log(response, '获取设备列表')
         this.tableData = response.data.list
         this.$set(this.pagination, 'total', Number(response.data.page.total))
         if (this.tableData.length === 0) {
@@ -246,6 +290,11 @@ export default {
       }
       // this.$set(this.screenData, 'employeeIds', e)
     },
+    // 日期选择回调
+    changeRange (e) {
+      this.$set(this.screenData, 'beginTime', moment(e[0]).format('YYYY-MM-DD'))
+      this.$set(this.screenData, 'endTime', moment(e[1]).format('YYYY-MM-DD'))
+    },
     // 查询按钮
     searchMethod () {
       this.$set(this.tablePagination, 'current', 1)
@@ -269,9 +318,9 @@ export default {
         ...this.screenData,
         idStr: this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : ''
       }
-      exportManagerTestApi(params).then(response => {
+      exportBloodPressureTestApi(params).then(response => {
         this.tableLoading = false
-        callDownLoadByBlob(response, '员工检测数据')
+        callDownLoadByBlob(response, '血压数据')
       })
     }
   }
@@ -279,5 +328,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import url('./css/customerTestTop.less');
+@import url('../css/customerTestTop.less');
 </style>

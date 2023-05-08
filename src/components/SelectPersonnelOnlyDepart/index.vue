@@ -331,6 +331,7 @@ export default {
         // let tempIndex = keyList.findIndex(info => info === singleItem.id)
         const tempIndex = keyList.findIndex(info => info === tempArray[i].id)
         if (tempIndex !== -1) {
+          this.$set(tempArray[i], 'label', tempArray[i].title)
           this.rows.push(tempArray[i])
         }
         const tempInfo = tempArray[i]
