@@ -35,9 +35,10 @@
         </div>
       </div>
     </div>
+    <!-- :row-key="record => record.id" -->
     <a-table
+      :row-key="record => record.empId"
       :loading="tableLoading"
-      :row-key="record => record.id"
       :data-source="tableDataList"
       :columns="tableColumns"
       :pagination="tablePagination"
@@ -177,7 +178,9 @@ export default {
   },
 
   created () {
-    this.screenData = {}
+    this.screenData = {
+      employeeIds: []
+    }
     this.getData()
   },
 
@@ -209,14 +212,14 @@ export default {
         // this.tableDataList = response.data.list
         this.tableLoading = false
         console.log(response, '获取员工检测数据')
-        this.tableData = response.data.list
-        this.$set(this.pagination, 'total', Number(response.data.page.total))
-        if (this.tableData.length === 0) {
+        this.tableDataList = response.data.list
+        this.$set(this.tablePagination, 'total', Number(response.data.page.total))
+        if (this.tableDataList.length === 0) {
           // 列表中没有数据
-          if (this.pagination.total !== 0) {
+          if (this.tablePagination.total !== 0) {
             // 总数据有,但当前页没有
             // 重新将页码换成1
-            this.$set(this.pagination, 'current', 1)
+            this.$set(this.tablePagination, 'current', 1)
             this.getData()
           } else {
             // 是真没有数据
@@ -255,6 +258,7 @@ export default {
     resetMethod () {
       this.$set(this.tablePagination, 'current', 1)
       this.screenData = {}
+      this.$set(this.screenData, 'employeeIds', [])
       this.totalDateArray = []
       this.getData()
     },

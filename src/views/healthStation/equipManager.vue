@@ -25,14 +25,15 @@
           type="primary"
           style="margin: 0 10px;"
           @click="goSearchData"
+          v-permission="`/healthWorkstationDevices/index@get`"
         >查询</a-button>
         <a-button
           @click="goResetData"
           style="margin: 0 10px;"
+          v-permission="`/healthWorkstationDevices/index@get`"
         >重置</a-button>
       </div>
     </div>
-    <!-- :row-selection="{ selectedRowKeys: selectedKeyList, onChange: onSelectionChange }" -->
     <a-table
       :loading="tableLoading"
       :row-key="record => record.id"
@@ -57,7 +58,7 @@
       <div slot="options" slot-scope="text, record">
         <template>
           <div style="display: flex;justify-content: center;">
-            <a-button type="link" @click="goEdit(record)" >编辑</a-button>
+            <a-button type="link" @click="goEdit(record)" v-permission="`/healthWorkstationDevices/getDevicesById@get`">编辑</a-button>
           </div>
         </template>
       </div>
@@ -72,31 +73,6 @@
       :getContainer="() => $refs['equip_container']"
     >
       <a-spin :spinning="editModalLoading">
-        <!-- <div class="editSearchDiv">
-            <div class="singleEditSearchDiv">
-                <div class="singleEditLabelDiv">设备SN码:</div>
-                <a-input class="singleInputDiv" v-model="editInfo.name" placeholder="请输入设备SN码" :disabled="true"></a-input>
-            </div>
-            <div class="singleEditSearchDiv">
-                <div class="singleEditLabelDiv">设备名称:</div>
-                <a-input class="singleInputDiv" v-model="editInfo.name" placeholder="请输入设备名称"></a-input>
-            </div>
-            <div class="singleEditSearchDiv">
-                <div class="singleEditLabelDiv">绑定机构:</div>
-                <a-input class="singleInputDiv" v-model="editInfo.name" placeholder="请输入绑定机构"></a-input>
-            </div>
-        </div> -->
-        <!-- <a-form :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-            <a-form-item label="设备SN码:">
-                <a-input class="singleInputDiv" v-model="editInfo.name" placeholder="请输入设备SN码" :disabled="true"></a-input>
-            </a-form-item>
-            <a-form-item label="设备名称:">
-                <a-input class="singleInputDiv" v-model="editInfo.name" placeholder="请输入设备名称"></a-input>
-            </a-form-item>
-            <a-form-item label="绑定机构:">
-                <a-input class="singleInputDiv" v-model="editInfo.name" placeholder="请输入选择绑定机构"></a-input>
-            </a-form-item>
-        </a-form> -->
         <a-form-model
           ref="editForm"
           :model="editInfo"
@@ -105,8 +81,7 @@
           :wrapper-col="{ span: 18 }"
         >
           <a-form-model-item label="设备SN码:" prop="snCode">
-            <!-- :disabled="true" -->
-            <a-input class="singleInputDiv" v-model="editInfo.snCode" placeholder="请输入设备SN码"></a-input>
+            <a-input class="singleInputDiv" v-model="editInfo.snCode" placeholder="请输入设备SN码" :disabled="true"></a-input>
           </a-form-model-item>
           <a-form-model-item label="设备名称:" prop="mobileDevicesName">
             <a-input
@@ -124,7 +99,6 @@
               v-model="editInfo.departmentId"
               @getVal="employeeIdsChange"
             />
-            <!-- <a-input class="singleInputDiv" v-model="editInfo.empName" placeholder="请绑定机构"></a-input> -->
           </a-form-model-item>
         </a-form-model>
       </a-spin>
@@ -137,12 +111,14 @@
           type="primary"
           :disabled="editModalLoading === true"
           @click="confirmEditMethod"
+          v-permission="`/healthWorkstationDevices/update@post`"
         >确定</a-button>
       </template>
     </a-modal>
   </div>
 </template>
 <script>
+import { deepClonev2 } from '@/utils/util'
 import { getDict } from '@/api/common'
 import { equipListApi, getEquipDetailApi, updateEquipApi } from '@/api/healthTest'
 export default {
@@ -247,14 +223,14 @@ export default {
         // this.tableDataList = response.data.list
         this.tableLoading = false
         console.log(response, '获取设备列表')
-        this.tableData = response.data.list
-        this.$set(this.pagination, 'total', Number(response.data.page.total))
-        if (this.tableData.length === 0) {
+        this.tableDataList = response.data.list
+        this.$set(this.tablePagination, 'total', Number(response.data.page.total))
+        if (this.tableDataList.length === 0) {
           // 列表中没有数据
-          if (this.pagination.total !== 0) {
+          if (this.tablePagination.total !== 0) {
             // 总数据有,但当前页没有
             // 重新将页码换成1
-            this.$set(this.pagination, 'current', 1)
+            this.$set(this.tablePagination, 'current', 1)
             this.getData()
           } else {
             // 是真没有数据
@@ -296,16 +272,25 @@ export default {
       const params = {
         id: record.id
       }
+      this.editInfo = {}
       getEquipDetailApi(params).then(response => {
         this.editModalShowStatus = true
         this.editInfo = response.data
+        if ((this.editInfo.departmentId === 0) || (this.editInfo.departmentId === null)) {
+          this.$set(this.editInfo, 'departmentId', [])
+        }
       })
     },
     // 组织机构选择回调
     employeeIdsChange (e) {
       console.log(e, '组织机构选择回调')
-      this.$set(this.editInfo, 'departmentId', e.map(item => item.id))
-      this.$set(this.editInfo, 'departmentName', e.map(item => item.title))
+      // this.$set(this.editInfo, 'departmentId', e.map(item => item.id))
+      // this.$set(this.editInfo, 'departmentName', e.map(item => item.title))
+      const tempArray = deepClonev2(e)
+      if (typeof tempArray[0] === 'object') {
+        this.$set(this.editInfo, 'departmentId', tempArray.map(item => item.id))
+        this.$set(this.editInfo, 'departmentName', tempArray.map(item => item.title))
+      }
     },
     // 点击关闭编辑弹框
     closeEditModal () {
@@ -316,14 +301,25 @@ export default {
     confirmEditMethod () {
       this.$refs.editForm.validate(valid => {
         if (valid) {
+          this.editModalLoading = true
           console.log('能提交', this.editInfo)
-          updateEquipApi(this.editInfo).then(response => {
+          const tempInfo = deepClonev2(this.editInfo)
+          tempInfo.departmentId = tempInfo.departmentId.join(',')
+          tempInfo.departmentName = tempInfo.departmentName.join(',')
+          updateEquipApi(tempInfo).then(response => {
             console.log(response, '修改设备')
             if (response.code === 200) {
+              this.editModalLoading = false
               this.editModalShowStatus = false
+              this.$message.success('修改成功')
               this.$set(this.tablePagination, 'current', 1)
               this.getData()
+            } else {
+              this.editModalLoading = false
             }
+          }).catch(error => {
+            console.log(error)
+            this.editModalLoading = false
           })
         } else {
           console.log('不能提交')

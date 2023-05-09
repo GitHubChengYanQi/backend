@@ -1048,8 +1048,8 @@ export const routeList = {
     component: () => import('@/views/integralManager/memberManager/index'),
     meta: { title: '会员列表' }
   },
-  '/healthStation/equipManager': {
-    path: '/healthStation/equipManager',
+  '/healthTest/equipManager': {
+    path: '/healthTest/equipManager',
     name: '设备管理',
     component: () => import('@/views/healthStation/equipManager'),
     meta: { title: '设备管理' }

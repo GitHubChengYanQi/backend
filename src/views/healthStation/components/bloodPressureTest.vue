@@ -73,7 +73,7 @@
         {{ returnTableText(text) }}
       </div>
       <div slot="isMemberCenterUserStr" slot-scope="text">
-        {{ returnIsMemberTableText(text) }}
+        {{ returnTableText(text) }}
       </div>
       <div slot="detectionTimeStr" slot-scope="text">
         {{ returnTableText(text) }}
@@ -88,7 +88,7 @@
         {{ returnTableText(text) }}
       </div>
       <div slot="dataSources" slot-scope="text">
-        {{ returnTableText(text) }}
+        {{ returnDataSourceText(text) }}
       </div>
       <div slot="bloodPressureDiagnosticResults" slot-scope="text">
         {{ returnTableText(text) }}
@@ -214,7 +214,9 @@ export default {
 
   created () {
     console.log('created')
-    this.screenData = {}
+    this.screenData = {
+      employeeIds: []
+    }
     this.getMemberRelativeMethod()
   },
 
@@ -222,6 +224,14 @@ export default {
     returnIsMemberTableText (text) {
       const tempArray = this.memberRelativeList.filter(item => item.code === text)
       return tempArray[0].name
+    },
+    // 返回数据来源
+    returnDataSourceText (text) {
+      if (text === '1') {
+        return '智能设备'
+      } else {
+        return '-'
+      }
     },
     // 单击某一行的回调
     onSelectionChange (selectedRowKeys, selectedRows) {
@@ -252,15 +262,15 @@ export default {
       bloodPressureTestApi(params).then(response => {
         // this.tableDataList = response.data.list
         this.tableLoading = false
-        console.log(response, '获取设备列表')
-        this.tableData = response.data.list
-        this.$set(this.pagination, 'total', Number(response.data.page.total))
-        if (this.tableData.length === 0) {
+        console.log(response, '获取血压列表')
+        this.tableDataList = response.data.list
+        this.$set(this.tablePagination, 'total', Number(response.data.page.total))
+        if (this.tableDataList.length === 0) {
           // 列表中没有数据
-          if (this.pagination.total !== 0) {
+          if (this.tablePagination.total !== 0) {
             // 总数据有,但当前页没有
             // 重新将页码换成1
-            this.$set(this.pagination, 'current', 1)
+            this.$set(this.tablePagination, 'current', 1)
             this.getData()
           } else {
             // 是真没有数据
@@ -304,6 +314,7 @@ export default {
     resetMethod () {
       this.$set(this.tablePagination, 'current', 1)
       this.screenData = {}
+      this.$set(this.screenData, 'employeeIds', [])
       this.totalDateArray = []
       this.getData()
     },
