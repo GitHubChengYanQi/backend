@@ -93,8 +93,13 @@
       <div slot="dataSources" slot-scope="text">
         {{ returnDataSourceText(text) }}
       </div>
-      <div slot="bloodPressureDiagnosticResults" slot-scope="text">
-        {{ returnTableText(text) }}
+      <div slot="bloodFatDiagnosisResultVo" slot-scope="text, record">
+        <div
+          :style="{color: record.bloodFatDiagnosisResultVo.color}"
+          v-if="record.bloodFatDiagnosisResultVo
+            && record.bloodFatDiagnosisResultVo.diagnosticResultsName">
+          {{ record.bloodFatDiagnosisResultVo.diagnosticResultsName }}
+        </div>
       </div>
     </a-table>
   </div>
@@ -202,10 +207,10 @@ export default {
         },
         {
           title: '诊断结果',
-          dataIndex: 'bloodPressureDiagnosticResults',
+          dataIndex: 'bloodFatDiagnosisResultVo',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'bloodPressureDiagnosticResults' }
+          scopedSlots: { customRender: 'bloodFatDiagnosisResultVo' }
         }
       ],
       // 已选中列表
@@ -267,6 +272,7 @@ export default {
         perPage: this.tablePagination.pageSize,
         ...this.screenData
       }
+      this.tableLoading = true
       console.log(params, '查询列表提交对象')
       // 这里请求接口
       bloodFlatTestApi(params).then(response => {
@@ -339,6 +345,7 @@ export default {
         ...this.screenData,
         idStr: this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : ''
       }
+      this.tableLoading = true
       exportBloodFlatTestApi(params).then(response => {
         this.tableLoading = false
         callDownLoadByBlob(response, '血脂数据')

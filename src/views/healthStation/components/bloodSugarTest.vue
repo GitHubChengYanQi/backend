@@ -81,14 +81,23 @@
       <div slot="bloodGlucoseVal" slot-scope="text">
         {{ returnTableText(text) }}
       </div>
-      <div slot="samplingPeriodStr" slot-scope="text">
-        {{ returnTableText(text) }}
+      <div slot="samplingPeriodStr" slot-scope="text, record">
+        <div
+          v-if="record.bloodSugarDiagnosisResultVo
+            && record.bloodSugarDiagnosisResultVo.samplingPeriodName">
+          {{ record.bloodSugarDiagnosisResultVo.samplingPeriodName }}
+        </div>
       </div>
       <div slot="dataSources" slot-scope="text">
         {{ returnDataSourceText(text) }}
       </div>
-      <div slot="bloodPressureDiagnosticResults" slot-scope="text">
-        {{ returnTableText(text) }}
+      <div slot="bloodSugarDiagnosisResultVo" slot-scope="text, record">
+        <div
+          :style="{color: record.bloodSugarDiagnosisResultVo.color}"
+          v-if="record.bloodSugarDiagnosisResultVo
+            && record.bloodSugarDiagnosisResultVo.diagnosticResultsName">
+          {{ record.bloodSugarDiagnosisResultVo.diagnosticResultsName }}
+        </div>
       </div>
     </a-table>
   </div>
@@ -182,10 +191,10 @@ export default {
         },
         {
           title: '诊断结果',
-          dataIndex: 'bloodPressureDiagnosticResults',
+          dataIndex: 'bloodSugarDiagnosisResultVo',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'bloodPressureDiagnosticResults' }
+          scopedSlots: { customRender: 'bloodSugarDiagnosisResultVo' }
         }
       ],
       // 已选中列表
@@ -248,6 +257,7 @@ export default {
         ...this.screenData
       }
       console.log(params, '查询列表提交对象')
+      this.tableLoading = true
       // 这里请求接口
       bloodSugarTestApi(params).then(response => {
         // this.tableDataList = response.data.list

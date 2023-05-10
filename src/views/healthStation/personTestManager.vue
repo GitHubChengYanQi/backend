@@ -207,6 +207,7 @@ export default {
         ...this.screenData
       }
       console.log(params, '查询列表提交对象')
+      this.tableLoading = true
       // 这里请求接口
       managerTestApi(params).then(response => {
         // this.tableDataList = response.data.list
@@ -269,10 +270,17 @@ export default {
     },
     // 导出按钮
     exportData () {
+      // const params = {
+      //   ...this.screenData,
+      //   idStr: this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : ''
+      // }
       const params = {
-        ...this.screenData,
-        idStr: this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : ''
+        page: this.tablePagination.current,
+        perPage: this.tablePagination.pageSize,
+        idStr: this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : '',
+        ...this.screenData
       }
+      this.tableLoading = true
       exportManagerTestApi(params).then(response => {
         this.tableLoading = false
         callDownLoadByBlob(response, '员工检测数据')

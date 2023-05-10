@@ -84,8 +84,13 @@
       <div slot="dataSources" slot-scope="text">
         {{ returnDataSourceText(text) }}
       </div>
-      <div slot="bloodPressureDiagnosticResults" slot-scope="text">
-        {{ returnTableText(text) }}
+      <div slot="uricAcidDiagnosisResultVo" slot-scope="text, record">
+        <div
+          :style="{color: record.uricAcidDiagnosisResultVo.color}"
+          v-if="record.uricAcidDiagnosisResultVo
+            && record.uricAcidDiagnosisResultVo.diagnosticResultsName">
+          {{ record.uricAcidDiagnosisResultVo.diagnosticResultsName }}
+        </div>
       </div>
     </a-table>
   </div>
@@ -172,10 +177,10 @@ export default {
         },
         {
           title: '诊断结果',
-          dataIndex: 'bloodPressureDiagnosticResults',
+          dataIndex: 'uricAcidDiagnosisResultVo',
           align: 'center',
           width: 200,
-          scopedSlots: { customRender: 'bloodPressureDiagnosticResults' }
+          scopedSlots: { customRender: 'uricAcidDiagnosisResultVo' }
         }
       ],
       // 已选中列表
@@ -237,6 +242,7 @@ export default {
         perPage: this.tablePagination.pageSize,
         ...this.screenData
       }
+      this.tableLoading = true
       console.log(params, '查询列表提交对象')
       // 这里请求接口
       uricAcidTestApi(params).then(response => {
@@ -305,6 +311,7 @@ export default {
     },
     // 导出按钮
     exportData () {
+      this.tableLoading = true
       const params = {
         ...this.screenData,
         idStr: this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : ''
