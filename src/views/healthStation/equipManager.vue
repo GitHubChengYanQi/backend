@@ -218,6 +218,7 @@ export default {
         perPage: this.tablePagination.pageSize,
         ...this.screenData
       }
+      this.tableLoading = true
       console.log(params, '查询列表提交对象')
       equipListApi(params).then(response => {
         // this.tableDataList = response.data.list
@@ -278,6 +279,13 @@ export default {
         this.editInfo = response.data
         if ((this.editInfo.departmentId === 0) || (this.editInfo.departmentId === null)) {
           this.$set(this.editInfo, 'departmentId', [])
+        } else {
+          const tempIdArray = []
+          tempIdArray.push(String(this.editInfo.departmentId))
+          this.$set(this.editInfo, 'departmentId', tempIdArray)
+          const tempNameArray = []
+          tempNameArray.push(this.editInfo.departmentName)
+          this.$set(this.editInfo, 'departmentName', tempNameArray)
         }
       })
     },
@@ -286,10 +294,15 @@ export default {
       console.log(e, '组织机构选择回调')
       // this.$set(this.editInfo, 'departmentId', e.map(item => item.id))
       // this.$set(this.editInfo, 'departmentName', e.map(item => item.title))
-      const tempArray = deepClonev2(e)
-      if (typeof tempArray[0] === 'object') {
-        this.$set(this.editInfo, 'departmentId', tempArray.map(item => item.id))
-        this.$set(this.editInfo, 'departmentName', tempArray.map(item => item.title))
+      if (e.length !== 0) {
+        const tempArray = deepClonev2(e)
+        if (typeof tempArray[0] === 'object') {
+          this.$set(this.editInfo, 'departmentId', tempArray.map(item => item.id))
+          this.$set(this.editInfo, 'departmentName', tempArray.map(item => item.title))
+        }
+      } else {
+        this.$set(this.editInfo, 'departmentId', [])
+        this.$set(this.editInfo, 'departmentName', '')
       }
     },
     // 点击关闭编辑弹框
@@ -304,8 +317,18 @@ export default {
           this.editModalLoading = true
           console.log('能提交', this.editInfo)
           const tempInfo = deepClonev2(this.editInfo)
-          tempInfo.departmentId = tempInfo.departmentId.join(',')
-          tempInfo.departmentName = tempInfo.departmentName.join(',')
+          if (tempInfo.departmentId.length !== 0) {
+            tempInfo.departmentId = tempInfo.departmentId.join(',')
+          } else {
+            this.$delete(tempInfo, 'departmentId')
+          }
+          if (tempInfo.departmentName.length !== 0) {
+            tempInfo.departmentName = tempInfo.departmentName.join(',')
+          } else {
+            this.$delete(tempInfo, 'departmentName')
+          }
+          // tempInfo.departmentId = tempInfo.departmentId.length !== 0 ? tempInfo.departmentId.join(',') : ''
+          // tempInfo.departmentName = tempInfo.departmentName.length !== 0 ? tempInfo.departmentName.join(',') : ''
           updateEquipApi(tempInfo).then(response => {
             console.log(response, '修改设备')
             if (response.code === 200) {
