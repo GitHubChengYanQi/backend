@@ -219,6 +219,7 @@ export default {
     showStatus () {
       // console.log('监听showStatus', this.showStatus)
       if (this.showStatus) {
+        this.options = []
         this.inputName = ''
         this.personList = []
         this.positionList = []
@@ -278,7 +279,6 @@ export default {
       if (info.isLeaf === '0') {
         const tempArray = []
         tempArray.push(info.id)
-        this.options = []
         this.chooseTreeVisible = false
         this.choosePersonStatus = 'tree'
         this.$emit('update:showStatus', false)

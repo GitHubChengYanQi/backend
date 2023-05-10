@@ -83,17 +83,18 @@
           <a-form-model-item label="设备SN码:" prop="snCode">
             <a-input class="singleInputDiv" v-model="editInfo.snCode" placeholder="请输入设备SN码" :disabled="true"></a-input>
           </a-form-model-item>
-          <a-form-model-item label="设备名称:" prop="mobileDevicesName">
+          <a-form-model-item label="设备名称:" prop="mobileDevicesName" class="deviceNameClass">
             <a-input
               class="singleInputDiv"
               v-model="editInfo.mobileDevicesName"
               placeholder="请输入设备名称">
             </a-input>
+            <span class="len">{{ editInfo.mobileDevicesName && editInfo.mobileDevicesName.length ? editInfo.mobileDevicesName.length :'0' }}/10</span>
           </a-form-model-item>
           <a-form-model-item label="绑定机构:" prop="departmentId">
             <SelectReadonlyPersonOnlyDepart
               class="selectPersonnelCom"
-              name="请选择创建者"
+              name="请选择机构"
               :changeId="true"
               :num="1"
               v-model="editInfo.departmentId"
@@ -145,18 +146,18 @@ export default {
       // 列表表头数据
       tableColumns: [
         {
-          title: '设备SN码',
-          dataIndex: 'snCode',
-          align: 'center',
-          width: 200,
-          scopedSlots: { customRender: 'snCode' }
-        },
-        {
           title: '设备名称',
           dataIndex: 'mobileDevicesName',
           align: 'center',
           width: 200,
           scopedSlots: { customRender: 'mobileDevicesName' }
+        },
+        {
+          title: '设备SN码',
+          dataIndex: 'snCode',
+          align: 'center',
+          width: 200,
+          scopedSlots: { customRender: 'snCode' }
         },
         {
           title: '是否关联机构',
@@ -201,7 +202,13 @@ export default {
   created () {
     this.getEquipRelativeMethod()
   },
-
+  watch: {
+    'editInfo.mobileDevicesName' (e) {
+      if (e && e.length > 10) {
+        this.editInfo.mobileDevicesName = e.slice(0, 10)
+      }
+    }
+  },
   methods: {
     // 获取是否关联机构
     async getEquipRelativeMethod () {

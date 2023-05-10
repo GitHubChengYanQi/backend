@@ -25,20 +25,23 @@
     background-color: white;
 }
 /deep/.limitModalClass {
-    .editSearchDiv {
-        padding: 0px 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        .singleEditSearchDiv {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            flex-wrap: nowrap;
-            margin-bottom: 20px;
-            .singleEditLabelDiv {
-                flex-shrink: 0;
-                margin-right: 20px;
+    .deviceNameClass {
+        .ant-form-item-control-wrapper {
+            .ant-form-item-control {
+                .ant-form-item-children {
+                    .len {
+                        position: absolute;
+                        top: 0px;
+                        height: 100%;
+                        right: 10px;
+                        bottom: 0px;
+                        margin: auto;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 14px;
+                    }
+                }
             }
         }
     }
