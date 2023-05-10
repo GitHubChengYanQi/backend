@@ -31,7 +31,7 @@
       style="width:100%"
       @click.native="openModal"
       @change="onChange"
-      placeholder="请选择员工"
+      :placeholder="name"
       :maxTagCount="num"
       v-if="type==='selector'"
     />
