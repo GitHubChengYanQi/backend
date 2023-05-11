@@ -316,8 +316,10 @@ export default {
       if (typeof tempArray[0] === 'object') {
         const tempPersonList = tempArray.filter(item => item.isLeaf === '1')
         const tempDepartList = tempArray.filter(item => item.isLeaf === '0')
-        this.$set(this.screenData, 'orgIdStr', tempPersonList.map(item => item.id).join(','))
-        this.$set(this.screenData, 'empIdStr', tempDepartList.map(item => item.id).join(','))
+        // this.$set(this.screenData, 'orgIdStr', tempPersonList.map(item => item.id).join(','))
+        // this.$set(this.screenData, 'empIdStr', tempDepartList.map(item => item.id).join(','))
+        this.$set(this.screenData, 'orgIdStr', tempDepartList.map(item => item.id).join(','))
+        this.$set(this.screenData, 'empIdStr', tempPersonList.map(item => item.id).join(','))
       }
       // this.$set(this.screenData, 'employeeIds', e)
     },
