@@ -281,17 +281,20 @@ export default {
     // 组织机构选择回调
     employeeIdsChange (e) {
       console.log(e, '组织机构选择回调')
-      // debugger
-      const tempArray = deepClonev2(e)
-      if (typeof tempArray[0] === 'object') {
-        const tempPersonList = tempArray.filter(item => item.isLeaf === '1')
-        const tempDepartList = tempArray.filter(item => item.isLeaf === '0')
-        // this.$set(this.screenData, 'orgIdStr', tempPersonList.map(item => item.id).join(','))
-        // this.$set(this.screenData, 'empIdStr', tempDepartList.map(item => item.id).join(','))
-        this.$set(this.screenData, 'orgIdStr', tempDepartList.map(item => item.id).join(','))
-        this.$set(this.screenData, 'empIdStr', tempPersonList.map(item => item.id).join(','))
+      if (e.length !== 0) {
+        const tempArray = deepClonev2(e)
+        if (typeof tempArray[0] === 'object') {
+          const tempPersonList = tempArray.filter(item => item.isLeaf === '1')
+          const tempDepartList = tempArray.filter(item => item.isLeaf === '0')
+          // this.$set(this.screenData, 'orgIdStr', tempPersonList.map(item => item.id).join(','))
+          // this.$set(this.screenData, 'empIdStr', tempDepartList.map(item => item.id).join(','))
+          this.$set(this.screenData, 'orgIdStr', tempDepartList.map(item => item.id).join(','))
+          this.$set(this.screenData, 'empIdStr', tempPersonList.map(item => item.id).join(','))
+        }
+      } else {
+        this.$set(this.screenData, 'orgIdStr', '')
+        this.$set(this.screenData, 'empIdStr', '')
       }
-      // this.$set(this.screenData, 'employeeIds', e)
     },
     // 日期选择回调
     changeRange (e) {
@@ -310,6 +313,8 @@ export default {
       this.$set(this.screenData, 'employeeIds', [])
       this.totalDateArray = []
       this.$set(this.screenData, 'isMemberCenterUser', this.memberRelativeList[0].code)
+      this.$set(this.screenData, 'orgIdStr', '')
+      this.$set(this.screenData, 'empIdStr', '')
       this.getData()
     },
     // 表格为空时显示"-"验证
