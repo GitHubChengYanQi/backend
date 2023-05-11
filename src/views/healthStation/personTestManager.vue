@@ -6,7 +6,7 @@
           <div class="singleLabelDiv">机构/员工:</div>
           <SelectPersonAll
             class="singleInputDiv"
-            name="请输入机构/员工"
+            name="请选择机构/员工"
             :changeId="true"
             :num="1"
             v-model="screenData.employeeIds"
