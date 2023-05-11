@@ -298,8 +298,15 @@ export default {
     },
     // 日期选择回调
     changeRange (e) {
-      this.$set(this.screenData, 'beginTime', moment(e[0]).format('YYYY-MM-DD'))
-      this.$set(this.screenData, 'endTime', moment(e[1]).format('YYYY-MM-DD'))
+      // this.$set(this.screenData, 'beginTime', moment(e[0]).format('YYYY-MM-DD'))
+      // this.$set(this.screenData, 'endTime', moment(e[1]).format('YYYY-MM-DD'))
+      if (e.length !== 0) {
+        this.$set(this.screenData, 'beginTime', moment(e[0]).format('YYYY-MM-DD'))
+        this.$set(this.screenData, 'endTime', moment(e[1]).format('YYYY-MM-DD'))
+      } else {
+        this.$set(this.screenData, 'beginTime', '')
+        this.$set(this.screenData, 'endTime', '')
+      }
     },
     // 查询按钮
     searchMethod () {
