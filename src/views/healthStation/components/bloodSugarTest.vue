@@ -21,7 +21,6 @@
         <div class="singleSearchDiv">
           <div class="singleLabelDiv">是否会员:</div>
           <a-select
-            :allowClear="true"
             class="pickSelectClass"
             placeholder="请选择"
             v-model="screenData.isMemberCenterUser"
@@ -246,7 +245,12 @@ export default {
       const params = { dictType: 'yes_no' }
       await getDict(params).then(response => {
         this.memberRelativeList = response.data
+        this.memberRelativeList.unshift({
+          code: '-1',
+          name: '全部'
+        })
       })
+      this.$set(this.screenData, 'isMemberCenterUser', this.memberRelativeList[0].code)
       this.getData()
     },
     // 获取数据
@@ -256,6 +260,7 @@ export default {
         perPage: this.tablePagination.pageSize,
         ...this.screenData
       }
+      params.isMemberCenterUser = params.isMemberCenterUser === '-1' ? '' : params.isMemberCenterUser
       console.log(params, '查询列表提交对象')
       this.tableLoading = true
       // 这里请求接口
@@ -316,6 +321,7 @@ export default {
       this.screenData = {}
       this.$set(this.screenData, 'employeeIds', [])
       this.totalDateArray = []
+      this.$set(this.screenData, 'isMemberCenterUser', this.memberRelativeList[0].code)
       this.getData()
     },
     // 表格为空时显示"-"验证
@@ -329,6 +335,8 @@ export default {
         ...this.screenData,
         idStr: this.selectedKeyList.length !== 0 ? this.selectedKeyList.join(',') : ''
       }
+      params.isMemberCenterUser = params.isMemberCenterUser === '-1' ? '' : params.isMemberCenterUser
+      this.tableLoading = true
       exportBloodSugarTestApi(params).then(response => {
         this.tableLoading = false
         callDownLoadByBlob(response, '血糖数据')
