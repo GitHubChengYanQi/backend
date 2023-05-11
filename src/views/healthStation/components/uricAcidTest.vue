@@ -230,7 +230,8 @@ export default {
     async getMemberRelativeMethod () {
       const params = { dictType: 'yes_no' }
       await getDict(params).then(response => {
-        this.memberRelativeList = response.datathis.memberRelativeList.unshift({
+        this.memberRelativeList = response.data
+        this.memberRelativeList.unshift({
           code: '-1',
           name: '全部'
         })
