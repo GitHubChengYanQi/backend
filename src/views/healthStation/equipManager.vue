@@ -12,7 +12,6 @@
       <div class="singleSearchDiv">
         <div class="singleLabelDiv">是否关联机构:</div>
         <a-select
-          :allowClear="true"
           class="pickSelectClass"
           placeholder="请选择"
           v-model="screenData.isOrg"
@@ -215,7 +214,12 @@ export default {
       const params = { dictType: 'yes_no' }
       await getDict(params).then(response => {
         this.equipRelativeList = response.data
+        this.equipRelativeList.unshift({
+          code: '-1',
+          name: '全部'
+        })
       })
+      this.$set(this.screenData, 'isOrg', this.equipRelativeList[0].code)
       this.getData()
     },
     // 获取数据
@@ -225,6 +229,7 @@ export default {
         perPage: this.tablePagination.pageSize,
         ...this.screenData
       }
+      params.isOrg = params.isOrg === '-1' ? '' : params.isOrg
       this.tableLoading = true
       console.log(params, '查询列表提交对象')
       equipListApi(params).then(response => {
@@ -264,6 +269,7 @@ export default {
     goResetData () {
       this.$set(this.tablePagination, 'current', 1)
       this.screenData = {}
+      this.$set(this.screenData, 'isOrg', this.equipRelativeList[0].code)
       this.getData()
     },
     // 表格为空时显示"-"验证
