@@ -15,7 +15,7 @@
           <!-- <a-input class="singleInputDiv" v-model="screenData.name" placeholder="请输入机构/员工" :allowClear="true"></a-input> -->
         </div>
         <div class="singleSearchDiv">
-          <div class="singleLabelDiv">检测时间:</div>
+          <div class="singleLabelDiv">时间范围:</div>
           <a-range-picker class="pickTimeClass" v-model="totalDateArray" :format="dateFormatList" @change="changeRange"></a-range-picker>
         </div>
         <div class="singleSearchDiv">
