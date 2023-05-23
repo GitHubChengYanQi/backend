@@ -273,7 +273,7 @@ export default {
       this.rows = []
       this.getNodeInfo(this.treeData, e)
       // console.log(this.rows, 'this.rows')
-      this.$emit('getVal', e)
+      // this.$emit('getVal', e)
       this.$emit('getVal', this.rows)
     },
     // 新的获取组织机构节点信息
@@ -322,21 +322,22 @@ export default {
     },
     onChange (e) {
       console.log(e, 'eeee')
-      // if (e.length === 0) {
-      //   this.keys = []
-      //   this.rows = []
-      //   this.$emit('input', [])
-      //   this.$emit('getRows', [])
-      //   this.$emit('getVal', [])
-      // } else {
-      //   const keys = []
-      //   for (let i = 0; i < e.length; i++) {
-      //     keys.push(e[i].key)
-      //   }
-      //   this.$set(this, 'keys', keys)
-      //   this.$set(this, 'rows', e)
-      //   this.$emit('input', this.keys)
-      // }
+      if (e.length === 0) {
+        this.keys = []
+        this.rows = []
+        this.$emit('input', [])
+        this.$emit('getRows', [])
+        this.$emit('getVal', [])
+      } else {
+        const keys = []
+        for (let i = 0; i < e.length; i++) {
+          keys.push(e[i].key)
+        }
+        this.getKeys(keys)
+        // this.$set(this, 'keys', keys)
+        // this.$set(this, 'rows', e)
+        // this.$emit('getVal', this.keys)
+      }
       // sessionStorage.removeItem(this.curId)
     },
     closeTagFn (e, item) {
@@ -348,8 +349,8 @@ export default {
         tempArray.splice(tempIndex, 1)
       }
       this.rows = deepClonev2(tempArray)
-      const tempIdList = this.rows.map(item => item.id)
-      this.$emit('getVal', tempIdList)
+      // const tempIdList = this.rows.map(item => item.id)
+      this.$emit('getVal', this.rows)
       // debugger
       // const arr = this.rows
       // const keys = []
