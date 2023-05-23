@@ -176,6 +176,7 @@ export default {
     }
   },
   created () {
+    this.rows = []
     this.openModal(true, true)
   },
   methods: {
@@ -225,7 +226,7 @@ export default {
           // debugger
           this.loading = false
           this.treeData = res.data
-          this.rows = []
+          // this.rows = []
           this.getNodeInfo(this.treeData, this.value)
           // this.getNodeInfo(this.treeData, val)
           // this.treeData = this.formatTree(res.data)
@@ -277,7 +278,7 @@ export default {
     },
     // 新的获取组织机构节点信息
     getNodeInfo (list, keyList) {
-      // console.log(list, '循环数据', keyList, '已存在的id数组', this.rows, '已存在的数组')
+      // console.log(list, '原始数据', keyList, '选中的数据')
       const tempArray = deepClonev2(list)
       for (let i = 0; i < tempArray.length; i++) {
         // let tempIndex = keyList.findIndex(info => info === singleItem.id)
@@ -320,22 +321,23 @@ export default {
       return [nodes, ids]
     },
     onChange (e) {
-      if (e.length === 0) {
-        this.keys = []
-        this.rows = []
-        this.$emit('input', [])
-        this.$emit('getRows', [])
-        this.$emit('getVal', [])
-      } else {
-        const keys = []
-        for (let i = 0; i < e.length; i++) {
-          keys.push(e[i].key)
-        }
-        this.$set(this, 'keys', keys)
-        this.$set(this, 'rows', e)
-        this.$emit('input', this.keys)
-      }
-      sessionStorage.removeItem(this.curId)
+      console.log(e, 'eeee')
+      // if (e.length === 0) {
+      //   this.keys = []
+      //   this.rows = []
+      //   this.$emit('input', [])
+      //   this.$emit('getRows', [])
+      //   this.$emit('getVal', [])
+      // } else {
+      //   const keys = []
+      //   for (let i = 0; i < e.length; i++) {
+      //     keys.push(e[i].key)
+      //   }
+      //   this.$set(this, 'keys', keys)
+      //   this.$set(this, 'rows', e)
+      //   this.$emit('input', this.keys)
+      // }
+      // sessionStorage.removeItem(this.curId)
     },
     closeTagFn (e, item) {
       e.preventDefault()
