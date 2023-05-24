@@ -205,6 +205,29 @@ export default {
   computed: {},
   watch: {},
   created () {
+    if (sessionStorage.getItem('momentPage')) {
+      this.pagination.current = Number(sessionStorage.getItem('momentPage'))
+    } else {
+      this.pagination.current = 1
+    }
+    if (sessionStorage.getItem('momentPageSize')) {
+      this.pagination.pageSize = Number(sessionStorage.getItem('momentPageSize'))
+    } else {
+      this.pagination.pageSize = 10
+    }
+    const tempSearchInfo = sessionStorage.getItem('momentSearchData')
+    if (tempSearchInfo) {
+      this.searchObj = JSON.parse(tempSearchInfo)
+    }
+    if (sessionStorage.getItem('momentSort')) {
+      this.tableSortStr = sessionStorage.getItem('momentSort')
+    } else {
+      this.tableSortStr = ''
+    }
+    sessionStorage.removeItem('momentPage')
+    sessionStorage.removeItem('momentSort')
+    sessionStorage.removeItem('momentPageSize')
+    sessionStorage.removeItem('momentSearchData')
     this.getTableList()
   },
   methods: {
@@ -247,7 +270,11 @@ export default {
       this.searchObj.date = values
     },
     editItem (id) {
+      sessionStorage.setItem('momentSearchData', JSON.stringify(this.searchObj))
       this.$router.push(`/clientFollow/momentsOperation/edit?id=${id}`)
+      sessionStorage.setItem('momentPage', this.pagination.current)
+      sessionStorage.setItem('momentPageSize', this.pagination.pageSize)
+      sessionStorage.setItem('momentSort', this.tableSortStr)
     },
     handleTableChange ({ current, pageSize }, _, { columnKey, order }) {
       let str = ''

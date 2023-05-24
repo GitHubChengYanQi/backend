@@ -686,10 +686,15 @@ export default {
         console.log(res)
         if (i != 0) {
           this.roleName = res.data.roleName
-          this.dataPermission = res.data.dataPermission ? res.data.dataPermission.toString() : '1'
+          if (res.data.dataPermission !== undefined) {
+            this.dataPermission = res.data.dataPermission.toString()
+          } else {
+            this.dataPermission = '1'
+          }
+          // this.dataPermission = res.data.dataPermission ? res.data.dataPermission.toString() : '1'
           let newData = this.treeData
           newData = newData.map((item) => {
-            item.children = res.data.roleMenu.slice(0, 2).map((items) => {
+            item.children = res.data.roleMenu.slice(0, 3).map((items) => {
               items.selectable = !(items.level == 1)
               this.propsKey = [...this.propsKey, items.id]
               if (items.checked == 2) {
@@ -736,7 +741,7 @@ export default {
           console.log(newData)
           this.treeData = newData
           const data = []
-          res.data.roleMenu.slice(2, 3).map((item) => {
+          res.data.roleMenu.slice(3, 4).map((item) => {
             item.children.map((items) => {
               if (items.checked == 2) {
                 this.siderKey = [...this.siderKey, items.id]

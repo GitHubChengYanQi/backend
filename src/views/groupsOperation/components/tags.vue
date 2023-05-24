@@ -1,6 +1,12 @@
 <template>
   <div class="groupTag_page">
     <div class="groupTag_left_box">
+      <a-input-search
+        v-model="searchStr"
+        @change="onSearch"
+        style="margin-bottom: 8px"
+        placeholder="请输入分组名称"
+      />
       <a-tree
         v-if="groupData.length"
         :treeData="groupData"
@@ -15,7 +21,10 @@
             <span
               class="tree-view-left"
               v-html="
-                item.title
+                item.title.replace(
+                  new RegExp(searchValue, 'g'),
+                  '<span style=color:#f50>' + searchValue + '</span>'
+                )
               "></span>
             <span class="tree-view-right" v-if="selectKey.includes(item.key)">
             </span>
@@ -59,6 +68,8 @@ export default {
   },
   data () {
     return {
+      searchStr: '',
+      searchValue: '',
       expandedKeys: [],
       backupsExpandedKeys: [],
       groupData: [],
@@ -78,6 +89,30 @@ export default {
     document.removeEventListener('click', this.setselectdiv)
   },
   methods: {
+    onSearch () {
+      this.searchValue = this.searchStr
+      console.log(this.searchValue)
+      if (this.searchValue === '') {
+        this.expandedKeys = []
+      } else {
+        this.expandedKeys = []
+        this.backupsExpandedKeys = []
+        const candidateKeysList = this.getkeyList(this.searchValue, this.groupData, [])
+        candidateKeysList.forEach((item) => {
+          const key = this.getParentKey(item, this.groupData)
+          // eslint-disable-next-line no-shadow
+          if (key && !this.backupsExpandedKeys.some((item) => item === key)) {
+            this.backupsExpandedKeys.push(key)
+          }
+        })
+        const { length } = this.backupsExpandedKeys
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < length; i++) {
+          this.getAllParentKey(this.backupsExpandedKeys[i], this.groupData)
+        }
+        this.expandedKeys = this.backupsExpandedKeys.slice()
+      }
+    },
     handleSelect (item) {
       const findIdx = this.groupTagsSelectList.findIndex(it => it.id === item.id)
       const oldD = deepClonev2(this.groupTagsSelectList)

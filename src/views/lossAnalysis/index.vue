@@ -349,8 +349,11 @@
 </template>
 
 <script>
+import 'echarts/lib/component/toolbox'
+import moment from 'moment'
 import { wastageContactLine, wastageContactCake, wastageContactCalc, wastageContactCome } from '@/api/lossAnalysis.js'
 import { callDownLoadByBlob } from '@/utils/downloadUtil'
+import { deepClonev2 } from '@/utils/util'
 
 export default {
   data () {
@@ -460,12 +463,24 @@ export default {
         tab: 0,
         options: [
           {
-            dataZoom: {
-              type: 'inside',
-              show: true,
-              start: 0,
-              end: 100
-            },
+            dataZoom: [
+              {
+                type: 'inside',
+                filterMode: 'none',
+                xAxisIndex: [0],
+                show: true,
+                start: 0,
+                end: 100,
+                minValueSpan: 3600 * 1000 * 24 * 4,
+                maxValueSpan: 3600 * 1000 * 24 * 30
+              },
+              {
+                type: 'inside',
+                filterMode: 'none',
+                yAxisIndex: [0],
+                show: true
+              }
+            ],
             tooltip: {
               trigger: 'axis',
               axisPointer: {
@@ -478,6 +493,32 @@ export default {
               borderWidth: 1,
               textStyle: {
                 color: '#444444' // 设置文字颜色
+              }
+            },
+            toolbox: {
+              show: true, // 是否显示工具栏组件
+              orient: 'vertical', // 工具栏icon的布局朝向
+              itemSize: 18, // 工具栏icon的大小
+              itemGap: 20, // item之间的间距
+              top: 60,
+              right: 20, // toolbox的定位位置
+              feature: {
+                dataView: { // 数据视图
+                  show: false
+                },
+                restore: { // 重置
+                  show: true
+                },
+                dataZoom: { // 数据缩放视图
+                  show: true
+                },
+                saveAsImage: {// 保存图片
+                  show: true,
+                  name: '流失统计图'
+                },
+                magicType: {// 动态类型切换
+                  show: false
+                }
               }
             },
             legend: {
@@ -493,21 +534,39 @@ export default {
               width: 'auto'
             },
             xAxis: {
-              type: 'category',
+              type: 'time',
               boundaryGap: false,
               data: [],
               axisLabel: {
-                interval: 'auto',
-                rotate: 0,
-                margin: 20,
-                textStyle: {
-                  color: '#868B98'
-                }
+                hideOverlap: true
+                // formatter: {
+                //   year: '{MM}-{dd}',
+                //   month: '{MM}-{dd}',
+                //   day: '{MM}-{dd}',
+                //   hour: '{HH}:{mm}',
+                //   minute: '{HH}:{mm}',
+                //   second: '{HH}:{mm}',
+                //   millisecond: '{HH}:{mm}'
+                // }
+                // formatter: function (v) {
+                //   return moment(v).format('YYYY-MM-DD')
+                // }
               },
+              // axisLabel: {
+              //   interval: 'auto',
+              //   rotate: 0,
+              //   margin: 20,
+              //   textStyle: {
+              //     color: '#868B98'
+              //   }
+              // },
               axisLine: {
-                show: false
+                show: true
               },
               axisTick: {
+                show: true
+              },
+              splitLine: {
                 show: false
               }
             },
@@ -525,7 +584,7 @@ export default {
                 }
               },
               axisLine: {
-                show: false
+                show: true
               },
               axisTick: {
                 show: false
@@ -633,21 +692,31 @@ export default {
               width: 'auto'
             },
             xAxis: {
-              type: 'category',
+              type: 'time',
               boundaryGap: false,
               data: [],
               axisLabel: {
-                interval: 'auto',
-                rotate: 0,
-                margin: 20,
-                textStyle: {
-                  color: '#868B98'
+                hideOverlap: true,
+                // formatter: {
+                //   year: '{MM}-{dd}',
+                //   month: '{MM}-{dd}',
+                //   day: '{MM}-{dd}',
+                //   hour: '{HH}:{mm}',
+                //   minute: '{HH}:{mm}',
+                //   second: '{HH}:{mm}',
+                //   millisecond: '{HH}:{mm}'
+                // }
+                formatter: function (v) {
+                  return moment(v).format('YYYY-MM-DD')
                 }
               },
               axisLine: {
-                show: false
+                show: true
               },
               axisTick: {
+                show: true
+              },
+              splitLine: {
                 show: false
               }
             },
@@ -665,7 +734,7 @@ export default {
                 }
               },
               axisLine: {
-                show: false
+                show: true
               },
               axisTick: {
                 show: false
@@ -1186,7 +1255,7 @@ export default {
       const { tableData } = this.search
       const searchKey = {
         infoEmployeeCount: 'info_employee_count',
-        infoContactCount: 'info_contact_coun',
+        infoContactCount: 'info_contact_count',
         contactLoseCount: 'contact_lose_count',
         fellowLoseCount: 'fellow_lose_count',
         deleteClientCount: 'delete_client_count',
@@ -1267,19 +1336,49 @@ export default {
       if (this.lineChart.tab != 0) {
         obj.tradeStatusStr = '是'
       }
-      // console.log(obj)
+      console.log(obj, obj.loseOccur)
       wastageContactLine(obj).then((res) => {
         // console.log(res)
-        this.state.lineChartState = res.data.xData.length > 0
-        this.lineChart.options[this.lineChart.tab].xAxis.data = res.data.xData
+        this.state.lineChartState = res.data.accumulated.length !== 0 || res.data.contactDelEmp.length !== 0 || res.data.empDelContact.length !== 0 || res.data.extends.length !== 0
+        // this.lineChart.options[this.lineChart.tab].xAxis.min = res.data.xData[0]
+        // this.lineChart.options[this.lineChart.tab].xAxis.max = res.data.xData[res.data.xData.length - 1]
+        // const currentInfo = deepClonev2(res.data)
+        // for (let singleKey in currentInfo) {
+        //   currentInfo[singleKey].map(item => item.lossTime)
+        // }
         this.lineChart.options[this.lineChart.tab].series = this.lineChart.options[this.lineChart.tab].series.map(
           (item, index) => {
-            item.data = res.data.yData[index]
+            if (item.name === '员工删除客户') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.empDelContact))
+            } else if (item.name === '客户删除员工') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.contactDelEmp))
+            } else if (item.name === '离职继承失败') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.extends))
+            } else if (item.name === '累计流失会员人数') {
+              item.data = this.commonDataMethod(deepClonev2(res.data.accumulated))
+            }
+            // const tempArray = res.data[index].map((yItem, yIndex) => {
+            //   const tempInfo = []
+            //   tempInfo[0] = res.data.xData[yIndex]
+            //   tempInfo[1] = yItem
+            //   return tempInfo
+            // })
+            // item.data = tempArray
             return item
           }
         )
-        this.lineChart.options[this.lineChart.tab].yAxis.name = '累计：' + res.data.total + '人'
+        console.log(this.lineChart.options[this.lineChart.tab], '处理后的echarts数据')
+        this.lineChart.options[this.lineChart.tab].yAxis.name = '累计：' + res.data.totalNum + '人'
       })
+    },
+    commonDataMethod (array) {
+      const tempArray = array.map(item => {
+        const singleArray = []
+        singleArray[0] = item.lossTime
+        singleArray[1] = item.num
+        return singleArray
+      })
+      return tempArray
     },
     setSearchData (e) {
       const data = this.search[e]
@@ -1301,7 +1400,11 @@ export default {
             return item.format('YYYY-MM-DD')
           })
         } else if (idKey.includes(key) && searchData[key].length > 0) {
-          newSearch[key] = searchData[key].join(',')
+          if (typeof (searchData[key][0]) !== 'object') {
+            newSearch[key] = searchData[key].join(',')
+          } else {
+            newSearch[key] = searchData[key].map(item => item.value).join(',')
+          }
         }
       }
       return newSearch

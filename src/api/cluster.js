@@ -86,7 +86,8 @@ export function getExecuteRecordSopListMethod (params) {
   return request({
     url: '/sopCluster/getExecutionLog',
     method: 'get',
-    params
+    params,
+    timeout: '180000'
   })
 }
 // 删除执行记录群SOP
@@ -169,7 +170,8 @@ export function getExecutingCalendarListMethod (params) {
   return request({
     url: '/sopClusterCalendar/getExecutionClusterCalendar',
     method: 'get',
-    params
+    params,
+    timeout: '180000'
   })
 }
 // 删除执行中的群日历
@@ -186,7 +188,8 @@ export function getExecuteRecordCalendarListMethod (params) {
   return request({
     url: '/sopClusterCalendar/getExecutionLog',
     method: 'get',
-    params
+    params,
+    timeout: '180000'
   })
 }
 // 删除执行记录群日历

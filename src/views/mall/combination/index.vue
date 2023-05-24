@@ -33,6 +33,16 @@ export default {
       ]
     }
   },
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/mall/combination/edit') {
+    } else {
+      sessionStorage.removeItem('combinPage')
+      sessionStorage.removeItem('combinSearchData')
+      sessionStorage.removeItem('combinPageSize')
+    }
+    next()
+  },
   created () {},
   methods: {}
 }

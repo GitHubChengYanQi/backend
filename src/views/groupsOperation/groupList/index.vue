@@ -331,7 +331,44 @@ export default {
   computed: {},
   watch: {
   },
+  // 路由守卫离开路由之前
+  beforeRouteLeave (to, from, next) {
+    console.log(from, '从哪里来', to, '跳到哪里')
+    if (to.path === '/groupsOperation/groupList/groupItemDetail') {
+      sessionStorage.setItem('groupPage', this.pagination.current)
+      sessionStorage.setItem('groupPageSize', this.pagination.pageSize)
+      sessionStorage.setItem('groupSearchData', JSON.stringify(this.searchObj))
+      sessionStorage.setItem('groupSort', this.tableSortStr)
+    } else {
+      sessionStorage.removeItem('groupPage')
+      sessionStorage.removeItem('groupPageSize')
+      sessionStorage.removeItem('groupSearchData')
+      sessionStorage.removeItem('groupSort')
+    }
+    next()
+  },
   created () {
+    if (sessionStorage.getItem('groupPage')) {
+      this.pagination.current = Number(sessionStorage.getItem('groupPage'))
+    } else {
+      this.pagination.current = 1
+    }
+    if (sessionStorage.getItem('groupPageSize')) {
+      this.pagination.pageSize = Number(sessionStorage.getItem('groupPageSize'))
+    } else {
+      this.pagination.groupPageSize = 10
+    }
+    const tempSearchInfo = sessionStorage.getItem('groupSearchData')
+    if (tempSearchInfo) {
+      this.searchObj = JSON.parse(tempSearchInfo)
+    }
+    if (sessionStorage.getItem('groupSort')) {
+      this.tableSortStr = sessionStorage.getItem('groupSort')
+    }
+    sessionStorage.removeItem('groupPage')
+    sessionStorage.removeItem('groupSearchData')
+    sessionStorage.removeItem('groupPageSize')
+    sessionStorage.removeItem('groupSort')
     this.getTableList()
   },
   methods: {

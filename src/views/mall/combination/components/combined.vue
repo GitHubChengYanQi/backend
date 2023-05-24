@@ -211,6 +211,23 @@ export default {
     }
   },
   created () {
+    if (sessionStorage.getItem('combinPage')) {
+      this.pagination.current = Number(sessionStorage.getItem('combinPage'))
+    } else {
+      this.pagination.current = 1
+    }
+    if (sessionStorage.getItem('combinPageSize')) {
+      this.pagination.pageSize = Number(sessionStorage.getItem('combinPageSize'))
+    } else {
+      this.pagination.pageSize = 10
+    }
+    const tempSearchInfo = sessionStorage.getItem('combinSearchData')
+    if (tempSearchInfo) {
+      this.screenData = JSON.parse(tempSearchInfo)
+    }
+    sessionStorage.removeItem('combinPage')
+    sessionStorage.removeItem('combinPageSize')
+    sessionStorage.removeItem('combinSearchData')
     this.initFn()
   },
   methods: {
@@ -324,6 +341,9 @@ export default {
     detailFn (type, record) {
       // 点击编辑后需要携带联合用药id跳转到编辑页面进行回显
       if (type === 'EDIT') {
+        sessionStorage.setItem('combinPage', this.pagination.current)
+        sessionStorage.setItem('combinPageSize', this.pagination.pageSize)
+        sessionStorage.setItem('combinSearchData', JSON.stringify(this.screenData))
         this.$router.push({
           path: '/mall/combination/edit',
           query: {

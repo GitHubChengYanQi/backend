@@ -199,13 +199,19 @@
                 <div class="hint" v-if="item.hint">{{ item.hint }}</div>
               </span>
               <span class="quillEditor_box" v-else-if="item.type == 'quillEditor'">
-                <quill-editor
+                <WangEditor
+                  ref="editor"
+                  @editorChange="editorChange"
+                  v-model="setData.inputData[item.key]"
+                  @editorInfo="setMedium">
+                </WangEditor>
+                <!-- <quill-editor
                   class="quillEditor"
                   @editorChange="editorChange"
                   @setMedium="setMedium"
                   :value="setData.inputData[item.key]"
                   ref="editor"
-                />
+                /> -->
                 <a-button
                   type="primary"
                   class="button"
@@ -550,18 +556,20 @@
 </template>
 
 <script>
-import QuillEditor from './components/QuillEditor'
+import WangEditor from '@/components/WangEditor/index.vue'
+// import QuillEditor from './components/QuillEditor'
 import { upLoad, mediaGetToken, ossUpload } from '@/api/common'
 import { materialLibraryList, mediumGroup } from '@/api/mediumGroup'
 import LabelSelect from './components/LabelSelect'
 import SvgIcon from './components/SvgIcon.vue'
-import { scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad, scrmRadarArticleGrab } from '@/api/setRadar.js'
+import { getPdfMediaMethod, scrmRadarArticleSave, scrmRadarLabelFind, scrmRadarArticleLoad, scrmRadarArticleGrab } from '@/api/setRadar.js'
 import axios from 'axios'
 
 export default {
-  components: { 'quill-editor': QuillEditor, 'label-select': LabelSelect, 'svg-icon': SvgIcon },
+  components: { 'label-select': LabelSelect, 'svg-icon': SvgIcon, WangEditor },
   data () {
     return {
+      insertFn: {},
       // 素材分组id
       materialGroupId: null,
       // 素材分组数据
@@ -724,7 +732,7 @@ export default {
           { code: '2', name: '新建' }
         ],
         videoType: [
-          { code: '0', name: '横板' },
+          { code: '0', name: '横版' },
           { code: '1', name: '竖版' }
         ],
         bgImgType: [
@@ -965,7 +973,7 @@ export default {
         getCheckboxProps: (record) => ({
           props: {
             // 全部默认禁止选中
-            disabled: record.type == '文件' ? record.content.fileName.split('.')[1] != 'pdf' : false
+            disabled: record.type == '文件' ? record.content.fileName.split('.')[record.content.fileName.split('.').length - 1] != 'pdf' : false
           }
         })
       }
@@ -1385,6 +1393,7 @@ export default {
     setModelTab (e) {
       this.modelTab = e
       if (e == 1) {
+        // 选择素材库
         this.getMedium()
       } else {
         this.radio = {
@@ -1401,6 +1410,7 @@ export default {
       const reg = type == 0 ? new RegExp(str) : new RegExp(wxStr)
       return reg.test(val)
     },
+    // 点击弹框确定按钮
     setCatalog () {
       const { id, content } = this.radio
       if (this.modelTab == 0) {
@@ -1408,7 +1418,8 @@ export default {
           if (!this.isEditor) {
             this.setData.inputData[this.selectKey] = this.uploadUrl
           } else {
-            this.$refs.editor[0].getEditorData('image', this.uploadUrl)
+            // this.$refs.editor[0].getEditorData('image', this.uploadUrl)
+            this.$refs.editor[0].chooseImage(this.insertFn, this.uploadUrl)
           }
           this.uploadUrl = ''
         } else if (this.medium.type == 5) {
@@ -1419,7 +1430,10 @@ export default {
               this.source.cancel()
               this.source = null
             }
-            if (this.uploadUrl.length > 0) { this.$refs.editor[0].getEditorData('video', this.uploadUrl) }
+            if (this.uploadUrl.length > 0) {
+              // this.$refs.editor[0].getEditorData('video', this.uploadUrl)
+              this.$refs.editor[0].chooseVideo(this.insertFn, this.uploadUrl)
+            }
           }
         } else {
           this.setData.inputData.radarPDF = this.uploadUrl
@@ -1437,7 +1451,8 @@ export default {
             }
             this.modelTab = 0
           } else {
-            this.$refs.editor[0].getEditorData('image', content.imageFullPath)
+            // this.$refs.editor[0].getEditorData('image', content.imageFullPath)
+            this.$refs.editor[0].chooseImage(this.insertFn, content.imageFullPath)
           }
         } else if (this.medium.type == 3) {
           this.setData.inputData.linkImg = content.imageFullPath
@@ -1450,7 +1465,8 @@ export default {
           if (this.setData.inputData.shape == 5) {
             this.setData.inputData.uploadVideo[this.selectIndex].video = content.videoFullPath
           } else {
-            this.$refs.editor[0].getEditorData('video', content.videoFullPath)
+            // this.$refs.editor[0].getEditorData('video', content.videoFullPath)
+            this.$refs.editor[0].chooseVideo(this.insertFn, content.videoFullPath)
           }
         } else {
           this.setData.inputData.radarPDF = content.fileFullPath
@@ -1470,6 +1486,7 @@ export default {
       this.selectKey = 'linkImg'
       this.modalState = false
     },
+    // 监听富文本改变
     editorChange (html) {
       // console.log(html)
       this.setData.inputData.content = html
@@ -1519,18 +1536,33 @@ export default {
         searchStr: this.modelSearch,
         mediumGroupId: this.materialGroupId === null ? '' : this.materialGroupId
       }
-      materialLibraryList(obj).then((res) => {
-        const { page, list } = res.data
-        console.log(res)
-        this.medium.pagination.total = page.total
-        this.medium.data = list.map((item) => {
-          item.title = item.content.title
-          return item
+      if (this.modalTitle === '上传PDF') {
+        console.log('选择pdf')
+        this.medium.pagination.total = 0
+        this.medium.data = []
+        getPdfMediaMethod(obj).then((res) => {
+          const { page, list } = res.data
+          console.log(res)
+          this.medium.pagination.total = page.total
+          this.medium.data = list.map((item) => {
+            item.title = item.content.title
+            return item
+          })
         })
-      })
+      } else {
+        materialLibraryList(obj).then((res) => {
+          const { page, list } = res.data
+          console.log(res)
+          this.medium.pagination.total = page.total
+          this.medium.data = list.map((item) => {
+            item.title = item.content.title
+            return item
+          })
+        })
+      }
     },
-    // 设置
-    setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0) {
+    // 点击出现弹框
+    setMedium (e, isEditor = false, selectKey = 'linkImg', selectIndex = 0, insertInfo) {
       this.isEditor = isEditor
       this.isUpload = false
       const title = {
@@ -1546,6 +1578,9 @@ export default {
         7: {
           title: '上传PDF'
         }
+      }
+      if (insertInfo) {
+        this.insertFn = insertInfo.insertFn
       }
       console.log(this.setData)
       this.selectKey = selectKey
@@ -2266,6 +2301,14 @@ export default {
     width: 350px;
     height: 700px;
     overflow: auto;
+  }
+  /deep/.ql-editor {
+    img {
+      max-width: 100%;
+    }
+    video {
+      max-width: 100%;
+    }
   }
   .over_box {
     position: absolute;

@@ -141,6 +141,23 @@ export default {
     } else {
       this.$set(this.pagination, 'current', 1)
     }
+    const tempPageSize = sessionStorage.getItem('sopTemplatePageSize')
+    if (tempPageSize) {
+      this.$set(this.pagination, 'pageSize', Number(tempPageSize))
+    } else {
+      this.$set(this.pagination, 'pageSize', 10)
+    }
+    const tempSearchInfo = sessionStorage.getItem('clusterSopSearchData')
+    if (tempSearchInfo) {
+      this.searchInfo = JSON.parse(tempSearchInfo)
+    }
+    if (sessionStorage.getItem('clusterSopSort')) {
+      this.sorter = sessionStorage.getItem('clusterSopSort')
+    }
+    sessionStorage.removeItem('sopTemplatePage')
+    sessionStorage.removeItem('clusterSopSort')
+    sessionStorage.removeItem('sopTemplatePageSize')
+    sessionStorage.removeItem('clusterSopSearchData')
     this.getTableData()
   },
   methods: {
@@ -248,6 +265,7 @@ export default {
     copyItem (info) {
       // 将页码缓存移除
       sessionStorage.removeItem('sopTemplatePage')
+      // sessionStorage.setItem('clusterSopSearchData', JSON.stringify(this.searchInfo))
       this.$router.push({
         path: '/sop/addClusterSop',
         query: {
@@ -285,6 +303,9 @@ export default {
     editItem (info) {
       // 将当前的页码存入缓存中
       sessionStorage.setItem('sopTemplatePage', this.pagination.current)
+      sessionStorage.setItem('sopTemplatePageSize', this.pagination.pageSize)
+      sessionStorage.setItem('clusterSopSearchData', JSON.stringify(this.searchInfo))
+      sessionStorage.setItem('clusterSopSort', this.sorter)
       this.$router.push({
         path: '/sop/editClusterSop',
         query: {

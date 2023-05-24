@@ -105,6 +105,9 @@
         <div slot="pztOrgName" slot-scope="text">
           {{ returnTableText(text) }}
         </div>
+        <div slot="erpOrgName" slot-scope="text">
+          {{ returnTableText(text) }}
+        </div>
         <div slot="pztOrgExpoSite" slot-scope="text">
           {{ returnTableText(text) }}
         </div>
@@ -196,6 +199,13 @@ export default {
           dataIndex: 'pztOrgName',
           align: 'center',
           scopedSlots: { customRender: 'pztOrgName' },
+          width: 200
+        },
+        {
+          title: '门店编码',
+          dataIndex: 'erpOrgName',
+          align: 'center',
+          scopedSlots: { customRender: 'erpOrgName' },
           width: 200
         },
         {
