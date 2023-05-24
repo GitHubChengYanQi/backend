@@ -1255,7 +1255,7 @@ export default {
       const { tableData } = this.search
       const searchKey = {
         infoEmployeeCount: 'info_employee_count',
-        infoContactCount: 'info_contact_coun',
+        infoContactCount: 'info_contact_count',
         contactLoseCount: 'contact_lose_count',
         fellowLoseCount: 'fellow_lose_count',
         deleteClientCount: 'delete_client_count',
