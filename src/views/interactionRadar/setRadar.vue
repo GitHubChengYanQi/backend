@@ -732,7 +732,7 @@ export default {
           { code: '2', name: '新建' }
         ],
         videoType: [
-          { code: '0', name: '横板' },
+          { code: '0', name: '横版' },
           { code: '1', name: '竖版' }
         ],
         bgImgType: [
